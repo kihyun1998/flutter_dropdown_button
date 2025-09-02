@@ -118,7 +118,7 @@ class CustomDropdown<T> extends StatefulWidget {
   /// When [width] is null, the dropdown will size itself based on content
   /// but will not exceed this maximum width. If content is longer,
   /// it will be ellipsized or wrapped depending on the child widget.
-  /// 
+  ///
   /// If null, no maximum width constraint is applied.
   final double? maxWidth;
 
@@ -127,7 +127,7 @@ class CustomDropdown<T> extends StatefulWidget {
   /// When [width] is null, the dropdown will size itself based on content
   /// but will be at least this wide. Useful for ensuring consistent
   /// minimum button size regardless of content length.
-  /// 
+  ///
   /// Defaults to null (no minimum width constraint).
   final double? minWidth;
 
@@ -143,51 +143,43 @@ class _CustomDropdownState<T> extends State<CustomDropdown<T>>
     with SingleTickerProviderStateMixin {
   /// Global key to access the dropdown button's render object for positioning.
   final GlobalKey _buttonKey = GlobalKey();
-  
+
   /// The overlay entry that contains the dropdown options when open.
   OverlayEntry? _overlayEntry;
-  
+
   /// Whether the dropdown is currently open.
   bool _isOpen = false;
-  
+
   /// Controls the dropdown show/hide animations.
   late AnimationController _animationController;
-  
+
   /// Animation for the dropdown scale effect (grows from 0.8 to 1.0).
   late Animation<double> _scaleAnimation;
-  
+
   /// Animation for the dropdown opacity (fades from 0.0 to 1.0).
   late Animation<double> _opacityAnimation;
 
   @override
   void initState() {
     super.initState();
-    
+
     // Initialize the animation controller with the specified duration
     _animationController = AnimationController(
       duration: widget.animationDuration,
       vsync: this,
     );
-    
+
     // Create a scale animation that starts at 0.8 and grows to 1.0
     // Uses easeOutBack curve for a slight bounce effect
-    _scaleAnimation = Tween<double>(
-      begin: 0.8,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeOutBack,
-    ));
+    _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeOutBack),
+    );
 
     // Create an opacity animation that fades from 0.0 to 1.0
     // Uses easeOut curve for smooth fade-in effect
-    _opacityAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeOut,
-    ));
+    _opacityAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeOut),
+    );
   }
 
   @override
@@ -208,14 +200,15 @@ class _CustomDropdownState<T> extends State<CustomDropdown<T>>
   }
 
   /// Opens the dropdown by creating and inserting an overlay entry.
-  /// 
+  ///
   /// Calculates the position based on the dropdown button's location
   /// and starts the opening animation.
   void _openDropdown() {
     if (_isOpen) return;
 
     // Get the dropdown button's position and size for overlay positioning
-    final renderBox = _buttonKey.currentContext!.findRenderObject() as RenderBox;
+    final renderBox =
+        _buttonKey.currentContext!.findRenderObject() as RenderBox;
     final size = renderBox.size;
     final offset = renderBox.localToGlobal(Offset.zero);
 
@@ -228,7 +221,7 @@ class _CustomDropdownState<T> extends State<CustomDropdown<T>>
   }
 
   /// Closes the dropdown by reversing the animation and removing the overlay.
-  /// 
+  ///
   /// The overlay entry is removed after the animation completes to ensure
   /// smooth visual transition.
   void _closeDropdown() {
@@ -242,13 +235,13 @@ class _CustomDropdownState<T> extends State<CustomDropdown<T>>
   }
 
   /// Creates the overlay entry that contains the dropdown options.
-  /// 
+  ///
   /// The overlay is positioned below the dropdown button and includes:
   /// - A full-screen gesture detector to handle outside taps
   /// - Animated appearance with scale and opacity effects
   /// - Scrollable list of dropdown items
   /// - Theme-appropriate styling and colors
-  /// 
+  ///
   /// [offset] is the global position of the dropdown button
   /// [size] is the size of the dropdown button for positioning
   OverlayEntry _createOverlayEntry(Offset offset, Size size) {
@@ -274,21 +267,27 @@ class _CustomDropdownState<T> extends State<CustomDropdown<T>>
                         opacity: _opacityAnimation.value,
                         child: Material(
                           elevation: 8,
-                          borderRadius: BorderRadius.circular(widget.borderRadius),
+                          borderRadius: BorderRadius.circular(
+                            widget.borderRadius,
+                          ),
                           child: Container(
                             constraints: BoxConstraints(
                               maxHeight: widget.height,
                               minWidth: widget.minWidth ?? 0,
                               maxWidth: widget.maxWidth ?? double.infinity,
                             ),
-                            decoration: widget.decoration ?? BoxDecoration(
-                              color: Theme.of(context).cardColor,
-                              borderRadius: BorderRadius.circular(widget.borderRadius),
-                              border: Border.all(
-                                color: Theme.of(context).dividerColor,
-                                width: 1,
-                              ),
-                            ),
+                            decoration:
+                                widget.decoration ??
+                                BoxDecoration(
+                                  color: Theme.of(context).cardColor,
+                                  borderRadius: BorderRadius.circular(
+                                    widget.borderRadius,
+                                  ),
+                                  border: Border.all(
+                                    color: Theme.of(context).dividerColor,
+                                    width: 1,
+                                  ),
+                                ),
                             child: SingleChildScrollView(
                               child: Column(
                                 mainAxisSize: MainAxisSize.min,
@@ -296,8 +295,9 @@ class _CustomDropdownState<T> extends State<CustomDropdown<T>>
                                   final isSelected = widget.value == item.value;
                                   final itemIndex = widget.items.indexOf(item);
                                   final isFirst = itemIndex == 0;
-                                  final isLast = itemIndex == widget.items.length - 1;
-                                  
+                                  final isLast =
+                                      itemIndex == widget.items.length - 1;
+
                                   return GestureDetector(
                                     onTap: () {
                                       // Call both callbacks and close dropdown
@@ -315,20 +315,30 @@ class _CustomDropdownState<T> extends State<CustomDropdown<T>>
                                       decoration: BoxDecoration(
                                         // Highlight selected item with primary color
                                         color: isSelected
-                                            ? Theme.of(context).primaryColor.withOpacity(0.1)
+                                            ? Theme.of(
+                                                context,
+                                              ).primaryColor.withOpacity(0.1)
                                             : Colors.transparent,
                                         // Apply border radius only to first and last items
                                         borderRadius: isFirst
                                             ? BorderRadius.only(
-                                                topLeft: Radius.circular(widget.borderRadius),
-                                                topRight: Radius.circular(widget.borderRadius),
+                                                topLeft: Radius.circular(
+                                                  widget.borderRadius,
+                                                ),
+                                                topRight: Radius.circular(
+                                                  widget.borderRadius,
+                                                ),
                                               )
                                             : isLast
-                                                ? BorderRadius.only(
-                                                    bottomLeft: Radius.circular(widget.borderRadius),
-                                                    bottomRight: Radius.circular(widget.borderRadius),
-                                                  )
-                                                : null,
+                                            ? BorderRadius.only(
+                                                bottomLeft: Radius.circular(
+                                                  widget.borderRadius,
+                                                ),
+                                                bottomRight: Radius.circular(
+                                                  widget.borderRadius,
+                                                ),
+                                              )
+                                            : null,
                                       ),
                                       child: Align(
                                         alignment: Alignment.centerLeft,
@@ -356,7 +366,9 @@ class _CustomDropdownState<T> extends State<CustomDropdown<T>>
   @override
   Widget build(BuildContext context) {
     // Find the currently selected item to display
-    final selectedItem = widget.items.where((item) => item.value == widget.value).firstOrNull;
+    final selectedItem = widget.items
+        .where((item) => item.value == widget.value)
+        .firstOrNull;
 
     Widget dropdownButton = GestureDetector(
       key: _buttonKey,
@@ -370,11 +382,14 @@ class _CustomDropdownState<T> extends State<CustomDropdown<T>>
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          mainAxisSize: widget.width != null ? MainAxisSize.max : MainAxisSize.min,
+          mainAxisSize: widget.width != null
+              ? MainAxisSize.max
+              : MainAxisSize.min,
           children: [
             // Show selected item, hint, or nothing
             Flexible(
-              child: selectedItem?.child ?? widget.hint ?? const SizedBox.shrink(),
+              child:
+                  selectedItem?.child ?? widget.hint ?? const SizedBox.shrink(),
             ),
             const SizedBox(width: 8),
             // Arrow icon that rotates based on open/closed state
@@ -388,7 +403,8 @@ class _CustomDropdownState<T> extends State<CustomDropdown<T>>
     );
 
     // Apply width constraints if specified
-    if (widget.width == null && (widget.minWidth != null || widget.maxWidth != null)) {
+    if (widget.width == null &&
+        (widget.minWidth != null || widget.maxWidth != null)) {
       dropdownButton = ConstrainedBox(
         constraints: BoxConstraints(
           minWidth: widget.minWidth ?? 0,

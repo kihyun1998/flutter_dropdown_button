@@ -30,7 +30,10 @@ class DropdownTheme {
     this.overlayDecoration,
     this.buttonDecoration,
     this.itemPadding = const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-    this.buttonPadding = const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+    this.buttonPadding = const EdgeInsets.symmetric(
+      horizontal: 16,
+      vertical: 12,
+    ),
   });
 
   /// The duration of the dropdown show/hide animation.

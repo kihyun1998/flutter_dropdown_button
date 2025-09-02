@@ -81,10 +81,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   final List<DropdownItem<int>> numberItems = List.generate(
     10,
-    (index) => DropdownItem(
-      value: index + 1,
-      child: Text('Number ${index + 1}'),
-    ),
+    (index) =>
+        DropdownItem(value: index + 1, child: Text('Number ${index + 1}')),
   );
 
   @override
@@ -140,8 +138,16 @@ class _MyHomePageState extends State<MyHomePage> {
             CustomDropdown<String>(
               items: [
                 const DropdownItem(value: 'short', child: Text('Short')),
-                const DropdownItem(value: 'medium', child: Text('Medium length text')),
-                const DropdownItem(value: 'long', child: Text('This is a very long text that should be constrained by maxWidth')),
+                const DropdownItem(
+                  value: 'medium',
+                  child: Text('Medium length text'),
+                ),
+                const DropdownItem(
+                  value: 'long',
+                  child: Text(
+                    'This is a very long text that should be constrained by maxWidth',
+                  ),
+                ),
               ],
               value: selectedDynamic,
               hint: const Text('Select text length'),
@@ -233,7 +239,12 @@ class _MyHomePageState extends State<MyHomePage> {
               },
             ),
             const SizedBox(height: 32),
-            if (selectedFruit != null || selectedNumber != null || selectedDynamic != null || selectedFixed != null || selectedTextOverflow != null || selectedMultiLine != null)
+            if (selectedFruit != null ||
+                selectedNumber != null ||
+                selectedDynamic != null ||
+                selectedFixed != null ||
+                selectedTextOverflow != null ||
+                selectedMultiLine != null)
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
@@ -247,14 +258,11 @@ class _MyHomePageState extends State<MyHomePage> {
                       'Selected values:',
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
-                    if (selectedFruit != null)
-                      Text('Fruit: $selectedFruit'),
-                    if (selectedNumber != null)
-                      Text('Number: $selectedNumber'),
+                    if (selectedFruit != null) Text('Fruit: $selectedFruit'),
+                    if (selectedNumber != null) Text('Number: $selectedNumber'),
                     if (selectedDynamic != null)
                       Text('Dynamic: $selectedDynamic'),
-                    if (selectedFixed != null)
-                      Text('Fixed: $selectedFixed'),
+                    if (selectedFixed != null) Text('Fixed: $selectedFixed'),
                     if (selectedTextOverflow != null)
                       Text('Text Overflow: $selectedTextOverflow'),
                     if (selectedMultiLine != null)

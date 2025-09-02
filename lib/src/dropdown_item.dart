@@ -25,11 +25,7 @@ class DropdownItem<T> {
   /// The [value] and [child] parameters are required.
   /// The [onTap] callback is optional and will be called when the item is selected,
   /// in addition to the dropdown's [CustomDropdown.onChanged] callback.
-  const DropdownItem({
-    required this.value,
-    required this.child,
-    this.onTap,
-  });
+  const DropdownItem({required this.value, required this.child, this.onTap});
 
   /// The value associated with this dropdown item.
   ///

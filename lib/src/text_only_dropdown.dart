@@ -132,52 +132,45 @@ class _TextOnlyDropdownState extends State<TextOnlyDropdown>
     with SingleTickerProviderStateMixin {
   /// Global key to access the dropdown button's render object for positioning.
   final GlobalKey _buttonKey = GlobalKey();
-  
+
   /// The overlay entry that contains the dropdown options when open.
   OverlayEntry? _overlayEntry;
-  
+
   /// Whether the dropdown is currently open.
   bool _isOpen = false;
-  
+
   /// Controls the dropdown show/hide animations.
   late AnimationController _animationController;
-  
+
   /// Animation for the dropdown scale effect.
   late Animation<double> _scaleAnimation;
-  
+
   /// Animation for the dropdown opacity.
   late Animation<double> _opacityAnimation;
 
   /// The effective theme, using provided theme or default.
   DropdownTheme get _theme => widget.theme ?? DropdownTheme.defaultTheme;
-  
+
   /// The effective config, using provided config or default.
-  TextDropdownConfig get _config => widget.config ?? TextDropdownConfig.defaultConfig;
+  TextDropdownConfig get _config =>
+      widget.config ?? TextDropdownConfig.defaultConfig;
 
   @override
   void initState() {
     super.initState();
-    
+
     _animationController = AnimationController(
       duration: _theme.animationDuration,
       vsync: this,
     );
-    
-    _scaleAnimation = Tween<double>(
-      begin: 0.8,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeOutBack,
-    ));
 
-    _opacityAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeOut,
-    ));
+    _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeOutBack),
+    );
+
+    _opacityAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeOut),
+    );
   }
 
   @override
@@ -190,7 +183,7 @@ class _TextOnlyDropdownState extends State<TextOnlyDropdown>
   /// Toggles the dropdown between open and closed states.
   void _toggleDropdown() {
     if (!widget.enabled) return;
-    
+
     if (_isOpen) {
       _closeDropdown();
     } else {
@@ -202,7 +195,8 @@ class _TextOnlyDropdownState extends State<TextOnlyDropdown>
   void _openDropdown() {
     if (_isOpen || !widget.enabled) return;
 
-    final renderBox = _buttonKey.currentContext!.findRenderObject() as RenderBox;
+    final renderBox =
+        _buttonKey.currentContext!.findRenderObject() as RenderBox;
     final size = renderBox.size;
     final offset = renderBox.localToGlobal(Offset.zero);
 
@@ -248,21 +242,31 @@ class _TextOnlyDropdownState extends State<TextOnlyDropdown>
                         child: Material(
                           elevation: _theme.elevation,
                           shadowColor: _theme.shadowColor,
-                          borderRadius: BorderRadius.circular(_theme.borderRadius),
+                          borderRadius: BorderRadius.circular(
+                            _theme.borderRadius,
+                          ),
                           child: Container(
                             constraints: BoxConstraints(
                               maxHeight: widget.height,
                               minWidth: widget.minWidth ?? 0,
                               maxWidth: widget.maxWidth ?? double.infinity,
                             ),
-                            decoration: _theme.overlayDecoration ?? BoxDecoration(
-                              color: _theme.backgroundColor ?? Theme.of(context).cardColor,
-                              borderRadius: BorderRadius.circular(_theme.borderRadius),
-                              border: _theme.border ?? Border.all(
-                                color: Theme.of(context).dividerColor,
-                                width: 1,
-                              ),
-                            ),
+                            decoration:
+                                _theme.overlayDecoration ??
+                                BoxDecoration(
+                                  color:
+                                      _theme.backgroundColor ??
+                                      Theme.of(context).cardColor,
+                                  borderRadius: BorderRadius.circular(
+                                    _theme.borderRadius,
+                                  ),
+                                  border:
+                                      _theme.border ??
+                                      Border.all(
+                                        color: Theme.of(context).dividerColor,
+                                        width: 1,
+                                      ),
+                                ),
                             child: SingleChildScrollView(
                               child: Column(
                                 mainAxisSize: MainAxisSize.min,
@@ -270,8 +274,9 @@ class _TextOnlyDropdownState extends State<TextOnlyDropdown>
                                   final isSelected = widget.value == item;
                                   final itemIndex = widget.items.indexOf(item);
                                   final isFirst = itemIndex == 0;
-                                  final isLast = itemIndex == widget.items.length - 1;
-                                  
+                                  final isLast =
+                                      itemIndex == widget.items.length - 1;
+
                                   return GestureDetector(
                                     onTap: () {
                                       widget.onChanged(item);
@@ -283,27 +288,37 @@ class _TextOnlyDropdownState extends State<TextOnlyDropdown>
                                       padding: _theme.itemPadding,
                                       decoration: BoxDecoration(
                                         color: isSelected
-                                            ? _theme.selectedItemColor ?? 
-                                              Theme.of(context).primaryColor.withOpacity(0.1)
+                                            ? _theme.selectedItemColor ??
+                                                  Theme.of(context).primaryColor
+                                                      .withOpacity(0.1)
                                             : Colors.transparent,
                                         borderRadius: isFirst
                                             ? BorderRadius.only(
-                                                topLeft: Radius.circular(_theme.borderRadius),
-                                                topRight: Radius.circular(_theme.borderRadius),
+                                                topLeft: Radius.circular(
+                                                  _theme.borderRadius,
+                                                ),
+                                                topRight: Radius.circular(
+                                                  _theme.borderRadius,
+                                                ),
                                               )
                                             : isLast
-                                                ? BorderRadius.only(
-                                                    bottomLeft: Radius.circular(_theme.borderRadius),
-                                                    bottomRight: Radius.circular(_theme.borderRadius),
-                                                  )
-                                                : null,
+                                            ? BorderRadius.only(
+                                                bottomLeft: Radius.circular(
+                                                  _theme.borderRadius,
+                                                ),
+                                                bottomRight: Radius.circular(
+                                                  _theme.borderRadius,
+                                                ),
+                                              )
+                                            : null,
                                       ),
                                       child: Align(
                                         alignment: Alignment.centerLeft,
                                         child: Text(
                                           item,
-                                          style: isSelected 
-                                              ? _config.selectedTextStyle ?? _config.textStyle
+                                          style: isSelected
+                                              ? _config.selectedTextStyle ??
+                                                    _config.textStyle
                                               : _config.textStyle,
                                           textAlign: _config.textAlign,
                                           maxLines: _config.maxLines,
@@ -311,8 +326,10 @@ class _TextOnlyDropdownState extends State<TextOnlyDropdown>
                                           softWrap: _config.softWrap,
                                           textDirection: _config.textDirection,
                                           locale: _config.locale,
-                                          textScaleFactor: _config.textScaleFactor,
-                                          semanticsLabel: _config.semanticsLabel,
+                                          textScaleFactor:
+                                              _config.textScaleFactor,
+                                          semanticsLabel:
+                                              _config.semanticsLabel,
                                         ),
                                       ),
                                     ),
@@ -346,15 +363,19 @@ class _TextOnlyDropdownState extends State<TextOnlyDropdown>
       child: Container(
         width: widget.width,
         padding: _theme.buttonPadding,
-        decoration: _theme.buttonDecoration ?? BoxDecoration(
-          border: _theme.border ?? Border.all(
-            color: Theme.of(context).dividerColor,
-          ),
-          borderRadius: BorderRadius.circular(_theme.borderRadius),
-        ),
+        decoration:
+            _theme.buttonDecoration ??
+            BoxDecoration(
+              border:
+                  _theme.border ??
+                  Border.all(color: Theme.of(context).dividerColor),
+              borderRadius: BorderRadius.circular(_theme.borderRadius),
+            ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          mainAxisSize: widget.width != null ? MainAxisSize.max : MainAxisSize.min,
+          mainAxisSize: widget.width != null
+              ? MainAxisSize.max
+              : MainAxisSize.min,
           children: [
             Flexible(
               child: Text(
@@ -372,7 +393,7 @@ class _TextOnlyDropdownState extends State<TextOnlyDropdown>
             const SizedBox(width: 8),
             Icon(
               _isOpen ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
-              color: widget.enabled 
+              color: widget.enabled
                   ? Theme.of(context).iconTheme.color
                   : Theme.of(context).disabledColor,
             ),
@@ -388,14 +409,12 @@ class _TextOnlyDropdownState extends State<TextOnlyDropdown>
 
     // Apply opacity for disabled state
     if (!widget.enabled) {
-      dropdownButton = Opacity(
-        opacity: 0.6,
-        child: dropdownButton,
-      );
+      dropdownButton = Opacity(opacity: 0.6, child: dropdownButton);
     }
 
     // Apply width constraints if specified
-    if (widget.width == null && (widget.minWidth != null || widget.maxWidth != null)) {
+    if (widget.width == null &&
+        (widget.minWidth != null || widget.maxWidth != null)) {
       dropdownButton = ConstrainedBox(
         constraints: BoxConstraints(
           minWidth: widget.minWidth ?? 0,
