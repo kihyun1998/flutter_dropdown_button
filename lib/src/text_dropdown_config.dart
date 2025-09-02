@@ -28,7 +28,7 @@ class TextDropdownConfig {
     this.softWrap = true,
     this.textDirection,
     this.locale,
-    this.textScaleFactor,
+    this.textScaler,
     this.semanticsLabel,
   });
 
@@ -89,11 +89,11 @@ class TextDropdownConfig {
   /// If null, uses the ambient [Localizations].
   final Locale? locale;
 
-  /// The font scaling factor for dropdown text.
+  /// The text scaler for dropdown text.
   ///
-  /// Multiplies the text size for accessibility. If null,
-  /// uses the ambient [MediaQuery] text scale factor.
-  final double? textScaleFactor;
+  /// Controls how text is scaled for accessibility. If null,
+  /// uses the ambient [MediaQuery] text scaler.
+  final TextScaler? textScaler;
 
   /// A semantic description of the dropdown for accessibility.
   ///
@@ -112,7 +112,7 @@ class TextDropdownConfig {
     bool? softWrap,
     TextDirection? textDirection,
     Locale? locale,
-    double? textScaleFactor,
+    TextScaler? textScaler,
     String? semanticsLabel,
   }) {
     return TextDropdownConfig(
@@ -125,7 +125,7 @@ class TextDropdownConfig {
       softWrap: softWrap ?? this.softWrap,
       textDirection: textDirection ?? this.textDirection,
       locale: locale ?? this.locale,
-      textScaleFactor: textScaleFactor ?? this.textScaleFactor,
+      textScaler: textScaler ?? this.textScaler,
       semanticsLabel: semanticsLabel ?? this.semanticsLabel,
     );
   }

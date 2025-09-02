@@ -181,7 +181,7 @@ TextDropdownConfig({
 | `softWrap` | `bool` | true | Whether text should wrap |
 | `textDirection` | `TextDirection?` | null | Text direction |
 | `locale` | `Locale?` | null | Locale for text rendering |
-| `textScaleFactor` | `double?` | null | Text scale factor |
+| `textScaler` | `TextScaler?` | null | Text scaler for accessibility |
 | `semanticsLabel` | `String?` | null | Semantic label for accessibility |
 
 ### Predefined Configurations

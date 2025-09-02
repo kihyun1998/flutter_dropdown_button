@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'dropdown_theme.dart';
 import 'text_dropdown_config.dart';
 
@@ -251,17 +252,14 @@ class _TextOnlyDropdownState extends State<TextOnlyDropdown>
                               minWidth: widget.minWidth ?? 0,
                               maxWidth: widget.maxWidth ?? double.infinity,
                             ),
-                            decoration:
-                                _theme.overlayDecoration ??
+                            decoration: _theme.overlayDecoration ??
                                 BoxDecoration(
-                                  color:
-                                      _theme.backgroundColor ??
+                                  color: _theme.backgroundColor ??
                                       Theme.of(context).cardColor,
                                   borderRadius: BorderRadius.circular(
                                     _theme.borderRadius,
                                   ),
-                                  border:
-                                      _theme.border ??
+                                  border: _theme.border ??
                                       Border.all(
                                         color: Theme.of(context).dividerColor,
                                         width: 1,
@@ -289,8 +287,9 @@ class _TextOnlyDropdownState extends State<TextOnlyDropdown>
                                       decoration: BoxDecoration(
                                         color: isSelected
                                             ? _theme.selectedItemColor ??
-                                                  Theme.of(context).primaryColor
-                                                      .withOpacity(0.1)
+                                                Theme.of(context)
+                                                    .primaryColor
+                                                    .withValues(alpha: 0.1)
                                             : Colors.transparent,
                                         borderRadius: isFirst
                                             ? BorderRadius.only(
@@ -302,15 +301,16 @@ class _TextOnlyDropdownState extends State<TextOnlyDropdown>
                                                 ),
                                               )
                                             : isLast
-                                            ? BorderRadius.only(
-                                                bottomLeft: Radius.circular(
-                                                  _theme.borderRadius,
-                                                ),
-                                                bottomRight: Radius.circular(
-                                                  _theme.borderRadius,
-                                                ),
-                                              )
-                                            : null,
+                                                ? BorderRadius.only(
+                                                    bottomLeft: Radius.circular(
+                                                      _theme.borderRadius,
+                                                    ),
+                                                    bottomRight:
+                                                        Radius.circular(
+                                                      _theme.borderRadius,
+                                                    ),
+                                                  )
+                                                : null,
                                       ),
                                       child: Align(
                                         alignment: Alignment.centerLeft,
@@ -318,7 +318,7 @@ class _TextOnlyDropdownState extends State<TextOnlyDropdown>
                                           item,
                                           style: isSelected
                                               ? _config.selectedTextStyle ??
-                                                    _config.textStyle
+                                                  _config.textStyle
                                               : _config.textStyle,
                                           textAlign: _config.textAlign,
                                           maxLines: _config.maxLines,
@@ -326,8 +326,7 @@ class _TextOnlyDropdownState extends State<TextOnlyDropdown>
                                           softWrap: _config.softWrap,
                                           textDirection: _config.textDirection,
                                           locale: _config.locale,
-                                          textScaleFactor:
-                                              _config.textScaleFactor,
+                                          textScaler: _config.textScaler,
                                           semanticsLabel:
                                               _config.semanticsLabel,
                                         ),
@@ -363,19 +362,16 @@ class _TextOnlyDropdownState extends State<TextOnlyDropdown>
       child: Container(
         width: widget.width,
         padding: _theme.buttonPadding,
-        decoration:
-            _theme.buttonDecoration ??
+        decoration: _theme.buttonDecoration ??
             BoxDecoration(
-              border:
-                  _theme.border ??
+              border: _theme.border ??
                   Border.all(color: Theme.of(context).dividerColor),
               borderRadius: BorderRadius.circular(_theme.borderRadius),
             ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          mainAxisSize: widget.width != null
-              ? MainAxisSize.max
-              : MainAxisSize.min,
+          mainAxisSize:
+              widget.width != null ? MainAxisSize.max : MainAxisSize.min,
           children: [
             Flexible(
               child: Text(
@@ -387,7 +383,7 @@ class _TextOnlyDropdownState extends State<TextOnlyDropdown>
                 softWrap: _config.softWrap,
                 textDirection: _config.textDirection,
                 locale: _config.locale,
-                textScaleFactor: _config.textScaleFactor,
+                textScaler: _config.textScaler,
               ),
             ),
             const SizedBox(width: 8),

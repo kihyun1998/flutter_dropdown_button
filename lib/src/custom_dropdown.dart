@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'dropdown_item.dart';
 
 /// A highly customizable dropdown widget using OverlayEntry for better control.
@@ -276,8 +277,7 @@ class _CustomDropdownState<T> extends State<CustomDropdown<T>>
                               minWidth: widget.minWidth ?? 0,
                               maxWidth: widget.maxWidth ?? double.infinity,
                             ),
-                            decoration:
-                                widget.decoration ??
+                            decoration: widget.decoration ??
                                 BoxDecoration(
                                   color: Theme.of(context).cardColor,
                                   borderRadius: BorderRadius.circular(
@@ -317,7 +317,9 @@ class _CustomDropdownState<T> extends State<CustomDropdown<T>>
                                         color: isSelected
                                             ? Theme.of(
                                                 context,
-                                              ).primaryColor.withOpacity(0.1)
+                                              )
+                                                .primaryColor
+                                                .withValues(alpha: 0.1)
                                             : Colors.transparent,
                                         // Apply border radius only to first and last items
                                         borderRadius: isFirst
@@ -330,15 +332,16 @@ class _CustomDropdownState<T> extends State<CustomDropdown<T>>
                                                 ),
                                               )
                                             : isLast
-                                            ? BorderRadius.only(
-                                                bottomLeft: Radius.circular(
-                                                  widget.borderRadius,
-                                                ),
-                                                bottomRight: Radius.circular(
-                                                  widget.borderRadius,
-                                                ),
-                                              )
-                                            : null,
+                                                ? BorderRadius.only(
+                                                    bottomLeft: Radius.circular(
+                                                      widget.borderRadius,
+                                                    ),
+                                                    bottomRight:
+                                                        Radius.circular(
+                                                      widget.borderRadius,
+                                                    ),
+                                                  )
+                                                : null,
                                       ),
                                       child: Align(
                                         alignment: Alignment.centerLeft,
@@ -366,9 +369,8 @@ class _CustomDropdownState<T> extends State<CustomDropdown<T>>
   @override
   Widget build(BuildContext context) {
     // Find the currently selected item to display
-    final selectedItem = widget.items
-        .where((item) => item.value == widget.value)
-        .firstOrNull;
+    final selectedItem =
+        widget.items.where((item) => item.value == widget.value).firstOrNull;
 
     Widget dropdownButton = GestureDetector(
       key: _buttonKey,
@@ -382,9 +384,8 @@ class _CustomDropdownState<T> extends State<CustomDropdown<T>>
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          mainAxisSize: widget.width != null
-              ? MainAxisSize.max
-              : MainAxisSize.min,
+          mainAxisSize:
+              widget.width != null ? MainAxisSize.max : MainAxisSize.min,
           children: [
             // Show selected item, hint, or nothing
             Flexible(

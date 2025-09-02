@@ -273,7 +273,7 @@ TextDropdownConfig(
 ```dart
 TextDropdownConfig(
   semanticsLabel: 'Fruit selection dropdown',
-  textScaleFactor: 1.2, // Larger text for accessibility
+  textScaler: TextScaler.linear(1.2), // Larger text for accessibility
 )
 ```
 
@@ -391,7 +391,7 @@ itemHeight: 80
 ### 2. Consistent Text Scaling
 ```dart
 TextDropdownConfig(
-  textScaleFactor: MediaQuery.of(context).textScaleFactor,
+  textScaler: MediaQuery.textScalerOf(context),
 )
 ```
 
