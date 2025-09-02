@@ -31,6 +31,10 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   String? selectedFruit;
   int? selectedNumber;
+  String? selectedDynamic;
+  String? selectedFixed;
+  String? selectedTextOverflow;
+  String? selectedMultiLine;
 
   final List<DropdownItem<String>> fruitItems = [
     const DropdownItem(
@@ -90,7 +94,7 @@ class _MyHomePageState extends State<MyHomePage> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: const Text('Custom Dropdown Demo'),
       ),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -128,7 +132,108 @@ class _MyHomePageState extends State<MyHomePage> {
               },
             ),
             const SizedBox(height: 32),
-            if (selectedFruit != null || selectedNumber != null)
+            const Text(
+              'Dynamic width dropdown (maxWidth: 200):',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            CustomDropdown<String>(
+              items: [
+                const DropdownItem(value: 'short', child: Text('Short')),
+                const DropdownItem(value: 'medium', child: Text('Medium length text')),
+                const DropdownItem(value: 'long', child: Text('This is a very long text that should be constrained by maxWidth')),
+              ],
+              value: selectedDynamic,
+              hint: const Text('Select text length'),
+              maxWidth: 200,
+              onChanged: (value) {
+                setState(() {
+                  selectedDynamic = value;
+                });
+              },
+            ),
+            const SizedBox(height: 32),
+            const Text(
+              'Fixed width dropdown (width: 300):',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            CustomDropdown<String>(
+              items: [
+                const DropdownItem(value: 'option1', child: Text('Option 1')),
+                const DropdownItem(value: 'option2', child: Text('Option 2')),
+              ],
+              value: selectedFixed,
+              hint: const Text('Fixed width'),
+              width: 300,
+              onChanged: (value) {
+                setState(() {
+                  selectedFixed = value;
+                });
+              },
+            ),
+            const SizedBox(height: 32),
+            const Text(
+              'TextOnlyDropdown with overflow control:',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            TextOnlyDropdown(
+              items: [
+                'Short',
+                'Medium length text',
+                'This is a very long text that will demonstrate ellipsis overflow behavior',
+                'Another extremely long option that might be cut off depending on the settings',
+              ],
+              value: selectedTextOverflow,
+              hint: 'Select overflow demo',
+              maxWidth: 250,
+              config: const TextDropdownConfig(
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+                textStyle: TextStyle(fontSize: 14),
+                hintStyle: TextStyle(fontSize: 14, color: Colors.grey),
+              ),
+              theme: const DropdownTheme(
+                borderRadius: 12.0,
+                animationDuration: Duration(milliseconds: 300),
+              ),
+              onChanged: (value) {
+                setState(() {
+                  selectedTextOverflow = value;
+                });
+              },
+            ),
+            const SizedBox(height: 32),
+            const Text(
+              'Multi-line TextOnlyDropdown:',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            TextOnlyDropdown(
+              items: [
+                'Single line',
+                'This is a longer text that will wrap to multiple lines when displayed',
+                'Another multi-line option\nthat contains explicit line breaks',
+              ],
+              value: selectedMultiLine,
+              hint: 'Select multi-line demo',
+              width: 300,
+              itemHeight: 60,
+              config: const TextDropdownConfig(
+                overflow: TextOverflow.visible,
+                maxLines: 3,
+                textStyle: TextStyle(fontSize: 14),
+                softWrap: true,
+              ),
+              onChanged: (value) {
+                setState(() {
+                  selectedMultiLine = value;
+                });
+              },
+            ),
+            const SizedBox(height: 32),
+            if (selectedFruit != null || selectedNumber != null || selectedDynamic != null || selectedFixed != null || selectedTextOverflow != null || selectedMultiLine != null)
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
@@ -146,6 +251,14 @@ class _MyHomePageState extends State<MyHomePage> {
                       Text('Fruit: $selectedFruit'),
                     if (selectedNumber != null)
                       Text('Number: $selectedNumber'),
+                    if (selectedDynamic != null)
+                      Text('Dynamic: $selectedDynamic'),
+                    if (selectedFixed != null)
+                      Text('Fixed: $selectedFixed'),
+                    if (selectedTextOverflow != null)
+                      Text('Text Overflow: $selectedTextOverflow'),
+                    if (selectedMultiLine != null)
+                      Text('Multi-line: $selectedMultiLine'),
                   ],
                 ),
               ),

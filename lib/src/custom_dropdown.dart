@@ -46,6 +46,9 @@ class CustomDropdown<T> extends StatefulWidget {
     this.borderRadius = 8.0,
     this.animationDuration = const Duration(milliseconds: 200),
     this.decoration,
+    this.width,
+    this.maxWidth,
+    this.minWidth,
   });
 
   /// The list of items to display in the dropdown.
@@ -102,6 +105,31 @@ class CustomDropdown<T> extends StatefulWidget {
   /// of the dropdown appearance including background color,
   /// border, shadow, etc.
   final BoxDecoration? decoration;
+
+  /// The width of the dropdown button and overlay.
+  ///
+  /// If null, the dropdown will size itself to fit its content
+  /// within the constraints of [minWidth] and [maxWidth].
+  /// If specified, both the button and overlay will have this fixed width.
+  final double? width;
+
+  /// The maximum width of the dropdown button and overlay.
+  ///
+  /// When [width] is null, the dropdown will size itself based on content
+  /// but will not exceed this maximum width. If content is longer,
+  /// it will be ellipsized or wrapped depending on the child widget.
+  /// 
+  /// If null, no maximum width constraint is applied.
+  final double? maxWidth;
+
+  /// The minimum width of the dropdown button and overlay.
+  ///
+  /// When [width] is null, the dropdown will size itself based on content
+  /// but will be at least this wide. Useful for ensuring consistent
+  /// minimum button size regardless of content length.
+  /// 
+  /// Defaults to null (no minimum width constraint).
+  final double? minWidth;
 
   @override
   State<CustomDropdown<T>> createState() => _CustomDropdownState<T>();
@@ -235,7 +263,7 @@ class _CustomDropdownState<T> extends State<CustomDropdown<T>>
               Positioned(
                 left: offset.dx,
                 top: offset.dy + size.height + 4, // 4px gap below button
-                width: size.width,
+                width: widget.width ?? size.width,
                 child: AnimatedBuilder(
                   animation: _animationController,
                   builder: (context, child) {
@@ -250,6 +278,8 @@ class _CustomDropdownState<T> extends State<CustomDropdown<T>>
                           child: Container(
                             constraints: BoxConstraints(
                               maxHeight: widget.height,
+                              minWidth: widget.minWidth ?? 0,
+                              maxWidth: widget.maxWidth ?? double.infinity,
                             ),
                             decoration: widget.decoration ?? BoxDecoration(
                               color: Theme.of(context).cardColor,
@@ -328,10 +358,11 @@ class _CustomDropdownState<T> extends State<CustomDropdown<T>>
     // Find the currently selected item to display
     final selectedItem = widget.items.where((item) => item.value == widget.value).firstOrNull;
 
-    return GestureDetector(
+    Widget dropdownButton = GestureDetector(
       key: _buttonKey,
       onTap: _toggleDropdown,
       child: Container(
+        width: widget.width,
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
           border: Border.all(color: Theme.of(context).dividerColor),
@@ -339,11 +370,13 @@ class _CustomDropdownState<T> extends State<CustomDropdown<T>>
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisSize: widget.width != null ? MainAxisSize.max : MainAxisSize.min,
           children: [
             // Show selected item, hint, or nothing
-            Expanded(
+            Flexible(
               child: selectedItem?.child ?? widget.hint ?? const SizedBox.shrink(),
             ),
+            const SizedBox(width: 8),
             // Arrow icon that rotates based on open/closed state
             Icon(
               _isOpen ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
@@ -353,5 +386,18 @@ class _CustomDropdownState<T> extends State<CustomDropdown<T>>
         ),
       ),
     );
+
+    // Apply width constraints if specified
+    if (widget.width == null && (widget.minWidth != null || widget.maxWidth != null)) {
+      dropdownButton = ConstrainedBox(
+        constraints: BoxConstraints(
+          minWidth: widget.minWidth ?? 0,
+          maxWidth: widget.maxWidth ?? double.infinity,
+        ),
+        child: dropdownButton,
+      );
+    }
+
+    return dropdownButton;
   }
 }
