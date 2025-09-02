@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'dropdown_item.dart';
+import 'dropdown_theme.dart';
 
 /// A highly customizable dropdown widget using OverlayEntry for better control.
 ///
@@ -50,6 +51,7 @@ class CustomDropdown<T> extends StatefulWidget {
     this.width,
     this.maxWidth,
     this.minWidth,
+    this.theme,
   });
 
   /// The list of items to display in the dropdown.
@@ -131,6 +133,12 @@ class CustomDropdown<T> extends StatefulWidget {
   ///
   /// Defaults to null (no minimum width constraint).
   final double? minWidth;
+
+  /// Custom theme configuration for the dropdown appearance and behavior.
+  ///
+  /// If null, uses [DropdownTheme.defaultTheme] with theme-appropriate colors.
+  /// Allows customization of colors, animations, and interaction effects.
+  final DropdownTheme? theme;
 
   @override
   State<CustomDropdown<T>> createState() => _CustomDropdownState<T>();
@@ -298,54 +306,61 @@ class _CustomDropdownState<T> extends State<CustomDropdown<T>>
                                   final isLast =
                                       itemIndex == widget.items.length - 1;
 
-                                  return GestureDetector(
-                                    onTap: () {
-                                      // Call both callbacks and close dropdown
-                                      widget.onChanged(item.value);
-                                      item.onTap?.call();
-                                      _closeDropdown();
-                                    },
-                                    child: Container(
-                                      height: widget.itemHeight,
-                                      width: double.infinity,
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 16,
-                                        vertical: 12,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        // Highlight selected item with primary color
-                                        color: isSelected
-                                            ? Theme.of(
-                                                context,
-                                              )
-                                                .primaryColor
-                                                .withValues(alpha: 0.1)
-                                            : Colors.transparent,
-                                        // Apply border radius only to first and last items
-                                        borderRadius: isFirst
-                                            ? BorderRadius.only(
-                                                topLeft: Radius.circular(
-                                                  widget.borderRadius,
-                                                ),
-                                                topRight: Radius.circular(
-                                                  widget.borderRadius,
-                                                ),
-                                              )
-                                            : isLast
-                                                ? BorderRadius.only(
-                                                    bottomLeft: Radius.circular(
-                                                      widget.borderRadius,
-                                                    ),
-                                                    bottomRight:
-                                                        Radius.circular(
-                                                      widget.borderRadius,
-                                                    ),
-                                                  )
-                                                : null,
-                                      ),
-                                      child: Align(
-                                        alignment: Alignment.centerLeft,
-                                        child: item.child,
+                                  final dropdownTheme = widget.theme ?? DropdownTheme.defaultTheme;
+                                  
+                                  return Material(
+                                    color: Colors.transparent,
+                                    child: InkWell(
+                                      onTap: () {
+                                        // Call both callbacks and close dropdown
+                                        widget.onChanged(item.value);
+                                        item.onTap?.call();
+                                        _closeDropdown();
+                                      },
+                                      // Custom splash and highlight colors from theme
+                                      splashColor: dropdownTheme.itemSplashColor ?? 
+                                          Theme.of(context).splashColor,
+                                      highlightColor: dropdownTheme.itemHighlightColor ?? 
+                                          Theme.of(context).highlightColor,
+                                      hoverColor: dropdownTheme.itemHoverColor ??
+                                          Theme.of(context).hoverColor,
+                                      // Apply border radius for ripple effect clipping
+                                      borderRadius: isFirst
+                                          ? BorderRadius.only(
+                                              topLeft: Radius.circular(
+                                                widget.borderRadius,
+                                              ),
+                                              topRight: Radius.circular(
+                                                widget.borderRadius,
+                                              ),
+                                            )
+                                          : isLast
+                                              ? BorderRadius.only(
+                                                  bottomLeft: Radius.circular(
+                                                    widget.borderRadius,
+                                                  ),
+                                                  bottomRight: Radius.circular(
+                                                    widget.borderRadius,
+                                                  ),
+                                                )
+                                              : null,
+                                      child: Container(
+                                        height: widget.itemHeight,
+                                        width: double.infinity,
+                                        padding: dropdownTheme.itemPadding,
+                                        decoration: BoxDecoration(
+                                          // Highlight selected item with theme or primary color
+                                          color: isSelected
+                                              ? dropdownTheme.selectedItemColor ??
+                                                  Theme.of(context)
+                                                      .primaryColor
+                                                      .withValues(alpha: 0.1)
+                                              : Colors.transparent,
+                                        ),
+                                        child: Align(
+                                          alignment: Alignment.centerLeft,
+                                          child: item.child,
+                                        ),
                                       ),
                                     ),
                                   );

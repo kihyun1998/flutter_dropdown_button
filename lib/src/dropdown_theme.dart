@@ -26,6 +26,8 @@ class DropdownTheme {
     this.border,
     this.selectedItemColor,
     this.itemHoverColor,
+    this.itemSplashColor,
+    this.itemHighlightColor,
     this.shadowColor,
     this.overlayDecoration,
     this.buttonDecoration,
@@ -78,6 +80,18 @@ class DropdownTheme {
   /// user interaction feedback on supported platforms.
   final Color? itemHoverColor;
 
+  /// The color of the ripple effect when tapping dropdown items.
+  ///
+  /// If null, uses the theme's splash color. This affects the
+  /// Material ink splash animation on item interaction.
+  final Color? itemSplashColor;
+
+  /// The color of the highlight effect for focused dropdown items.
+  ///
+  /// If null, uses the theme's highlight color. This affects
+  /// keyboard navigation and accessibility focus indicators.
+  final Color? itemHighlightColor;
+
   /// The shadow color for the dropdown overlay.
   ///
   /// If null, uses the default Material shadow color.
@@ -119,6 +133,8 @@ class DropdownTheme {
     Border? border,
     Color? selectedItemColor,
     Color? itemHoverColor,
+    Color? itemSplashColor,
+    Color? itemHighlightColor,
     Color? shadowColor,
     BoxDecoration? overlayDecoration,
     BoxDecoration? buttonDecoration,
@@ -133,6 +149,8 @@ class DropdownTheme {
       border: border ?? this.border,
       selectedItemColor: selectedItemColor ?? this.selectedItemColor,
       itemHoverColor: itemHoverColor ?? this.itemHoverColor,
+      itemSplashColor: itemSplashColor ?? this.itemSplashColor,
+      itemHighlightColor: itemHighlightColor ?? this.itemHighlightColor,
       shadowColor: shadowColor ?? this.shadowColor,
       overlayDecoration: overlayDecoration ?? this.overlayDecoration,
       buttonDecoration: buttonDecoration ?? this.buttonDecoration,

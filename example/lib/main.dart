@@ -114,7 +114,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             const SizedBox(height: 32),
             const Text(
-              'Select a number:',
+              'Select a number with custom theme colors:',
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
@@ -123,6 +123,14 @@ class _MyHomePageState extends State<MyHomePage> {
               value: selectedNumber,
               hint: const Text('Choose a number'),
               height: 150,
+              theme: const DropdownTheme(
+                selectedItemColor: Color(0x1A4CAF50), // Light green
+                itemHoverColor: Color(0x0A2196F3), // Light blue hover
+                itemSplashColor: Color(0x40FF9800), // Orange splash
+                itemHighlightColor: Color(0x20E91E63), // Pink highlight
+                borderRadius: 12.0,
+                animationDuration: Duration(milliseconds: 250),
+              ),
               onChanged: (value) {
                 setState(() {
                   selectedNumber = value;
@@ -235,6 +243,32 @@ class _MyHomePageState extends State<MyHomePage> {
               onChanged: (value) {
                 setState(() {
                   selectedMultiLine = value;
+                });
+              },
+            ),
+            const SizedBox(height: 32),
+            const Text(
+              'Custom themed dropdown with vibrant colors:',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            CustomDropdown<String>(
+              items: fruitItems,
+              value: selectedFruit,
+              hint: const Text('Vibrant theme demo'),
+              theme: const DropdownTheme(
+                selectedItemColor: Color(0x2000BCD4), // Cyan selection
+                itemHoverColor: Color(0x1000BCD4), // Cyan hover
+                itemSplashColor: Color(0x60FF5722), // Deep orange splash
+                itemHighlightColor: Color(0x303F51B5), // Indigo highlight
+                borderRadius: 16.0,
+                animationDuration: Duration(milliseconds: 300),
+                elevation: 12.0,
+                itemPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+              ),
+              onChanged: (value) {
+                setState(() {
+                  selectedFruit = value;
                 });
               },
             ),
