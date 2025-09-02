@@ -1,5 +1,12 @@
 # Changelog
 
+## [Unreleased]
+
+### Changed
+- Replaced GestureDetector with InkWell for dropdown items to support Material ripple effects and hover states
+- Added hover, splash, and highlight color customization options to DropdownTheme
+- Enhanced dropdown item interaction with better visual feedback on web and desktop platforms
+
 ## 1.0.0
 
 * **FEAT**: Initial release with CustomDropdown and TextOnlyDropdown widgets
