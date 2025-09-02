@@ -1,0 +1,1 @@
+todo: will provider text width calculate helper
