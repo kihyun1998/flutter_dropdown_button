@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 
 import 'dropdown_item.dart';
@@ -245,15 +247,59 @@ class _CustomDropdownState<T> extends State<CustomDropdown<T>>
 
   /// Creates the overlay entry that contains the dropdown options.
   ///
-  /// The overlay is positioned below the dropdown button and includes:
+  /// The overlay is positioned optimally based on available screen space and includes:
   /// - A full-screen gesture detector to handle outside taps
   /// - Animated appearance with scale and opacity effects
   /// - Scrollable list of dropdown items
+  /// - Smart positioning (above or below button) based on available space
+  /// - Dynamic height adjustment to prevent overflow
   /// - Theme-appropriate styling and colors
   ///
   /// [offset] is the global position of the dropdown button
   /// [size] is the size of the dropdown button for positioning
   OverlayEntry _createOverlayEntry(Offset offset, Size size) {
+    // Calculate available space for smart positioning
+    final screenHeight = MediaQuery.of(context).size.height;
+    final spaceBelow = screenHeight - (offset.dy + size.height + 8);
+    final spaceAbove = offset.dy - 8;
+    
+    // Calculate dynamic preferred height based on items
+    final totalItemsHeight = widget.items.length * widget.itemHeight;
+    final preferredHeight = math.min(totalItemsHeight, widget.height);
+    
+    // Determine positioning and height
+    double menuHeight;
+    bool openDown;
+    Alignment transformAlignment;
+    
+    if (spaceBelow >= preferredHeight) {
+      // Sufficient space below - open downward
+      menuHeight = preferredHeight;
+      openDown = true;
+      transformAlignment = Alignment.topCenter;
+    } else if (spaceAbove >= preferredHeight) {
+      // Sufficient space above - open upward
+      menuHeight = preferredHeight;
+      openDown = false;
+      transformAlignment = Alignment.bottomCenter;
+    } else {
+      // Insufficient space in both directions - choose the larger space
+      if (spaceBelow >= spaceAbove) {
+        menuHeight = spaceBelow - 8; // Extra margin for safety
+        openDown = true;
+        transformAlignment = Alignment.topCenter;
+      } else {
+        menuHeight = spaceAbove - 8;
+        openDown = false;
+        transformAlignment = Alignment.bottomCenter;
+      }
+      
+      // Ensure minimum height for usability (show at least 2 items)
+      final minItemsVisible = 2;
+      final minHeight = minItemsVisible * widget.itemHeight;
+      menuHeight = math.max(menuHeight, minHeight);
+    }
+    
     return OverlayEntry(
       builder: (context) => GestureDetector(
         // Detect taps outside the dropdown to close it
@@ -264,14 +310,16 @@ class _CustomDropdownState<T> extends State<CustomDropdown<T>>
             children: [
               Positioned(
                 left: offset.dx,
-                top: offset.dy + size.height + 4, // 4px gap below button
+                top: openDown 
+                    ? offset.dy + size.height + 4 // 4px gap below button
+                    : offset.dy - menuHeight - 4,  // 4px gap above button
                 width: widget.width ?? size.width,
                 child: AnimatedBuilder(
                   animation: _animationController,
                   builder: (context, child) {
                     return Transform.scale(
                       scale: _scaleAnimation.value,
-                      alignment: Alignment.topCenter,
+                      alignment: transformAlignment,
                       child: Opacity(
                         opacity: _opacityAnimation.value,
                         child: Material(
@@ -280,8 +328,8 @@ class _CustomDropdownState<T> extends State<CustomDropdown<T>>
                             widget.borderRadius,
                           ),
                           child: Container(
+                            height: menuHeight,
                             constraints: BoxConstraints(
-                              maxHeight: widget.height,
                               minWidth: widget.minWidth ?? 0,
                               maxWidth: widget.maxWidth ?? double.infinity,
                             ),

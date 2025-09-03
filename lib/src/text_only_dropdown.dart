@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 
 import 'dropdown_theme.dart';
@@ -220,7 +222,54 @@ class _TextOnlyDropdownState extends State<TextOnlyDropdown>
   }
 
   /// Creates the overlay entry containing the dropdown options.
+  ///
+  /// The overlay is positioned optimally based on available screen space and includes:
+  /// - Smart positioning (above or below button) based on available space
+  /// - Dynamic height adjustment to prevent overflow
+  /// - Automatic positioning for optimal user experience
   OverlayEntry _createOverlayEntry(Offset offset, Size size) {
+    // Calculate available space for smart positioning
+    final screenHeight = MediaQuery.of(context).size.height;
+    final spaceBelow = screenHeight - (offset.dy + size.height + 8);
+    final spaceAbove = offset.dy - 8;
+    
+    // Calculate dynamic preferred height based on items
+    final totalItemsHeight = widget.items.length * widget.itemHeight;
+    final preferredHeight = math.min(totalItemsHeight, widget.height);
+    
+    // Determine positioning and height
+    double menuHeight;
+    bool openDown;
+    Alignment transformAlignment;
+    
+    if (spaceBelow >= preferredHeight) {
+      // Sufficient space below - open downward
+      menuHeight = preferredHeight;
+      openDown = true;
+      transformAlignment = Alignment.topCenter;
+    } else if (spaceAbove >= preferredHeight) {
+      // Sufficient space above - open upward
+      menuHeight = preferredHeight;
+      openDown = false;
+      transformAlignment = Alignment.bottomCenter;
+    } else {
+      // Insufficient space in both directions - choose the larger space
+      if (spaceBelow >= spaceAbove) {
+        menuHeight = spaceBelow - 8; // Extra margin for safety
+        openDown = true;
+        transformAlignment = Alignment.topCenter;
+      } else {
+        menuHeight = spaceAbove - 8;
+        openDown = false;
+        transformAlignment = Alignment.bottomCenter;
+      }
+      
+      // Ensure minimum height for usability (show at least 2 items)
+      final minItemsVisible = 2;
+      final minHeight = minItemsVisible * widget.itemHeight;
+      menuHeight = math.max(menuHeight, minHeight);
+    }
+    
     return OverlayEntry(
       builder: (context) => GestureDetector(
         onTap: _closeDropdown,
@@ -230,14 +279,16 @@ class _TextOnlyDropdownState extends State<TextOnlyDropdown>
             children: [
               Positioned(
                 left: offset.dx,
-                top: offset.dy + size.height + 4,
+                top: openDown 
+                    ? offset.dy + size.height + 4 // 4px gap below button
+                    : offset.dy - menuHeight - 4,  // 4px gap above button
                 width: widget.width ?? size.width,
                 child: AnimatedBuilder(
                   animation: _animationController,
                   builder: (context, child) {
                     return Transform.scale(
                       scale: _scaleAnimation.value,
-                      alignment: Alignment.topCenter,
+                      alignment: transformAlignment,
                       child: Opacity(
                         opacity: _opacityAnimation.value,
                         child: Material(
@@ -247,8 +298,8 @@ class _TextOnlyDropdownState extends State<TextOnlyDropdown>
                             _theme.borderRadius,
                           ),
                           child: Container(
+                            height: menuHeight,
                             constraints: BoxConstraints(
-                              maxHeight: widget.height,
                               minWidth: widget.minWidth ?? 0,
                               maxWidth: widget.maxWidth ?? double.infinity,
                             ),
