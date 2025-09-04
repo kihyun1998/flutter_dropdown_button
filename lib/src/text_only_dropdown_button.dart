@@ -133,7 +133,6 @@ class TextOnlyDropdownButton extends StatefulWidget {
 /// Uses [DropdownMixin] to provide common dropdown functionality.
 class _TextOnlyDropdownButtonState extends State<TextOnlyDropdownButton>
     with SingleTickerProviderStateMixin, DropdownMixin<TextOnlyDropdownButton> {
-
   /// The effective theme, using provided theme or default.
   DropdownTheme get _theme => widget.theme ?? DropdownTheme.defaultTheme;
 
@@ -296,7 +295,9 @@ class _TextOnlyDropdownButtonState extends State<TextOnlyDropdownButton>
             ),
             const SizedBox(width: 8),
             Icon(
-              isDropdownOpen ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+              isDropdownOpen
+                  ? Icons.keyboard_arrow_up
+                  : Icons.keyboard_arrow_down,
               color: widget.enabled
                   ? Theme.of(context).iconTheme.color
                   : Theme.of(context).disabledColor,

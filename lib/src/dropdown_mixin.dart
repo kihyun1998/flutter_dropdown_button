@@ -37,14 +37,14 @@ class DropdownPositionResult {
 ///
 /// Usage:
 /// ```dart
-/// class _MyDropdownState extends State<MyDropdown> 
+/// class _MyDropdownState extends State<MyDropdown>
 ///     with SingleTickerProviderStateMixin, DropdownMixin<MyDropdown> {
-///   
+///
 ///   @override
 ///   Widget buildOverlayContent(double height) {
 ///     return Container(height: height, child: ListView(...));
 ///   }
-///   
+///
 ///   @override
 ///   Duration get animationDuration => Duration(milliseconds: 200);
 ///   // ... other required implementations
@@ -70,7 +70,7 @@ mixin DropdownMixin<T extends StatefulWidget> on State<T>, TickerProvider {
   late Animation<double> dropdownOpacityAnimation;
 
   // Abstract getters that must be implemented by the using class
-  
+
   /// The duration of the dropdown animations.
   Duration get animationDuration;
 
@@ -107,25 +107,25 @@ mixin DropdownMixin<T extends StatefulWidget> on State<T>, TickerProvider {
   // Abstract methods that must be implemented by the using class
 
   /// Builds the content of the dropdown overlay with the given height.
-  /// 
+  ///
   /// This method should return the scrollable content that will be displayed
   /// inside the dropdown overlay. The [height] parameter specifies the
   /// calculated optimal height for the overlay.
   Widget buildOverlayContent(double height);
 
   /// Builds the decoration for the dropdown overlay container.
-  /// 
+  ///
   /// Return null to use the default theme-based decoration.
   BoxDecoration? buildOverlayDecoration();
 
   /// Called when an item is selected from the dropdown.
-  /// 
+  ///
   /// Implementations should handle the selection logic and call
   /// [closeDropdown] to close the overlay.
   void onDropdownItemSelected();
 
   /// Initializes the dropdown animations and controllers.
-  /// 
+  ///
   /// This should be called in the [initState] method of the using class.
   void initializeDropdown() {
     dropdownAnimationController = AnimationController(
@@ -149,7 +149,7 @@ mixin DropdownMixin<T extends StatefulWidget> on State<T>, TickerProvider {
   }
 
   /// Disposes of the dropdown resources.
-  /// 
+  ///
   /// This should be called in the [dispose] method of the using class.
   void disposeDropdown() {
     closeDropdown();
@@ -171,7 +171,8 @@ mixin DropdownMixin<T extends StatefulWidget> on State<T>, TickerProvider {
   void openDropdown() {
     if (isDropdownOpen || !isEnabled) return;
 
-    final renderBox = dropdownButtonKey.currentContext!.findRenderObject() as RenderBox;
+    final renderBox =
+        dropdownButtonKey.currentContext!.findRenderObject() as RenderBox;
     final buttonSize = renderBox.size;
     final buttonOffset = renderBox.localToGlobal(Offset.zero);
 
@@ -192,7 +193,7 @@ mixin DropdownMixin<T extends StatefulWidget> on State<T>, TickerProvider {
   }
 
   /// Calculates the optimal position and height for the dropdown overlay.
-  /// 
+  ///
   /// This method performs smart positioning based on available screen space:
   /// - Prefers to open downward if there's sufficient space
   /// - Falls back to opening upward if there's more space above
@@ -204,7 +205,8 @@ mixin DropdownMixin<T extends StatefulWidget> on State<T>, TickerProvider {
   ) {
     // Calculate available space for smart positioning
     final screenHeight = MediaQuery.of(context).size.height;
-    final spaceBelow = screenHeight - (buttonOffset.dy + buttonSize.height + screenMargin);
+    final spaceBelow =
+        screenHeight - (buttonOffset.dy + buttonSize.height + screenMargin);
     final spaceAbove = buttonOffset.dy - screenMargin;
 
     // Calculate dynamic preferred height based on items
@@ -282,13 +284,15 @@ mixin DropdownMixin<T extends StatefulWidget> on State<T>, TickerProvider {
                         child: Material(
                           elevation: overlayElevation,
                           shadowColor: overlayShadowColor,
-                          borderRadius: BorderRadius.circular(overlayBorderRadius),
+                          borderRadius:
+                              BorderRadius.circular(overlayBorderRadius),
                           child: Container(
                             height: position.height,
                             decoration: buildOverlayDecoration() ??
                                 BoxDecoration(
                                   color: Theme.of(context).cardColor,
-                                  borderRadius: BorderRadius.circular(overlayBorderRadius),
+                                  borderRadius: BorderRadius.circular(
+                                      overlayBorderRadius),
                                   border: Border.all(
                                     color: Theme.of(context).dividerColor,
                                     width: 1,

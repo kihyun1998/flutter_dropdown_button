@@ -151,7 +151,6 @@ class BasicDropdownButton<T> extends StatefulWidget {
 /// Uses [DropdownMixin] to provide common dropdown functionality.
 class _BasicDropdownButtonState<T> extends State<BasicDropdownButton<T>>
     with SingleTickerProviderStateMixin, DropdownMixin<BasicDropdownButton<T>> {
-
   // Implement DropdownMixin abstract getters
   @override
   Duration get animationDuration => widget.animationDuration;
@@ -229,8 +228,8 @@ class _BasicDropdownButtonState<T> extends State<BasicDropdownButton<T>>
                   Theme.of(context).splashColor,
               highlightColor: dropdownTheme.itemHighlightColor ??
                   Theme.of(context).highlightColor,
-              hoverColor: dropdownTheme.itemHoverColor ??
-                  Theme.of(context).hoverColor,
+              hoverColor:
+                  dropdownTheme.itemHoverColor ?? Theme.of(context).hoverColor,
               // Apply border radius for ripple effect clipping
               borderRadius: isFirst
                   ? BorderRadius.only(
@@ -295,7 +294,9 @@ class _BasicDropdownButtonState<T> extends State<BasicDropdownButton<T>>
             const SizedBox(width: 8),
             // Arrow icon that rotates based on open/closed state
             Icon(
-              isDropdownOpen ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+              isDropdownOpen
+                  ? Icons.keyboard_arrow_up
+                  : Icons.keyboard_arrow_down,
               color: Theme.of(context).iconTheme.color,
             ),
           ],
