@@ -11,7 +11,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Custom Dropdown Demo',
+      title: 'Flutter Dropdown Button Demo',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
@@ -90,7 +90,7 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: const Text('Custom Dropdown Demo'),
+        title: const Text('Flutter Dropdown Button Demo'),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20.0),
@@ -102,7 +102,7 @@ class _MyHomePageState extends State<MyHomePage> {
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
-            CustomDropdown<String>(
+            BasicDropdownButton<String>(
               items: fruitItems,
               value: selectedFruit,
               hint: const Text('Choose a fruit'),
@@ -118,7 +118,7 @@ class _MyHomePageState extends State<MyHomePage> {
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
-            CustomDropdown<int>(
+            BasicDropdownButton<int>(
               items: numberItems,
               value: selectedNumber,
               hint: const Text('Choose a number'),
@@ -143,7 +143,7 @@ class _MyHomePageState extends State<MyHomePage> {
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
-            CustomDropdown<String>(
+            BasicDropdownButton<String>(
               items: [
                 const DropdownItem(value: 'short', child: Text('Short')),
                 const DropdownItem(
@@ -172,7 +172,7 @@ class _MyHomePageState extends State<MyHomePage> {
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
-            CustomDropdown<String>(
+            BasicDropdownButton<String>(
               items: [
                 const DropdownItem(value: 'option1', child: Text('Option 1')),
                 const DropdownItem(value: 'option2', child: Text('Option 2')),
@@ -188,11 +188,11 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             const SizedBox(height: 32),
             const Text(
-              'TextOnlyDropdown with overflow control:',
+              'TextOnlyDropdownButton with overflow control:',
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
-            TextOnlyDropdown(
+            TextOnlyDropdownButton(
               items: [
                 'Short',
                 'Medium length text',
@@ -220,11 +220,11 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             const SizedBox(height: 32),
             const Text(
-              'Multi-line TextOnlyDropdown:',
+              'Multi-line TextOnlyDropdownButton:',
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
-            TextOnlyDropdown(
+            TextOnlyDropdownButton(
               items: [
                 'Single line',
                 'This is a longer text that will wrap to multiple lines when displayed',
@@ -252,7 +252,7 @@ class _MyHomePageState extends State<MyHomePage> {
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
-            CustomDropdown<String>(
+            BasicDropdownButton<String>(
               items: fruitItems,
               value: selectedFruit,
               hint: const Text('Vibrant theme demo'),
