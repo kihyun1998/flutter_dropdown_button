@@ -81,7 +81,7 @@ The `DropdownMixin.calculateDropdownPosition()` method implements smart position
 5. Ensures minimum visibility of items
 
 ### Breaking Changes
-Version 1.1.0 introduced breaking changes:
+Version 1.0.0 includes breaking changes from initial development:
 - `CustomDropdown` → `BasicDropdownButton`  
 - `TextOnlyDropdown` → `TextOnlyDropdownButton`
 
@@ -102,7 +102,7 @@ lib/
 
 ## Version Management
 
-- Current version: 1.1.0
+- Current version: 1.0.0
 - Uses semantic versioning
 - Breaking changes require major version bump
 - Update version in both `pubspec.yaml` and documentation when releasing

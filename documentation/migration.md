@@ -24,7 +24,7 @@ Learn how to migrate from Flutter's built-in DropdownButton to flutter_dropdown_
 
 ## Basic Migration
 
-### From DropdownButton to CustomDropdown
+### From DropdownButton to BasicDropdownButton
 
 **Before (DropdownButton):**
 ```dart
@@ -44,9 +44,9 @@ DropdownButton<String>(
 )
 ```
 
-**After (CustomDropdown):**
+**After (BasicDropdownButton):**
 ```dart
-CustomDropdown<String>(
+BasicDropdownButton<String>(
   value: selectedValue,
   hint: Text('Select an option'),
   items: [
@@ -62,7 +62,7 @@ CustomDropdown<String>(
 )
 ```
 
-### From DropdownButton to TextOnlyDropdown
+### From DropdownButton to TextOnlyDropdownButton
 
 **Before (DropdownButton):**
 ```dart
@@ -81,9 +81,9 @@ DropdownButton<String>(
 )
 ```
 
-**After (TextOnlyDropdown):**
+**After (TextOnlyDropdownButton):**
 ```dart
-TextOnlyDropdown(
+TextOnlyDropdownButton(
   value: selectedValue,
   hint: 'Select fruit',
   items: ['Apple', 'Banana'],
@@ -99,7 +99,7 @@ TextOnlyDropdown(
 
 ### Constructor Parameters
 
-| DropdownButton | CustomDropdown | TextOnlyDropdown |
+| DropdownButton | BasicDropdownButton | TextOnlyDropdownButton |
 |---------------|----------------|------------------|
 | `value` | `value` | `value` |
 | `items` | `items` | `items` |
@@ -174,7 +174,7 @@ DropdownButtonFormField<String>(
 
 **After:**
 ```dart
-TextOnlyDropdown(
+TextOnlyDropdownButton(
   value: selectedValue,
   hint: 'Select Option',
   items: itemStrings,
@@ -207,7 +207,7 @@ SizedBox(
 
 **After:**
 ```dart
-CustomDropdown<String>(
+BasicDropdownButton<String>(
   width: 200,
   value: selectedValue,
   items: items,
@@ -230,7 +230,7 @@ DropdownButton<String>(
 
 **After:**
 ```dart
-TextOnlyDropdown(
+TextOnlyDropdownButton(
   itemHeight: 40,
   value: selectedValue,
   items: itemStrings,
@@ -249,7 +249,7 @@ DropdownButton inherits text style from parent. Our dropdowns don't.
 
 **Solution:**
 ```dart
-TextOnlyDropdown(
+TextOnlyDropdownButton(
   config: TextDropdownConfig(
     textStyle: DefaultTextStyle.of(context).style,
   ),
@@ -263,7 +263,7 @@ DropdownButton has platform-specific animations. Our dropdowns have consistent a
 
 **Solution:**
 ```dart
-TextOnlyDropdown(
+TextOnlyDropdownButton(
   theme: DropdownTheme(
     animationDuration: Duration(milliseconds: 150), // Adjust as needed
   ),
@@ -282,7 +282,7 @@ FormField<String>(
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        TextOnlyDropdown(
+        TextOnlyDropdownButton(
           value: state.value,
           items: items,
           onChanged: state.didChange,
@@ -304,7 +304,7 @@ FormField<String>(
 ### 1. Install Package
 ```yaml
 dependencies:
-  flutter_dropdown_button: ^1.1.0
+  flutter_dropdown_button: ^1.0.0
 ```
 
 ### 2. Replace Imports
@@ -319,27 +319,27 @@ import 'package:flutter_dropdown_button/flutter_dropdown_button.dart';
 
 ### 3. Update Widget Declarations
 
-For simple text dropdowns, replace `DropdownButton` with `TextOnlyDropdown`:
+For simple text dropdowns, replace `DropdownButton` with `TextOnlyDropdownButton`:
 ```dart
 // Before
 DropdownButton<String>
 
 // After  
-TextOnlyDropdown
+TextOnlyDropdownButton
 ```
 
-For complex dropdowns with custom widgets, use `CustomDropdown`:
+For complex dropdowns with custom widgets, use `BasicDropdownButton`:
 ```dart
 // Before
 DropdownButton<String>
 
 // After
-CustomDropdown<String>
+BasicDropdownButton<String>
 ```
 
 ### 4. Update Items
 
-For TextOnlyDropdown:
+For TextOnlyDropdownButton:
 ```dart
 // Before
 items: options.map((option) => 
@@ -350,7 +350,7 @@ items: options.map((option) =>
 items: options,
 ```
 
-For CustomDropdown:
+For BasicDropdownButton:
 ```dart
 // Before
 items: options.map((option) => 
@@ -367,7 +367,7 @@ items: options.map((option) =>
 
 After migration, test your dropdowns and add customizations:
 ```dart
-TextOnlyDropdown(
+TextOnlyDropdownButton(
   // ... migrated properties
   theme: DropdownTheme(
     borderRadius: 8.0,
@@ -383,7 +383,7 @@ TextOnlyDropdown(
 
 ### Issue: Text Overflow
 **Problem:** Long text gets cut off awkwardly.
-**Solution:** Use TextOnlyDropdown with proper overflow configuration.
+**Solution:** Use TextOnlyDropdownButton with proper overflow configuration.
 
 ### Issue: Inconsistent Styling
 **Problem:** Dropdowns look different across platforms.

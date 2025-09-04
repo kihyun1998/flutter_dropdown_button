@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// Represents an item in a [CustomDropdown].
+/// Represents an item in a [BasicDropdownButton].
 ///
 /// Each dropdown item contains a value of type [T], a child widget to display,
 /// and an optional tap callback for custom behavior when the item is selected.
@@ -24,12 +24,12 @@ class DropdownItem<T> {
   ///
   /// The [value] and [child] parameters are required.
   /// The [onTap] callback is optional and will be called when the item is selected,
-  /// in addition to the dropdown's [CustomDropdown.onChanged] callback.
+  /// in addition to the dropdown's [BasicDropdownButton.onChanged] callback.
   const DropdownItem({required this.value, required this.child, this.onTap});
 
   /// The value associated with this dropdown item.
   ///
-  /// This value will be passed to the [CustomDropdown.onChanged] callback
+  /// This value will be passed to the [BasicDropdownButton.onChanged] callback
   /// when the item is selected. It should be unique among all items in the dropdown.
   final T value;
 
@@ -41,7 +41,7 @@ class DropdownItem<T> {
 
   /// An optional callback that will be invoked when this item is selected.
   ///
-  /// This callback is called in addition to the dropdown's [CustomDropdown.onChanged]
+  /// This callback is called in addition to the dropdown's [BasicDropdownButton.onChanged]
   /// callback, allowing for item-specific behavior when selected.
   final VoidCallback? onTap;
 }

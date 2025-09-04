@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 /// Shared theme configuration for all dropdown widgets.
 ///
 /// This class contains styling and behavior properties that are common
-/// across all dropdown variants (CustomDropdown, TextOnlyDropdown, etc.)
+/// across all dropdown variants (BasicDropdownButton, TextOnlyDropdownButton, etc.)
 /// to maintain visual consistency throughout the application.
 ///
 /// Example:
