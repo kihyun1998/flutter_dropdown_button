@@ -1,16 +1,13 @@
 # Changelog
 
-## [Unreleased]
+## v1.1.0
 
-### Added
-- Smart dropdown positioning - automatically opens upward when insufficient space below
-- Dynamic height adjustment to prevent screen overflow
-- `DropdownMixin` for shared functionality across dropdown variants
-
-### Changed
-- **BREAKING**: `CustomDropdown` → `BasicDropdownButton`
-- **BREAKING**: `TextOnlyDropdown` → `TextOnlyDropdownButton`
-- Improved code architecture with ~150 lines of duplicate code removed
+* **FEAT**: Smart dropdown positioning - automatically opens upward when insufficient space below
+* **FEAT**: Dynamic height adjustment to prevent screen overflow  
+* **FEAT**: `DropdownMixin` for shared functionality across dropdown variants
+* **BREAKING**: `CustomDropdown` → `BasicDropdownButton`
+* **BREAKING**: `TextOnlyDropdown` → `TextOnlyDropdownButton`
+* **REFACTOR**: Improved code architecture with ~150 lines of duplicate code removed
 
 ## 1.0.0
 
