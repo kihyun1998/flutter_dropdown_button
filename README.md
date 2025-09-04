@@ -13,16 +13,16 @@ A highly customizable dropdown package for Flutter with overlay-based rendering,
 - 🎯 **Outside-tap Dismissal**: Automatic closure when tapping outside
 - 📏 **Dynamic Width**: Fixed, min/max width constraints, or content-based sizing
 - 📝 **Text Overflow Control**: Ellipsis, fade, clip, or visible overflow options
-- 🎭 **Multiple Variants**: Generic CustomDropdown and specialized TextOnlyDropdown
+- 🎭 **Multiple Variants**: Generic BasicDropdownButton and specialized TextOnlyDropdownButton
 - 🎨 **Shared Theme System**: Consistent styling across all dropdown variants
 - ♿ **Accessibility Support**: Screen reader friendly with proper semantics
 
 ## Variants
 
-### CustomDropdown
+### BasicDropdownButton
 Generic dropdown supporting any widget as items with complete customization.
 
-### TextOnlyDropdown
+### TextOnlyDropdownButton
 Specialized dropdown for text content with precise text rendering control.
 
 ## Quick Start
@@ -31,7 +31,7 @@ Add to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  flutter_dropdown_button: ^1.0.0
+  flutter_dropdown_button: ^1.1.0
 ```
 
 Import the package:
@@ -42,10 +42,10 @@ import 'package:flutter_dropdown_button/flutter_dropdown_button.dart';
 
 ## Basic Usage
 
-### CustomDropdown
+### BasicDropdownButton
 
 ```dart
-CustomDropdown<String>(
+BasicDropdownButton<String>(
   items: [
     DropdownItem(
       value: 'apple',
@@ -72,10 +72,10 @@ CustomDropdown<String>(
 )
 ```
 
-### TextOnlyDropdown
+### TextOnlyDropdownButton
 
 ```dart
-TextOnlyDropdown(
+TextOnlyDropdownButton(
   items: [
     'Short',
     'Medium length text',
@@ -101,7 +101,7 @@ TextOnlyDropdown(
 ### Custom Theme
 
 ```dart
-TextOnlyDropdown(
+TextOnlyDropdownButton(
   // ... other properties
   theme: DropdownTheme(
     borderRadius: 12.0,
@@ -115,7 +115,7 @@ TextOnlyDropdown(
 ### Text Configuration
 
 ```dart
-TextOnlyDropdown(
+TextOnlyDropdownButton(
   // ... other properties
   config: TextDropdownConfig(
     overflow: TextOverflow.fade,
@@ -129,7 +129,7 @@ TextOnlyDropdown(
 ### Dynamic Width
 
 ```dart
-CustomDropdown<String>(
+BasicDropdownButton<String>(
   // ... other properties
   maxWidth: 300,        // Maximum width constraint
   minWidth: 150,        // Minimum width constraint

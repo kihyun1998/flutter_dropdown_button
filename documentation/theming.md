@@ -12,7 +12,7 @@ The `DropdownTheme` class provides a unified way to style all dropdown variants.
 
 ```dart
 // Uses default Material Design styling
-TextOnlyDropdown(
+TextOnlyDropdownButton(
   items: ['Option 1', 'Option 2'],
   onChanged: (value) {},
 )
@@ -21,7 +21,7 @@ TextOnlyDropdown(
 ### Custom Theme
 
 ```dart
-TextOnlyDropdown(
+TextOnlyDropdownButton(
   items: ['Option 1', 'Option 2'],
   onChanged: (value) {},
   theme: DropdownTheme(
@@ -144,7 +144,7 @@ class AppThemes {
 ### Usage
 
 ```dart
-TextOnlyDropdown(
+TextOnlyDropdownButton(
   theme: AppThemes.primaryDropdownTheme,
   // ... other properties
 )
@@ -196,7 +196,7 @@ DropdownTheme(
 Widget buildDropdown(BuildContext context) {
   final isDark = Theme.of(context).brightness == Brightness.dark;
   
-  return TextOnlyDropdown(
+  return TextOnlyDropdownButton(
     theme: DropdownTheme(
       backgroundColor: isDark ? Colors.grey[800] : Colors.white,
       selectedItemColor: isDark 
@@ -218,7 +218,7 @@ Widget buildResponsiveDropdown(BuildContext context) {
   final screenWidth = MediaQuery.of(context).size.width;
   final isTablet = screenWidth > 600;
   
-  return TextOnlyDropdown(
+  return TextOnlyDropdownButton(
     theme: DropdownTheme(
       borderRadius: isTablet ? 12.0 : 8.0,
       elevation: isTablet ? 8.0 : 4.0,

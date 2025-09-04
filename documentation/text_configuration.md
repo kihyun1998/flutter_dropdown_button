@@ -1,17 +1,17 @@
 # Text Configuration Guide
 
-Comprehensive guide for configuring text behavior in TextOnlyDropdown widgets.
+Comprehensive guide for configuring text behavior in TextOnlyDropdownButton widgets.
 
 ## TextDropdownConfig Overview
 
-The `TextDropdownConfig` class provides precise control over text rendering, overflow behavior, and styling in `TextOnlyDropdown` widgets.
+The `TextDropdownConfig` class provides precise control over text rendering, overflow behavior, and styling in `TextOnlyDropdownButton` widgets.
 
 ## Basic Configuration
 
 ### Default Configuration
 
 ```dart
-TextOnlyDropdown(
+TextOnlyDropdownButton(
   items: ['Short', 'Medium text', 'Very long text that might overflow'],
   onChanged: (value) {},
   // Uses TextDropdownConfig.defaultConfig by default
@@ -21,7 +21,7 @@ TextOnlyDropdown(
 ### Custom Configuration
 
 ```dart
-TextOnlyDropdown(
+TextOnlyDropdownButton(
   items: ['Option 1', 'Option 2'],
   onChanged: (value) {},
   config: TextDropdownConfig(
@@ -109,7 +109,7 @@ TextDropdownConfig(
 Handle `\n` characters in text:
 
 ```dart
-TextOnlyDropdown(
+TextOnlyDropdownButton(
   items: [
     'Single line',
     'Multi-line text\nwith explicit\nbreaks',
@@ -208,7 +208,7 @@ TextDropdownConfig(
 ### Default Single-line
 
 ```dart
-TextOnlyDropdown(
+TextOnlyDropdownButton(
   config: TextDropdownConfig.defaultConfig,
   // Equivalent to:
   // TextDropdownConfig(
@@ -221,7 +221,7 @@ TextOnlyDropdown(
 ### Multi-line Display
 
 ```dart
-TextOnlyDropdown(
+TextOnlyDropdownButton(
   config: TextDropdownConfig.multiLine,
   itemHeight: 80, // Increase height for multi-line
   // Equivalent to:
@@ -236,7 +236,7 @@ TextOnlyDropdown(
 ### Center Aligned
 
 ```dart
-TextOnlyDropdown(
+TextOnlyDropdownButton(
   config: TextDropdownConfig.centered,
   // Equivalent to:
   // TextDropdownConfig(
@@ -248,7 +248,7 @@ TextOnlyDropdown(
 ### Fade Overflow
 
 ```dart
-TextOnlyDropdown(
+TextOnlyDropdownButton(
   config: TextDropdownConfig.fadeOverflow,
   // Equivalent to:
   // TextDropdownConfig(
@@ -328,7 +328,7 @@ TextDropdownConfig buildThemedConfig(BuildContext context) {
 ### Search Dropdown with Long Options
 
 ```dart
-TextOnlyDropdown(
+TextOnlyDropdownButton(
   items: [
     'Apple Inc. (AAPL)',
     'Microsoft Corporation (MSFT)',
@@ -346,7 +346,7 @@ TextOnlyDropdown(
 ### Multi-line Description Dropdown
 
 ```dart
-TextOnlyDropdown(
+TextOnlyDropdownButton(
   items: [
     'Option 1\nShort description',
     'Option 2\nA longer description that explains the purpose of this option',
@@ -364,7 +364,7 @@ TextOnlyDropdown(
 ### Language Selector
 
 ```dart
-TextOnlyDropdown(
+TextOnlyDropdownButton(
   items: ['English', '中文', 'العربية', 'עברית'],
   config: TextDropdownConfig(
     textAlign: TextAlign.center,

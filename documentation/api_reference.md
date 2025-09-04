@@ -2,14 +2,14 @@
 
 Complete reference for all classes and widgets in the flutter_dropdown_button package.
 
-## CustomDropdown<T>
+## BasicDropdownButton<T>
 
 A highly customizable dropdown widget using OverlayEntry for better control.
 
 ### Constructor
 
 ```dart
-CustomDropdown<T>({
+BasicDropdownButton<T>({
   Key? key,
   required List<DropdownItem<T>> items,
   required ValueChanged<T?> onChanged,
@@ -43,14 +43,14 @@ CustomDropdown<T>({
 | `maxWidth` | `double?` | null | Maximum width constraint |
 | `minWidth` | `double?` | null | Minimum width constraint |
 
-## TextOnlyDropdown
+## TextOnlyDropdownButton
 
 A dropdown widget specifically designed for text-only content with precise text control.
 
 ### Constructor
 
 ```dart
-TextOnlyDropdown({
+TextOnlyDropdownButton({
   Key? key,
   required List<String> items,
   required ValueChanged<String?> onChanged,
@@ -84,9 +84,22 @@ TextOnlyDropdown({
 | `itemHeight` | `double` | 48.0 | Height of each dropdown item |
 | `enabled` | `bool` | true | Whether dropdown is interactive |
 
+## DropdownPositionResult
+
+Position calculation result for dropdown overlay positioning.
+
+### Properties
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `height` | `double` | The calculated height for the dropdown overlay |
+| `openDown` | `bool` | Whether the dropdown should open downward (true) or upward (false) |
+| `transformAlignment` | `Alignment` | The transform alignment for animations |
+| `topPosition` | `double` | The calculated top position for the overlay |
+
 ## DropdownItem<T>
 
-Represents an item in a CustomDropdown.
+Represents an item in a BasicDropdownButton.
 
 ### Constructor
 
@@ -145,6 +158,86 @@ DropdownTheme({
 | `buttonDecoration` | `BoxDecoration?` | null | Custom decoration for button |
 | `itemPadding` | `EdgeInsets` | 16h, 12v | Padding for dropdown items |
 | `buttonPadding` | `EdgeInsets` | 16h, 12v | Padding for dropdown button |
+
+## DropdownMixin<T>
+
+A mixin that provides common dropdown functionality including positioning, animations, and overlay management.
+
+This mixin eliminates code duplication between different dropdown variants by providing shared functionality for smart positioning, animation setup, overlay management, and common state management.
+
+### Key Features
+
+- **Smart Positioning**: Automatically opens upward when insufficient space below
+- **Dynamic Height Adjustment**: Prevents screen overflow with adaptive height
+- **Animation Management**: Consistent scale and opacity animations
+- **Overlay Lifecycle**: Proper creation, insertion, and disposal
+- **Outside-tap Dismissal**: Automatic closure when tapping outside
+
+### Usage
+
+```dart
+class _MyDropdownState extends State<MyDropdown> 
+    with SingleTickerProviderStateMixin, DropdownMixin<MyDropdown> {
+  
+  @override
+  Widget buildOverlayContent(double height) {
+    return Container(height: height, child: ListView(...));
+  }
+  
+  @override
+  Duration get animationDuration => Duration(milliseconds: 200);
+  // ... other required implementations
+}
+```
+
+### Abstract Properties
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `animationDuration` | `Duration` | Duration of show/hide animations |
+| `itemHeight` | `double` | Height of each dropdown item |
+| `maxDropdownHeight` | `double` | Maximum height of dropdown overlay |
+| `itemCount` | `int` | Number of items in the dropdown |
+| `isEnabled` | `bool` | Whether dropdown is interactive (default: true) |
+| `screenMargin` | `double` | Safety margin from screen edges (default: 8.0) |
+| `buttonGap` | `double` | Gap between button and overlay (default: 4.0) |
+| `minVisibleItems` | `int` | Minimum visible items when constrained (default: 2) |
+| `overlayElevation` | `double` | Elevation of overlay Material (default: 8.0) |
+| `overlayBorderRadius` | `double` | Border radius for overlay (default: 8.0) |
+| `overlayShadowColor` | `Color?` | Shadow color for overlay (default: null) |
+
+### Abstract Methods
+
+| Method | Return Type | Description |
+|--------|-------------|-------------|
+| `buildOverlayContent(double height)` | `Widget` | Builds the scrollable content for the overlay |
+| `buildOverlayDecoration()` | `BoxDecoration?` | Builds custom decoration (null for default) |
+| `onDropdownItemSelected()` | `void` | Called when an item is selected |
+
+### Available Methods
+
+| Method | Description |
+|--------|-------------|
+| `initializeDropdown()` | Initialize animations and controllers |
+| `disposeDropdown()` | Dispose of dropdown resources |
+| `toggleDropdown()` | Toggle between open/closed states |
+| `openDropdown()` | Open the dropdown overlay |
+| `closeDropdown()` | Close the dropdown overlay |
+| `calculateDropdownPosition()` | Calculate optimal position and height |
+
+### Position Calculation
+
+The mixin automatically calculates the optimal position based on:
+- Available space above and below the button
+- Screen boundaries and safety margins
+- Content height requirements
+- Minimum visibility constraints
+
+Returns a `DropdownPositionResult` with:
+- `height`: Calculated overlay height
+- `openDown`: Whether to open downward
+- `transformAlignment`: Animation alignment
+- `topPosition`: Calculated top position
 
 ## TextDropdownConfig
 

@@ -304,7 +304,7 @@ FormField<String>(
 ### 1. Install Package
 ```yaml
 dependencies:
-  flutter_dropdown_button: ^1.0.0
+  flutter_dropdown_button: ^1.1.0
 ```
 
 ### 2. Replace Imports

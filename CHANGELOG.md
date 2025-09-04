@@ -2,10 +2,15 @@
 
 ## [Unreleased]
 
+### Added
+- Smart dropdown positioning - automatically opens upward when insufficient space below
+- Dynamic height adjustment to prevent screen overflow
+- `DropdownMixin` for shared functionality across dropdown variants
+
 ### Changed
-- Replaced GestureDetector with InkWell for dropdown items to support Material ripple effects and hover states
-- Added hover, splash, and highlight color customization options to DropdownTheme
-- Enhanced dropdown item interaction with better visual feedback on web and desktop platforms
+- **BREAKING**: `CustomDropdown` → `BasicDropdownButton`
+- **BREAKING**: `TextOnlyDropdown` → `TextOnlyDropdownButton`
+- Improved code architecture with ~150 lines of duplicate code removed
 
 ## 1.0.0
 
