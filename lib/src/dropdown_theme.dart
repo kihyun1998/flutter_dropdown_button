@@ -36,6 +36,8 @@ class DropdownTheme {
       horizontal: 16,
       vertical: 12,
     ),
+    this.itemMargin,
+    this.itemBorderRadius,
   });
 
   /// The duration of the dropdown show/hide animation.
@@ -124,6 +126,18 @@ class DropdownTheme {
   /// Should provide adequate touch target size for accessibility.
   final EdgeInsets buttonPadding;
 
+  /// Margin applied around each dropdown item.
+  ///
+  /// Controls the external spacing between dropdown items.
+  /// Creates visual separation between items for better UX.
+  final EdgeInsets? itemMargin;
+
+  /// Border radius applied to each individual dropdown item.
+  ///
+  /// If null, items will not have rounded corners.
+  /// Allows for rounded item styling independent of overlay border radius.
+  final double? itemBorderRadius;
+
   /// Creates a copy of this theme with the given fields replaced.
   DropdownTheme copyWith({
     Duration? animationDuration,
@@ -140,6 +154,8 @@ class DropdownTheme {
     BoxDecoration? buttonDecoration,
     EdgeInsets? itemPadding,
     EdgeInsets? buttonPadding,
+    EdgeInsets? itemMargin,
+    double? itemBorderRadius,
   }) {
     return DropdownTheme(
       animationDuration: animationDuration ?? this.animationDuration,
@@ -156,6 +172,8 @@ class DropdownTheme {
       buttonDecoration: buttonDecoration ?? this.buttonDecoration,
       itemPadding: itemPadding ?? this.itemPadding,
       buttonPadding: buttonPadding ?? this.buttonPadding,
+      itemMargin: itemMargin ?? this.itemMargin,
+      itemBorderRadius: itemBorderRadius ?? this.itemBorderRadius,
     );
   }
 

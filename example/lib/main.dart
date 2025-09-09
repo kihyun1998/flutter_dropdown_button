@@ -273,6 +273,36 @@ class _MyHomePageState extends State<MyHomePage> {
               },
             ),
             const SizedBox(height: 32),
+            const Text(
+              'New Feature: Dropdown with itemMargin & itemBorderRadius:',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            TextOnlyDropdownButton(
+              items: [
+                'Item 1',
+                'Item 2 with hover effect',
+                'Item 3',
+                'Item 4',
+                'Item 5',
+              ],
+              value: selectedTextOverflow,
+              hint: 'Hover over items to see effect',
+              maxWidth: 300,
+              theme: const DropdownTheme(
+                itemMargin: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                itemBorderRadius: 8.0,
+                itemHoverColor: Color(0xFFE0E0E0), // Gray hover like in your image
+                itemPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                borderRadius: 12.0,
+              ),
+              onChanged: (value) {
+                setState(() {
+                  selectedTextOverflow = value;
+                });
+              },
+            ),
+            const SizedBox(height: 32),
             if (selectedFruit != null ||
                 selectedNumber != null ||
                 selectedDynamic != null ||

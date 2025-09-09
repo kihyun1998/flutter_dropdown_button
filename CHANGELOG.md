@@ -1,5 +1,12 @@
 # Changelog
 
+## [Unreleased]
+
+* **FEAT**: Added itemMargin property to DropdownTheme for controlling spacing between dropdown items
+* **FEAT**: Added itemBorderRadius property to DropdownTheme for individual item border radius styling
+* **FEAT**: Added hover effect support to TextOnlyDropdownButton with InkWell integration
+* **FIX**: Fixed hover effect positioning to respect itemMargin boundaries for consistent visual feedback
+
 ## 1.0.0
 
 * **FEAT**: Initial release with BasicDropdownButton and TextOnlyDropdownButton widgets

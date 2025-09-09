@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
+import 'dropdown_mixin.dart';
 import 'dropdown_theme.dart';
 import 'text_dropdown_config.dart';
-import 'dropdown_mixin.dart';
 
 /// A dropdown button widget specifically designed for text-only content.
 ///
@@ -207,47 +207,62 @@ class _TextOnlyDropdownButtonState extends State<TextOnlyDropdownButton>
           final isFirst = itemIndex == 0;
           final isLast = itemIndex == widget.items.length - 1;
 
-          return GestureDetector(
-            onTap: () {
-              widget.onChanged(item);
-              onDropdownItemSelected();
-            },
+          return Material(
+            color: Colors.transparent,
             child: Container(
-              height: widget.itemHeight,
-              width: double.infinity,
-              padding: _theme.itemPadding,
-              decoration: BoxDecoration(
-                color: isSelected
-                    ? _theme.selectedItemColor ??
-                        Theme.of(context).primaryColor.withValues(alpha: 0.1)
-                    : Colors.transparent,
-                borderRadius: isFirst
-                    ? BorderRadius.only(
-                        topLeft: Radius.circular(_theme.borderRadius),
-                        topRight: Radius.circular(_theme.borderRadius),
-                      )
-                    : isLast
-                        ? BorderRadius.only(
-                            bottomLeft: Radius.circular(_theme.borderRadius),
-                            bottomRight: Radius.circular(_theme.borderRadius),
-                          )
+              margin: _theme.itemMargin,
+              child: InkWell(
+                onTap: () {
+                  widget.onChanged(item);
+                  onDropdownItemSelected();
+                },
+                // Custom splash and highlight colors from theme
+                splashColor:
+                    _theme.itemSplashColor ?? Theme.of(context).splashColor,
+                highlightColor: _theme.itemHighlightColor ??
+                    Theme.of(context).highlightColor,
+                hoverColor:
+                    _theme.itemHoverColor ?? Theme.of(context).hoverColor,
+                // Apply item-specific border radius if provided, otherwise use overlay radius for edges
+                borderRadius: BorderRadius.circular(_theme.itemBorderRadius ??
+                    (isFirst
+                        ? _theme.borderRadius
+                        : isLast
+                            ? _theme.borderRadius
+                            : 0.0)),
+                child: Container(
+                  height: widget.itemHeight,
+                  width: double.infinity,
+                  padding: _theme.itemPadding,
+                  decoration: BoxDecoration(
+                    color: isSelected
+                        ? _theme.selectedItemColor ??
+                            Theme.of(context)
+                                .primaryColor
+                                .withValues(alpha: 0.1)
+                        : Colors.transparent,
+                    // Apply item-specific border radius if provided
+                    borderRadius: _theme.itemBorderRadius != null
+                        ? BorderRadius.circular(_theme.itemBorderRadius!)
                         : null,
-              ),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  item,
-                  style: isSelected
-                      ? _config.selectedTextStyle ?? _config.textStyle
-                      : _config.textStyle,
-                  textAlign: _config.textAlign,
-                  maxLines: _config.maxLines,
-                  overflow: _config.overflow,
-                  softWrap: _config.softWrap,
-                  textDirection: _config.textDirection,
-                  locale: _config.locale,
-                  textScaler: _config.textScaler,
-                  semanticsLabel: _config.semanticsLabel,
+                  ),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      item,
+                      style: isSelected
+                          ? _config.selectedTextStyle ?? _config.textStyle
+                          : _config.textStyle,
+                      textAlign: _config.textAlign,
+                      maxLines: _config.maxLines,
+                      overflow: _config.overflow,
+                      softWrap: _config.softWrap,
+                      textDirection: _config.textDirection,
+                      locale: _config.locale,
+                      textScaler: _config.textScaler,
+                      semanticsLabel: _config.semanticsLabel,
+                    ),
+                  ),
                 ),
               ),
             ),
