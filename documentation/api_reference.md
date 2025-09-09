@@ -2,6 +2,70 @@
 
 Complete reference for all classes and widgets in the flutter_dropdown_button package.
 
+## BaseDropdownButton<T>
+
+Abstract base class for all dropdown button variants. Provides common properties and structure while allowing each variant to customize their specific rendering and behavior.
+
+### Constructor
+
+```dart
+BaseDropdownButton<T>({
+  Key? key,
+  required ValueChanged<T?> onChanged,
+  T? value,
+  double height = 200.0,
+  double itemHeight = 48.0,
+  Duration animationDuration = const Duration(milliseconds: 200),
+  double? width,
+  double? maxWidth,
+  double? minWidth,
+  DropdownTheme? theme,
+  bool enabled = true,
+})
+```
+
+### Properties
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `onChanged` | `ValueChanged<T?>` | required | Callback when selection changes |
+| `value` | `T?` | null | Currently selected value |
+| `height` | `double` | 200.0 | Maximum height of dropdown overlay |
+| `itemHeight` | `double` | 48.0 | Height of each dropdown item |
+| `animationDuration` | `Duration` | 200ms | Animation duration for show/hide |
+| `width` | `double?` | null | Fixed width for dropdown |
+| `maxWidth` | `double?` | null | Maximum width constraint |
+| `minWidth` | `double?` | null | Minimum width constraint |
+| `theme` | `DropdownTheme?` | null | Custom theme configuration |
+| `enabled` | `bool` | true | Whether dropdown is interactive |
+
+### Creating Custom Dropdowns
+
+To create a custom dropdown widget, extend `BaseDropdownButton` and implement the required abstract methods:
+
+```dart
+class MyCustomDropdown extends BaseDropdownButton<MyItemType> {
+  // Your custom properties
+}
+
+class _MyCustomDropdownState extends BaseDropdownButtonState<MyCustomDropdown, MyItemType> {
+  @override
+  Widget buildSelectedWidget() {
+    // Return widget for selected value display
+  }
+  
+  @override
+  Widget buildItemWidget(MyItemType item, bool isSelected) {
+    // Return widget for individual dropdown items
+  }
+  
+  @override
+  List<MyItemType> getItems() {
+    // Return list of available items
+  }
+}
+```
+
 ## BasicDropdownButton<T>
 
 A highly customizable dropdown widget using OverlayEntry for better control.
@@ -158,6 +222,10 @@ DropdownTheme({
 | `buttonDecoration` | `BoxDecoration?` | null | Custom decoration for button |
 | `itemPadding` | `EdgeInsets` | 16h, 12v | Padding for dropdown items |
 | `buttonPadding` | `EdgeInsets` | 16h, 12v | Padding for dropdown button |
+| `itemMargin` | `EdgeInsets?` | null | Margin around each dropdown item |
+| `itemBorderRadius` | `double?` | null | Individual border radius for items |
+| `itemSplashColor` | `Color?` | null | Splash color for item interactions |
+| `itemHighlightColor` | `Color?` | null | Highlight color for item touch |
 
 ## DropdownMixin<T>
 

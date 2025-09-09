@@ -65,12 +65,25 @@ DropdownTheme(
 )
 ```
 
-### Padding
+### Padding and Spacing
 
 ```dart
 DropdownTheme(
   itemPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
   buttonPadding: EdgeInsets.all(16),
+  itemMargin: EdgeInsets.symmetric(horizontal: 8, vertical: 4), // Space between items
+)
+```
+
+### Item Styling
+
+```dart
+DropdownTheme(
+  itemBorderRadius: 8.0,                    // Individual item border radius
+  itemMargin: EdgeInsets.all(4),            // Margin around each item
+  itemHoverColor: Colors.grey[100],         // Hover effect color
+  itemSplashColor: Colors.blue[50],         // Touch splash color
+  itemHighlightColor: Colors.blue[25],      // Highlight color
 )
 ```
 
@@ -160,6 +173,22 @@ DropdownTheme(
   elevation: 3.0,
   backgroundColor: Theme.of(context).colorScheme.surface,
   selectedItemColor: Theme.of(context).colorScheme.primaryContainer,
+  itemBorderRadius: 12.0,
+  itemMargin: EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+)
+```
+
+### Modern Card Style
+
+```dart
+DropdownTheme(
+  borderRadius: 12.0,
+  elevation: 2.0,
+  backgroundColor: Colors.white,
+  itemMargin: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+  itemBorderRadius: 8.0,
+  itemHoverColor: Color(0xFFF5F5F5),
+  selectedItemColor: Color(0xFFE3F2FD),
 )
 ```
 

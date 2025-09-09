@@ -292,7 +292,9 @@ class _MyHomePageState extends State<MyHomePage> {
               theme: const DropdownTheme(
                 itemMargin: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 itemBorderRadius: 8.0,
-                itemHoverColor: Color(0xFFE0E0E0), // Gray hover like in your image
+                itemHoverColor: Color(
+                  0xFFE0E0E0,
+                ), // Gray hover like in your image
                 itemPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 borderRadius: 12.0,
               ),
