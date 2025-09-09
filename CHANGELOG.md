@@ -6,6 +6,8 @@
 * **FEAT**: Added itemBorderRadius property to DropdownTheme for individual item border radius styling
 * **FEAT**: Added hover effect support to TextOnlyDropdownButton with InkWell integration
 * **FIX**: Fixed hover effect positioning to respect itemMargin boundaries for consistent visual feedback
+* **REFACTOR**: Added BaseDropdownButton abstract class to reduce code duplication between dropdown variants
+* **FEAT**: Exported BaseDropdownButton for creating custom dropdown implementations
 
 ## 1.0.0
 

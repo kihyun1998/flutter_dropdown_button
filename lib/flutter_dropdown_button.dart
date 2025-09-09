@@ -1,5 +1,6 @@
 library;
 
+export 'src/base_dropdown_button.dart';
 export 'src/basic_dropdown_button.dart';
 export 'src/dropdown_item.dart';
 export 'src/dropdown_theme.dart';
