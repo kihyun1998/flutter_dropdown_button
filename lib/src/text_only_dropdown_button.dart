@@ -78,9 +78,11 @@ class TextOnlyDropdownButton extends BaseDropdownButton<String> {
 ///
 /// Manages the dropdown's open/closed state, animations, and overlay positioning.
 /// Uses [BaseDropdownButtonState] to provide common dropdown functionality.
-class _TextOnlyDropdownButtonState extends BaseDropdownButtonState<TextOnlyDropdownButton, String> {
+class _TextOnlyDropdownButtonState
+    extends BaseDropdownButtonState<TextOnlyDropdownButton, String> {
   /// The effective config, using provided config or default.
-  TextDropdownConfig get _config => widget.config ?? TextDropdownConfig.defaultConfig;
+  TextDropdownConfig get _config =>
+      widget.config ?? TextDropdownConfig.defaultConfig;
 
   @override
   Widget buildSelectedWidget() {

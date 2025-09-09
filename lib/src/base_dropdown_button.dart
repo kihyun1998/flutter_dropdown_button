@@ -120,9 +120,9 @@ abstract class BaseDropdownButton<T> extends StatefulWidget {
 /// - [getItems]: How to access the list of available items
 abstract class BaseDropdownButtonState<W extends BaseDropdownButton<T>, T>
     extends State<W> with SingleTickerProviderStateMixin, DropdownMixin<W> {
-  
   /// Gets the effective theme, using provided theme or default.
-  DropdownTheme get effectiveTheme => widget.theme ?? DropdownTheme.defaultTheme;
+  DropdownTheme get effectiveTheme =>
+      widget.theme ?? DropdownTheme.defaultTheme;
 
   // DropdownMixin implementation
   @override
@@ -192,7 +192,7 @@ abstract class BaseDropdownButtonState<W extends BaseDropdownButton<T>, T>
   @override
   Widget buildOverlayContent(double height) {
     final items = getItems();
-    
+
     return SingleChildScrollView(
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -233,14 +233,15 @@ abstract class BaseDropdownButtonState<W extends BaseDropdownButton<T>, T>
             onDropdownItemSelected();
           },
           // Custom splash and highlight colors from theme
-          splashColor: effectiveTheme.itemSplashColor ?? Theme.of(context).splashColor,
-          highlightColor: effectiveTheme.itemHighlightColor ?? Theme.of(context).highlightColor,
-          hoverColor: effectiveTheme.itemHoverColor ?? Theme.of(context).hoverColor,
+          splashColor:
+              effectiveTheme.itemSplashColor ?? Theme.of(context).splashColor,
+          highlightColor: effectiveTheme.itemHighlightColor ??
+              Theme.of(context).highlightColor,
+          hoverColor:
+              effectiveTheme.itemHoverColor ?? Theme.of(context).hoverColor,
           // Apply item-specific border radius if provided, otherwise use overlay radius for edges
-          borderRadius: BorderRadius.circular(
-            effectiveTheme.itemBorderRadius ?? 
-            (isFirst || isLast ? effectiveTheme.borderRadius : 0.0)
-          ),
+          borderRadius: BorderRadius.circular(effectiveTheme.itemBorderRadius ??
+              (isFirst || isLast ? effectiveTheme.borderRadius : 0.0)),
           child: Container(
             height: widget.itemHeight,
             width: double.infinity,
@@ -278,12 +279,15 @@ abstract class BaseDropdownButtonState<W extends BaseDropdownButton<T>, T>
         decoration: buildButtonDecoration(),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          mainAxisSize: widget.width != null ? MainAxisSize.max : MainAxisSize.min,
+          mainAxisSize:
+              widget.width != null ? MainAxisSize.max : MainAxisSize.min,
           children: [
             Flexible(child: buildSelectedWidget()),
             const SizedBox(width: 8),
             Icon(
-              isDropdownOpen ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+              isDropdownOpen
+                  ? Icons.keyboard_arrow_up
+                  : Icons.keyboard_arrow_down,
               color: widget.enabled
                   ? Theme.of(context).iconTheme.color
                   : Theme.of(context).disabledColor,
@@ -314,7 +318,7 @@ abstract class BaseDropdownButtonState<W extends BaseDropdownButton<T>, T>
 
   /// Applies width constraints to the dropdown button.
   Widget _applyWidthConstraints(Widget child) {
-    if (widget.width == null && 
+    if (widget.width == null &&
         (widget.minWidth != null || widget.maxWidth != null)) {
       return ConstrainedBox(
         constraints: BoxConstraints(

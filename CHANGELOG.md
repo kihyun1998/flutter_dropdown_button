@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## 1.0.1
 
 * **FEAT**: Added itemMargin property to DropdownTheme for controlling spacing between dropdown items
 * **FEAT**: Added itemBorderRadius property to DropdownTheme for individual item border radius styling

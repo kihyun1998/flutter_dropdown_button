@@ -87,7 +87,8 @@ class BasicDropdownButton<T> extends BaseDropdownButton<T> {
 ///
 /// Manages the dropdown's open/closed state, animations, and overlay positioning.
 /// Uses [BaseDropdownButtonState] to provide common dropdown functionality.
-class _BasicDropdownButtonState<T> extends BaseDropdownButtonState<BasicDropdownButton<T>, T> {
+class _BasicDropdownButtonState<T>
+    extends BaseDropdownButtonState<BasicDropdownButton<T>, T> {
   @override
   double get overlayBorderRadius => widget.borderRadius;
 
@@ -106,13 +107,15 @@ class _BasicDropdownButtonState<T> extends BaseDropdownButtonState<BasicDropdown
 
   @override
   Widget buildSelectedWidget() {
-    final selectedItem = widget.items.where((item) => item.value == widget.value).firstOrNull;
+    final selectedItem =
+        widget.items.where((item) => item.value == widget.value).firstOrNull;
     return selectedItem?.child ?? widget.hint ?? const SizedBox.shrink();
   }
 
   @override
   Widget buildItemWidget(T item, bool isSelected) {
-    final dropdownItem = widget.items.firstWhere((dropdownItem) => dropdownItem.value == item);
+    final dropdownItem =
+        widget.items.firstWhere((dropdownItem) => dropdownItem.value == item);
     return dropdownItem.child;
   }
 
@@ -123,7 +126,8 @@ class _BasicDropdownButtonState<T> extends BaseDropdownButtonState<BasicDropdown
 
   @override
   void onItemTap(T item) {
-    final dropdownItem = widget.items.firstWhere((dropdownItem) => dropdownItem.value == item);
+    final dropdownItem =
+        widget.items.firstWhere((dropdownItem) => dropdownItem.value == item);
     widget.onChanged(item);
     dropdownItem.onTap?.call();
   }
