@@ -15,6 +15,7 @@ A highly customizable dropdown package for Flutter with overlay-based rendering,
 - 📝 **Text Overflow Control**: Ellipsis, fade, clip, or visible overflow options
 - 🎭 **Multiple Variants**: Generic BasicDropdownButton and specialized TextOnlyDropdownButton
 - 🎨 **Shared Theme System**: Consistent styling across all dropdown variants
+- 📜 **Custom Scrollbar**: Scrollbar theming with colors, thickness, and visibility options
 - ♿ **Accessibility Support**: Screen reader friendly with proper semantics
 
 ## Variants
@@ -31,7 +32,7 @@ Add to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  flutter_dropdown_button: ^1.0.1
+  flutter_dropdown_button: ^1.1.0
 ```
 
 Import the package:
@@ -103,11 +104,15 @@ TextOnlyDropdownButton(
 ```dart
 TextOnlyDropdownButton(
   // ... other properties
-  theme: DropdownTheme(
-    borderRadius: 12.0,
-    animationDuration: Duration(milliseconds: 300),
-    elevation: 4.0,
-    backgroundColor: Colors.white,
+  theme: DropdownStyleTheme(
+    dropdown: DropdownTheme(
+      borderRadius: 12.0,
+      elevation: 4.0,
+    ),
+    scroll: DropdownScrollTheme(
+      thickness: 8.0,
+      thumbColor: Colors.blue,
+    ),
   ),
 )
 ```

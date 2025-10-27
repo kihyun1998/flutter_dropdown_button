@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import 'dropdown_mixin.dart';
 import 'dropdown_theme.dart';
+import 'dropdown_style_theme.dart';
+import 'dropdown_scroll_theme.dart';
 
 /// Abstract base class for all dropdown button variants.
 ///
@@ -96,9 +98,14 @@ abstract class BaseDropdownButton<T> extends StatefulWidget {
 
   /// Custom theme configuration for the dropdown appearance and behavior.
   ///
-  /// If null, uses [DropdownTheme.defaultTheme] with theme-appropriate colors.
-  /// Allows customization of colors, animations, and interaction effects.
-  final DropdownTheme? theme;
+  /// Accepts either [DropdownStyleTheme] (recommended) or [DropdownTheme] for
+  /// backward compatibility. If null, uses [DropdownStyleTheme.defaultTheme]
+  /// with theme-appropriate colors.
+  ///
+  /// When using [DropdownStyleTheme], you can configure both dropdown styling
+  /// and scrollbar appearance. When using [DropdownTheme], only dropdown
+  /// styling is configured.
+  final Object? theme;
 
   /// Whether the dropdown is enabled for user interaction.
   ///
@@ -120,9 +127,25 @@ abstract class BaseDropdownButton<T> extends StatefulWidget {
 /// - [getItems]: How to access the list of available items
 abstract class BaseDropdownButtonState<W extends BaseDropdownButton<T>, T>
     extends State<W> with SingleTickerProviderStateMixin, DropdownMixin<W> {
-  /// Gets the effective theme, using provided theme or default.
-  DropdownTheme get effectiveTheme =>
-      widget.theme ?? DropdownTheme.defaultTheme;
+  /// Gets the effective dropdown theme, handling both DropdownStyleTheme and DropdownTheme.
+  DropdownTheme get effectiveTheme {
+    final theme = widget.theme;
+    if (theme is DropdownStyleTheme) {
+      return theme.dropdown;
+    } else if (theme is DropdownTheme) {
+      return theme;
+    }
+    return DropdownTheme.defaultTheme;
+  }
+
+  /// Gets the effective scroll theme if available.
+  DropdownScrollTheme? get effectiveScrollTheme {
+    final theme = widget.theme;
+    if (theme is DropdownStyleTheme) {
+      return theme.scroll;
+    }
+    return null;
+  }
 
   // DropdownMixin implementation
   @override
@@ -157,6 +180,7 @@ abstract class BaseDropdownButtonState<W extends BaseDropdownButton<T>, T>
 
   @override
   void dispose() {
+    _scrollController?.dispose();
     disposeDropdown();
     super.dispose();
   }
@@ -180,10 +204,13 @@ abstract class BaseDropdownButtonState<W extends BaseDropdownButton<T>, T>
         );
   }
 
+  // ScrollController for custom scrollbar
+  ScrollController? _scrollController;
+
   /// Builds the common dropdown overlay content with items.
   ///
   /// This method handles the common structure that all dropdown variants share:
-  /// - Scrollable container
+  /// - Scrollable container with custom scrollbar theming
   /// - Item iteration and selection state
   /// - Theme application and interaction handling
   /// - First/last item border radius logic
@@ -192,8 +219,15 @@ abstract class BaseDropdownButtonState<W extends BaseDropdownButton<T>, T>
   @override
   Widget buildOverlayContent(double height) {
     final items = getItems();
+    final scrollTheme = effectiveScrollTheme;
 
-    return SingleChildScrollView(
+    // Create ScrollController if needed for custom scrollbar
+    if (scrollTheme != null && _scrollController == null) {
+      _scrollController = ScrollController();
+    }
+
+    Widget scrollView = SingleChildScrollView(
+      controller: scrollTheme != null ? _scrollController : null,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: items.asMap().entries.map((entry) {
@@ -213,6 +247,48 @@ abstract class BaseDropdownButtonState<W extends BaseDropdownButton<T>, T>
         }).toList(),
       ),
     );
+
+    // Apply custom scrollbar theme if provided
+    if (scrollTheme != null) {
+      // Apply ScrollbarTheme for colors first
+      if (scrollTheme.thumbColor != null ||
+          scrollTheme.trackColor != null ||
+          scrollTheme.trackBorderColor != null ||
+          scrollTheme.crossAxisMargin != null ||
+          scrollTheme.mainAxisMargin != null ||
+          scrollTheme.minThumbLength != null) {
+        scrollView = ScrollbarTheme(
+          data: ScrollbarThemeData(
+            thumbColor: scrollTheme.thumbColor != null
+                ? WidgetStateProperty.all(scrollTheme.thumbColor)
+                : null,
+            trackColor: scrollTheme.trackColor != null
+                ? WidgetStateProperty.all(scrollTheme.trackColor)
+                : null,
+            trackBorderColor: scrollTheme.trackBorderColor != null
+                ? WidgetStateProperty.all(scrollTheme.trackBorderColor)
+                : null,
+            crossAxisMargin: scrollTheme.crossAxisMargin,
+            mainAxisMargin: scrollTheme.mainAxisMargin,
+            minThumbLength: scrollTheme.minThumbLength,
+          ),
+          child: scrollView,
+        );
+      }
+
+      // Then wrap with Scrollbar
+      scrollView = Scrollbar(
+        controller: _scrollController,
+        thickness: scrollTheme.thickness,
+        radius: scrollTheme.radius,
+        thumbVisibility: scrollTheme.thumbVisibility,
+        trackVisibility: scrollTheme.trackVisibility,
+        interactive: scrollTheme.interactive,
+        child: scrollView,
+      );
+    }
+
+    return scrollView;
   }
 
   /// Builds the common item wrapper with theme and interaction handling.
@@ -348,7 +424,7 @@ abstract class BaseDropdownButtonState<W extends BaseDropdownButton<T>, T>
   /// Returns the list of items available in this dropdown.
   ///
   /// This abstraction allows different dropdown types to manage their
-  /// items differently (e.g., List<String> vs List<DropdownItem<T>>).
+  /// items differently (e.g., `List<String>` vs `List<DropdownItem<T>>`).
   List<T> getItems();
 
   /// Determines if the given item is currently selected.

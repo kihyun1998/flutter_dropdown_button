@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.1.0
+
+* **FEAT**: Added DropdownScrollTheme for customizing scrollbar appearance
+* **FEAT**: Added DropdownStyleTheme as main theme container for dropdown and scroll themes
+* **FEAT**: Support for custom scrollbar colors, thickness, radius, and visibility options
+* **REFACTOR**: Updated example app with feature-based showcase and style selector
+
 ## 1.0.1
 
 * **FEAT**: Added itemMargin property to DropdownTheme for controlling spacing between dropdown items
