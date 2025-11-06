@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 import 'dropdown_mixin.dart';
-import 'dropdown_theme.dart';
-import 'dropdown_style_theme.dart';
 import 'dropdown_scroll_theme.dart';
+import 'dropdown_style_theme.dart';
+import 'dropdown_theme.dart';
 
 /// Abstract base class for all dropdown button variants.
 ///
@@ -98,14 +98,10 @@ abstract class BaseDropdownButton<T> extends StatefulWidget {
 
   /// Custom theme configuration for the dropdown appearance and behavior.
   ///
-  /// Accepts either [DropdownStyleTheme] (recommended) or [DropdownTheme] for
-  /// backward compatibility. If null, uses [DropdownStyleTheme.defaultTheme]
+  /// Accepts [DropdownStyleTheme] which allows you to configure both dropdown
+  /// styling and scrollbar appearance. If null, uses [DropdownStyleTheme.defaultTheme]
   /// with theme-appropriate colors.
-  ///
-  /// When using [DropdownStyleTheme], you can configure both dropdown styling
-  /// and scrollbar appearance. When using [DropdownTheme], only dropdown
-  /// styling is configured.
-  final Object? theme;
+  final DropdownStyleTheme? theme;
 
   /// Whether the dropdown is enabled for user interaction.
   ///
@@ -127,24 +123,14 @@ abstract class BaseDropdownButton<T> extends StatefulWidget {
 /// - [getItems]: How to access the list of available items
 abstract class BaseDropdownButtonState<W extends BaseDropdownButton<T>, T>
     extends State<W> with SingleTickerProviderStateMixin, DropdownMixin<W> {
-  /// Gets the effective dropdown theme, handling both DropdownStyleTheme and DropdownTheme.
+  /// Gets the effective dropdown theme from the DropdownStyleTheme.
   DropdownTheme get effectiveTheme {
-    final theme = widget.theme;
-    if (theme is DropdownStyleTheme) {
-      return theme.dropdown;
-    } else if (theme is DropdownTheme) {
-      return theme;
-    }
-    return DropdownTheme.defaultTheme;
+    return widget.theme?.dropdown ?? DropdownTheme.defaultTheme;
   }
 
   /// Gets the effective scroll theme if available.
   DropdownScrollTheme? get effectiveScrollTheme {
-    final theme = widget.theme;
-    if (theme is DropdownStyleTheme) {
-      return theme.scroll;
-    }
-    return null;
+    return widget.theme?.scroll;
   }
 
   // DropdownMixin implementation
@@ -164,10 +150,31 @@ abstract class BaseDropdownButtonState<W extends BaseDropdownButton<T>, T>
   bool get isEnabled => widget.enabled;
 
   @override
+  double get actualItemHeight {
+    // Calculate the actual height including margins
+    final itemMargin = effectiveTheme.itemMargin;
+    final marginHeight =
+        itemMargin != null ? (itemMargin.top + itemMargin.bottom) : 0.0;
+    return widget.itemHeight + marginHeight;
+  }
+
+  @override
   double get overlayElevation => effectiveTheme.elevation;
 
   @override
   double get overlayBorderRadius => effectiveTheme.borderRadius;
+
+  @override
+  double get overlayBorderThickness {
+    final overlayDecoration = buildOverlayDecoration();
+    if (overlayDecoration?.border != null) {
+      final border = overlayDecoration!.border!;
+      if (border is Border) {
+        return border.top.width + border.bottom.width;
+      }
+    }
+    return 0.0;
+  }
 
   @override
   Color? get overlayShadowColor => effectiveTheme.shadowColor;
@@ -210,7 +217,7 @@ abstract class BaseDropdownButtonState<W extends BaseDropdownButton<T>, T>
   /// Builds the common dropdown overlay content with items.
   ///
   /// This method handles the common structure that all dropdown variants share:
-  /// - Scrollable container with custom scrollbar theming
+  /// - Scrollable container with custom scrollbar theming (only when needed)
   /// - Item iteration and selection state
   /// - Theme application and interaction handling
   /// - First/last item border radius logic
@@ -221,74 +228,87 @@ abstract class BaseDropdownButtonState<W extends BaseDropdownButton<T>, T>
     final items = getItems();
     final scrollTheme = effectiveScrollTheme;
 
-    // Create ScrollController if needed for custom scrollbar
-    if (scrollTheme != null && _scrollController == null) {
-      _scrollController = ScrollController();
-    }
+    // Calculate total items height with margins
+    // Note: height already includes border thickness from calculateDropdownPosition
+    final availableContentHeight = height - overlayBorderThickness;
+    final totalItemsHeight = items.length * actualItemHeight;
+    final needsScroll = totalItemsHeight > availableContentHeight;
 
-    Widget scrollView = SingleChildScrollView(
-      controller: scrollTheme != null ? _scrollController : null,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: items.asMap().entries.map((entry) {
-          final index = entry.key;
-          final item = entry.value;
-          final isSelected = isItemSelected(item);
-          final isFirst = index == 0;
-          final isLast = index == items.length - 1;
+    // Build the items column
+    Widget content = Column(
+      mainAxisSize: MainAxisSize.min,
+      children: items.asMap().entries.map((entry) {
+        final index = entry.key;
+        final item = entry.value;
+        final isSelected = isItemSelected(item);
+        final isFirst = index == 0;
+        final isLast = index == items.length - 1;
 
-          return _buildItemWrapper(
-            item: item,
-            isSelected: isSelected,
-            isFirst: isFirst,
-            isLast: isLast,
-            child: buildItemWidget(item, isSelected),
-          );
-        }).toList(),
-      ),
+        return _buildItemWrapper(
+          item: item,
+          isSelected: isSelected,
+          isFirst: isFirst,
+          isLast: isLast,
+          child: buildItemWidget(item, isSelected),
+        );
+      }).toList(),
     );
 
-    // Apply custom scrollbar theme if provided
-    if (scrollTheme != null) {
-      // Apply ScrollbarTheme for colors first
-      if (scrollTheme.thumbColor != null ||
-          scrollTheme.trackColor != null ||
-          scrollTheme.trackBorderColor != null ||
-          scrollTheme.crossAxisMargin != null ||
-          scrollTheme.mainAxisMargin != null ||
-          scrollTheme.minThumbLength != null) {
-        scrollView = ScrollbarTheme(
-          data: ScrollbarThemeData(
-            thumbColor: scrollTheme.thumbColor != null
-                ? WidgetStateProperty.all(scrollTheme.thumbColor)
-                : null,
-            trackColor: scrollTheme.trackColor != null
-                ? WidgetStateProperty.all(scrollTheme.trackColor)
-                : null,
-            trackBorderColor: scrollTheme.trackBorderColor != null
-                ? WidgetStateProperty.all(scrollTheme.trackBorderColor)
-                : null,
-            crossAxisMargin: scrollTheme.crossAxisMargin,
-            mainAxisMargin: scrollTheme.mainAxisMargin,
-            minThumbLength: scrollTheme.minThumbLength,
-          ),
-          child: scrollView,
-        );
+    // Only apply scrolling if needed
+    if (needsScroll) {
+      // Create ScrollController if needed for custom scrollbar
+      if (scrollTheme != null && _scrollController == null) {
+        _scrollController = ScrollController();
       }
 
-      // Then wrap with Scrollbar
-      scrollView = Scrollbar(
-        controller: _scrollController,
-        thickness: scrollTheme.thickness,
-        radius: scrollTheme.radius,
-        thumbVisibility: scrollTheme.thumbVisibility,
-        trackVisibility: scrollTheme.trackVisibility,
-        interactive: scrollTheme.interactive,
-        child: scrollView,
+      // Wrap with SingleChildScrollView
+      content = SingleChildScrollView(
+        controller: scrollTheme != null ? _scrollController : null,
+        child: content,
       );
+
+      // Apply custom scrollbar theme if provided
+      if (scrollTheme != null) {
+        // Apply ScrollbarTheme for colors first
+        if (scrollTheme.thumbColor != null ||
+            scrollTheme.trackColor != null ||
+            scrollTheme.trackBorderColor != null ||
+            scrollTheme.crossAxisMargin != null ||
+            scrollTheme.mainAxisMargin != null ||
+            scrollTheme.minThumbLength != null) {
+          content = ScrollbarTheme(
+            data: ScrollbarThemeData(
+              thumbColor: scrollTheme.thumbColor != null
+                  ? WidgetStateProperty.all(scrollTheme.thumbColor)
+                  : null,
+              trackColor: scrollTheme.trackColor != null
+                  ? WidgetStateProperty.all(scrollTheme.trackColor)
+                  : null,
+              trackBorderColor: scrollTheme.trackBorderColor != null
+                  ? WidgetStateProperty.all(scrollTheme.trackBorderColor)
+                  : null,
+              crossAxisMargin: scrollTheme.crossAxisMargin,
+              mainAxisMargin: scrollTheme.mainAxisMargin,
+              minThumbLength: scrollTheme.minThumbLength,
+            ),
+            child: content,
+          );
+        }
+
+        // Then wrap with Scrollbar
+        content = Scrollbar(
+          controller: _scrollController,
+          thickness: scrollTheme.thickness,
+          radius: scrollTheme.radius,
+          thumbVisibility: scrollTheme.thumbVisibility,
+          trackVisibility: scrollTheme.trackVisibility,
+          interactive: scrollTheme.interactive,
+          child: content,
+        );
+      }
     }
 
-    return scrollView;
+    return content;
   }
 
   /// Builds the common item wrapper with theme and interaction handling.
@@ -365,7 +385,8 @@ abstract class BaseDropdownButtonState<W extends BaseDropdownButton<T>, T>
                   ? Icons.keyboard_arrow_up
                   : Icons.keyboard_arrow_down,
               color: widget.enabled
-                  ? Theme.of(context).iconTheme.color
+                  ? (effectiveTheme.iconColor ??
+                      Theme.of(context).iconTheme.color)
                   : Theme.of(context).disabledColor,
             ),
           ],

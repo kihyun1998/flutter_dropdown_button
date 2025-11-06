@@ -1,5 +1,12 @@
 # Changelog
 
+## [Unreleased]
+
+* **FEAT**: Added iconColor property to DropdownTheme for customizing dropdown arrow icon color
+* **FIX**: Fixed dropdown overlay content clipping issue with border radius by adding clipBehavior to Material widget
+* **FIX**: Changed theme parameter type from Object? to DropdownStyleTheme? for better type safety
+* **FIX**: Fixed dropdown menu height calculation to properly account for itemMargin and border thickness, preventing unnecessary scrollbars
+
 ## 1.1.0
 
 * **FEAT**: Added DropdownScrollTheme for customizing scrollbar appearance

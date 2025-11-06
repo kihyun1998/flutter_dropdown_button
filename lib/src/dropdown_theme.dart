@@ -32,12 +32,11 @@ class DropdownTheme {
     this.overlayDecoration,
     this.buttonDecoration,
     this.itemPadding = const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-    this.buttonPadding = const EdgeInsets.symmetric(
-      horizontal: 16,
-      vertical: 12,
-    ),
+    this.buttonPadding =
+        const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
     this.itemMargin,
     this.itemBorderRadius,
+    this.iconColor,
   });
 
   /// The duration of the dropdown show/hide animation.
@@ -138,6 +137,13 @@ class DropdownTheme {
   /// Allows for rounded item styling independent of overlay border radius.
   final double? itemBorderRadius;
 
+  /// The color of the dropdown button icon (arrow).
+  ///
+  /// If null, uses the theme's icon color.
+  /// This allows customization of the dropdown arrow color
+  /// independent of the global icon theme.
+  final Color? iconColor;
+
   /// Creates a copy of this theme with the given fields replaced.
   DropdownTheme copyWith({
     Duration? animationDuration,
@@ -156,6 +162,7 @@ class DropdownTheme {
     EdgeInsets? buttonPadding,
     EdgeInsets? itemMargin,
     double? itemBorderRadius,
+    Color? iconColor,
   }) {
     return DropdownTheme(
       animationDuration: animationDuration ?? this.animationDuration,
@@ -174,6 +181,7 @@ class DropdownTheme {
       buttonPadding: buttonPadding ?? this.buttonPadding,
       itemMargin: itemMargin ?? this.itemMargin,
       itemBorderRadius: itemBorderRadius ?? this.itemBorderRadius,
+      iconColor: iconColor ?? this.iconColor,
     );
   }
 

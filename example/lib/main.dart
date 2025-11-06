@@ -108,6 +108,7 @@ final List<StylePreset> stylePresets = [
         itemSplashColor: const Color(0x60FF9800),
         itemPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         border: Border.all(color: Colors.deepPurple.shade200, width: 2),
+        iconColor: Colors.deepPurple, // Custom icon color
       ),
     ),
   ),
@@ -124,6 +125,40 @@ final List<StylePreset> stylePresets = [
         border: Border.all(
           color: Colors.white.withValues(alpha: 0.4),
           width: 1.5,
+        ),
+      ),
+    ),
+  ),
+  StylePreset(
+    'Thick Border',
+    DropdownStyleTheme(
+      dropdown: DropdownTheme(
+        borderRadius: 12.0,
+        elevation: 4.0,
+        backgroundColor: Colors.white,
+        selectedItemColor: const Color(0x1AFF5722),
+        itemHoverColor: const Color(0x0AFF5722),
+        itemPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        border: Border.all(
+          color: Colors.deepOrange,
+          width: 3.0, // Thick border for testing
+        ),
+      ),
+    ),
+  ),
+  StylePreset(
+    'Extra Thick Border',
+    DropdownStyleTheme(
+      dropdown: DropdownTheme(
+        borderRadius: 8.0,
+        elevation: 2.0,
+        backgroundColor: Colors.blue.shade50,
+        selectedItemColor: const Color(0x402196F3),
+        itemHoverColor: const Color(0x202196F3),
+        itemPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        border: Border.all(
+          color: Colors.blue.shade700,
+          width: 5.0, // Extra thick border for testing
         ),
       ),
     ),
@@ -467,12 +502,14 @@ class _MyHomePageState extends State<MyHomePage> {
                     config: const TextDropdownConfig(
                       textStyle: TextStyle(fontSize: 12),
                     ),
-                    theme: const DropdownTheme(
-                      borderRadius: 8.0,
-                      elevation: 2.0,
-                      itemPadding: EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 8,
+                    theme: const DropdownStyleTheme(
+                      dropdown: DropdownTheme(
+                        borderRadius: 8.0,
+                        elevation: 2.0,
+                        itemPadding: EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 8,
+                        ),
                       ),
                     ),
                     onChanged: onStyleChanged,

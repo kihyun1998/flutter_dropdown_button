@@ -77,6 +77,12 @@ mixin DropdownMixin<T extends StatefulWidget> on State<T>, TickerProvider {
   /// The height of each individual dropdown item.
   double get itemHeight;
 
+  /// The actual height of each dropdown item including margins.
+  ///
+  /// This should return the total vertical space each item occupies,
+  /// including any margins applied to the item.
+  double get actualItemHeight;
+
   /// The maximum height of the dropdown overlay.
   double get maxDropdownHeight;
 
@@ -100,6 +106,12 @@ mixin DropdownMixin<T extends StatefulWidget> on State<T>, TickerProvider {
 
   /// The border radius for the dropdown overlay.
   double get overlayBorderRadius => 8.0;
+
+  /// The total vertical border thickness (top + bottom) for the dropdown overlay.
+  ///
+  /// This is used to calculate the available content height within the overlay.
+  /// Returns 0.0 if no border is applied.
+  double get overlayBorderThickness => 0.0;
 
   /// The shadow color for the dropdown overlay Material.
   Color? get overlayShadowColor => null;
@@ -209,9 +221,10 @@ mixin DropdownMixin<T extends StatefulWidget> on State<T>, TickerProvider {
         screenHeight - (buttonOffset.dy + buttonSize.height + screenMargin);
     final spaceAbove = buttonOffset.dy - screenMargin;
 
-    // Calculate dynamic preferred height based on items
-    final totalItemsHeight = itemCount * itemHeight;
-    final preferredHeight = math.min(totalItemsHeight, maxDropdownHeight);
+    // Calculate dynamic preferred height based on items with actual item heights
+    final totalItemsHeight = itemCount * actualItemHeight;
+    // Add border thickness to ensure enough space for content + border
+    final preferredHeight = math.min(totalItemsHeight, maxDropdownHeight) + overlayBorderThickness;
 
     // Determine positioning and height
     double menuHeight;
@@ -240,8 +253,8 @@ mixin DropdownMixin<T extends StatefulWidget> on State<T>, TickerProvider {
         transformAlignment = Alignment.bottomCenter;
       }
 
-      // Ensure minimum height for usability
-      final minHeight = minVisibleItems * itemHeight;
+      // Ensure minimum height for usability with actual item heights + border
+      final minHeight = minVisibleItems * actualItemHeight + overlayBorderThickness;
       menuHeight = math.max(menuHeight, minHeight);
     }
 
@@ -286,6 +299,7 @@ mixin DropdownMixin<T extends StatefulWidget> on State<T>, TickerProvider {
                           shadowColor: overlayShadowColor,
                           borderRadius:
                               BorderRadius.circular(overlayBorderRadius),
+                          clipBehavior: Clip.antiAlias,
                           child: Container(
                             height: position.height,
                             decoration: buildOverlayDecoration() ??
