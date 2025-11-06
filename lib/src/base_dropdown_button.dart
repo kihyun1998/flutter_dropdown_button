@@ -269,42 +269,52 @@ abstract class BaseDropdownButtonState<W extends BaseDropdownButton<T>, T>
 
       // Apply custom scrollbar theme if provided
       if (scrollTheme != null) {
-        // Apply ScrollbarTheme for colors first
-        if (scrollTheme.thumbColor != null ||
-            scrollTheme.trackColor != null ||
-            scrollTheme.trackBorderColor != null ||
-            scrollTheme.crossAxisMargin != null ||
-            scrollTheme.mainAxisMargin != null ||
-            scrollTheme.minThumbLength != null) {
-          content = ScrollbarTheme(
-            data: ScrollbarThemeData(
-              thumbColor: scrollTheme.thumbColor != null
-                  ? WidgetStateProperty.all(scrollTheme.thumbColor)
-                  : null,
-              trackColor: scrollTheme.trackColor != null
-                  ? WidgetStateProperty.all(scrollTheme.trackColor)
-                  : null,
-              trackBorderColor: scrollTheme.trackBorderColor != null
-                  ? WidgetStateProperty.all(scrollTheme.trackBorderColor)
-                  : null,
-              crossAxisMargin: scrollTheme.crossAxisMargin,
-              mainAxisMargin: scrollTheme.mainAxisMargin,
-              minThumbLength: scrollTheme.minThumbLength,
-            ),
+        // Check if custom width control is needed
+        final bool hasCustomWidths =
+            scrollTheme.thumbWidth != null || scrollTheme.trackWidth != null;
+
+        if (hasCustomWidths) {
+          // Use custom scrollbar implementation with independent width control
+          content = _buildCustomScrollbar(content, scrollTheme);
+        } else {
+          // Use standard Scrollbar with unified thickness
+          // Apply ScrollbarTheme for colors first
+          if (scrollTheme.thumbColor != null ||
+              scrollTheme.trackColor != null ||
+              scrollTheme.trackBorderColor != null ||
+              scrollTheme.crossAxisMargin != null ||
+              scrollTheme.mainAxisMargin != null ||
+              scrollTheme.minThumbLength != null) {
+            content = ScrollbarTheme(
+              data: ScrollbarThemeData(
+                thumbColor: scrollTheme.thumbColor != null
+                    ? WidgetStateProperty.all(scrollTheme.thumbColor)
+                    : null,
+                trackColor: scrollTheme.trackColor != null
+                    ? WidgetStateProperty.all(scrollTheme.trackColor)
+                    : null,
+                trackBorderColor: scrollTheme.trackBorderColor != null
+                    ? WidgetStateProperty.all(scrollTheme.trackBorderColor)
+                    : null,
+                crossAxisMargin: scrollTheme.crossAxisMargin,
+                mainAxisMargin: scrollTheme.mainAxisMargin,
+                minThumbLength: scrollTheme.minThumbLength,
+              ),
+              child: content,
+            );
+          }
+
+          // Then wrap with Scrollbar
+          content = Scrollbar(
+            controller: _scrollController,
+            thickness: scrollTheme.thickness,
+            radius: scrollTheme.radius,
+            thumbVisibility: scrollTheme.thumbVisibility,
+            trackVisibility: scrollTheme.trackVisibility,
+            interactive: scrollTheme.interactive,
             child: content,
           );
         }
-
-        // Then wrap with Scrollbar
-        content = Scrollbar(
-          controller: _scrollController,
-          thickness: scrollTheme.thickness,
-          radius: scrollTheme.radius,
-          thumbVisibility: scrollTheme.thumbVisibility,
-          trackVisibility: scrollTheme.trackVisibility,
-          interactive: scrollTheme.interactive,
-          child: content,
-        );
       }
     }
 
@@ -426,6 +436,78 @@ abstract class BaseDropdownButtonState<W extends BaseDropdownButton<T>, T>
       );
     }
     return child;
+  }
+
+  /// Builds a custom scrollbar with independent thumb and track width control.
+  ///
+  /// This method creates a scrollbar where the thumb and track can have
+  /// different widths, which is not possible with the standard Scrollbar widget.
+  Widget _buildCustomScrollbar(Widget child, DropdownScrollTheme scrollTheme) {
+    final double effectiveThumbWidth =
+        scrollTheme.thumbWidth ?? scrollTheme.thickness ?? 8.0;
+    final double effectiveTrackWidth =
+        scrollTheme.trackWidth ?? scrollTheme.thickness ?? 8.0;
+
+    // Build theme data for the scrollbar
+    final scrollbarThemeData = ScrollbarThemeData(
+      thumbColor: scrollTheme.thumbColor != null
+          ? WidgetStateProperty.all(scrollTheme.thumbColor)
+          : null,
+      trackColor: scrollTheme.trackColor != null
+          ? WidgetStateProperty.all(scrollTheme.trackColor)
+          : null,
+      trackBorderColor: scrollTheme.trackBorderColor != null
+          ? WidgetStateProperty.all(scrollTheme.trackBorderColor)
+          : null,
+      thickness: WidgetStateProperty.all(effectiveThumbWidth),
+      radius: scrollTheme.radius,
+      crossAxisMargin: scrollTheme.crossAxisMargin,
+      mainAxisMargin: scrollTheme.mainAxisMargin,
+      minThumbLength: scrollTheme.minThumbLength,
+    );
+
+    // If track width is different from thumb width, we need custom rendering
+    if (effectiveTrackWidth != effectiveThumbWidth &&
+        scrollTheme.trackVisibility == true) {
+      // Use RawScrollbar for more control
+      return ScrollbarTheme(
+        data: scrollbarThemeData.copyWith(
+          // Set track thickness separately
+          trackColor: scrollTheme.trackColor != null
+              ? WidgetStateProperty.all(scrollTheme.trackColor)
+              : null,
+        ),
+        child: RawScrollbar(
+          controller: _scrollController,
+          thickness: effectiveThumbWidth,
+          radius: scrollTheme.radius,
+          thumbVisibility: scrollTheme.thumbVisibility ?? false,
+          trackVisibility: scrollTheme.trackVisibility ?? false,
+          interactive: scrollTheme.interactive ?? true,
+          thumbColor: scrollTheme.thumbColor,
+          trackColor: scrollTheme.trackColor,
+          trackBorderColor: scrollTheme.trackBorderColor,
+          crossAxisMargin: scrollTheme.crossAxisMargin ?? 0,
+          mainAxisMargin: scrollTheme.mainAxisMargin ?? 0,
+          minThumbLength: scrollTheme.minThumbLength ?? 18,
+          child: child,
+        ),
+      );
+    }
+
+    // Otherwise use standard Scrollbar with theme
+    return ScrollbarTheme(
+      data: scrollbarThemeData,
+      child: Scrollbar(
+        controller: _scrollController,
+        thickness: effectiveThumbWidth,
+        radius: scrollTheme.radius,
+        thumbVisibility: scrollTheme.thumbVisibility,
+        trackVisibility: scrollTheme.trackVisibility,
+        interactive: scrollTheme.interactive,
+        child: child,
+      ),
+    );
   }
 
   // Abstract methods that subclasses must implement

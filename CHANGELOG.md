@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 
+* **FEAT**: Added thumbWidth and trackWidth properties to DropdownScrollTheme for independent scrollbar thumb and track width control
 * **FEAT**: Added iconColor property to DropdownTheme for customizing dropdown arrow icon color
 * **FIX**: Fixed dropdown overlay content clipping issue with border radius by adding clipBehavior to Material widget
 * **FIX**: Changed theme parameter type from Object? to DropdownStyleTheme? for better type safety

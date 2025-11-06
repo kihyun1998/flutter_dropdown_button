@@ -19,6 +19,8 @@ class DropdownScrollTheme {
   /// Creates a dropdown scroll theme configuration.
   const DropdownScrollTheme({
     this.thickness,
+    this.thumbWidth,
+    this.trackWidth,
     this.radius,
     this.thumbColor,
     this.trackColor,
@@ -36,7 +38,22 @@ class DropdownScrollTheme {
   ///
   /// If null, uses the default scrollbar thickness (platform-dependent).
   /// Controls the width of the scrollbar when visible.
+  ///
+  /// **Deprecated**: Use [thumbWidth] and [trackWidth] for independent control.
+  /// If [thumbWidth] or [trackWidth] is set, this property is ignored.
   final double? thickness;
+
+  /// Width of the scrollbar thumb (the draggable part).
+  ///
+  /// If null, falls back to [thickness] or the default scrollbar thickness.
+  /// When set, allows independent control of thumb width separate from track width.
+  final double? thumbWidth;
+
+  /// Width of the scrollbar track (the background area).
+  ///
+  /// If null, falls back to [thickness] or the default scrollbar thickness.
+  /// When set, allows independent control of track width separate from thumb width.
+  final double? trackWidth;
 
   /// Radius of the scrollbar thumb corners.
   ///
@@ -105,6 +122,8 @@ class DropdownScrollTheme {
   /// Creates a copy of this theme with the given fields replaced.
   DropdownScrollTheme copyWith({
     double? thickness,
+    double? thumbWidth,
+    double? trackWidth,
     Radius? radius,
     Color? thumbColor,
     Color? trackColor,
@@ -119,6 +138,8 @@ class DropdownScrollTheme {
   }) {
     return DropdownScrollTheme(
       thickness: thickness ?? this.thickness,
+      thumbWidth: thumbWidth ?? this.thumbWidth,
+      trackWidth: trackWidth ?? this.trackWidth,
       radius: radius ?? this.radius,
       thumbColor: thumbColor ?? this.thumbColor,
       trackColor: trackColor ?? this.trackColor,
