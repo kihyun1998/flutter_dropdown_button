@@ -18,6 +18,19 @@ A highly customizable dropdown package for Flutter with overlay-based rendering,
 - 📜 **Custom Scrollbar**: Scrollbar theming with colors, thickness, and visibility options
 - ♿ **Accessibility Support**: Screen reader friendly with proper semantics
 
+## Screenshots
+
+<table>
+  <tr>
+    <td><img src="screenshot/basic_screenshot.png" alt="Basic Text Dropdown" width="300"/></td>
+    <td><img src="screenshot/custom_hover.png" alt="Icon + Text Dropdown with Hover" width="300"/></td>
+  </tr>
+  <tr>
+    <td align="center"><b>Basic Text Dropdown</b><br/>Simple text options with customizable styles</td>
+    <td align="center"><b>Icon + Text Dropdown</b><br/>Rich content with icons and hover effects</td>
+  </tr>
+</table>
+
 ## Variants
 
 ### BasicDropdownButton
@@ -32,7 +45,7 @@ Add to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  flutter_dropdown_button: ^1.1.0
+  flutter_dropdown_button: ^1.2.0
 ```
 
 Import the package:

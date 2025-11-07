@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## 1.2.0
 
 * **FEAT**: Added thumbWidth and trackWidth properties to DropdownScrollTheme for independent scrollbar thumb and track width control
 * **FEAT**: Added iconColor property to DropdownTheme for customizing dropdown arrow icon color
