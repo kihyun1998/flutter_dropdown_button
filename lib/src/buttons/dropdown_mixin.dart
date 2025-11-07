@@ -256,8 +256,9 @@ mixin DropdownMixin<T extends StatefulWidget> on State<T>, TickerProvider {
         ? (overlayPadding!.top + overlayPadding!.bottom)
         : 0.0;
     // Add border thickness and overlay padding to ensure enough space for content + border + padding
-    final preferredHeight =
-        math.min(totalItemsHeight, maxDropdownHeight) + overlayBorderThickness + overlayPaddingVertical;
+    final preferredHeight = math.min(totalItemsHeight, maxDropdownHeight) +
+        overlayBorderThickness +
+        overlayPaddingVertical;
 
     // Determine positioning and height
     double menuHeight;
@@ -287,8 +288,9 @@ mixin DropdownMixin<T extends StatefulWidget> on State<T>, TickerProvider {
       }
 
       // Ensure minimum height for usability with actual item heights + border + padding
-      final minHeight =
-          minVisibleItems * actualItemHeight + overlayBorderThickness + overlayPaddingVertical;
+      final minHeight = minVisibleItems * actualItemHeight +
+          overlayBorderThickness +
+          overlayPaddingVertical;
       menuHeight = math.max(menuHeight, minHeight);
     }
 

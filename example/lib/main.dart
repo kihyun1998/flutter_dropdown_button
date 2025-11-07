@@ -563,7 +563,8 @@ class _MyHomePageState extends State<MyHomePage> {
                             value: disabledValue,
                             hint: 'Disabled state',
                             maxWidth: 280,
-                            enabled: false, // Disabled to show iconDisabledColor
+                            enabled:
+                                false, // Disabled to show iconDisabledColor
                             theme: _getTheme(disabledStyle),
                             onChanged: (value) =>
                                 setState(() => disabledValue = value),
