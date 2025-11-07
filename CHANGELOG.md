@@ -1,10 +1,15 @@
 # Changelog
 
+## 1.3.1
+
+* **FEAT**: Added leadingBuilder property to DynamicTextBaseDropdownButton for displaying custom widgets (icons, images) before text
+* **FEAT**: Added leadingWidgetPadding property to DynamicTextBaseDropdownButton for controlling leading widget spacing
+
 ## 1.3.0
 
-* **FEAT**: Added DynamicDropdownButton widget that adapts behavior based on item count (non-interactive when single item, normal dropdown when multiple items)
-* **FEAT**: Added hideIconWhenSingleItem property to DynamicDropdownButton for controlling icon visibility in single-item mode
-* **FEAT**: Added interactive example demo with real-time item add/delete functionality to test DynamicDropdownButton behavior
+* **FEAT**: Added DynamicTextBaseDropdownButton widget that adapts behavior based on item count (non-interactive when single item, normal dropdown when multiple items)
+* **FEAT**: Added hideIconWhenSingleItem property to DynamicTextBaseDropdownButton for controlling icon visibility in single-item mode
+* **FEAT**: Added interactive example demo with real-time item add/delete functionality
 * **FIX**: Fixed dropdown button height consistency issue by wrapping Text and Icon in SizedBox with fixed height based on iconSize
 * **FIX**: Fixed mainAxisAlignment from spaceBetween to start to allow button width to fit content size within maxWidth constraint
 

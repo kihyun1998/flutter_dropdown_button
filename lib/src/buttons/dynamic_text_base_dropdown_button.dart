@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../config/text_dropdown_config.dart';
 import 'base_dropdown_button.dart';
 
-/// A dynamic dropdown button widget that adapts its behavior based on the number of items.
+/// A dynamic text-based dropdown button widget that adapts its behavior based on the number of items.
 ///
 /// This widget provides intelligent behavior switching:
 /// - When [items] has only one element: displays as a non-interactive button (no dropdown)
@@ -15,12 +15,14 @@ import 'base_dropdown_button.dart';
 /// Features:
 /// - Automatic behavior switching based on item count
 /// - Same text rendering controls as [TextOnlyDropdownButton]
+/// - Optional leading widget support via [leadingBuilder]
+/// - Customizable leading widget padding
 /// - Smooth animations and outside-tap dismissal (when dropdown is enabled)
 /// - Shared theme with other dropdown variants
 ///
 /// Example:
 /// ```dart
-/// DynamicDropdownButton(
+/// DynamicTextBaseDropdownButton(
 ///   items: availableOptions, // May have 1 or more items
 ///   value: selectedValue,
 ///   hint: 'Select an option',
@@ -30,15 +32,17 @@ import 'base_dropdown_button.dart';
 ///     maxLines: 1,
 ///     textStyle: TextStyle(fontSize: 16),
 ///   ),
+///   leadingBuilder: (item) => Icon(Icons.star, size: 20),
+///   leadingWidgetPadding: EdgeInsets.only(right: 8.0),
 ///   onChanged: (value) => setState(() => selectedValue = value),
 /// )
 /// ```
-class DynamicDropdownButton extends BaseDropdownButton<String> {
-  /// Creates a dynamic dropdown button widget.
+class DynamicTextBaseDropdownButton extends BaseDropdownButton<String> {
+  /// Creates a dynamic text-based dropdown button widget.
   ///
   /// The [items] and [onChanged] parameters are required.
   /// Behavior automatically adapts based on [items.length].
-  const DynamicDropdownButton({
+  const DynamicTextBaseDropdownButton({
     super.key,
     required this.items,
     required super.onChanged,
@@ -55,6 +59,8 @@ class DynamicDropdownButton extends BaseDropdownButton<String> {
     super.scrollToSelectedItem = true,
     super.scrollToSelectedDuration,
     this.hideIconWhenSingleItem = true,
+    this.leadingBuilder,
+    this.leadingWidgetPadding,
   });
 
   /// The list of text options to display in the dropdown.
@@ -81,16 +87,34 @@ class DynamicDropdownButton extends BaseDropdownButton<String> {
   /// When false, the icon is always shown.
   final bool hideIconWhenSingleItem;
 
+  /// Builder function to create a leading widget for each item.
+  ///
+  /// This widget will be displayed before the text in both the selected
+  /// state and in the dropdown list. Useful for adding icons, images,
+  /// or other decorative elements.
+  ///
+  /// Example:
+  /// ```dart
+  /// leadingBuilder: (item) => SvgPicture.string(svgData, width: 20, height: 20)
+  /// ```
+  final Widget Function(String item)? leadingBuilder;
+
+  /// Padding around the leading widget.
+  ///
+  /// If null, defaults to `EdgeInsets.only(right: 8.0)`.
+  final EdgeInsets? leadingWidgetPadding;
+
   @override
-  State<DynamicDropdownButton> createState() => _DynamicDropdownButtonState();
+  State<DynamicTextBaseDropdownButton> createState() =>
+      _DynamicTextBaseDropdownButtonState();
 }
 
-/// The state class for [DynamicDropdownButton].
+/// The state class for [DynamicTextBaseDropdownButton].
 ///
 /// Manages the dropdown's behavior switching and delegates to
 /// [BaseDropdownButtonState] for common functionality.
-class _DynamicDropdownButtonState
-    extends BaseDropdownButtonState<DynamicDropdownButton, String> {
+class _DynamicTextBaseDropdownButtonState
+    extends BaseDropdownButtonState<DynamicTextBaseDropdownButton, String> {
   /// The effective config, using provided config or default.
   TextDropdownConfig get _config =>
       widget.config ?? TextDropdownConfig.defaultConfig;
@@ -115,7 +139,7 @@ class _DynamicDropdownButtonState
     final displayText = selectedText ?? widget.hint ?? '';
     final isHint = selectedText == null;
 
-    return Text(
+    final textWidget = Text(
       displayText,
       style: isHint ? _config.hintStyle : _config.textStyle,
       textAlign: _config.textAlign,
@@ -126,11 +150,34 @@ class _DynamicDropdownButtonState
       locale: _config.locale,
       textScaler: _config.textScaler,
     );
+
+    // If no leading builder or no value selected, return text only
+    if (widget.leadingBuilder == null || selectedText == null) {
+      return textWidget;
+    }
+
+    // Return Row with leading widget and text
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Padding(
+          padding:
+              widget.leadingWidgetPadding ?? const EdgeInsets.only(right: 8.0),
+          child: SizedBox(
+            height: effectiveTheme.iconSize ?? 24.0,
+            child: Center(
+              child: widget.leadingBuilder!(selectedText),
+            ),
+          ),
+        ),
+        Flexible(child: textWidget),
+      ],
+    );
   }
 
   @override
   Widget buildItemWidget(String item, bool isSelected) {
-    return Text(
+    final textWidget = Text(
       item,
       style: isSelected
           ? _config.selectedTextStyle ?? _config.textStyle
@@ -143,6 +190,29 @@ class _DynamicDropdownButtonState
       locale: _config.locale,
       textScaler: _config.textScaler,
       semanticsLabel: _config.semanticsLabel,
+    );
+
+    // If no leading builder, return text only
+    if (widget.leadingBuilder == null) {
+      return textWidget;
+    }
+
+    // Return Row with leading widget and text
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Padding(
+          padding:
+              widget.leadingWidgetPadding ?? const EdgeInsets.only(right: 8.0),
+          child: SizedBox(
+            height: effectiveTheme.iconSize ?? 24.0,
+            child: Center(
+              child: widget.leadingBuilder!(item),
+            ),
+          ),
+        ),
+        Flexible(child: textWidget),
+      ],
     );
   }
 
