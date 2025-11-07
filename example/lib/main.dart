@@ -768,7 +768,10 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
                 const SizedBox(width: 8),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 2,
+                  ),
                   decoration: BoxDecoration(
                     color: dynamicItems.length == 1
                         ? Colors.orange.shade100
@@ -776,7 +779,9 @@ class _MyHomePageState extends State<MyHomePage> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
-                    dynamicItems.length == 1 ? 'Non-interactive' : 'Interactive',
+                    dynamicItems.length == 1
+                        ? 'Non-interactive'
+                        : 'Interactive',
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w600,
@@ -797,7 +802,10 @@ class _MyHomePageState extends State<MyHomePage> {
                     controller: _dynamicItemController,
                     decoration: InputDecoration(
                       hintText: 'Enter item text (or leave empty for default)',
-                      hintStyle: TextStyle(fontSize: 12, color: Colors.grey[400]),
+                      hintStyle: TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey[400],
+                      ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
@@ -824,7 +832,9 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
                 const SizedBox(width: 8),
                 ElevatedButton.icon(
-                  onPressed: dynamicItems.isNotEmpty ? _deleteDynamicItem : null,
+                  onPressed: dynamicItems.isNotEmpty
+                      ? _deleteDynamicItem
+                      : null,
                   icon: const Icon(Icons.remove, size: 18),
                   label: const Text('Delete'),
                   style: ElevatedButton.styleFrom(

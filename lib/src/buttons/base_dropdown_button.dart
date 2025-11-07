@@ -432,24 +432,34 @@ abstract class BaseDropdownButtonState<W extends BaseDropdownButton<T>, T>
         padding: effectiveTheme.buttonPadding,
         decoration: buildButtonDecoration(),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisAlignment: MainAxisAlignment.start,
           mainAxisSize:
               widget.width != null ? MainAxisSize.max : MainAxisSize.min,
           children: [
-            Flexible(child: buildSelectedWidget()),
+            Flexible(
+              child: SizedBox(
+                height: effectiveTheme.iconSize ?? 24.0,
+                child: buildSelectedWidget(),
+              ),
+            ),
             Padding(
               padding: effectiveTheme.iconPadding ??
                   const EdgeInsets.only(left: 8.0),
-              child: RotationTransition(
-                turns: dropdownIconRotationAnimation,
-                child: Icon(
-                  effectiveTheme.icon ?? Icons.keyboard_arrow_down,
-                  size: effectiveTheme.iconSize ?? 24.0,
-                  color: widget.enabled
-                      ? (effectiveTheme.iconColor ??
-                          Theme.of(context).iconTheme.color)
-                      : (effectiveTheme.iconDisabledColor ??
-                          Theme.of(context).disabledColor),
+              child: SizedBox(
+                height: effectiveTheme.iconSize ?? 24.0,
+                child: Center(
+                  child: RotationTransition(
+                    turns: dropdownIconRotationAnimation,
+                    child: Icon(
+                      effectiveTheme.icon ?? Icons.keyboard_arrow_down,
+                      size: effectiveTheme.iconSize ?? 24.0,
+                      color: widget.enabled
+                          ? (effectiveTheme.iconColor ??
+                              Theme.of(context).iconTheme.color)
+                          : (effectiveTheme.iconDisabledColor ??
+                              Theme.of(context).disabledColor),
+                    ),
+                  ),
                 ),
               ),
             ),

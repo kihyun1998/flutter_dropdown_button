@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.3.0
+
+* **FEAT**: Added DynamicDropdownButton widget that adapts behavior based on item count (non-interactive when single item, normal dropdown when multiple items)
+* **FEAT**: Added hideIconWhenSingleItem property to DynamicDropdownButton for controlling icon visibility in single-item mode
+* **FEAT**: Added interactive example demo with real-time item add/delete functionality to test DynamicDropdownButton behavior
+* **FIX**: Fixed dropdown button height consistency issue by wrapping Text and Icon in SizedBox with fixed height based on iconSize
+* **FIX**: Fixed mainAxisAlignment from spaceBetween to start to allow button width to fit content size within maxWidth constraint
+
 ## 1.2.3
 
 * **FEAT**: Added scrollToSelectedItem property to automatically scroll to the currently selected item when dropdown opens (defaults to true)
