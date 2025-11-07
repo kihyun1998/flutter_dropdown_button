@@ -70,6 +70,7 @@ final List<StylePreset> stylePresets = [
         selectedItemColor: const Color(0xFFD0D0D0),
         itemPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         border: Border.all(color: Colors.grey.shade300, width: 1),
+        overlayPadding: const EdgeInsets.symmetric(vertical: 4, horizontal: 0),
       ),
     ),
   ),
@@ -177,6 +178,52 @@ final List<StylePreset> stylePresets = [
       ),
     ),
   ),
+  StylePreset(
+    'Custom Icon & Size',
+    DropdownStyleTheme(
+      dropdown: const DropdownTheme(
+        borderRadius: 12.0,
+        elevation: 4.0,
+        selectedItemColor: Color(0x1A4CAF50),
+        itemHoverColor: Color(0x0A4CAF50),
+        itemPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        icon: Icons.expand_more, // Custom icon
+        iconSize: 32.0, // Larger icon size
+        iconColor: Colors.green,
+        iconDisabledColor: Colors.grey,
+      ),
+    ),
+  ),
+  StylePreset(
+    'Tiny Arrow',
+    DropdownStyleTheme(
+      dropdown: const DropdownTheme(
+        borderRadius: 8.0,
+        elevation: 2.0,
+        selectedItemColor: Color(0x1AFF9800),
+        itemHoverColor: Color(0x0AFF9800),
+        itemPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        icon: Icons.arrow_drop_down, // Different icon
+        iconSize: 16.0, // Smaller icon size
+        iconColor: Colors.orange,
+      ),
+    ),
+  ),
+  StylePreset(
+    'Wide Icon Spacing',
+    DropdownStyleTheme(
+      dropdown: const DropdownTheme(
+        borderRadius: 10.0,
+        elevation: 4.0,
+        selectedItemColor: Color(0x1A9C27B0),
+        itemHoverColor: Color(0x0A9C27B0),
+        itemPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        iconPadding: EdgeInsets.only(left: 24.0), // Wide spacing
+        iconColor: Colors.purple,
+        iconSize: 28.0,
+      ),
+    ),
+  ),
 ];
 
 class MyHomePage extends StatefulWidget {
@@ -196,6 +243,8 @@ class _MyHomePageState extends State<MyHomePage> {
   String? centerAlignStyle = 'iOS/Cupertino';
   String? fixedWidthStyle = 'Material Design';
   String? darkModeStyle = 'Black with White Border';
+  String? customIconStyle = 'Custom Icon & Size';
+  String? disabledStyle = 'Tiny Arrow';
 
   // Selected values for demo dropdowns
   String? basicValue;
@@ -206,6 +255,8 @@ class _MyHomePageState extends State<MyHomePage> {
   String? centerValue;
   String? fixedWidthValue;
   String? darkModeValue;
+  String? customIconValue;
+  String? disabledValue;
 
   final List<String> basicItems = [
     'Option 1',
@@ -482,6 +533,40 @@ class _MyHomePageState extends State<MyHomePage> {
                             theme: _getTheme(darkModeStyle),
                             onChanged: (value) =>
                                 setState(() => darkModeValue = value),
+                          ),
+                        ),
+                        _buildFeatureCard(
+                          title: 'Custom Icon & Size',
+                          description:
+                              'Different icon (expand_more) and larger size',
+                          selectedStyle: customIconStyle,
+                          onStyleChanged: (style) =>
+                              setState(() => customIconStyle = style),
+                          demoDropdown: TextOnlyDropdownButton(
+                            items: basicItems,
+                            value: customIconValue,
+                            hint: 'Custom icon demo',
+                            maxWidth: 280,
+                            theme: _getTheme(customIconStyle),
+                            onChanged: (value) =>
+                                setState(() => customIconValue = value),
+                          ),
+                        ),
+                        _buildFeatureCard(
+                          title: 'Disabled Dropdown',
+                          description: 'Shows disabled icon color',
+                          selectedStyle: disabledStyle,
+                          onStyleChanged: (style) =>
+                              setState(() => disabledStyle = style),
+                          demoDropdown: TextOnlyDropdownButton(
+                            items: basicItems,
+                            value: disabledValue,
+                            hint: 'Disabled state',
+                            maxWidth: 280,
+                            enabled: false, // Disabled to show iconDisabledColor
+                            theme: _getTheme(disabledStyle),
+                            onChanged: (value) =>
+                                setState(() => disabledValue = value),
                           ),
                         ),
                       ],

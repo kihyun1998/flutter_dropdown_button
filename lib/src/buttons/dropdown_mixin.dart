@@ -119,6 +119,12 @@ mixin DropdownMixin<T extends StatefulWidget> on State<T>, TickerProvider {
   /// The shadow color for the dropdown overlay Material.
   Color? get overlayShadowColor => null;
 
+  /// The padding applied to the dropdown overlay container.
+  ///
+  /// This padding creates internal spacing between the overlay edges
+  /// and the item list. If null, no padding is applied.
+  EdgeInsets? get overlayPadding => null;
+
   // Abstract methods that must be implemented by the using class
 
   /// Builds the content of the dropdown overlay with the given height.
@@ -245,9 +251,13 @@ mixin DropdownMixin<T extends StatefulWidget> on State<T>, TickerProvider {
 
     // Calculate dynamic preferred height based on items with actual item heights
     final totalItemsHeight = itemCount * actualItemHeight;
-    // Add border thickness to ensure enough space for content + border
+    // Calculate total overlay padding
+    final overlayPaddingVertical = overlayPadding != null
+        ? (overlayPadding!.top + overlayPadding!.bottom)
+        : 0.0;
+    // Add border thickness and overlay padding to ensure enough space for content + border + padding
     final preferredHeight =
-        math.min(totalItemsHeight, maxDropdownHeight) + overlayBorderThickness;
+        math.min(totalItemsHeight, maxDropdownHeight) + overlayBorderThickness + overlayPaddingVertical;
 
     // Determine positioning and height
     double menuHeight;
@@ -276,9 +286,9 @@ mixin DropdownMixin<T extends StatefulWidget> on State<T>, TickerProvider {
         transformAlignment = Alignment.bottomCenter;
       }
 
-      // Ensure minimum height for usability with actual item heights + border
+      // Ensure minimum height for usability with actual item heights + border + padding
       final minHeight =
-          minVisibleItems * actualItemHeight + overlayBorderThickness;
+          minVisibleItems * actualItemHeight + overlayBorderThickness + overlayPaddingVertical;
       menuHeight = math.max(menuHeight, minHeight);
     }
 

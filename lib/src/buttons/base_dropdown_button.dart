@@ -180,6 +180,9 @@ abstract class BaseDropdownButtonState<W extends BaseDropdownButton<T>, T>
   Color? get overlayShadowColor => effectiveTheme.shadowColor;
 
   @override
+  EdgeInsets? get overlayPadding => effectiveTheme.overlayPadding;
+
+  @override
   void initState() {
     super.initState();
     initializeDropdown();
@@ -228,9 +231,15 @@ abstract class BaseDropdownButtonState<W extends BaseDropdownButton<T>, T>
     final items = getItems();
     final scrollTheme = effectiveScrollTheme;
 
+    // Calculate overlay padding
+    final padding = effectiveTheme.overlayPadding;
+    final paddingVertical =
+        padding != null ? (padding.top + padding.bottom) : 0.0;
+
     // Calculate total items height with margins
-    // Note: height already includes border thickness from calculateDropdownPosition
-    final availableContentHeight = height - overlayBorderThickness;
+    // Note: height already includes border thickness and overlay padding from calculateDropdownPosition
+    final availableContentHeight =
+        height - overlayBorderThickness - paddingVertical;
     final totalItemsHeight = items.length * actualItemHeight;
     final needsScroll = totalItemsHeight > availableContentHeight;
 
@@ -318,6 +327,14 @@ abstract class BaseDropdownButtonState<W extends BaseDropdownButton<T>, T>
       }
     }
 
+    // Apply overlay padding if specified
+    if (padding != null) {
+      content = Padding(
+        padding: padding,
+        child: content,
+      );
+    }
+
     return content;
   }
 
@@ -389,15 +406,20 @@ abstract class BaseDropdownButtonState<W extends BaseDropdownButton<T>, T>
               widget.width != null ? MainAxisSize.max : MainAxisSize.min,
           children: [
             Flexible(child: buildSelectedWidget()),
-            const SizedBox(width: 8),
-            RotationTransition(
-              turns: dropdownIconRotationAnimation,
-              child: Icon(
-                Icons.keyboard_arrow_down,
-                color: widget.enabled
-                    ? (effectiveTheme.iconColor ??
-                        Theme.of(context).iconTheme.color)
-                    : Theme.of(context).disabledColor,
+            Padding(
+              padding: effectiveTheme.iconPadding ??
+                  const EdgeInsets.only(left: 8.0),
+              child: RotationTransition(
+                turns: dropdownIconRotationAnimation,
+                child: Icon(
+                  effectiveTheme.icon ?? Icons.keyboard_arrow_down,
+                  size: effectiveTheme.iconSize ?? 24.0,
+                  color: widget.enabled
+                      ? (effectiveTheme.iconColor ??
+                          Theme.of(context).iconTheme.color)
+                      : (effectiveTheme.iconDisabledColor ??
+                          Theme.of(context).disabledColor),
+                ),
               ),
             ),
           ],

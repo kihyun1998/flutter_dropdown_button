@@ -1,6 +1,12 @@
 # Changelog
 
-## Unreleased
+## 1.2.2
+
+* **FEAT**: Added icon property to DropdownTheme for customizing dropdown arrow icon (supports any IconData)
+* **FEAT**: Added iconSize property to DropdownTheme for controlling dropdown icon size
+* **FEAT**: Added iconDisabledColor property to DropdownTheme for customizing icon color in disabled state
+* **FEAT**: Added iconPadding property to DropdownTheme for controlling spacing between selected value and icon
+* **FEAT**: Added overlayPadding property to DropdownTheme for controlling internal spacing of the dropdown menu container
 
 ## 1.2.1
 

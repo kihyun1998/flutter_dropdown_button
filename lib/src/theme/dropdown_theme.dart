@@ -37,6 +37,11 @@ class DropdownTheme {
     this.itemMargin,
     this.itemBorderRadius,
     this.iconColor,
+    this.iconDisabledColor,
+    this.icon,
+    this.iconSize,
+    this.iconPadding,
+    this.overlayPadding,
   });
 
   /// The duration of the dropdown show/hide animation.
@@ -137,12 +142,50 @@ class DropdownTheme {
   /// Allows for rounded item styling independent of overlay border radius.
   final double? itemBorderRadius;
 
-  /// The color of the dropdown button icon (arrow).
+  /// The color of the dropdown button icon (arrow) when enabled.
   ///
   /// If null, uses the theme's icon color.
   /// This allows customization of the dropdown arrow color
   /// independent of the global icon theme.
   final Color? iconColor;
+
+  /// The color of the dropdown button icon (arrow) when disabled.
+  ///
+  /// If null, uses the theme's disabled color.
+  /// This allows customization of the disabled dropdown arrow color.
+  final Color? iconDisabledColor;
+
+  /// The icon to display for the dropdown button.
+  ///
+  /// If null, uses the default [Icons.keyboard_arrow_down].
+  /// This allows customization of the dropdown arrow icon.
+  final IconData? icon;
+
+  /// The size of the dropdown button icon.
+  ///
+  /// If null, uses the default size of 24.0.
+  /// This allows customization of the dropdown arrow size.
+  final double? iconSize;
+
+  /// Padding applied around the dropdown button icon.
+  ///
+  /// If null, uses the default padding of EdgeInsets.only(left: 8.0).
+  /// This controls the spacing between the selected value and the icon.
+  final EdgeInsets? iconPadding;
+
+  /// Padding applied to the dropdown overlay container.
+  ///
+  /// Controls the internal spacing of the dropdown menu container,
+  /// creating space between the container edges and the item list.
+  /// This is useful for creating consistent spacing at the top and bottom
+  /// of the dropdown menu, especially when using itemMargin.
+  ///
+  /// For example, if itemMargin creates 8px spacing between items,
+  /// setting overlayPadding to EdgeInsets.symmetric(vertical: 8) will
+  /// create matching 8px spacing at the top and bottom of the menu.
+  ///
+  /// If null, no padding is applied to the overlay container.
+  final EdgeInsets? overlayPadding;
 
   /// Creates a copy of this theme with the given fields replaced.
   DropdownTheme copyWith({
@@ -163,6 +206,11 @@ class DropdownTheme {
     EdgeInsets? itemMargin,
     double? itemBorderRadius,
     Color? iconColor,
+    Color? iconDisabledColor,
+    IconData? icon,
+    double? iconSize,
+    EdgeInsets? iconPadding,
+    EdgeInsets? overlayPadding,
   }) {
     return DropdownTheme(
       animationDuration: animationDuration ?? this.animationDuration,
@@ -182,6 +230,11 @@ class DropdownTheme {
       itemMargin: itemMargin ?? this.itemMargin,
       itemBorderRadius: itemBorderRadius ?? this.itemBorderRadius,
       iconColor: iconColor ?? this.iconColor,
+      iconDisabledColor: iconDisabledColor ?? this.iconDisabledColor,
+      icon: icon ?? this.icon,
+      iconSize: iconSize ?? this.iconSize,
+      iconPadding: iconPadding ?? this.iconPadding,
+      overlayPadding: overlayPadding ?? this.overlayPadding,
     );
   }
 
