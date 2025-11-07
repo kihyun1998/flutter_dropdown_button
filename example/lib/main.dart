@@ -245,6 +245,7 @@ class _MyHomePageState extends State<MyHomePage> {
   String? darkModeStyle = 'Black with White Border';
   String? customIconStyle = 'Custom Icon & Size';
   String? disabledStyle = 'Tiny Arrow';
+  String? dynamicStyle = 'Material Design';
 
   // Selected values for demo dropdowns
   String? basicValue;
@@ -258,6 +259,12 @@ class _MyHomePageState extends State<MyHomePage> {
   String? darkModeValue;
   String? customIconValue;
   String? disabledValue;
+  String? dynamicValue;
+
+  // Dynamic dropdown items for interactive demo
+  List<String> dynamicItems = ['Option 1'];
+  final TextEditingController _dynamicItemController = TextEditingController();
+  int _itemCounter = 1;
 
   final List<String> basicItems = [
     'Option 1',
@@ -346,6 +353,39 @@ class _MyHomePageState extends State<MyHomePage> {
     'This is a very long text that will overflow with ellipsis',
     'OK',
   ];
+
+  @override
+  void dispose() {
+    _dynamicItemController.dispose();
+    super.dispose();
+  }
+
+  void _addDynamicItem() {
+    setState(() {
+      final text = _dynamicItemController.text.trim();
+      if (text.isEmpty) {
+        // Add default value
+        _itemCounter++;
+        dynamicItems.add('Option $_itemCounter');
+      } else {
+        // Add custom text
+        dynamicItems.add(text);
+        _dynamicItemController.clear();
+      }
+    });
+  }
+
+  void _deleteDynamicItem() {
+    if (dynamicItems.isNotEmpty) {
+      setState(() {
+        final removedItem = dynamicItems.removeLast();
+        // If the removed item was selected, clear selection
+        if (dynamicValue == removedItem) {
+          dynamicValue = null;
+        }
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -580,6 +620,9 @@ class _MyHomePageState extends State<MyHomePage> {
                     );
                   },
                 ),
+                const SizedBox(height: 24),
+                // Interactive Dynamic Dropdown Card (full width)
+                _buildInteractiveDynamicCard(),
               ],
             ),
           ),
@@ -650,6 +693,215 @@ class _MyHomePageState extends State<MyHomePage> {
             const SizedBox(height: 16),
             // Demo dropdown
             demoDropdown,
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInteractiveDynamicCard() {
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Padding(
+        padding: const EdgeInsets.all(24.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Dynamic Dropdown (Interactive)',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'Add/remove items to see behavior change. Single item = non-interactive, multiple items = normal dropdown',
+              style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+            ),
+            const SizedBox(height: 16),
+            // Style selector
+            Row(
+              children: [
+                Text(
+                  'Style: ',
+                  style: TextStyle(fontSize: 12, color: Colors.grey[700]),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: TextOnlyDropdownButton(
+                    items: stylePresets.map((s) => s.name).toList(),
+                    value: dynamicStyle,
+                    hint: 'Select style',
+                    maxWidth: 180,
+                    config: const TextDropdownConfig(
+                      textStyle: TextStyle(fontSize: 12),
+                    ),
+                    theme: const DropdownStyleTheme(
+                      dropdown: DropdownTheme(
+                        borderRadius: 8.0,
+                        elevation: 2.0,
+                        itemPadding: EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 8,
+                        ),
+                      ),
+                    ),
+                    onChanged: (value) => setState(() => dynamicStyle = value),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            const Divider(),
+            const SizedBox(height: 16),
+            // Item count indicator
+            Row(
+              children: [
+                Icon(Icons.list, size: 16, color: Colors.grey[700]),
+                const SizedBox(width: 8),
+                Text(
+                  'Current items: ${dynamicItems.length}',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.grey[700],
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: dynamicItems.length == 1
+                        ? Colors.orange.shade100
+                        : Colors.green.shade100,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    dynamicItems.length == 1 ? 'Non-interactive' : 'Interactive',
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      color: dynamicItems.length == 1
+                          ? Colors.orange.shade900
+                          : Colors.green.shade900,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            // Add/Delete controls
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _dynamicItemController,
+                    decoration: InputDecoration(
+                      hintText: 'Enter item text (or leave empty for default)',
+                      hintStyle: TextStyle(fontSize: 12, color: Colors.grey[400]),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 10,
+                      ),
+                    ),
+                    style: const TextStyle(fontSize: 13),
+                    onSubmitted: (_) => _addDynamicItem(),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                ElevatedButton.icon(
+                  onPressed: _addDynamicItem,
+                  icon: const Icon(Icons.add, size: 18),
+                  label: const Text('Add'),
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 10,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                ElevatedButton.icon(
+                  onPressed: dynamicItems.isNotEmpty ? _deleteDynamicItem : null,
+                  icon: const Icon(Icons.remove, size: 18),
+                  label: const Text('Delete'),
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 10,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            // Current items list
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.grey.shade50,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.grey.shade300),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Items:',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.grey[700],
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: dynamicItems.map((item) {
+                      return Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 6,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.blue.shade50,
+                          borderRadius: BorderRadius.circular(6),
+                          border: Border.all(color: Colors.blue.shade200),
+                        ),
+                        child: Text(
+                          item,
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: Colors.blue.shade900,
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+            const Divider(),
+            const SizedBox(height: 16),
+            // Demo dropdown
+            Builder(
+              builder: (context) => DynamicDropdownButton(
+                items: dynamicItems,
+                value: dynamicValue,
+                hint: 'Select option',
+                maxWidth: MediaQuery.of(context).size.width * 0.45,
+                theme: _getTheme(dynamicStyle),
+                config: const TextDropdownConfig(
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                ),
+                onChanged: (value) => setState(() => dynamicValue = value),
+              ),
+            ),
           ],
         ),
       ),
