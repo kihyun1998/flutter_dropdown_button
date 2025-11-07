@@ -321,9 +321,9 @@ mixin DropdownMixin<T extends StatefulWidget> on State<T>, TickerProvider {
                         child: Material(
                           elevation: overlayElevation,
                           shadowColor: overlayShadowColor,
+                          color: Colors.transparent,
                           borderRadius:
                               BorderRadius.circular(overlayBorderRadius),
-                          clipBehavior: Clip.antiAlias,
                           child: Container(
                             height: position.height,
                             decoration: buildOverlayDecoration() ??

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../dropdown_item.dart';
 import 'base_dropdown_button.dart';
-import 'dropdown_item.dart';
 
 /// A basic dropdown button widget using OverlayEntry for better control.
 ///

@@ -173,10 +173,7 @@ final List<StylePreset> stylePresets = [
         selectedItemColor: Colors.white.withValues(alpha: 0.2),
         itemHoverColor: Colors.white.withValues(alpha: 0.1),
         itemPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        border: Border.all(
-          color: Colors.white,
-          width: 1.0,
-        ),
+        border: Border.all(color: Colors.white, width: 1.0),
       ),
     ),
   ),
@@ -469,8 +466,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         ),
                         _buildFeatureCard(
                           title: 'Dark Mode Style',
-                          description:
-                              'Black background with white border',
+                          description: 'Black background with white border',
                           selectedStyle: darkModeStyle,
                           onStyleChanged: (style) =>
                               setState(() => darkModeStyle = style),

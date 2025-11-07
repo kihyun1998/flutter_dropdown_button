@@ -2,7 +2,11 @@
 
 ## Unreleased
 
+## 1.2.1
+
+* **FIX**: Fixed dropdown overlay border rendering issue by removing Material borderRadius that conflicted with Container border decoration
 * **FIX**: Fixed dropdown icon not updating on open/close state change and added rotation animation
+* **REFACTOR**: Reorganized theme files into theme/ subdirectory for better code organization
 
 ## 1.2.0
 

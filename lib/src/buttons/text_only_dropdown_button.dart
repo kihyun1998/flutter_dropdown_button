@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../config/text_dropdown_config.dart';
+import '../theme/dropdown_theme.dart';
 import 'base_dropdown_button.dart';
-import 'dropdown_theme.dart';
-import 'text_dropdown_config.dart';
 
 /// A dropdown button widget specifically designed for text-only content.
 ///

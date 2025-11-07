@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
+import '../theme/dropdown_scroll_theme.dart';
+import '../theme/dropdown_style_theme.dart';
+import '../theme/dropdown_theme.dart';
 import 'dropdown_mixin.dart';
-import 'dropdown_scroll_theme.dart';
-import 'dropdown_style_theme.dart';
-import 'dropdown_theme.dart';
 
 /// Abstract base class for all dropdown button variants.
 ///

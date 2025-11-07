@@ -1,4 +1,4 @@
-import 'dropdown_theme.dart';
+import '../../flutter_dropdown_button.dart';
 import 'dropdown_scroll_theme.dart';
 
 /// Main theme container for all dropdown styling configurations.
