@@ -390,14 +390,15 @@ abstract class BaseDropdownButtonState<W extends BaseDropdownButton<T>, T>
           children: [
             Flexible(child: buildSelectedWidget()),
             const SizedBox(width: 8),
-            Icon(
-              isDropdownOpen
-                  ? Icons.keyboard_arrow_up
-                  : Icons.keyboard_arrow_down,
-              color: widget.enabled
-                  ? (effectiveTheme.iconColor ??
-                      Theme.of(context).iconTheme.color)
-                  : Theme.of(context).disabledColor,
+            RotationTransition(
+              turns: dropdownIconRotationAnimation,
+              child: Icon(
+                Icons.keyboard_arrow_down,
+                color: widget.enabled
+                    ? (effectiveTheme.iconColor ??
+                        Theme.of(context).iconTheme.color)
+                    : Theme.of(context).disabledColor,
+              ),
             ),
           ],
         ),

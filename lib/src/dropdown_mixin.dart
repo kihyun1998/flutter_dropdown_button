@@ -69,6 +69,9 @@ mixin DropdownMixin<T extends StatefulWidget> on State<T>, TickerProvider {
   /// Animation for the dropdown opacity (fades from 0.0 to 1.0).
   late Animation<double> dropdownOpacityAnimation;
 
+  /// Animation for the dropdown icon rotation (rotates 180 degrees).
+  late Animation<double> dropdownIconRotationAnimation;
+
   // Abstract getters that must be implemented by the using class
 
   /// The duration of the dropdown animations.
@@ -158,6 +161,13 @@ mixin DropdownMixin<T extends StatefulWidget> on State<T>, TickerProvider {
         curve: Curves.easeOut,
       ),
     );
+
+    dropdownIconRotationAnimation = Tween<double>(begin: 0.0, end: 0.5).animate(
+      CurvedAnimation(
+        parent: dropdownAnimationController,
+        curve: Curves.easeInOut,
+      ),
+    );
   }
 
   /// Disposes of the dropdown resources.
@@ -192,6 +202,12 @@ mixin DropdownMixin<T extends StatefulWidget> on State<T>, TickerProvider {
     Overlay.of(context).insert(_overlayEntry!);
 
     dropdownAnimationController.forward();
+
+    // Update UI to reflect dropdown state change
+    if (mounted) {
+      // ignore: invalid_use_of_protected_member
+      setState(() {});
+    }
   }
 
   /// Closes the dropdown by reversing the animation and removing the overlay.
@@ -201,6 +217,12 @@ mixin DropdownMixin<T extends StatefulWidget> on State<T>, TickerProvider {
     dropdownAnimationController.reverse().then((_) {
       _overlayEntry?.remove();
       _overlayEntry = null;
+
+      // Update UI to reflect dropdown state change
+      if (mounted) {
+        // ignore: invalid_use_of_protected_member
+        setState(() {});
+      }
     });
   }
 

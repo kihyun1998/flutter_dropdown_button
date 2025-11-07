@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+* **FIX**: Fixed dropdown icon not updating on open/close state change and added rotation animation
+
 ## 1.2.0
 
 * **FEAT**: Added thumbWidth and trackWidth properties to DropdownScrollTheme for independent scrollbar thumb and track width control

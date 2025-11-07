@@ -163,6 +163,23 @@ final List<StylePreset> stylePresets = [
       ),
     ),
   ),
+  StylePreset(
+    'Black with White Border',
+    DropdownStyleTheme(
+      dropdown: DropdownTheme(
+        borderRadius: 8.0,
+        elevation: 6.0,
+        backgroundColor: Colors.black,
+        selectedItemColor: Colors.white.withValues(alpha: 0.2),
+        itemHoverColor: Colors.white.withValues(alpha: 0.1),
+        itemPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        border: Border.all(
+          color: Colors.white,
+          width: 1.0,
+        ),
+      ),
+    ),
+  ),
 ];
 
 class MyHomePage extends StatefulWidget {
@@ -181,6 +198,7 @@ class _MyHomePageState extends State<MyHomePage> {
   String? scrollListStyle = 'Custom Scrollbar';
   String? centerAlignStyle = 'iOS/Cupertino';
   String? fixedWidthStyle = 'Material Design';
+  String? darkModeStyle = 'Black with White Border';
 
   // Selected values for demo dropdowns
   String? basicValue;
@@ -190,6 +208,7 @@ class _MyHomePageState extends State<MyHomePage> {
   String? scrollValue;
   String? centerValue;
   String? fixedWidthValue;
+  String? darkModeValue;
 
   final List<String> basicItems = [
     'Option 1',
@@ -446,6 +465,27 @@ class _MyHomePageState extends State<MyHomePage> {
                             theme: _getTheme(fixedWidthStyle),
                             onChanged: (value) =>
                                 setState(() => fixedWidthValue = value),
+                          ),
+                        ),
+                        _buildFeatureCard(
+                          title: 'Dark Mode Style',
+                          description:
+                              'Black background with white border',
+                          selectedStyle: darkModeStyle,
+                          onStyleChanged: (style) =>
+                              setState(() => darkModeStyle = style),
+                          demoDropdown: TextOnlyDropdownButton(
+                            items: basicItems,
+                            value: darkModeValue,
+                            hint: 'Select option',
+                            maxWidth: 280,
+                            config: const TextDropdownConfig(
+                              textStyle: TextStyle(color: Colors.white),
+                              hintStyle: TextStyle(color: Colors.white70),
+                            ),
+                            theme: _getTheme(darkModeStyle),
+                            onChanged: (value) =>
+                                setState(() => darkModeValue = value),
                           ),
                         ),
                       ],
