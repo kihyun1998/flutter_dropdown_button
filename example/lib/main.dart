@@ -251,7 +251,8 @@ class _MyHomePageState extends State<MyHomePage> {
   String? longTextValue;
   String? multiLineValue;
   String? iconValue;
-  String? scrollValue;
+  String? scrollValue =
+      'South Korea'; // Pre-selected to test scroll-to-selected
   String? centerValue;
   String? fixedWidthValue;
   String? darkModeValue;
@@ -460,7 +461,8 @@ class _MyHomePageState extends State<MyHomePage> {
                         ),
                         _buildFeatureCard(
                           title: 'Long Scrollable List',
-                          description: 'Many items with custom scrollbar',
+                          description:
+                              'Auto-scrolls to selected item with animation',
                           selectedStyle: scrollListStyle,
                           onStyleChanged: (style) =>
                               setState(() => scrollListStyle = style),
@@ -470,6 +472,10 @@ class _MyHomePageState extends State<MyHomePage> {
                             hint: 'Select a country',
                             maxWidth: 280,
                             height: 200,
+                            scrollToSelectedItem: true, // Enable auto-scroll
+                            scrollToSelectedDuration: const Duration(
+                              milliseconds: 100,
+                            ), // Smooth animation
                             theme: _getTheme(scrollListStyle),
                             onChanged: (value) =>
                                 setState(() => scrollValue = value),

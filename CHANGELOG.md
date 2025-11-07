@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.2.3
+
+* **FEAT**: Added scrollToSelectedItem property to automatically scroll to the currently selected item when dropdown opens (defaults to true)
+* **FEAT**: Added scrollToSelectedDuration property for controlling scroll animation duration (null for instant jump, duration value for smooth animation)
+* **FEAT**: Improved scrollable dropdown UX by automatically positioning selected items in view when there are many items
+
 ## 1.2.2
 
 * **FEAT**: Added icon property to DropdownTheme for customizing dropdown arrow icon (supports any IconData)

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 
 import '../theme/dropdown_scroll_theme.dart';
 import '../theme/dropdown_style_theme.dart';
@@ -39,6 +40,8 @@ abstract class BaseDropdownButton<T> extends StatefulWidget {
     this.minWidth,
     this.theme,
     this.enabled = true,
+    this.scrollToSelectedItem = true,
+    this.scrollToSelectedDuration,
   });
 
   /// Called when the user selects an item from the dropdown.
@@ -108,6 +111,30 @@ abstract class BaseDropdownButton<T> extends StatefulWidget {
   /// When false, the dropdown appears dimmed and does not respond
   /// to taps or other user input. Defaults to true.
   final bool enabled;
+
+  /// Whether to automatically scroll to the selected item when dropdown opens.
+  ///
+  /// When true, the dropdown will scroll to show the currently selected item
+  /// when opened. This is especially useful when there are many items and
+  /// scrolling is required.
+  ///
+  /// The scroll behavior depends on [scrollToSelectedDuration]:
+  /// - If null: instantly jumps to the selected item
+  /// - If provided: animates smoothly to the selected item
+  ///
+  /// Defaults to true.
+  final bool scrollToSelectedItem;
+
+  /// The duration for scrolling animation to the selected item.
+  ///
+  /// If null, the dropdown will instantly jump to the selected item position.
+  /// If provided, the dropdown will smoothly animate to the selected item
+  /// over this duration.
+  ///
+  /// Only takes effect when [scrollToSelectedItem] is true.
+  ///
+  /// Defaults to null (instant jump).
+  final Duration? scrollToSelectedDuration;
 }
 
 /// Abstract base state class for all dropdown button variants.
@@ -265,14 +292,18 @@ abstract class BaseDropdownButtonState<W extends BaseDropdownButton<T>, T>
 
     // Only apply scrolling if needed
     if (needsScroll) {
-      // Create ScrollController if needed for custom scrollbar
-      if (scrollTheme != null && _scrollController == null) {
-        _scrollController = ScrollController();
+      // Create ScrollController if not already created
+      // Controller is needed for both scrollbar theming and scroll-to-selected functionality
+      _scrollController ??= ScrollController();
+
+      // Schedule scroll to selected item after overlay is displayed
+      if (widget.scrollToSelectedItem && widget.value != null) {
+        _scheduleScrollToSelectedItem();
       }
 
       // Wrap with SingleChildScrollView
       content = SingleChildScrollView(
-        controller: scrollTheme != null ? _scrollController : null,
+        controller: _scrollController,
         child: content,
       );
 
@@ -459,6 +490,66 @@ abstract class BaseDropdownButtonState<W extends BaseDropdownButton<T>, T>
       );
     }
     return child;
+  }
+
+  /// Schedules scrolling to the selected item after the overlay is displayed.
+  ///
+  /// This method uses [SchedulerBinding.addPostFrameCallback] to ensure that
+  /// the scroll happens after the overlay has been rendered and the scroll
+  /// controller is properly attached to the scrollable widget.
+  void _scheduleScrollToSelectedItem() {
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      if (!mounted ||
+          _scrollController == null ||
+          !_scrollController!.hasClients) {
+        return;
+      }
+
+      final selectedIndex = _findSelectedItemIndex();
+      if (selectedIndex == -1) {
+        return;
+      }
+
+      // Calculate the exact scroll offset for the selected item
+      // offset = selectedIndex * (itemHeight + margin)
+      final scrollOffset = selectedIndex * actualItemHeight;
+
+      // Ensure the offset is within valid scroll range
+      final maxScrollExtent = _scrollController!.position.maxScrollExtent;
+      final clampedOffset = scrollOffset.clamp(0.0, maxScrollExtent);
+
+      // Scroll to the selected item
+      if (widget.scrollToSelectedDuration != null) {
+        // Animate to the position
+        _scrollController!.animateTo(
+          clampedOffset,
+          duration: widget.scrollToSelectedDuration!,
+          curve: Curves.easeInOut,
+        );
+      } else {
+        // Jump immediately to the position
+        _scrollController!.jumpTo(clampedOffset);
+      }
+    });
+  }
+
+  /// Finds the index of the currently selected item.
+  ///
+  /// Returns -1 if no item is selected or if the selected value
+  /// doesn't match any item in the list.
+  int _findSelectedItemIndex() {
+    if (widget.value == null) {
+      return -1;
+    }
+
+    final items = getItems();
+    for (int i = 0; i < items.length; i++) {
+      if (isItemSelected(items[i])) {
+        return i;
+      }
+    }
+
+    return -1;
   }
 
   /// Builds a custom scrollbar with independent thumb and track width control.
