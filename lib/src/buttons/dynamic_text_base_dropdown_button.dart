@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../config/text_dropdown_config.dart';
+import '../widgets/smart_tooltip_text.dart';
 import 'base_dropdown_button.dart';
 
 /// A dynamic text-based dropdown button widget that adapts its behavior based on the number of items.
@@ -139,8 +140,9 @@ class _DynamicTextBaseDropdownButtonState
     final displayText = selectedText ?? widget.hint ?? '';
     final isHint = selectedText == null;
 
-    final textWidget = Text(
-      displayText,
+    final textWidget = SmartTooltipText(
+      text: displayText,
+      config: _config,
       style: isHint ? _config.hintStyle : _config.textStyle,
       textAlign: _config.textAlign,
       maxLines: _config.maxLines,
@@ -177,8 +179,9 @@ class _DynamicTextBaseDropdownButtonState
 
   @override
   Widget buildItemWidget(String item, bool isSelected) {
-    final textWidget = Text(
-      item,
+    final textWidget = SmartTooltipText(
+      text: item,
+      config: _config,
       style: isSelected
           ? _config.selectedTextStyle ?? _config.textStyle
           : _config.textStyle,

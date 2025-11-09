@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../config/text_dropdown_config.dart';
 import '../theme/dropdown_theme.dart';
+import '../widgets/smart_tooltip_text.dart';
 import 'base_dropdown_button.dart';
 
 /// A dropdown button widget specifically designed for text-only content.
@@ -92,8 +93,9 @@ class _TextOnlyDropdownButtonState
     final displayText = selectedText ?? widget.hint ?? '';
     final isHint = selectedText == null;
 
-    return Text(
-      displayText,
+    return SmartTooltipText(
+      text: displayText,
+      config: _config,
       style: isHint ? _config.hintStyle : _config.textStyle,
       textAlign: _config.textAlign,
       maxLines: _config.maxLines,
@@ -107,8 +109,9 @@ class _TextOnlyDropdownButtonState
 
   @override
   Widget buildItemWidget(String item, bool isSelected) {
-    return Text(
-      item,
+    return SmartTooltipText(
+      text: item,
+      config: _config,
       style: isSelected
           ? _config.selectedTextStyle ?? _config.textStyle
           : _config.textStyle,
