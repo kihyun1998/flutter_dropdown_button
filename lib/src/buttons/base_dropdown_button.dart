@@ -432,9 +432,12 @@ abstract class BaseDropdownButtonState<W extends BaseDropdownButton<T>, T>
         padding: effectiveTheme.buttonPadding,
         decoration: buildButtonDecoration(),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
+          mainAxisAlignment: widget.width != null
+              ? MainAxisAlignment.spaceBetween
+              : MainAxisAlignment.start,
           mainAxisSize:
               widget.width != null ? MainAxisSize.max : MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Flexible(
               child: SizedBox(
