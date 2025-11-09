@@ -442,7 +442,10 @@ abstract class BaseDropdownButtonState<W extends BaseDropdownButton<T>, T>
             Flexible(
               child: SizedBox(
                 height: effectiveTheme.iconSize ?? 24.0,
-                child: buildSelectedWidget(),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: buildSelectedWidget(),
+                ),
               ),
             ),
             Padding(
