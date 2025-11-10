@@ -56,10 +56,23 @@ class TextDropdownConfig {
     this.tooltipMode = TooltipMode.onlyWhenOverflow,
     this.tooltipWaitDuration = const Duration(milliseconds: 500),
     this.tooltipShowDuration = const Duration(seconds: 3),
+    this.tooltipExitDuration = const Duration(milliseconds: 100),
+    this.tooltipBackgroundColor,
+    this.tooltipTextColor,
+    this.tooltipBorderRadius,
+    this.tooltipBorderColor,
+    this.tooltipBorderWidth,
+    this.tooltipShadow,
     this.tooltipDecoration,
     this.tooltipTextStyle,
+    this.tooltipTextAlign,
     this.tooltipPadding,
     this.tooltipMargin,
+    this.tooltipConstraints,
+    this.tooltipVerticalOffset,
+    this.tooltipPreferBelow,
+    this.tooltipEnableTapToDismiss,
+    this.tooltipTriggerMode,
   });
 
   /// How to handle text that overflows the available space.
@@ -159,16 +172,77 @@ class TextDropdownConfig {
   /// Defaults to 3 seconds.
   final Duration tooltipShowDuration;
 
+  /// The duration for the tooltip to fade out when hiding.
+  ///
+  /// This controls how long it takes for the tooltip to disappear after
+  /// the pointer stops hovering or the showDuration expires.
+  /// Defaults to 100 milliseconds.
+  final Duration tooltipExitDuration;
+
+  /// The background color of the tooltip.
+  ///
+  /// If null, uses Flutter's default tooltip background color (dark grey).
+  /// This is a convenience property that creates a BoxDecoration internally.
+  /// If [tooltipDecoration] is provided, this property is ignored.
+  final Color? tooltipBackgroundColor;
+
+  /// The text color for tooltip content.
+  ///
+  /// If null, uses Flutter's default tooltip text color (white).
+  /// This is a convenience property that creates a TextStyle internally.
+  /// If [tooltipTextStyle] is provided, this property is ignored.
+  final Color? tooltipTextColor;
+
+  /// The border radius of the tooltip.
+  ///
+  /// If null, uses Flutter's default rounded corners.
+  /// This is a convenience property that creates a BoxDecoration internally.
+  /// If [tooltipDecoration] is provided, this property is ignored.
+  final BorderRadius? tooltipBorderRadius;
+
+  /// The border color of the tooltip.
+  ///
+  /// If null, no border is displayed.
+  /// This is a convenience property that creates a BoxDecoration internally.
+  /// If [tooltipDecoration] is provided, this property is ignored.
+  final Color? tooltipBorderColor;
+
+  /// The border width of the tooltip.
+  ///
+  /// Only applies if [tooltipBorderColor] is also set.
+  /// Defaults to 1.0 if [tooltipBorderColor] is provided.
+  /// This is a convenience property that creates a BoxDecoration internally.
+  /// If [tooltipDecoration] is provided, this property is ignored.
+  final double? tooltipBorderWidth;
+
+  /// The shadow for the tooltip.
+  ///
+  /// If null, uses Flutter's default tooltip shadow.
+  /// This is a convenience property that creates a BoxDecoration internally.
+  /// If [tooltipDecoration] is provided, this property is ignored.
+  final List<BoxShadow>? tooltipShadow;
+
   /// The decoration for the tooltip background.
   ///
-  /// If null, uses Flutter's default tooltip decoration (dark background with rounded corners).
+  /// If provided, this takes precedence over [tooltipBackgroundColor],
+  /// [tooltipBorderRadius], [tooltipBorderColor], [tooltipBorderWidth],
+  /// and [tooltipShadow].
+  ///
+  /// If null, a BoxDecoration is created from the individual style properties.
   /// Customize this to match your app's design system.
   final Decoration? tooltipDecoration;
 
   /// The text style for tooltip content.
   ///
+  /// If provided, this takes precedence over [tooltipTextColor].
   /// If null, uses Flutter's default tooltip text style (white text).
   final TextStyle? tooltipTextStyle;
+
+  /// The horizontal alignment of the tooltip text.
+  ///
+  /// Controls how the tooltip message is aligned horizontally.
+  /// If null, uses Flutter's default (left-aligned).
+  final TextAlign? tooltipTextAlign;
 
   /// The padding inside the tooltip.
   ///
@@ -180,6 +254,61 @@ class TextDropdownConfig {
   /// Controls the spacing between the tooltip and the target widget.
   /// If null, uses Flutter's default tooltip margin.
   final EdgeInsetsGeometry? tooltipMargin;
+
+  /// The constraints for the tooltip's dimensions.
+  ///
+  /// Allows flexible sizing control using BoxConstraints.
+  /// You can control min/max width and height of the tooltip.
+  ///
+  /// If null, uses Flutter's default tooltip constraints.
+  ///
+  /// Example:
+  /// ```dart
+  /// tooltipConstraints: BoxConstraints(
+  ///   minHeight: 32,
+  ///   maxHeight: 200,
+  ///   maxWidth: 300,
+  /// )
+  /// ```
+  final BoxConstraints? tooltipConstraints;
+
+  /// The vertical gap between the widget and the displayed tooltip.
+  ///
+  /// When [tooltipPreferBelow] is true, this is the space between the
+  /// widget's bottom edge and the tooltip's top edge.
+  /// When false, this is the space between the widget's top edge and
+  /// the tooltip's bottom edge.
+  /// If null, uses Flutter's default vertical offset.
+  final double? tooltipVerticalOffset;
+
+  /// Whether the tooltip should prefer to appear below the widget.
+  ///
+  /// If true, the tooltip will be displayed below the widget.
+  /// If false, the tooltip will be displayed above the widget.
+  /// If null (default), automatically calculates the best position by comparing
+  /// available space above and below the widget, similar to dropdown overlays.
+  ///
+  /// **Auto-calculation behavior (when null):**
+  /// - Measures the widget's position on screen
+  /// - Compares space above vs. space below
+  /// - Prefers the direction with more available space
+  /// - Falls back to below if calculation fails
+  final bool? tooltipPreferBelow;
+
+  /// Whether the tooltip can be dismissed by tapping on it.
+  ///
+  /// If true, tapping the tooltip will dismiss it.
+  /// If false, the tooltip can only be dismissed by un-hovering or waiting
+  /// for the [tooltipShowDuration] to expire.
+  /// If null, uses Flutter's default behavior (typically true).
+  final bool? tooltipEnableTapToDismiss;
+
+  /// Determines how the tooltip is triggered.
+  ///
+  /// Controls whether the tooltip appears on hover, long press, tap, or manually.
+  /// If null, uses Flutter's default trigger mode (typically long press on mobile,
+  /// hover on desktop).
+  final TooltipTriggerMode? tooltipTriggerMode;
 
   /// Creates a copy of this config with the given fields replaced.
   TextDropdownConfig copyWith({
@@ -198,10 +327,23 @@ class TextDropdownConfig {
     TooltipMode? tooltipMode,
     Duration? tooltipWaitDuration,
     Duration? tooltipShowDuration,
+    Duration? tooltipExitDuration,
+    Color? tooltipBackgroundColor,
+    Color? tooltipTextColor,
+    BorderRadius? tooltipBorderRadius,
+    Color? tooltipBorderColor,
+    double? tooltipBorderWidth,
+    List<BoxShadow>? tooltipShadow,
     Decoration? tooltipDecoration,
     TextStyle? tooltipTextStyle,
+    TextAlign? tooltipTextAlign,
     EdgeInsetsGeometry? tooltipPadding,
     EdgeInsetsGeometry? tooltipMargin,
+    BoxConstraints? tooltipConstraints,
+    double? tooltipVerticalOffset,
+    bool? tooltipPreferBelow,
+    bool? tooltipEnableTapToDismiss,
+    TooltipTriggerMode? tooltipTriggerMode,
   }) {
     return TextDropdownConfig(
       overflow: overflow ?? this.overflow,
@@ -219,10 +361,26 @@ class TextDropdownConfig {
       tooltipMode: tooltipMode ?? this.tooltipMode,
       tooltipWaitDuration: tooltipWaitDuration ?? this.tooltipWaitDuration,
       tooltipShowDuration: tooltipShowDuration ?? this.tooltipShowDuration,
+      tooltipExitDuration: tooltipExitDuration ?? this.tooltipExitDuration,
+      tooltipBackgroundColor:
+          tooltipBackgroundColor ?? this.tooltipBackgroundColor,
+      tooltipTextColor: tooltipTextColor ?? this.tooltipTextColor,
+      tooltipBorderRadius: tooltipBorderRadius ?? this.tooltipBorderRadius,
+      tooltipBorderColor: tooltipBorderColor ?? this.tooltipBorderColor,
+      tooltipBorderWidth: tooltipBorderWidth ?? this.tooltipBorderWidth,
+      tooltipShadow: tooltipShadow ?? this.tooltipShadow,
       tooltipDecoration: tooltipDecoration ?? this.tooltipDecoration,
       tooltipTextStyle: tooltipTextStyle ?? this.tooltipTextStyle,
+      tooltipTextAlign: tooltipTextAlign ?? this.tooltipTextAlign,
       tooltipPadding: tooltipPadding ?? this.tooltipPadding,
       tooltipMargin: tooltipMargin ?? this.tooltipMargin,
+      tooltipConstraints: tooltipConstraints ?? this.tooltipConstraints,
+      tooltipVerticalOffset:
+          tooltipVerticalOffset ?? this.tooltipVerticalOffset,
+      tooltipPreferBelow: tooltipPreferBelow ?? this.tooltipPreferBelow,
+      tooltipEnableTapToDismiss:
+          tooltipEnableTapToDismiss ?? this.tooltipEnableTapToDismiss,
+      tooltipTriggerMode: tooltipTriggerMode ?? this.tooltipTriggerMode,
     );
   }
 

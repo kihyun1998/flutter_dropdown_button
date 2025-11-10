@@ -211,7 +211,6 @@ mixin DropdownMixin<T extends StatefulWidget> on State<T>, TickerProvider {
 
     // Update UI to reflect dropdown state change
     if (mounted) {
-      // ignore: invalid_use_of_protected_member
       setState(() {});
     }
   }
@@ -226,7 +225,6 @@ mixin DropdownMixin<T extends StatefulWidget> on State<T>, TickerProvider {
 
       // Update UI to reflect dropdown state change
       if (mounted) {
-        // ignore: invalid_use_of_protected_member
         setState(() {});
       }
     });

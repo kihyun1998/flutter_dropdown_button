@@ -246,6 +246,8 @@ class _MyHomePageState extends State<MyHomePage> {
   String? customIconStyle = 'Custom Icon & Size';
   String? disabledStyle = 'Tiny Arrow';
   String? dynamicStyle = 'Material Design';
+  String? tooltipBasicStyle = 'Material Design';
+  String? tooltipCustomStyle = 'Vibrant';
 
   // Selected values for demo dropdowns
   String? basicValue;
@@ -260,6 +262,8 @@ class _MyHomePageState extends State<MyHomePage> {
   String? customIconValue;
   String? disabledValue;
   String? dynamicValue;
+  String? tooltipBasicValue;
+  String? tooltipCustomValue;
 
   // Dynamic dropdown items for interactive demo
   List<String> dynamicItems = ['Option 1'];
@@ -459,6 +463,78 @@ class _MyHomePageState extends State<MyHomePage> {
                             theme: _getTheme(longTextStyle),
                             onChanged: (value) =>
                                 setState(() => longTextValue = value),
+                          ),
+                        ),
+                        _buildFeatureCard(
+                          title: 'Smart Tooltip (Auto)',
+                          description:
+                              'Hover long text to see tooltip. Auto-positioned.',
+                          selectedStyle: tooltipBasicStyle,
+                          onStyleChanged: (style) =>
+                              setState(() => tooltipBasicStyle = style),
+                          demoDropdown: TextOnlyDropdownButton(
+                            items: longTextItems,
+                            value: tooltipBasicValue,
+                            hint: 'Hover to see tooltip',
+                            maxWidth: 280,
+                            config: const TextDropdownConfig(
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                              // Tooltip enabled by default with smart overflow detection
+                              enableTooltip: true,
+                              tooltipMode: TooltipMode.onlyWhenOverflow,
+                              // Auto-positioned based on available space
+                              tooltipPreferBelow: null,
+                            ),
+                            theme: _getTheme(tooltipBasicStyle),
+                            onChanged: (value) =>
+                                setState(() => tooltipBasicValue = value),
+                          ),
+                        ),
+                        _buildFeatureCard(
+                          title: 'Custom Styled Tooltip',
+                          description:
+                              'Tooltip with custom colors, border & shadow',
+                          selectedStyle: tooltipCustomStyle,
+                          onStyleChanged: (style) =>
+                              setState(() => tooltipCustomStyle = style),
+                          demoDropdown: TextOnlyDropdownButton(
+                            items: longTextItems,
+                            value: tooltipCustomValue,
+                            hint: 'Styled tooltip demo',
+                            maxWidth: 280,
+                            config: TextDropdownConfig(
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                              enableTooltip: true,
+                              tooltipMode: TooltipMode.onlyWhenOverflow,
+                              // Custom tooltip styling
+                              tooltipBackgroundColor: Colors.deepPurple,
+                              tooltipTextColor: Colors.white,
+                              tooltipBorderRadius: BorderRadius.circular(12),
+                              tooltipBorderColor: Colors.deepPurple.shade300,
+                              tooltipBorderWidth: 2.0,
+                              tooltipShadow: [
+                                BoxShadow(
+                                  color: Colors.deepPurple.withValues(
+                                    alpha: 0.3,
+                                  ),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
+                              tooltipPadding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 12,
+                              ),
+                              tooltipWaitDuration: const Duration(
+                                milliseconds: 300,
+                              ),
+                              tooltipVerticalOffset: 8,
+                            ),
+                            theme: _getTheme(tooltipCustomStyle),
+                            onChanged: (value) =>
+                                setState(() => tooltipCustomValue = value),
                           ),
                         ),
                         _buildFeatureCard(

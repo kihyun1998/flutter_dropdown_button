@@ -85,7 +85,7 @@ class SmartTooltipText extends StatelessWidget {
 
     // If mode is always, always show tooltip
     if (config.tooltipMode == TooltipMode.always) {
-      return _buildWithTooltip(showTooltip: true);
+      return _buildWithTooltip(context: context, showTooltip: true);
     }
 
     // For onlyWhenOverflow mode, detect overflow dynamically
@@ -96,7 +96,10 @@ class SmartTooltipText extends StatelessWidget {
           maxWidth: constraints.maxWidth,
         );
 
-        return _buildWithTooltip(showTooltip: isOverflowing);
+        return _buildWithTooltip(
+          context: context,
+          showTooltip: isOverflowing,
+        );
       },
     );
   }
@@ -118,23 +121,96 @@ class SmartTooltipText extends StatelessWidget {
   }
 
   /// Builds the text widget with optional tooltip wrapper.
-  Widget _buildWithTooltip({required bool showTooltip}) {
+  Widget _buildWithTooltip({
+    required BuildContext context,
+    required bool showTooltip,
+  }) {
     final textWidget = _buildText();
 
     if (!showTooltip) {
       return textWidget;
     }
 
+    // Build decoration from individual properties if not explicitly provided
+    Decoration? effectiveDecoration = config.tooltipDecoration;
+    if (effectiveDecoration == null &&
+        (config.tooltipBackgroundColor != null ||
+            config.tooltipBorderRadius != null ||
+            config.tooltipBorderColor != null ||
+            config.tooltipShadow != null)) {
+      effectiveDecoration = BoxDecoration(
+        color: config.tooltipBackgroundColor,
+        borderRadius: config.tooltipBorderRadius,
+        border: config.tooltipBorderColor != null
+            ? Border.all(
+                color: config.tooltipBorderColor!,
+                width: config.tooltipBorderWidth ?? 1.0,
+              )
+            : null,
+        boxShadow: config.tooltipShadow,
+      );
+    }
+
+    // Build text style from individual properties if not explicitly provided
+    TextStyle? effectiveTextStyle = config.tooltipTextStyle;
+    if (effectiveTextStyle == null && config.tooltipTextColor != null) {
+      effectiveTextStyle = TextStyle(color: config.tooltipTextColor);
+    }
+
+    // Calculate preferBelow automatically if not explicitly set
+    final bool effectivePreferBelow =
+        config.tooltipPreferBelow ?? _calculatePreferBelow(context);
+
     return Tooltip(
       message: text,
       waitDuration: config.tooltipWaitDuration,
       showDuration: config.tooltipShowDuration,
-      decoration: config.tooltipDecoration,
-      textStyle: config.tooltipTextStyle,
+      exitDuration: config.tooltipExitDuration,
+      decoration: effectiveDecoration,
+      textStyle: effectiveTextStyle,
+      textAlign: config.tooltipTextAlign,
       padding: config.tooltipPadding,
       margin: config.tooltipMargin,
+      constraints: config.tooltipConstraints,
+      verticalOffset: config.tooltipVerticalOffset,
+      preferBelow: effectivePreferBelow,
+      enableTapToDismiss: config.tooltipEnableTapToDismiss ?? true,
+      triggerMode: config.tooltipTriggerMode,
       child: textWidget,
     );
+  }
+
+  /// Calculates whether the tooltip should prefer to appear below the widget.
+  ///
+  /// This method calculates the available space above and below the widget
+  /// and returns true if there is more space below, false otherwise.
+  /// This mimics the behavior of dropdown overlays.
+  bool _calculatePreferBelow(BuildContext context) {
+    try {
+      // Get the RenderBox of the widget
+      final RenderBox? renderBox = context.findRenderObject() as RenderBox?;
+      if (renderBox == null || !renderBox.hasSize) {
+        // If we can't get the render box, default to below
+        return true;
+      }
+
+      // Get the global position of the widget
+      final Offset offset = renderBox.localToGlobal(Offset.zero);
+      final Size size = renderBox.size;
+
+      // Get the screen height
+      final double screenHeight = MediaQuery.of(context).size.height;
+
+      // Calculate space above and below the widget
+      final double spaceAbove = offset.dy;
+      final double spaceBelow = screenHeight - (offset.dy + size.height);
+
+      // Prefer below if there's more space below
+      return spaceBelow >= spaceAbove;
+    } catch (e) {
+      // If any error occurs during calculation, default to below
+      return true;
+    }
   }
 
   /// Checks if the text overflows the available space.
@@ -151,12 +227,10 @@ class SmartTooltipText extends StatelessWidget {
     }
 
     // Get the effective text direction
-    final effectiveTextDirection =
-        textDirection ?? Directionality.of(context);
+    final effectiveTextDirection = textDirection ?? Directionality.of(context);
 
     // Get the effective text scaler
-    final effectiveTextScaler =
-        textScaler ?? MediaQuery.textScalerOf(context);
+    final effectiveTextScaler = textScaler ?? MediaQuery.textScalerOf(context);
 
     // Create a text painter to measure the text
     final textPainter = TextPainter(

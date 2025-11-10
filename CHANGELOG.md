@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.3.2
+
+* **FEAT**: Added smart tooltip support with overflow detection, auto-positioning, and extensive customization options (background color, border, shadow, text styling, trigger modes, and timing controls)
+* **FIX**: Fixed text and icon vertical alignment issue by adding centerLeft alignment to text and center crossAxisAlignment to Row, and fixed mainAxisAlignment to use spaceBetween when width is fixed
+
 ## 1.3.1
 
 * **FEAT**: Added leadingBuilder property to DynamicTextBaseDropdownButton for displaying custom widgets (icons, images) before text
