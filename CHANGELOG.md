@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.4.0
+
+* **BREAKING**: Changed `leadingBuilder` to `leading` and `selectedLeading` parameters in DynamicTextBaseDropdownButton for better performance and simpler API
+* **BREAKING**: Renamed `leadingWidgetPadding` to `leadingPadding` in DynamicTextBaseDropdownButton for consistent naming
+* **PERF**: Optimized AnimatedBuilder in DropdownMixin to prevent unnecessary rebuilds of overlay content during animations (60+ rebuilds eliminated per dropdown open/close)
+* **PERF**: Changed leading widget API from builder function to direct widget parameters, eliminating redundant widget creation (126+ widget creations reduced to 2 per dropdown)
+
 ## 1.3.3
 
 * **FEAT**: Added expand parameter to automatically wrap dropdown in Expanded widget for flex layouts, with spaceBetween alignment when expanded

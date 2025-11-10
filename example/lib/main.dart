@@ -983,8 +983,12 @@ class _MyHomePageState extends State<MyHomePage> {
                   overflow: TextOverflow.ellipsis,
                   maxLines: 1,
                 ),
-                leadingBuilder: (item) => _getIconForItem(item),
-                leadingWidgetPadding: const EdgeInsets.only(right: 8.0),
+                // Same icon for all items
+                leading: const Icon(Icons.circle, size: 16, color: Colors.grey),
+                // Different color for selected item
+                selectedLeading:
+                    const Icon(Icons.circle, size: 16, color: Colors.blue),
+                leadingPadding: const EdgeInsets.only(right: 8.0),
                 onChanged: (value) => setState(() => dynamicValue = value),
               ),
             ),
@@ -1000,23 +1004,5 @@ class _MyHomePageState extends State<MyHomePage> {
       orElse: () => stylePresets[0],
     );
     return preset.theme;
-  }
-
-  Widget _getIconForItem(String item) {
-    // Assign different icons based on item text
-    if (item.toLowerCase().contains('option 1')) {
-      return const Icon(Icons.star, size: 20, color: Colors.amber);
-    } else if (item.toLowerCase().contains('option 2')) {
-      return const Icon(Icons.favorite, size: 20, color: Colors.red);
-    } else if (item.toLowerCase().contains('option 3')) {
-      return const Icon(Icons.thumb_up, size: 20, color: Colors.blue);
-    } else if (item.toLowerCase().contains('option 4')) {
-      return const Icon(Icons.lightbulb, size: 20, color: Colors.orange);
-    } else if (item.toLowerCase().contains('option 5')) {
-      return const Icon(Icons.flag, size: 20, color: Colors.green);
-    } else {
-      // Default icon for custom added items
-      return const Icon(Icons.label, size: 20, color: Colors.purple);
-    }
   }
 }

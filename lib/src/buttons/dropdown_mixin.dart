@@ -322,33 +322,35 @@ mixin DropdownMixin<T extends StatefulWidget> on State<T>, TickerProvider {
                 width: buttonSize.width,
                 child: AnimatedBuilder(
                   animation: dropdownAnimationController,
+                  // Build overlay content once and reuse it during animation
+                  child: Material(
+                    elevation: overlayElevation,
+                    shadowColor: overlayShadowColor,
+                    color: Colors.transparent,
+                    borderRadius:
+                        BorderRadius.circular(overlayBorderRadius),
+                    child: Container(
+                      height: position.height,
+                      decoration: buildOverlayDecoration() ??
+                          BoxDecoration(
+                            color: Theme.of(context).cardColor,
+                            borderRadius: BorderRadius.circular(
+                                overlayBorderRadius),
+                            border: Border.all(
+                              color: Theme.of(context).dividerColor,
+                              width: 1,
+                            ),
+                          ),
+                      child: buildOverlayContent(position.height),
+                    ),
+                  ),
                   builder: (context, child) {
                     return Transform.scale(
                       scale: dropdownScaleAnimation.value,
                       alignment: position.transformAlignment,
                       child: Opacity(
                         opacity: dropdownOpacityAnimation.value,
-                        child: Material(
-                          elevation: overlayElevation,
-                          shadowColor: overlayShadowColor,
-                          color: Colors.transparent,
-                          borderRadius:
-                              BorderRadius.circular(overlayBorderRadius),
-                          child: Container(
-                            height: position.height,
-                            decoration: buildOverlayDecoration() ??
-                                BoxDecoration(
-                                  color: Theme.of(context).cardColor,
-                                  borderRadius: BorderRadius.circular(
-                                      overlayBorderRadius),
-                                  border: Border.all(
-                                    color: Theme.of(context).dividerColor,
-                                    width: 1,
-                                  ),
-                                ),
-                            child: buildOverlayContent(position.height),
-                          ),
-                        ),
+                        child: child,
                       ),
                     );
                   },
