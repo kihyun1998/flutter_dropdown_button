@@ -327,15 +327,14 @@ mixin DropdownMixin<T extends StatefulWidget> on State<T>, TickerProvider {
                     elevation: overlayElevation,
                     shadowColor: overlayShadowColor,
                     color: Colors.transparent,
-                    borderRadius:
-                        BorderRadius.circular(overlayBorderRadius),
+                    borderRadius: BorderRadius.circular(overlayBorderRadius),
                     child: Container(
                       height: position.height,
                       decoration: buildOverlayDecoration() ??
                           BoxDecoration(
                             color: Theme.of(context).cardColor,
-                            borderRadius: BorderRadius.circular(
-                                overlayBorderRadius),
+                            borderRadius:
+                                BorderRadius.circular(overlayBorderRadius),
                             border: Border.all(
                               color: Theme.of(context).dividerColor,
                               width: 1,

@@ -986,8 +986,11 @@ class _MyHomePageState extends State<MyHomePage> {
                 // Same icon for all items
                 leading: const Icon(Icons.circle, size: 16, color: Colors.grey),
                 // Different color for selected item
-                selectedLeading:
-                    const Icon(Icons.circle, size: 16, color: Colors.blue),
+                selectedLeading: const Icon(
+                  Icons.circle,
+                  size: 16,
+                  color: Colors.blue,
+                ),
                 leadingPadding: const EdgeInsets.only(right: 8.0),
                 onChanged: (value) => setState(() => dynamicValue = value),
               ),
