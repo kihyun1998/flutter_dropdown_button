@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.4.1
+
+* **FEAT**: Added hover cursor support - dropdown button now shows click cursor on mouse hover using InkWell
+
 ## 1.4.0
 
 * **BREAKING**: Changed `leadingBuilder` to `leading` and `selectedLeading` parameters in DynamicTextBaseDropdownButton for better performance and simpler API

@@ -451,59 +451,65 @@ abstract class BaseDropdownButtonState<W extends BaseDropdownButton<T>, T>
   /// Builds the dropdown button with common structure and constraints.
   @override
   Widget build(BuildContext context) {
-    Widget dropdownButton = GestureDetector(
+    Widget dropdownButton = Container(
       key: dropdownButtonKey,
-      onTap: toggleDropdown,
-      child: Container(
-        width: widget.width,
-        padding: effectiveTheme.buttonPadding,
-        decoration: buildButtonDecoration(),
-        child: Row(
-          mainAxisAlignment: widget.width != null || widget.expand
-              ? MainAxisAlignment.spaceBetween
-              : MainAxisAlignment.start,
-          mainAxisSize: widget.width != null || widget.expand
-              ? MainAxisSize.max
-              : MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Flexible(
-              child: SizedBox(
-                height: effectiveTheme.iconSize ?? 24.0,
-                child: widget.width != null || widget.expand
-                    ? Container(
-                        alignment: Alignment.centerLeft,
-                        child: buildSelectedWidget(),
-                      )
-                    : Align(
-                        alignment: Alignment.centerLeft,
-                        widthFactor: 1.0,
-                        child: buildSelectedWidget(),
+      width: widget.width,
+      decoration: buildButtonDecoration(),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: widget.enabled ? toggleDropdown : null,
+          borderRadius: BorderRadius.circular(effectiveTheme.borderRadius),
+          child: Container(
+            padding: effectiveTheme.buttonPadding,
+            child: Row(
+              mainAxisAlignment: widget.width != null || widget.expand
+                  ? MainAxisAlignment.spaceBetween
+                  : MainAxisAlignment.start,
+              mainAxisSize: widget.width != null || widget.expand
+                  ? MainAxisSize.max
+                  : MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Flexible(
+                  child: SizedBox(
+                    height: effectiveTheme.iconSize ?? 24.0,
+                    child: widget.width != null || widget.expand
+                        ? Container(
+                            alignment: Alignment.centerLeft,
+                            child: buildSelectedWidget(),
+                          )
+                        : Align(
+                            alignment: Alignment.centerLeft,
+                            widthFactor: 1.0,
+                            child: buildSelectedWidget(),
+                          ),
+                  ),
+                ),
+                Padding(
+                  padding: effectiveTheme.iconPadding ??
+                      const EdgeInsets.only(left: 8.0),
+                  child: SizedBox(
+                    height: effectiveTheme.iconSize ?? 24.0,
+                    child: Center(
+                      child: RotationTransition(
+                        turns: dropdownIconRotationAnimation,
+                        child: Icon(
+                          effectiveTheme.icon ?? Icons.keyboard_arrow_down,
+                          size: effectiveTheme.iconSize ?? 24.0,
+                          color: widget.enabled
+                              ? (effectiveTheme.iconColor ??
+                                  Theme.of(context).iconTheme.color)
+                              : (effectiveTheme.iconDisabledColor ??
+                                  Theme.of(context).disabledColor),
+                        ),
                       ),
-              ),
-            ),
-            Padding(
-              padding: effectiveTheme.iconPadding ??
-                  const EdgeInsets.only(left: 8.0),
-              child: SizedBox(
-                height: effectiveTheme.iconSize ?? 24.0,
-                child: Center(
-                  child: RotationTransition(
-                    turns: dropdownIconRotationAnimation,
-                    child: Icon(
-                      effectiveTheme.icon ?? Icons.keyboard_arrow_down,
-                      size: effectiveTheme.iconSize ?? 24.0,
-                      color: widget.enabled
-                          ? (effectiveTheme.iconColor ??
-                              Theme.of(context).iconTheme.color)
-                          : (effectiveTheme.iconDisabledColor ??
-                              Theme.of(context).disabledColor),
                     ),
                   ),
                 ),
-              ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
