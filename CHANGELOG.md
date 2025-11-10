@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.3.3
+
+* **FEAT**: Added expand parameter to automatically wrap dropdown in Expanded widget for flex layouts, with spaceBetween alignment when expanded
+
 ## 1.3.2
 
 * **FEAT**: Added smart tooltip support with overflow detection, auto-positioning, and extensive customization options (background color, border, shadow, text styling, trigger modes, and timing controls)

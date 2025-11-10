@@ -59,6 +59,7 @@ class DynamicTextBaseDropdownButton extends BaseDropdownButton<String> {
     super.enabled = true,
     super.scrollToSelectedItem = true,
     super.scrollToSelectedDuration,
+    super.expand = false,
     this.hideIconWhenSingleItem = true,
     this.leadingBuilder,
     this.leadingWidgetPadding,
@@ -234,17 +235,18 @@ class _DynamicTextBaseDropdownButtonState
         padding: effectiveTheme.buttonPadding,
         decoration: buildButtonDecoration(),
         child: Row(
-          mainAxisAlignment: widget.width != null
+          mainAxisAlignment: widget.width != null || widget.expand
               ? MainAxisAlignment.spaceBetween
               : MainAxisAlignment.start,
-          mainAxisSize:
-              widget.width != null ? MainAxisSize.max : MainAxisSize.min,
+          mainAxisSize: widget.width != null || widget.expand
+              ? MainAxisSize.max
+              : MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Flexible(
               child: SizedBox(
                 height: effectiveTheme.iconSize ?? 24.0,
-                child: widget.width != null
+                child: widget.width != null || widget.expand
                     ? Container(
                         alignment: Alignment.centerLeft,
                         child: buildSelectedWidget(),

@@ -42,6 +42,7 @@ abstract class BaseDropdownButton<T> extends StatefulWidget {
     this.enabled = true,
     this.scrollToSelectedItem = true,
     this.scrollToSelectedDuration,
+    this.expand = false,
   });
 
   /// Called when the user selects an item from the dropdown.
@@ -135,6 +136,32 @@ abstract class BaseDropdownButton<T> extends StatefulWidget {
   ///
   /// Defaults to null (instant jump).
   final Duration? scrollToSelectedDuration;
+
+  /// Whether the dropdown should expand to fill available space in a flex container.
+  ///
+  /// When true, the dropdown will be wrapped in an Expanded widget, making it
+  /// fill the remaining space in a Row, Column, or Flex parent. This is useful
+  /// when you want the dropdown to take up available space alongside other widgets.
+  ///
+  /// When false (default), the dropdown sizes itself based on its content and
+  /// width constraints (width, minWidth, maxWidth).
+  ///
+  /// Example:
+  /// ```dart
+  /// Row(
+  ///   children: [
+  ///     Text('Label:'),
+  ///     TextOnlyDropdownButton(
+  ///       expand: true,  // Takes remaining space
+  ///       maxWidth: 200,
+  ///       ...
+  ///     ),
+  ///   ],
+  /// )
+  /// ```
+  ///
+  /// Defaults to false.
+  final bool expand;
 }
 
 /// Abstract base state class for all dropdown button variants.
@@ -432,17 +459,18 @@ abstract class BaseDropdownButtonState<W extends BaseDropdownButton<T>, T>
         padding: effectiveTheme.buttonPadding,
         decoration: buildButtonDecoration(),
         child: Row(
-          mainAxisAlignment: widget.width != null
+          mainAxisAlignment: widget.width != null || widget.expand
               ? MainAxisAlignment.spaceBetween
               : MainAxisAlignment.start,
-          mainAxisSize:
-              widget.width != null ? MainAxisSize.max : MainAxisSize.min,
+          mainAxisSize: widget.width != null || widget.expand
+              ? MainAxisSize.max
+              : MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Flexible(
               child: SizedBox(
                 height: effectiveTheme.iconSize ?? 24.0,
-                child: widget.width != null
+                child: widget.width != null || widget.expand
                     ? Container(
                         alignment: Alignment.centerLeft,
                         child: buildSelectedWidget(),
@@ -501,9 +529,10 @@ abstract class BaseDropdownButtonState<W extends BaseDropdownButton<T>, T>
 
   /// Applies width constraints to the dropdown button.
   Widget _applyWidthConstraints(Widget child) {
+    // First apply width constraints if specified
     if (widget.width == null &&
         (widget.minWidth != null || widget.maxWidth != null)) {
-      return ConstrainedBox(
+      child = ConstrainedBox(
         constraints: BoxConstraints(
           minWidth: widget.minWidth ?? 0,
           maxWidth: widget.maxWidth ?? double.infinity,
@@ -511,6 +540,12 @@ abstract class BaseDropdownButtonState<W extends BaseDropdownButton<T>, T>
         child: child,
       );
     }
+
+    // Then wrap with Expanded if expand is true
+    if (widget.expand) {
+      child = Expanded(child: child);
+    }
+
     return child;
   }
 
