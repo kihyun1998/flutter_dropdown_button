@@ -234,14 +234,26 @@ class _DynamicTextBaseDropdownButtonState
         padding: effectiveTheme.buttonPadding,
         decoration: buildButtonDecoration(),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
+          mainAxisAlignment: widget.width != null
+              ? MainAxisAlignment.spaceBetween
+              : MainAxisAlignment.start,
           mainAxisSize:
               widget.width != null ? MainAxisSize.max : MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Flexible(
               child: SizedBox(
                 height: effectiveTheme.iconSize ?? 24.0,
-                child: buildSelectedWidget(),
+                child: widget.width != null
+                    ? Container(
+                        alignment: Alignment.centerLeft,
+                        child: buildSelectedWidget(),
+                      )
+                    : Align(
+                        alignment: Alignment.centerLeft,
+                        widthFactor: 1.0,
+                        child: buildSelectedWidget(),
+                      ),
               ),
             ),
             // Conditionally show icon for single item

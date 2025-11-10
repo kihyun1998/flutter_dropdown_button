@@ -740,27 +740,25 @@ class _MyHomePageState extends State<MyHomePage> {
                   style: TextStyle(fontSize: 12, color: Colors.grey[700]),
                 ),
                 const SizedBox(width: 8),
-                Expanded(
-                  child: TextOnlyDropdownButton(
-                    items: stylePresets.map((s) => s.name).toList(),
-                    value: selectedStyle,
-                    hint: 'Select style',
-                    maxWidth: 180,
-                    config: const TextDropdownConfig(
-                      textStyle: TextStyle(fontSize: 12),
-                    ),
-                    theme: const DropdownStyleTheme(
-                      dropdown: DropdownTheme(
-                        borderRadius: 8.0,
-                        elevation: 2.0,
-                        itemPadding: EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 8,
-                        ),
+                TextOnlyDropdownButton(
+                  items: stylePresets.map((s) => s.name).toList(),
+                  value: selectedStyle,
+                  hint: 'Select style',
+                  maxWidth: 180,
+                  config: const TextDropdownConfig(
+                    textStyle: TextStyle(fontSize: 12),
+                  ),
+                  theme: const DropdownStyleTheme(
+                    dropdown: DropdownTheme(
+                      borderRadius: 8.0,
+                      elevation: 2.0,
+                      itemPadding: EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
                       ),
                     ),
-                    onChanged: onStyleChanged,
                   ),
+                  onChanged: onStyleChanged,
                 ),
               ],
             ),
