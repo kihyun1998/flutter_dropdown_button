@@ -43,6 +43,7 @@ abstract class BaseDropdownButton<T> extends StatefulWidget {
     this.scrollToSelectedItem = true,
     this.scrollToSelectedDuration,
     this.expand = false,
+    this.trailing,
   });
 
   /// Called when the user selects an item from the dropdown.
@@ -162,6 +163,24 @@ abstract class BaseDropdownButton<T> extends StatefulWidget {
   ///
   /// Defaults to false.
   final bool expand;
+
+  /// An optional widget to replace the default dropdown arrow icon.
+  ///
+  /// This widget will be automatically wrapped with a [RotationTransition]
+  /// that rotates it 180 degrees when the dropdown opens/closes.
+  ///
+  /// The height is constrained to [DropdownTheme.iconSize]. If null,
+  /// the default arrow icon from the theme will be used.
+  ///
+  /// Example:
+  /// ```dart
+  /// TextOnlyDropdownButton(
+  ///   trailing: Icon(Icons.expand_more),
+  ///   items: ['Option 1', 'Option 2'],
+  ///   ...
+  /// )
+  /// ```
+  final Widget? trailing;
 }
 
 /// Abstract base state class for all dropdown button variants.
@@ -506,6 +525,7 @@ abstract class BaseDropdownButtonState<W extends BaseDropdownButton<T>, T>
             : MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
+          // Selected content
           Flexible(
             child: SizedBox(
               height: effectiveContentHeight,
@@ -521,6 +541,8 @@ abstract class BaseDropdownButtonState<W extends BaseDropdownButton<T>, T>
                     ),
             ),
           ),
+
+          // Trailing widget (with rotation animation)
           Padding(
             padding:
                 effectiveTheme.iconPadding ?? const EdgeInsets.only(left: 8.0),
@@ -529,15 +551,16 @@ abstract class BaseDropdownButtonState<W extends BaseDropdownButton<T>, T>
               child: Center(
                 child: RotationTransition(
                   turns: dropdownIconRotationAnimation,
-                  child: Icon(
-                    effectiveTheme.icon ?? Icons.keyboard_arrow_down,
-                    size: effectiveIconSize,
-                    color: widget.enabled
-                        ? (effectiveTheme.iconColor ??
-                            Theme.of(context).iconTheme.color)
-                        : (effectiveTheme.iconDisabledColor ??
-                            Theme.of(context).disabledColor),
-                  ),
+                  child: widget.trailing ??
+                      Icon(
+                        effectiveTheme.icon ?? Icons.keyboard_arrow_down,
+                        size: effectiveIconSize,
+                        color: widget.enabled
+                            ? (effectiveTheme.iconColor ??
+                                Theme.of(context).iconTheme.color)
+                            : (effectiveTheme.iconDisabledColor ??
+                                Theme.of(context).disabledColor),
+                      ),
                 ),
               ),
             ),

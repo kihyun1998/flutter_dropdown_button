@@ -56,6 +56,7 @@ class BasicDropdownButton<T> extends BaseDropdownButton<T> {
     super.scrollToSelectedItem = true,
     super.scrollToSelectedDuration,
     super.expand = false,
+    super.trailing,
   });
 
   /// The list of items to display in the dropdown.

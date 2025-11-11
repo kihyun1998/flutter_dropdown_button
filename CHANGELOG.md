@@ -4,6 +4,7 @@
 
 * **FEAT**: Added buttonHoverColor, buttonSplashColor, and buttonHighlightColor to DropdownTheme for controlling dropdown button InkWell interaction colors
 * **FEAT**: Added buttonHeight property to DropdownTheme for independent button content height control from iconSize, with automatic overflow prevention
+* **FEAT**: Added trailing parameter to BaseDropdownButton for customizing the dropdown arrow icon with automatic rotation animation
 
 ## 1.4.1
 

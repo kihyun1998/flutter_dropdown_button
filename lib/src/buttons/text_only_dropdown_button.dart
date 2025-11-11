@@ -55,6 +55,7 @@ class TextOnlyDropdownButton extends BaseDropdownButton<String> {
     super.scrollToSelectedItem = true,
     super.scrollToSelectedDuration,
     super.expand = false,
+    super.trailing,
   });
 
   /// The list of text options to display in the dropdown.
