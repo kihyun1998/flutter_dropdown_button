@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.4.3
+
+* **FEAT**: Added trailing parameter support to DynamicTextBaseDropdownButton (static display for single-item mode, rotation animation for multi-item mode)
+
 ## 1.4.2
 
 * **FEAT**: Added buttonHoverColor, buttonSplashColor, and buttonHighlightColor to DropdownTheme for controlling dropdown button InkWell interaction colors

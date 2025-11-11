@@ -61,6 +61,7 @@ class DynamicTextBaseDropdownButton extends BaseDropdownButton<String> {
     super.scrollToSelectedItem = true,
     super.scrollToSelectedDuration,
     super.expand = false,
+    super.trailing,
     this.hideIconWhenSingleItem = true,
     this.leading,
     this.selectedLeading,
@@ -282,7 +283,7 @@ class _DynamicTextBaseDropdownButtonState
                       ),
               ),
             ),
-            // Conditionally show icon for single item
+            // Conditionally show icon/trailing for single item
             if (_shouldShowIcon)
               Padding(
                 padding: effectiveTheme.iconPadding ??
@@ -290,15 +291,16 @@ class _DynamicTextBaseDropdownButtonState
                 child: SizedBox(
                   height: effectiveTheme.iconSize ?? 24.0,
                   child: Center(
-                    child: Icon(
-                      effectiveTheme.icon ?? Icons.keyboard_arrow_down,
-                      size: effectiveTheme.iconSize ?? 24.0,
-                      color: widget.enabled
-                          ? (effectiveTheme.iconColor ??
-                              Theme.of(context).iconTheme.color)
-                          : (effectiveTheme.iconDisabledColor ??
-                              Theme.of(context).disabledColor),
-                    ),
+                    child: widget.trailing ??
+                        Icon(
+                          effectiveTheme.icon ?? Icons.keyboard_arrow_down,
+                          size: effectiveTheme.iconSize ?? 24.0,
+                          color: widget.enabled
+                              ? (effectiveTheme.iconColor ??
+                                  Theme.of(context).iconTheme.color)
+                              : (effectiveTheme.iconDisabledColor ??
+                                  Theme.of(context).disabledColor),
+                        ),
                   ),
                 ),
               ),

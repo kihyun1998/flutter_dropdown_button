@@ -692,6 +692,35 @@ class _MyHomePageState extends State<MyHomePage> {
                                 setState(() => disabledValue = value),
                           ),
                         ),
+                        _buildFeatureCard(
+                          title: 'Custom Trailing Widget',
+                          description:
+                              'Custom trailing widget with rotation animation',
+                          selectedStyle: basicValue,
+                          onStyleChanged: (style) =>
+                              setState(() => basicValue = style),
+                          demoDropdown: TextOnlyDropdownButton(
+                            items: basicItems,
+                            value: basicValue,
+                            hint: 'Custom trailing',
+                            maxWidth: 280,
+                            trailing: Container(
+                              padding: const EdgeInsets.all(4),
+                              decoration: BoxDecoration(
+                                color: Colors.blue.shade100,
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                Icons.arrow_drop_down,
+                                size: 20,
+                                color: Colors.blue.shade700,
+                              ),
+                            ),
+                            theme: _getTheme(basicValue),
+                            onChanged: (value) =>
+                                setState(() => basicValue = value),
+                          ),
+                        ),
                       ],
                     );
                   },
@@ -992,6 +1021,19 @@ class _MyHomePageState extends State<MyHomePage> {
                   color: Colors.blue,
                 ),
                 leadingPadding: const EdgeInsets.only(right: 8.0),
+                // Custom trailing widget (rotates on multi-item, static on single-item)
+                trailing: Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    color: Colors.green.shade100,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.arrow_drop_down,
+                    size: 16,
+                    color: Colors.green.shade700,
+                  ),
+                ),
                 onChanged: (value) => setState(() => dynamicValue = value),
               ),
             ),
