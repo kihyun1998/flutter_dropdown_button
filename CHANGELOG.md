@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.4.2
+
+* **FEAT**: Added buttonHoverColor, buttonSplashColor, and buttonHighlightColor to DropdownTheme for controlling dropdown button InkWell interaction colors
+* **FEAT**: Added buttonHeight property to DropdownTheme for independent button content height control from iconSize, with automatic overflow prevention
+
 ## 1.4.1
 
 * **FEAT**: Added hover cursor support - dropdown button now shows click cursor on mouse hover using InkWell

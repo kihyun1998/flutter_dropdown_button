@@ -460,55 +460,15 @@ abstract class BaseDropdownButtonState<W extends BaseDropdownButton<T>, T>
         child: InkWell(
           onTap: widget.enabled ? toggleDropdown : null,
           borderRadius: BorderRadius.circular(effectiveTheme.borderRadius),
-          child: Container(
+          splashColor:
+              effectiveTheme.buttonSplashColor ?? Theme.of(context).splashColor,
+          highlightColor: effectiveTheme.buttonHighlightColor ??
+              Theme.of(context).highlightColor,
+          hoverColor:
+              effectiveTheme.buttonHoverColor ?? Theme.of(context).hoverColor,
+          child: Padding(
             padding: effectiveTheme.buttonPadding,
-            child: Row(
-              mainAxisAlignment: widget.width != null || widget.expand
-                  ? MainAxisAlignment.spaceBetween
-                  : MainAxisAlignment.start,
-              mainAxisSize: widget.width != null || widget.expand
-                  ? MainAxisSize.max
-                  : MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Flexible(
-                  child: SizedBox(
-                    height: effectiveTheme.iconSize ?? 24.0,
-                    child: widget.width != null || widget.expand
-                        ? Container(
-                            alignment: Alignment.centerLeft,
-                            child: buildSelectedWidget(),
-                          )
-                        : Align(
-                            alignment: Alignment.centerLeft,
-                            widthFactor: 1.0,
-                            child: buildSelectedWidget(),
-                          ),
-                  ),
-                ),
-                Padding(
-                  padding: effectiveTheme.iconPadding ??
-                      const EdgeInsets.only(left: 8.0),
-                  child: SizedBox(
-                    height: effectiveTheme.iconSize ?? 24.0,
-                    child: Center(
-                      child: RotationTransition(
-                        turns: dropdownIconRotationAnimation,
-                        child: Icon(
-                          effectiveTheme.icon ?? Icons.keyboard_arrow_down,
-                          size: effectiveTheme.iconSize ?? 24.0,
-                          color: widget.enabled
-                              ? (effectiveTheme.iconColor ??
-                                  Theme.of(context).iconTheme.color)
-                              : (effectiveTheme.iconDisabledColor ??
-                                  Theme.of(context).disabledColor),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
+            child: _buildButtonContent(),
           ),
         ),
       ),
@@ -521,6 +481,70 @@ abstract class BaseDropdownButtonState<W extends BaseDropdownButton<T>, T>
 
     // Apply width constraints if specified
     return _applyWidthConstraints(dropdownButton);
+  }
+
+  /// Builds the button content with proper height handling.
+  Widget _buildButtonContent() {
+    // Calculate effective heights
+    final effectiveContentHeight =
+        effectiveTheme.buttonHeight ?? effectiveTheme.iconSize ?? 24.0;
+    final effectiveIconSize = effectiveTheme.iconSize ?? 24.0;
+
+    // Use the larger of content height or icon size to prevent overflow
+    final rowHeight = effectiveContentHeight > effectiveIconSize
+        ? effectiveContentHeight
+        : effectiveIconSize;
+
+    return SizedBox(
+      height: rowHeight,
+      child: Row(
+        mainAxisAlignment: widget.width != null || widget.expand
+            ? MainAxisAlignment.spaceBetween
+            : MainAxisAlignment.start,
+        mainAxisSize: widget.width != null || widget.expand
+            ? MainAxisSize.max
+            : MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Flexible(
+            child: SizedBox(
+              height: effectiveContentHeight,
+              child: widget.width != null || widget.expand
+                  ? Container(
+                      alignment: Alignment.centerLeft,
+                      child: buildSelectedWidget(),
+                    )
+                  : Align(
+                      alignment: Alignment.centerLeft,
+                      widthFactor: 1.0,
+                      child: buildSelectedWidget(),
+                    ),
+            ),
+          ),
+          Padding(
+            padding:
+                effectiveTheme.iconPadding ?? const EdgeInsets.only(left: 8.0),
+            child: SizedBox(
+              height: effectiveIconSize,
+              child: Center(
+                child: RotationTransition(
+                  turns: dropdownIconRotationAnimation,
+                  child: Icon(
+                    effectiveTheme.icon ?? Icons.keyboard_arrow_down,
+                    size: effectiveIconSize,
+                    color: widget.enabled
+                        ? (effectiveTheme.iconColor ??
+                            Theme.of(context).iconTheme.color)
+                        : (effectiveTheme.iconDisabledColor ??
+                            Theme.of(context).disabledColor),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   /// Builds the decoration for the dropdown button.

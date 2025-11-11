@@ -28,6 +28,9 @@ class DropdownTheme {
     this.itemHoverColor,
     this.itemSplashColor,
     this.itemHighlightColor,
+    this.buttonHoverColor,
+    this.buttonSplashColor,
+    this.buttonHighlightColor,
     this.shadowColor,
     this.overlayDecoration,
     this.buttonDecoration,
@@ -40,6 +43,7 @@ class DropdownTheme {
     this.iconDisabledColor,
     this.icon,
     this.iconSize,
+    this.buttonHeight,
     this.iconPadding,
     this.overlayPadding,
   });
@@ -97,6 +101,24 @@ class DropdownTheme {
   /// If null, uses the theme's highlight color. This affects
   /// keyboard navigation and accessibility focus indicators.
   final Color? itemHighlightColor;
+
+  /// The background color for the dropdown button on hover.
+  ///
+  /// If null, uses the theme's hover color. This provides
+  /// visual feedback when hovering over the dropdown button.
+  final Color? buttonHoverColor;
+
+  /// The color of the ripple effect when tapping the dropdown button.
+  ///
+  /// If null, uses the theme's splash color. This affects the
+  /// Material ink splash animation on button interaction.
+  final Color? buttonSplashColor;
+
+  /// The color of the highlight effect for the focused dropdown button.
+  ///
+  /// If null, uses the theme's highlight color. This affects
+  /// keyboard navigation and accessibility focus indicators for the button.
+  final Color? buttonHighlightColor;
 
   /// The shadow color for the dropdown overlay.
   ///
@@ -167,6 +189,14 @@ class DropdownTheme {
   /// This allows customization of the dropdown arrow size.
   final double? iconSize;
 
+  /// The height of the dropdown button content area.
+  ///
+  /// This controls the height of the selected value display area
+  /// in the dropdown button. If null, falls back to iconSize (or 24.0).
+  /// Setting this independently from iconSize allows for better control
+  /// over button proportions when using different icon and text sizes.
+  final double? buttonHeight;
+
   /// Padding applied around the dropdown button icon.
   ///
   /// If null, uses the default padding of EdgeInsets.only(left: 8.0).
@@ -198,6 +228,9 @@ class DropdownTheme {
     Color? itemHoverColor,
     Color? itemSplashColor,
     Color? itemHighlightColor,
+    Color? buttonHoverColor,
+    Color? buttonSplashColor,
+    Color? buttonHighlightColor,
     Color? shadowColor,
     BoxDecoration? overlayDecoration,
     BoxDecoration? buttonDecoration,
@@ -209,6 +242,7 @@ class DropdownTheme {
     Color? iconDisabledColor,
     IconData? icon,
     double? iconSize,
+    double? buttonHeight,
     EdgeInsets? iconPadding,
     EdgeInsets? overlayPadding,
   }) {
@@ -222,6 +256,9 @@ class DropdownTheme {
       itemHoverColor: itemHoverColor ?? this.itemHoverColor,
       itemSplashColor: itemSplashColor ?? this.itemSplashColor,
       itemHighlightColor: itemHighlightColor ?? this.itemHighlightColor,
+      buttonHoverColor: buttonHoverColor ?? this.buttonHoverColor,
+      buttonSplashColor: buttonSplashColor ?? this.buttonSplashColor,
+      buttonHighlightColor: buttonHighlightColor ?? this.buttonHighlightColor,
       shadowColor: shadowColor ?? this.shadowColor,
       overlayDecoration: overlayDecoration ?? this.overlayDecoration,
       buttonDecoration: buttonDecoration ?? this.buttonDecoration,
@@ -233,6 +270,7 @@ class DropdownTheme {
       iconDisabledColor: iconDisabledColor ?? this.iconDisabledColor,
       icon: icon ?? this.icon,
       iconSize: iconSize ?? this.iconSize,
+      buttonHeight: buttonHeight ?? this.buttonHeight,
       iconPadding: iconPadding ?? this.iconPadding,
       overlayPadding: overlayPadding ?? this.overlayPadding,
     );
