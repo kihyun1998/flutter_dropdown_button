@@ -442,7 +442,7 @@ abstract class BaseDropdownButtonState<W extends BaseDropdownButton<T>, T>
           // Apply item-specific border radius if provided, otherwise use overlay radius for edges
           borderRadius: BorderRadius.circular(effectiveTheme.itemBorderRadius ??
               (isFirst || isLast ? effectiveTheme.borderRadius : 0.0)),
-          child: Container(
+          child: Ink(
             height: widget.itemHeight,
             width: double.infinity,
             padding: effectiveTheme.itemPadding,

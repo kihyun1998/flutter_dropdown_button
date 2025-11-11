@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.4.4
+
+* **FIX**: Fixed hover color not visible when selectedItemColor is set by changing Container to Ink widget for proper Material effect layering
+
 ## 1.4.3
 
 * **FEAT**: Added trailing parameter support to DynamicTextBaseDropdownButton (static display for single-item mode, rotation animation for multi-item mode)

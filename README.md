@@ -45,7 +45,7 @@ Add to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  flutter_dropdown_button: ^1.4.3
+  flutter_dropdown_button: ^1.4.4
 ```
 
 Import the package:
