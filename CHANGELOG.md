@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.4.5
+## 1.4.6
 
 * **FEAT**: Added showSeparator and separator parameters to display customizable dividers between dropdown items (defaults to Divider widget)
 
