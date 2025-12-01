@@ -44,6 +44,8 @@ abstract class BaseDropdownButton<T> extends StatefulWidget {
     this.scrollToSelectedDuration,
     this.expand = false,
     this.trailing,
+    this.showSeparator = false,
+    this.separator,
   });
 
   /// Called when the user selects an item from the dropdown.
@@ -181,6 +183,31 @@ abstract class BaseDropdownButton<T> extends StatefulWidget {
   /// )
   /// ```
   final Widget? trailing;
+
+  /// Whether to show separators between dropdown items.
+  ///
+  /// When true, a separator widget will be inserted between each item
+  /// in the dropdown overlay. The separator can be customized using
+  /// the [separator] parameter.
+  ///
+  /// Defaults to false.
+  final bool showSeparator;
+
+  /// The widget to use as a separator between dropdown items.
+  ///
+  /// Only used when [showSeparator] is true. If null, a default
+  /// [Divider] widget will be used.
+  ///
+  /// Example:
+  /// ```dart
+  /// TextOnlyDropdownButton(
+  ///   showSeparator: true,
+  ///   separator: Divider(color: Colors.grey, height: 1),
+  ///   items: ['Option 1', 'Option 2'],
+  ///   ...
+  /// )
+  /// ```
+  final Widget? separator;
 }
 
 /// Abstract base state class for all dropdown button variants.
@@ -316,24 +343,34 @@ abstract class BaseDropdownButtonState<W extends BaseDropdownButton<T>, T>
     final totalItemsHeight = items.length * actualItemHeight;
     final needsScroll = totalItemsHeight > availableContentHeight;
 
-    // Build the items column
-    Widget content = Column(
-      mainAxisSize: MainAxisSize.min,
-      children: items.asMap().entries.map((entry) {
-        final index = entry.key;
-        final item = entry.value;
-        final isSelected = isItemSelected(item);
-        final isFirst = index == 0;
-        final isLast = index == items.length - 1;
+    // Build the items column with optional separators
+    final List<Widget> itemWidgets = [];
+    for (int index = 0; index < items.length; index++) {
+      final item = items[index];
+      final isSelected = isItemSelected(item);
+      final isFirst = index == 0;
+      final isLast = index == items.length - 1;
 
-        return _buildItemWrapper(
+      // Add the item
+      itemWidgets.add(
+        _buildItemWrapper(
           item: item,
           isSelected: isSelected,
           isFirst: isFirst,
           isLast: isLast,
           child: buildItemWidget(item, isSelected),
-        );
-      }).toList(),
+        ),
+      );
+
+      // Add separator after item (except for the last item)
+      if (widget.showSeparator && !isLast) {
+        itemWidgets.add(widget.separator ?? const Divider(height: 1));
+      }
+    }
+
+    Widget content = Column(
+      mainAxisSize: MainAxisSize.min,
+      children: itemWidgets,
     );
 
     // Only apply scrolling if needed

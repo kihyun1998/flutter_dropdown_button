@@ -248,6 +248,8 @@ class _MyHomePageState extends State<MyHomePage> {
   String? dynamicStyle = 'Material Design';
   String? tooltipBasicStyle = 'Material Design';
   String? tooltipCustomStyle = 'Vibrant';
+  String? separatorBasicStyle = 'Material Design';
+  String? separatorCustomStyle = 'Vibrant';
 
   // Selected values for demo dropdowns
   String? basicValue;
@@ -264,6 +266,8 @@ class _MyHomePageState extends State<MyHomePage> {
   String? dynamicValue;
   String? tooltipBasicValue;
   String? tooltipCustomValue;
+  String? separatorBasicValue;
+  String? separatorCustomValue;
 
   // Dynamic dropdown items for interactive demo
   List<String> dynamicItems = ['Option 1'];
@@ -719,6 +723,48 @@ class _MyHomePageState extends State<MyHomePage> {
                             theme: _getTheme(basicValue),
                             onChanged: (value) =>
                                 setState(() => basicValue = value),
+                          ),
+                        ),
+                        _buildFeatureCard(
+                          title: 'Basic Separator',
+                          description: 'Default divider between dropdown items',
+                          selectedStyle: separatorBasicStyle,
+                          onStyleChanged: (style) =>
+                              setState(() => separatorBasicStyle = style),
+                          demoDropdown: TextOnlyDropdownButton(
+                            items: basicItems,
+                            value: separatorBasicValue,
+                            hint: 'With separator',
+                            maxWidth: 280,
+                            showSeparator: true,
+                            theme: _getTheme(separatorBasicStyle),
+                            onChanged: (value) =>
+                                setState(() => separatorBasicValue = value),
+                          ),
+                        ),
+                        _buildFeatureCard(
+                          title: 'Custom Separator',
+                          description:
+                              'Custom styled separator with color and thickness',
+                          selectedStyle: separatorCustomStyle,
+                          onStyleChanged: (style) =>
+                              setState(() => separatorCustomStyle = style),
+                          demoDropdown: TextOnlyDropdownButton(
+                            items: countries.take(8).toList(),
+                            value: separatorCustomValue,
+                            hint: 'Custom separator',
+                            maxWidth: 280,
+                            showSeparator: true,
+                            separator: Divider(
+                              height: 8,
+                              thickness: 2,
+                              color: Colors.deepPurple.shade200,
+                              indent: 16,
+                              endIndent: 16,
+                            ),
+                            theme: _getTheme(separatorCustomStyle),
+                            onChanged: (value) =>
+                                setState(() => separatorCustomValue = value),
                           ),
                         ),
                       ],

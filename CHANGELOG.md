@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.4.5
+
+* **FEAT**: Added showSeparator and separator parameters to display customizable dividers between dropdown items (defaults to Divider widget)
+
 ## 1.4.4
 
 * **FIX**: Fixed hover color not visible when selectedItemColor is set by changing Container to Ink widget for proper Material effect layering
