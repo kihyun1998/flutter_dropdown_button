@@ -250,6 +250,11 @@ class _MyHomePageState extends State<MyHomePage> {
   String? tooltipCustomStyle = 'Vibrant';
   String? separatorBasicStyle = 'Material Design';
   String? separatorCustomStyle = 'Vibrant';
+  String? minWidthLeftStyle = 'Material Design';
+  String? minWidthCenterStyle = 'iOS/Cupertino';
+  String? minWidthRightStyle = 'Vibrant';
+  String? maxWidthStyle = 'Material Design';
+  String? combinedWidthStyle = 'Minimal Hover';
 
   // Selected values for demo dropdowns
   String? basicValue;
@@ -268,6 +273,11 @@ class _MyHomePageState extends State<MyHomePage> {
   String? tooltipCustomValue;
   String? separatorBasicValue;
   String? separatorCustomValue;
+  String? minWidthLeftValue;
+  String? minWidthCenterValue;
+  String? minWidthRightValue;
+  String? maxWidthValue;
+  String? combinedWidthValue;
 
   // Dynamic dropdown items for interactive demo
   List<String> dynamicItems = ['Option 1'];
@@ -765,6 +775,108 @@ class _MyHomePageState extends State<MyHomePage> {
                             theme: _getTheme(separatorCustomStyle),
                             onChanged: (value) =>
                                 setState(() => separatorCustomValue = value),
+                          ),
+                        ),
+                        _buildFeatureCard(
+                          title: 'Min Menu Width (Left)',
+                          description:
+                              'Button 120px, Menu 250px - Left aligned (default)',
+                          selectedStyle: minWidthLeftStyle,
+                          onStyleChanged: (style) =>
+                              setState(() => minWidthLeftStyle = style),
+                          demoDropdown: TextOnlyDropdownButton(
+                            items: basicItems,
+                            value: minWidthLeftValue,
+                            hint: 'Narrow button',
+                            width: 120,
+                            minMenuWidth: 250,
+                            menuAlignment: MenuAlignment.left,
+                            theme: _getTheme(minWidthLeftStyle),
+                            onChanged: (value) =>
+                                setState(() => minWidthLeftValue = value),
+                          ),
+                        ),
+                        _buildFeatureCard(
+                          title: 'Min Menu Width (Center)',
+                          description:
+                              'Button 120px, Menu 250px - Center aligned',
+                          selectedStyle: minWidthCenterStyle,
+                          onStyleChanged: (style) =>
+                              setState(() => minWidthCenterStyle = style),
+                          demoDropdown: TextOnlyDropdownButton(
+                            items: basicItems,
+                            value: minWidthCenterValue,
+                            hint: 'Narrow button',
+                            width: 120,
+                            minMenuWidth: 250,
+                            menuAlignment: MenuAlignment.center,
+                            theme: _getTheme(minWidthCenterStyle),
+                            onChanged: (value) =>
+                                setState(() => minWidthCenterValue = value),
+                          ),
+                        ),
+                        _buildFeatureCard(
+                          title: 'Min Menu Width (Right)',
+                          description:
+                              'Button 120px, Menu 250px - Right aligned',
+                          selectedStyle: minWidthRightStyle,
+                          onStyleChanged: (style) =>
+                              setState(() => minWidthRightStyle = style),
+                          demoDropdown: TextOnlyDropdownButton(
+                            items: basicItems,
+                            value: minWidthRightValue,
+                            hint: 'Narrow button',
+                            width: 120,
+                            minMenuWidth: 250,
+                            menuAlignment: MenuAlignment.right,
+                            theme: _getTheme(minWidthRightStyle),
+                            onChanged: (value) =>
+                                setState(() => minWidthRightValue = value),
+                          ),
+                        ),
+                        _buildFeatureCard(
+                          title: 'Max Menu Width',
+                          description:
+                              'Button auto-sizes, Menu max 200px wide',
+                          selectedStyle: maxWidthStyle,
+                          onStyleChanged: (style) =>
+                              setState(() => maxWidthStyle = style),
+                          demoDropdown: TextOnlyDropdownButton(
+                            items: longTextItems,
+                            value: maxWidthValue,
+                            hint: 'Very long text with limits',
+                            maxWidth: 300,
+                            maxMenuWidth: 200,
+                            config: const TextDropdownConfig(
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                            ),
+                            theme: _getTheme(maxWidthStyle),
+                            onChanged: (value) =>
+                                setState(() => maxWidthValue = value),
+                          ),
+                        ),
+                        _buildFeatureCard(
+                          title: 'Min & Max Combined',
+                          description:
+                              'Menu constrained between 180px and 280px',
+                          selectedStyle: combinedWidthStyle,
+                          onStyleChanged: (style) =>
+                              setState(() => combinedWidthStyle = style),
+                          demoDropdown: TextOnlyDropdownButton(
+                            items: mixedLengthItems,
+                            value: combinedWidthValue,
+                            hint: 'Flexible menu',
+                            minMenuWidth: 180,
+                            maxMenuWidth: 280,
+                            menuAlignment: MenuAlignment.center,
+                            config: const TextDropdownConfig(
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                            ),
+                            theme: _getTheme(combinedWidthStyle),
+                            onChanged: (value) =>
+                                setState(() => combinedWidthValue = value),
                           ),
                         ),
                       ],

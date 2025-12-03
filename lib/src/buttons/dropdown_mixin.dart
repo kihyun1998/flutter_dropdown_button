@@ -2,6 +2,8 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
+import 'menu_alignment.dart';
+
 /// Position calculation result for dropdown overlay positioning.
 class DropdownPositionResult {
   /// Creates a position result with calculated values.
@@ -124,6 +126,24 @@ mixin DropdownMixin<T extends StatefulWidget> on State<T>, TickerProvider {
   /// This padding creates internal spacing between the overlay edges
   /// and the item list. If null, no padding is applied.
   EdgeInsets? get overlayPadding => null;
+
+  /// The minimum width of the dropdown menu overlay.
+  ///
+  /// When set, the menu will be at least this wide even if the button
+  /// is narrower. If null, the menu width matches the button width.
+  double? get minMenuWidth => null;
+
+  /// The maximum width of the dropdown menu overlay.
+  ///
+  /// When set, the menu will not exceed this width even if the button
+  /// is wider. If null, no maximum width constraint is applied.
+  double? get maxMenuWidth => null;
+
+  /// The alignment of the menu relative to the button when wider.
+  ///
+  /// This only applies when the menu is wider than the button.
+  /// Defaults to [MenuAlignment.left].
+  MenuAlignment get menuAlignment => MenuAlignment.left;
 
   // Abstract methods that must be implemented by the using class
 
@@ -304,9 +324,93 @@ mixin DropdownMixin<T extends StatefulWidget> on State<T>, TickerProvider {
     );
   }
 
+  /// Calculates the effective width for the dropdown menu.
+  ///
+  /// Applies [minMenuWidth] and [maxMenuWidth] constraints to the button width.
+  /// Returns a width between minMenuWidth and maxMenuWidth, preferring buttonWidth.
+  double calculateMenuWidth(double buttonWidth) {
+    double menuWidth = buttonWidth;
+
+    // Apply minMenuWidth if provided
+    if (minMenuWidth != null && menuWidth < minMenuWidth!) {
+      menuWidth = minMenuWidth!;
+    }
+
+    // Apply maxMenuWidth if provided
+    if (maxMenuWidth != null && menuWidth > maxMenuWidth!) {
+      menuWidth = maxMenuWidth!;
+    }
+
+    return menuWidth;
+  }
+
+  /// Calculates the left position for the dropdown menu based on alignment.
+  ///
+  /// When the menu is wider than the button, aligns according to [menuAlignment]:
+  /// - [MenuAlignment.left]: Left edges align
+  /// - [MenuAlignment.center]: Centers menu over button
+  /// - [MenuAlignment.right]: Right edges align
+  ///
+  /// Also ensures the menu stays within screen bounds.
+  double calculateMenuLeftPosition(
+    double buttonLeft,
+    double buttonWidth,
+    double menuWidth,
+  ) {
+    double leftPosition;
+
+    // Calculate initial position based on alignment
+    if (menuWidth <= buttonWidth) {
+      // Menu is not wider than button, use button position
+      leftPosition = buttonLeft;
+    } else {
+      // Menu is wider than button, apply alignment
+      final widthDiff = menuWidth - buttonWidth;
+
+      switch (menuAlignment) {
+        case MenuAlignment.left:
+          // Left edges align: menu extends to the right
+          leftPosition = buttonLeft;
+          break;
+
+        case MenuAlignment.center:
+          // Center menu over button
+          leftPosition = buttonLeft - (widthDiff / 2);
+          break;
+
+        case MenuAlignment.right:
+          // Right edges align: menu extends to the left
+          leftPosition = buttonLeft - widthDiff;
+          break;
+      }
+    }
+
+    // Ensure menu stays within screen bounds
+    final screenWidth = MediaQuery.of(context).size.width;
+    final rightEdge = leftPosition + menuWidth;
+
+    // Check right edge overflow
+    if (rightEdge > screenWidth - screenMargin) {
+      leftPosition = screenWidth - screenMargin - menuWidth;
+    }
+
+    // Check left edge overflow
+    if (leftPosition < screenMargin) {
+      leftPosition = screenMargin;
+    }
+
+    return leftPosition;
+  }
+
   /// Creates the overlay entry that contains the dropdown options.
   OverlayEntry _createOverlayEntry(Offset buttonOffset, Size buttonSize) {
     final position = calculateDropdownPosition(buttonOffset, buttonSize);
+    final menuWidth = calculateMenuWidth(buttonSize.width);
+    final leftPosition = calculateMenuLeftPosition(
+      buttonOffset.dx,
+      buttonSize.width,
+      menuWidth,
+    );
 
     return OverlayEntry(
       builder: (context) => GestureDetector(
@@ -317,9 +421,9 @@ mixin DropdownMixin<T extends StatefulWidget> on State<T>, TickerProvider {
           child: Stack(
             children: [
               Positioned(
-                left: buttonOffset.dx,
+                left: leftPosition,
                 top: position.topPosition,
-                width: buttonSize.width,
+                width: menuWidth,
                 child: AnimatedBuilder(
                   animation: dropdownAnimationController,
                   // Build overlay content once and reuse it during animation

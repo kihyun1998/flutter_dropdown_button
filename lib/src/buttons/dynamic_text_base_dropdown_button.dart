@@ -66,6 +66,9 @@ class DynamicTextBaseDropdownButton extends BaseDropdownButton<String> {
     this.leading,
     this.selectedLeading,
     this.leadingPadding,
+    super.minMenuWidth,
+    super.maxMenuWidth,
+    super.menuAlignment,
   });
 
   /// The list of text options to display in the dropdown.

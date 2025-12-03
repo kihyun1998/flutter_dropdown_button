@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.4.7
+
+* **FEAT**: Added minMenuWidth parameter to set minimum dropdown menu width independently from button width
+* **FEAT**: Added maxMenuWidth parameter to set maximum dropdown menu width independently from button width
+* **FEAT**: Added menuAlignment parameter (left/center/right) to control menu positioning when menu is wider than button
+
 ## 1.4.6
 
 * **FEAT**: Added showSeparator and separator parameters to display customizable dividers between dropdown items (defaults to Divider widget)

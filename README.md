@@ -12,6 +12,7 @@ A highly customizable dropdown package for Flutter with overlay-based rendering,
 - ✨ **Smooth Animations**: Scale and fade effects with configurable timing
 - 🎯 **Outside-tap Dismissal**: Automatic closure when tapping outside
 - 📏 **Dynamic Width**: Fixed, min/max width constraints, or content-based sizing
+- 📐 **Independent Menu Width**: Set menu width separately from button with min/max constraints and alignment control
 - 📝 **Text Overflow Control**: Ellipsis, fade, clip, or visible overflow options
 - 🎭 **Multiple Variants**: Generic BasicDropdownButton and specialized TextOnlyDropdownButton
 - 🎨 **Shared Theme System**: Consistent styling across all dropdown variants
@@ -45,7 +46,7 @@ Add to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  flutter_dropdown_button: ^1.4.6
+  flutter_dropdown_button: ^1.4.7
 ```
 
 Import the package:
@@ -153,6 +154,18 @@ BasicDropdownButton<String>(
   minWidth: 150,        // Minimum width constraint
   // OR
   width: 250,           // Fixed width
+)
+```
+
+### Menu Width & Alignment
+
+```dart
+TextOnlyDropdownButton(
+  // ... other properties
+  width: 120,              // Button width
+  minMenuWidth: 250,       // Menu minimum width (wider than button)
+  maxMenuWidth: 400,       // Menu maximum width
+  menuAlignment: MenuAlignment.left,  // left (default), center, or right
 )
 ```
 

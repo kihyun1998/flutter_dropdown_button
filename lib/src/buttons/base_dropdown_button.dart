@@ -5,6 +5,7 @@ import '../theme/dropdown_scroll_theme.dart';
 import '../theme/dropdown_style_theme.dart';
 import '../theme/dropdown_theme.dart';
 import 'dropdown_mixin.dart';
+import 'menu_alignment.dart';
 
 /// Abstract base class for all dropdown button variants.
 ///
@@ -46,7 +47,15 @@ abstract class BaseDropdownButton<T> extends StatefulWidget {
     this.trailing,
     this.showSeparator = false,
     this.separator,
-  });
+    this.minMenuWidth,
+    this.maxMenuWidth,
+    this.menuAlignment = MenuAlignment.left,
+  }) : assert(
+          minMenuWidth == null ||
+              maxMenuWidth == null ||
+              minMenuWidth <= maxMenuWidth,
+          'minMenuWidth must be less than or equal to maxMenuWidth',
+        );
 
   /// Called when the user selects an item from the dropdown.
   ///
@@ -208,6 +217,62 @@ abstract class BaseDropdownButton<T> extends StatefulWidget {
   /// )
   /// ```
   final Widget? separator;
+
+  /// The minimum width of the dropdown menu overlay.
+  ///
+  /// When set, the menu will be at least this wide even if the button
+  /// is narrower. Useful for ensuring menu items are fully visible.
+  ///
+  /// Example:
+  /// ```dart
+  /// TextOnlyDropdownButton(
+  ///   items: ['Short', 'A very long item text'],
+  ///   width: 100,
+  ///   minMenuWidth: 200,  // Menu will be 200px wide
+  ///   ...
+  /// )
+  /// ```
+  final double? minMenuWidth;
+
+  /// The maximum width of the dropdown menu overlay.
+  ///
+  /// When set, the menu will not exceed this width even if the button
+  /// is wider. Useful for preventing excessively wide menus.
+  ///
+  /// Example:
+  /// ```dart
+  /// TextOnlyDropdownButton(
+  ///   items: items,
+  ///   maxWidth: 500,  // Button max 500px
+  ///   maxMenuWidth: 300,  // Menu max 300px
+  ///   ...
+  /// )
+  /// ```
+  final double? maxMenuWidth;
+
+  /// Defines how the dropdown menu should be aligned relative to the button
+  /// when the menu is wider than the button.
+  ///
+  /// This only takes effect when the menu is wider than the button
+  /// (e.g., when [minMenuWidth] is larger than the button width).
+  ///
+  /// - [MenuAlignment.left] (default): Left edges align, menu extends right
+  /// - [MenuAlignment.center]: Menu centered over button
+  /// - [MenuAlignment.right]: Right edges align, menu extends left
+  ///
+  /// Example:
+  /// ```dart
+  /// TextOnlyDropdownButton(
+  ///   items: items,
+  ///   width: 100,
+  ///   minMenuWidth: 200,
+  ///   menuAlignment: MenuAlignment.center,  // Menu centered over button
+  ///   ...
+  /// )
+  /// ```
+  ///
+  /// Defaults to [MenuAlignment.left].
+  final MenuAlignment menuAlignment;
 }
 
 /// Abstract base state class for all dropdown button variants.
@@ -281,6 +346,15 @@ abstract class BaseDropdownButtonState<W extends BaseDropdownButton<T>, T>
 
   @override
   EdgeInsets? get overlayPadding => effectiveTheme.overlayPadding;
+
+  @override
+  double? get minMenuWidth => widget.minMenuWidth;
+
+  @override
+  double? get maxMenuWidth => widget.maxMenuWidth;
+
+  @override
+  MenuAlignment get menuAlignment => widget.menuAlignment;
 
   @override
   void initState() {

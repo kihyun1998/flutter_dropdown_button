@@ -59,6 +59,9 @@ class BasicDropdownButton<T> extends BaseDropdownButton<T> {
     super.trailing,
     super.showSeparator = false,
     super.separator,
+    super.minMenuWidth,
+    super.maxMenuWidth,
+    super.menuAlignment,
   });
 
   /// The list of items to display in the dropdown.

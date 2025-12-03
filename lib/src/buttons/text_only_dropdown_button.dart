@@ -58,6 +58,9 @@ class TextOnlyDropdownButton extends BaseDropdownButton<String> {
     super.trailing,
     super.showSeparator = false,
     super.separator,
+    super.minMenuWidth,
+    super.maxMenuWidth,
+    super.menuAlignment,
   });
 
   /// The list of text options to display in the dropdown.
