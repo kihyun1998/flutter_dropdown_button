@@ -836,8 +836,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         ),
                         _buildFeatureCard(
                           title: 'Max Menu Width',
-                          description:
-                              'Button auto-sizes, Menu max 200px wide',
+                          description: 'Button auto-sizes, Menu max 200px wide',
                           selectedStyle: maxWidthStyle,
                           onStyleChanged: (style) =>
                               setState(() => maxWidthStyle = style),
