@@ -224,6 +224,25 @@ final List<StylePreset> stylePresets = [
       ),
     ),
   ),
+  StylePreset(
+    'Item Borders',
+    DropdownStyleTheme(
+      dropdown: DropdownTheme(
+        borderRadius: 8.0,
+        elevation: 4.0,
+        backgroundColor: Colors.white,
+        selectedItemColor: const Color(0x1A2196F3),
+        itemHoverColor: const Color(0x0A2196F3),
+        itemPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        border: Border.all(color: Colors.grey.shade300, width: 1),
+        // Item borders without using separators
+        itemBorder: Border(
+          bottom: BorderSide(color: Colors.grey.shade300, width: 1),
+        ),
+        excludeLastItemBorder: true, // Last item won't have bottom border
+      ),
+    ),
+  ),
 ];
 
 class MyHomePage extends StatefulWidget {

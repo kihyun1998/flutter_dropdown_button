@@ -200,6 +200,15 @@ abstract class BaseDropdownButton<T> extends StatefulWidget {
   /// the [separator] parameter.
   ///
   /// Defaults to false.
+  ///
+  /// **Deprecated**: Use [DropdownTheme.itemBorder] instead for better control
+  /// and proper height calculation. For example:
+  /// ```dart
+  /// DropdownTheme(
+  ///   itemBorder: Border(bottom: BorderSide(color: Colors.grey, width: 1)),
+  /// )
+  /// ```
+  @Deprecated('Use DropdownTheme.itemBorder instead. Will be removed in 2.0.0')
   final bool showSeparator;
 
   /// The widget to use as a separator between dropdown items.
@@ -216,6 +225,10 @@ abstract class BaseDropdownButton<T> extends StatefulWidget {
   ///   ...
   /// )
   /// ```
+  ///
+  /// **Deprecated**: Use [DropdownTheme.itemBorder] instead for better control
+  /// and proper height calculation.
+  @Deprecated('Use DropdownTheme.itemBorder instead. Will be removed in 2.0.0')
   final Widget? separator;
 
   /// The minimum width of the dropdown menu overlay.
@@ -567,6 +580,10 @@ abstract class BaseDropdownButtonState<W extends BaseDropdownButton<T>, T>
               borderRadius: effectiveTheme.itemBorderRadius != null
                   ? BorderRadius.circular(effectiveTheme.itemBorderRadius!)
                   : null,
+              // Apply item border, excluding last item if configured
+              border: (isLast && effectiveTheme.excludeLastItemBorder)
+                  ? null
+                  : effectiveTheme.itemBorder,
             ),
             child: Align(
               alignment: Alignment.centerLeft,

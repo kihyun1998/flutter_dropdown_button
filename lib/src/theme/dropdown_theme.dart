@@ -46,6 +46,8 @@ class DropdownTheme {
     this.buttonHeight,
     this.iconPadding,
     this.overlayPadding,
+    this.itemBorder,
+    this.excludeLastItemBorder = true,
   });
 
   /// The duration of the dropdown show/hide animation.
@@ -217,6 +219,39 @@ class DropdownTheme {
   /// If null, no padding is applied to the overlay container.
   final EdgeInsets? overlayPadding;
 
+  /// Border applied to each dropdown item.
+  ///
+  /// This allows you to add borders to individual items without using separators.
+  /// Commonly used to add a bottom border between items:
+  ///
+  /// Example:
+  /// ```dart
+  /// DropdownTheme(
+  ///   itemBorder: Border(
+  ///     bottom: BorderSide(color: Colors.grey.shade300, width: 1),
+  ///   ),
+  /// )
+  /// ```
+  ///
+  /// By default, the border is NOT applied to the last item when
+  /// [excludeLastItemBorder] is true, creating a clean bottom edge.
+  ///
+  /// If null, no border is applied to items.
+  final Border? itemBorder;
+
+  /// Whether to exclude the border from the last dropdown item.
+  ///
+  /// When true (default), the [itemBorder] will not be applied to the last item
+  /// in the dropdown list. This is the typical design pattern for dropdown menus
+  /// with item borders, as it prevents a redundant border at the bottom of the list.
+  ///
+  /// When false, all items including the last one will have the [itemBorder] applied.
+  ///
+  /// This property only has an effect when [itemBorder] is not null.
+  ///
+  /// Defaults to true.
+  final bool excludeLastItemBorder;
+
   /// Creates a copy of this theme with the given fields replaced.
   DropdownTheme copyWith({
     Duration? animationDuration,
@@ -245,6 +280,8 @@ class DropdownTheme {
     double? buttonHeight,
     EdgeInsets? iconPadding,
     EdgeInsets? overlayPadding,
+    Border? itemBorder,
+    bool? excludeLastItemBorder,
   }) {
     return DropdownTheme(
       animationDuration: animationDuration ?? this.animationDuration,
@@ -273,6 +310,8 @@ class DropdownTheme {
       buttonHeight: buttonHeight ?? this.buttonHeight,
       iconPadding: iconPadding ?? this.iconPadding,
       overlayPadding: overlayPadding ?? this.overlayPadding,
+      itemBorder: itemBorder ?? this.itemBorder,
+      excludeLastItemBorder: excludeLastItemBorder ?? this.excludeLastItemBorder,
     );
   }
 

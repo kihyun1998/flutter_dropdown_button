@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.4.8
+
+* **FEAT**: Added itemBorder property to DropdownTheme for applying borders to individual dropdown items (commonly used for bottom borders between items)
+* **FEAT**: Added excludeLastItemBorder property to DropdownTheme to exclude border from the last item (defaults to true for clean design)
+* **DEPRECATED**: showSeparator and separator parameters are now deprecated in favor of itemBorder (will be removed in 2.0.0)
+
 ## 1.4.7
 
 * **FEAT**: Added minMenuWidth parameter to set minimum dropdown menu width independently from button width
