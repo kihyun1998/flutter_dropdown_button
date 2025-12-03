@@ -311,7 +311,8 @@ class DropdownTheme {
       iconPadding: iconPadding ?? this.iconPadding,
       overlayPadding: overlayPadding ?? this.overlayPadding,
       itemBorder: itemBorder ?? this.itemBorder,
-      excludeLastItemBorder: excludeLastItemBorder ?? this.excludeLastItemBorder,
+      excludeLastItemBorder:
+          excludeLastItemBorder ?? this.excludeLastItemBorder,
     );
   }
 
