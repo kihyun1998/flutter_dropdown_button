@@ -168,7 +168,7 @@ class _DynamicTextBaseDropdownButtonState
 
     final textWidget = SmartTooltipText(
       text: displayText,
-      config: _config,
+      tooltipTheme: effectiveTooltipTheme,
       style: isHint ? _config.hintStyle : _config.textStyle,
       textAlign: _config.textAlign,
       maxLines: _config.maxLines,
@@ -211,7 +211,7 @@ class _DynamicTextBaseDropdownButtonState
   Widget buildItemWidget(String item, bool isSelected) {
     final textWidget = SmartTooltipText(
       text: item,
-      config: _config,
+      tooltipTheme: effectiveTooltipTheme,
       style: isSelected
           ? _config.selectedTextStyle ?? _config.textStyle
           : _config.textStyle,

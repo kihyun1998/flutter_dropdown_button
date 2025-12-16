@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 
 import '../config/text_dropdown_config.dart';
+import '../theme/tooltip_theme.dart';
 
 /// A text widget that intelligently displays tooltips based on overflow detection.
 ///
 /// This widget wraps a [Text] widget and automatically shows a tooltip containing
 /// the full text when the text is clipped due to overflow. The tooltip behavior
-/// is controlled by the [TextDropdownConfig.tooltipMode] setting.
+/// is controlled by the [DropdownTooltipTheme.mode] setting.
 ///
 /// Features:
 /// - Smart overflow detection using [TextPainter]
@@ -21,8 +22,11 @@ import '../config/text_dropdown_config.dart';
 ///   style: TextStyle(fontSize: 16),
 ///   maxLines: 1,
 ///   overflow: TextOverflow.ellipsis,
-///   config: TextDropdownConfig(
-///     tooltipMode: TooltipMode.onlyWhenOverflow,
+///   tooltipTheme: DropdownTooltipTheme(
+///     enabled: true,
+///     mode: TooltipMode.onlyWhenOverflow,
+///     backgroundColor: Colors.black87,
+///     textStyle: TextStyle(color: Colors.white),
 ///   ),
 /// )
 /// ```
@@ -31,7 +35,7 @@ class SmartTooltipText extends StatelessWidget {
   const SmartTooltipText({
     super.key,
     required this.text,
-    required this.config,
+    this.tooltipTheme,
     this.style,
     this.textAlign,
     this.maxLines,
@@ -46,8 +50,12 @@ class SmartTooltipText extends StatelessWidget {
   /// The text to display.
   final String text;
 
-  /// The configuration for tooltip behavior.
-  final TextDropdownConfig config;
+  /// The theme for tooltip configuration.
+  ///
+  /// Controls both visual styling (colors, borders, padding, shadows, text styling)
+  /// and behavioral settings (when to show, durations, trigger modes, positioning).
+  /// If null, uses [DropdownTooltipTheme.defaultTheme].
+  final DropdownTooltipTheme? tooltipTheme;
 
   /// The text style to apply.
   final TextStyle? style;
@@ -78,13 +86,16 @@ class SmartTooltipText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Get effective theme
+    final theme = tooltipTheme ?? DropdownTooltipTheme.defaultTheme;
+
     // If tooltips are disabled, return text only
-    if (!config.enableTooltip || config.tooltipMode == TooltipMode.disabled) {
+    if (!theme.enabled || theme.mode == TooltipMode.disabled) {
       return _buildText();
     }
 
     // If mode is always, always show tooltip
-    if (config.tooltipMode == TooltipMode.always) {
+    if (theme.mode == TooltipMode.always) {
       return _buildWithTooltip(context: context, showTooltip: true);
     }
 
@@ -131,51 +142,54 @@ class SmartTooltipText extends StatelessWidget {
       return textWidget;
     }
 
+    // Get effective theme (use provided theme or default)
+    final theme = tooltipTheme ?? DropdownTooltipTheme.defaultTheme;
+
     // Build decoration from individual properties if not explicitly provided
-    Decoration? effectiveDecoration = config.tooltipDecoration;
+    Decoration? effectiveDecoration = theme.decoration;
     if (effectiveDecoration == null &&
-        (config.tooltipBackgroundColor != null ||
-            config.tooltipBorderRadius != null ||
-            config.tooltipBorderColor != null ||
-            config.tooltipShadow != null)) {
+        (theme.backgroundColor != null ||
+            theme.borderRadius != null ||
+            theme.borderColor != null ||
+            theme.shadow != null)) {
       effectiveDecoration = BoxDecoration(
-        color: config.tooltipBackgroundColor,
-        borderRadius: config.tooltipBorderRadius,
-        border: config.tooltipBorderColor != null
+        color: theme.backgroundColor,
+        borderRadius: theme.borderRadius,
+        border: theme.borderColor != null
             ? Border.all(
-                color: config.tooltipBorderColor!,
-                width: config.tooltipBorderWidth ?? 1.0,
+                color: theme.borderColor!,
+                width: theme.borderWidth ?? 1.0,
               )
             : null,
-        boxShadow: config.tooltipShadow,
+        boxShadow: theme.shadow,
       );
     }
 
     // Build text style from individual properties if not explicitly provided
-    TextStyle? effectiveTextStyle = config.tooltipTextStyle;
-    if (effectiveTextStyle == null && config.tooltipTextColor != null) {
-      effectiveTextStyle = TextStyle(color: config.tooltipTextColor);
+    TextStyle? effectiveTextStyle = theme.textStyle;
+    if (effectiveTextStyle == null && theme.textColor != null) {
+      effectiveTextStyle = TextStyle(color: theme.textColor);
     }
 
     // Calculate preferBelow automatically if not explicitly set
     final bool effectivePreferBelow =
-        config.tooltipPreferBelow ?? _calculatePreferBelow(context);
+        theme.preferBelow ?? _calculatePreferBelow(context);
 
     return Tooltip(
       message: text,
-      waitDuration: config.tooltipWaitDuration,
-      showDuration: config.tooltipShowDuration,
-      exitDuration: config.tooltipExitDuration,
+      waitDuration: theme.waitDuration,
+      showDuration: theme.showDuration,
+      exitDuration: theme.exitDuration,
       decoration: effectiveDecoration,
       textStyle: effectiveTextStyle,
-      textAlign: config.tooltipTextAlign,
-      padding: config.tooltipPadding,
-      margin: config.tooltipMargin,
-      constraints: config.tooltipConstraints,
-      verticalOffset: config.tooltipVerticalOffset,
+      textAlign: theme.textAlign,
+      padding: theme.padding,
+      margin: theme.margin,
+      constraints: theme.constraints,
+      verticalOffset: theme.verticalOffset,
       preferBelow: effectivePreferBelow,
-      enableTapToDismiss: config.tooltipEnableTapToDismiss ?? true,
-      triggerMode: config.tooltipTriggerMode,
+      enableTapToDismiss: theme.enableTapToDismiss ?? true,
+      triggerMode: theme.triggerMode,
       child: textWidget,
     );
   }

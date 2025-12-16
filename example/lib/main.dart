@@ -513,11 +513,6 @@ class _MyHomePageState extends State<MyHomePage> {
                             config: const TextDropdownConfig(
                               overflow: TextOverflow.ellipsis,
                               maxLines: 1,
-                              // Tooltip enabled by default with smart overflow detection
-                              enableTooltip: true,
-                              tooltipMode: TooltipMode.onlyWhenOverflow,
-                              // Auto-positioned based on available space
-                              tooltipPreferBelow: null,
                             ),
                             theme: _getTheme(tooltipBasicStyle),
                             onChanged: (value) =>
@@ -536,36 +531,36 @@ class _MyHomePageState extends State<MyHomePage> {
                             value: tooltipCustomValue,
                             hint: 'Styled tooltip demo',
                             maxWidth: 280,
-                            config: TextDropdownConfig(
+                            config: const TextDropdownConfig(
                               overflow: TextOverflow.ellipsis,
                               maxLines: 1,
-                              enableTooltip: true,
-                              tooltipMode: TooltipMode.onlyWhenOverflow,
-                              // Custom tooltip styling
-                              tooltipBackgroundColor: Colors.deepPurple,
-                              tooltipTextColor: Colors.white,
-                              tooltipBorderRadius: BorderRadius.circular(12),
-                              tooltipBorderColor: Colors.deepPurple.shade300,
-                              tooltipBorderWidth: 2.0,
-                              tooltipShadow: [
-                                BoxShadow(
-                                  color: Colors.deepPurple.withValues(
-                                    alpha: 0.3,
-                                  ),
-                                  blurRadius: 8,
-                                  offset: const Offset(0, 4),
-                                ),
-                              ],
-                              tooltipPadding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 12,
-                              ),
-                              tooltipWaitDuration: const Duration(
-                                milliseconds: 300,
-                              ),
-                              tooltipVerticalOffset: 8,
                             ),
-                            theme: _getTheme(tooltipCustomStyle),
+                            theme: _getTheme(tooltipCustomStyle).copyWith(
+                              tooltip: DropdownTooltipTheme(
+                                enabled: true,
+                                mode: TooltipMode.onlyWhenOverflow,
+                                waitDuration: const Duration(milliseconds: 300),
+                                verticalOffset: 8,
+                                backgroundColor: Colors.deepPurple,
+                                textColor: Colors.white,
+                                borderRadius: BorderRadius.circular(12),
+                                borderColor: Colors.deepPurple.shade300,
+                                borderWidth: 2.0,
+                                shadow: [
+                                  BoxShadow(
+                                    color: Colors.deepPurple.withValues(
+                                      alpha: 0.3,
+                                    ),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ],
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 12,
+                                ),
+                              ),
+                            ),
                             onChanged: (value) =>
                                 setState(() => tooltipCustomValue = value),
                           ),

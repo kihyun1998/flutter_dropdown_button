@@ -11,3 +11,4 @@ export 'src/dropdown_item.dart';
 export 'src/theme/dropdown_scroll_theme.dart';
 export 'src/theme/dropdown_style_theme.dart';
 export 'src/theme/dropdown_theme.dart';
+export 'src/theme/tooltip_theme.dart';

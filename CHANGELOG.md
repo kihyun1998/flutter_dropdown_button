@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.5.0
+
+* **BREAKING**: Extracted tooltip styling from TextDropdownConfig into new TooltipTheme class for better separation of concerns
+* **BREAKING**: Removed tooltip styling properties from TextDropdownConfig (tooltipBackgroundColor, tooltipTextColor, tooltipTextStyle, tooltipDecoration, tooltipBorderRadius, tooltipBorderColor, tooltipBorderWidth, tooltipShadow, tooltipPadding, tooltipMargin, tooltipConstraints, tooltipTextAlign)
+* **FEAT**: Added TooltipTheme class for centralized tooltip visual styling
+* **FEAT**: Added tooltip field to DropdownStyleTheme to include TooltipTheme alongside DropdownTheme and DropdownScrollTheme
+* **CHANGE**: TextDropdownConfig now only controls tooltip behavior (enableTooltip, tooltipMode, durations, positioning, trigger modes)
+* **MIGRATION**: Move tooltip styling properties from TextDropdownConfig to TooltipTheme in DropdownStyleTheme
+
 ## 1.4.8
 
 * **FEAT**: Added itemBorder property to DropdownTheme for applying borders to individual dropdown items (commonly used for bottom borders between items)

@@ -4,6 +4,7 @@ import 'package:flutter/scheduler.dart';
 import '../theme/dropdown_scroll_theme.dart';
 import '../theme/dropdown_style_theme.dart';
 import '../theme/dropdown_theme.dart';
+import '../theme/tooltip_theme.dart';
 import 'dropdown_mixin.dart';
 import 'menu_alignment.dart';
 
@@ -311,6 +312,11 @@ abstract class BaseDropdownButtonState<W extends BaseDropdownButton<T>, T>
     return widget.theme?.scroll;
   }
 
+  /// Gets the effective tooltip theme from the DropdownStyleTheme.
+  DropdownTooltipTheme get effectiveTooltipTheme {
+    return widget.theme?.tooltip ?? DropdownTooltipTheme.defaultTheme;
+  }
+
   // DropdownMixin implementation
   @override
   Duration get animationDuration => widget.animationDuration;
@@ -450,7 +456,10 @@ abstract class BaseDropdownButtonState<W extends BaseDropdownButton<T>, T>
       );
 
       // Add separator after item (except for the last item)
+
+      // ignore: deprecated_member_use_from_same_package
       if (widget.showSeparator && !isLast) {
+        // ignore: deprecated_member_use_from_same_package
         itemWidgets.add(widget.separator ?? const Divider(height: 1));
       }
     }
