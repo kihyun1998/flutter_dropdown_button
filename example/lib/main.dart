@@ -1278,6 +1278,25 @@ class _DropdownBugTestPageState extends State<DropdownBugTestPage> {
     });
   }
 
+  void _startCountdownWithCloseAll() {
+    setState(() => _countdown = 3);
+
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (_countdown == 1) {
+        timer.cancel();
+        // Use closeAll() before navigation to manually close dropdown
+        DropdownMixin.closeAll();
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          '/result-page',
+          (route) => false, // Remove all previous routes
+        );
+      } else {
+        setState(() => _countdown = _countdown! - 1);
+      }
+    });
+  }
+
   @override
   void dispose() {
     _timer?.cancel();
@@ -1291,13 +1310,14 @@ class _DropdownBugTestPageState extends State<DropdownBugTestPage> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: const Text('Dropdown Overlay Bug Test'),
       ),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // Instructions Card
+      body: SingleChildScrollView(
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // Instructions Card
               Card(
                 elevation: 4,
                 shape: RoundedRectangleBorder(
@@ -1339,7 +1359,35 @@ class _DropdownBugTestPageState extends State<DropdownBugTestPage> {
                         'Open the dropdown below (click to expand)',
                       ),
                       _buildStep('2', 'Keep the dropdown OPEN'),
-                      _buildStep('3', 'Click the "Start" button'),
+                      _buildStep(
+                        '3',
+                        'Click either button to test different fixes',
+                      ),
+                      const SizedBox(height: 8),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 40.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              '• Auto Fix: Uses dispose() cleanup (automatic)',
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: Colors.grey[700],
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              '• Manual Fix: Uses closeAll() API (manual)',
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: Colors.grey[700],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 8),
                       _buildStep(
                         '4',
                         'Wait for countdown to finish (3... 2... 1...)',
@@ -1399,29 +1447,56 @@ class _DropdownBugTestPageState extends State<DropdownBugTestPage> {
                 ),
               if (_countdown != null) const SizedBox(height: 32),
 
-              // Start Button
-              ElevatedButton.icon(
-                onPressed: _countdown == null ? _startCountdown : null,
-                icon: const Icon(Icons.play_arrow, size: 28),
-                label: Text(
-                  _countdown == null
-                      ? 'Start Countdown'
-                      : 'Countdown Active...',
-                  style: const TextStyle(fontSize: 18),
-                ),
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 32,
-                    vertical: 16,
+              // Buttons
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ElevatedButton.icon(
+                    onPressed: _countdown == null ? _startCountdown : null,
+                    icon: const Icon(Icons.play_arrow, size: 24),
+                    label: const Text(
+                      'Auto Fix\n(dispose)',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 14),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 16,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
                   ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                  const SizedBox(width: 16),
+                  ElevatedButton.icon(
+                    onPressed:
+                        _countdown == null ? _startCountdownWithCloseAll : null,
+                    icon: const Icon(Icons.cleaning_services, size: 24),
+                    label: const Text(
+                      'Manual Fix\n(closeAll)',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 14),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 16,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      backgroundColor: Colors.green,
+                      foregroundColor: Colors.white,
+                    ),
                   ),
-                ),
+                ],
               ),
             ],
           ),
         ),
+      ),
       ),
     );
   }
