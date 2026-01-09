@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.5.1
+
+* **FIX**: Fixed dropdown overlay remaining visible after screen transitions by immediately removing overlay on dispose without animation
+* **FIX**: Added safe error handling for overlay removal to prevent crashes when overlay has already been removed
+* **FEAT**: Added DropdownMixin.closeAll() static method for manual dropdown cleanup before navigation or other actions
+
 ## 1.5.0
 
 * **BREAKING**: Extracted tooltip styling from TextDropdownConfig into new TooltipTheme class for better separation of concerns
