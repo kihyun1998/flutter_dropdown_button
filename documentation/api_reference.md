@@ -292,6 +292,45 @@ class _MyDropdownState extends State<MyDropdown>
 | `openDropdown()` | Open the dropdown overlay |
 | `closeDropdown()` | Close the dropdown overlay |
 | `calculateDropdownPosition()` | Calculate optimal position and height |
+| `closeAll()` (static) | Manually close any open dropdown immediately |
+
+### Manual Dropdown Cleanup
+
+The `closeAll()` static method provides a way to manually close any open dropdown overlay. This is useful when you need to ensure all dropdowns are closed before navigation or other actions.
+
+#### Features
+- **Static Method**: Can be called without a dropdown instance
+- **Immediate Cleanup**: Removes overlay instantly without animation
+- **Safe Execution**: Handles already-removed overlays gracefully
+- **Single Overlay**: Only one dropdown can be open at a time
+
+#### Example Usage
+
+```dart
+// Close any open dropdown before navigation
+void navigateAway() {
+  DropdownMixin.closeAll();
+  Navigator.pushNamedAndRemoveUntil(
+    context,
+    '/home',
+    (route) => false,
+  );
+}
+
+// Close dropdown before showing dialog
+void showConfirmDialog() {
+  DropdownMixin.closeAll();
+  showDialog(
+    context: context,
+    builder: (context) => AlertDialog(...),
+  );
+}
+```
+
+#### Automatic vs Manual Cleanup
+
+- **Automatic**: The dropdown overlay is automatically removed when the widget is disposed (e.g., during navigation). This is the default behavior and requires no additional code.
+- **Manual**: Use `closeAll()` when you want explicit control over when the dropdown closes, such as before triggering navigation programmatically.
 
 ### Position Calculation
 

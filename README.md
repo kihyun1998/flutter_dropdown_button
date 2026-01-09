@@ -169,6 +169,30 @@ TextOnlyDropdownButton(
 )
 ```
 
+### Manual Dropdown Cleanup
+
+Need to close any open dropdown before navigation or other actions? Use the static `closeAll()` method:
+
+```dart
+// Close dropdown before navigation
+void navigateToHome() {
+  DropdownMixin.closeAll();  // Immediately close any open dropdown
+  Navigator.pushNamedAndRemoveUntil(
+    context,
+    '/home',
+    (route) => false,
+  );
+}
+
+// Close dropdown before showing dialog
+void showDialog() {
+  DropdownMixin.closeAll();
+  showDialog(...);
+}
+```
+
+**Note**: Dropdowns are automatically cleaned up during normal navigation (widget disposal). Use `closeAll()` only when you need explicit control over when the dropdown closes.
+
 ## Documentation
 
 For detailed documentation and advanced usage examples, see:
