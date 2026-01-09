@@ -200,7 +200,12 @@ mixin DropdownMixin<T extends StatefulWidget> on State<T>, TickerProvider {
   ///
   /// This should be called in the [dispose] method of the using class.
   void disposeDropdown() {
-    closeDropdown();
+    // Immediately remove overlay without animation when disposing
+    // to prevent overlay from remaining after screen transitions
+    if (_overlayEntry != null) {
+      _overlayEntry!.remove();
+      _overlayEntry = null;
+    }
     dropdownAnimationController.dispose();
   }
 
