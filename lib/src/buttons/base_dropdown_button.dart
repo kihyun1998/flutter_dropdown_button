@@ -967,11 +967,13 @@ abstract class BaseDropdownButtonState<W extends BaseDropdownButton<T>, T>
     final gradientHeight = scrollTheme.gradientHeight ?? 24.0;
     // Use gradient colors from theme, or create default gradient from background color
     final List<Color> gradientColors;
-    if (scrollTheme.gradientColors != null && scrollTheme.gradientColors!.isNotEmpty) {
+    if (scrollTheme.gradientColors != null &&
+        scrollTheme.gradientColors!.isNotEmpty) {
       gradientColors = scrollTheme.gradientColors!;
     } else {
       // Fallback: create default gradient from background color
-      final baseColor = effectiveTheme.backgroundColor ?? Theme.of(context).cardColor;
+      final baseColor =
+          effectiveTheme.backgroundColor ?? Theme.of(context).cardColor;
       gradientColors = [
         baseColor.withValues(alpha: 0.0),
         baseColor,
