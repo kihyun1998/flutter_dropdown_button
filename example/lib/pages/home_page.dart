@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dropdown_button/flutter_dropdown_button.dart';
+
 import '../data/style_presets.dart';
 
 class MyHomePage extends StatefulWidget {
@@ -372,7 +373,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         _buildFeatureCard(
                           title: 'Long Scrollable List',
                           description:
-                              'Auto-scrolls to selected item with animation',
+                              'Scroll gradient fade at edges + auto-scroll to selected',
                           selectedStyle: scrollListStyle,
                           onStyleChanged: (style) =>
                               setState(() => scrollListStyle = style),
@@ -386,7 +387,17 @@ class _MyHomePageState extends State<MyHomePage> {
                             scrollToSelectedDuration: const Duration(
                               milliseconds: 100,
                             ), // Smooth animation
-                            theme: _getTheme(scrollListStyle),
+                            theme: _getTheme(scrollListStyle).copyWith(
+                              scroll: DropdownScrollTheme(
+                                showScrollGradient: true,
+                                gradientHeight: 20.0,
+                                gradientColors: [
+                                  Colors.white.withValues(alpha: 0.8),
+                                  Colors.white.withValues(alpha: 0.5),
+                                  Colors.white.withValues(alpha: 0.0),
+                                ],
+                              ),
+                            ),
                             onChanged: (value) =>
                                 setState(() => scrollValue = value),
                           ),

@@ -32,6 +32,9 @@ class DropdownScrollTheme {
     this.crossAxisMargin,
     this.mainAxisMargin,
     this.minThumbLength,
+    this.showScrollGradient,
+    this.gradientHeight,
+    this.gradientColors,
   });
 
   /// Thickness of the scrollbar track.
@@ -119,6 +122,41 @@ class DropdownScrollTheme {
   /// through very long content.
   final double? minThumbLength;
 
+  /// Whether to show gradient fade indicators when content is scrollable.
+  ///
+  /// When true, a gradient fade will appear at the top when there's
+  /// content above the visible area, and at the bottom when there's
+  /// content below.
+  ///
+  /// If null, defaults to false (no gradient indicators).
+  final bool? showScrollGradient;
+
+  /// The height of the gradient fade indicator.
+  ///
+  /// Controls how tall the gradient fade effect is at the top and bottom
+  /// edges of the scrollable content.
+  ///
+  /// If null, defaults to 24.0 pixels.
+  final double? gradientHeight;
+
+  /// The colors for the gradient fade indicator.
+  ///
+  /// Defines a gradient that fades from the edge towards the content.
+  /// The first color appears at the edge (visible when scrolled),
+  /// and the last color appears towards the content (typically transparent).
+  ///
+  /// Example:
+  /// ```dart
+  /// gradientColors: [
+  ///   Colors.white,
+  ///   Colors.white.withOpacity(0.5),
+  ///   Colors.white.withOpacity(0.0),
+  /// ]
+  /// ```
+  ///
+  /// If null, auto-detects from dropdown background color.
+  final List<Color>? gradientColors;
+
   /// Creates a copy of this theme with the given fields replaced.
   DropdownScrollTheme copyWith({
     double? thickness,
@@ -135,6 +173,9 @@ class DropdownScrollTheme {
     double? crossAxisMargin,
     double? mainAxisMargin,
     double? minThumbLength,
+    bool? showScrollGradient,
+    double? gradientHeight,
+    List<Color>? gradientColors,
   }) {
     return DropdownScrollTheme(
       thickness: thickness ?? this.thickness,
@@ -151,6 +192,9 @@ class DropdownScrollTheme {
       crossAxisMargin: crossAxisMargin ?? this.crossAxisMargin,
       mainAxisMargin: mainAxisMargin ?? this.mainAxisMargin,
       minThumbLength: minThumbLength ?? this.minThumbLength,
+      showScrollGradient: showScrollGradient ?? this.showScrollGradient,
+      gradientHeight: gradientHeight ?? this.gradientHeight,
+      gradientColors: gradientColors ?? this.gradientColors,
     );
   }
 

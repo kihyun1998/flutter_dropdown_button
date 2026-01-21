@@ -383,9 +383,30 @@ abstract class BaseDropdownButtonState<W extends BaseDropdownButton<T>, T>
 
   @override
   void dispose() {
+    _scrollController?.removeListener(_updateScrollGradients);
     _scrollController?.dispose();
+    _canScrollUp.dispose();
+    _canScrollDown.dispose();
     disposeDropdown();
     super.dispose();
+  }
+
+  /// Updates the scroll gradient visibility based on current scroll position.
+  void _updateScrollGradients() {
+    if (_scrollController == null || !_scrollController!.hasClients) return;
+
+    final position = _scrollController!.position;
+    _canScrollUp.value = position.pixels > 0;
+    _canScrollDown.value = position.pixels < position.maxScrollExtent;
+  }
+
+  /// Initializes scroll gradients after the first frame.
+  void _initializeScrollGradients() {
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      if (_scrollController != null && _scrollController!.hasClients) {
+        _updateScrollGradients();
+      }
+    });
   }
 
   @override
@@ -409,6 +430,10 @@ abstract class BaseDropdownButtonState<W extends BaseDropdownButton<T>, T>
 
   // ScrollController for custom scrollbar
   ScrollController? _scrollController;
+
+  // ValueNotifiers for scroll gradient visibility
+  final ValueNotifier<bool> _canScrollUp = ValueNotifier<bool>(false);
+  final ValueNotifier<bool> _canScrollDown = ValueNotifier<bool>(false);
 
   /// Builds the common dropdown overlay content with items.
   ///
@@ -442,7 +467,13 @@ abstract class BaseDropdownButtonState<W extends BaseDropdownButton<T>, T>
     if (needsScroll) {
       // Create ScrollController if not already created
       // Controller is needed for both scrollbar theming and scroll-to-selected functionality
-      _scrollController ??= ScrollController();
+      if (_scrollController == null) {
+        _scrollController = ScrollController();
+        _scrollController!.addListener(_updateScrollGradients);
+      }
+
+      // Initialize gradient visibility after first frame
+      _initializeScrollGradients();
 
       // Schedule scroll to selected item after overlay is displayed
       if (widget.scrollToSelectedItem && widget.value != null) {
@@ -511,6 +542,11 @@ abstract class BaseDropdownButtonState<W extends BaseDropdownButton<T>, T>
             content = scrollbarWidget;
           }
         }
+      }
+
+      // Add scroll gradient indicators if enabled
+      if (scrollTheme?.showScrollGradient == true) {
+        content = _buildScrollGradientOverlay(content, scrollTheme!);
       }
     } else {
       // Build the items column for non-scrollable content
@@ -918,6 +954,91 @@ abstract class BaseDropdownButtonState<W extends BaseDropdownButton<T>, T>
         trackVisibility: scrollTheme.trackVisibility,
         interactive: scrollTheme.interactive,
         child: child,
+      ),
+    );
+  }
+
+  /// Builds a scroll gradient overlay that shows fade indicators
+  /// at the top and bottom when content is scrollable.
+  Widget _buildScrollGradientOverlay(
+    Widget child,
+    DropdownScrollTheme scrollTheme,
+  ) {
+    final gradientHeight = scrollTheme.gradientHeight ?? 24.0;
+    // Use gradient colors from theme, or create default gradient from background color
+    final List<Color> gradientColors;
+    if (scrollTheme.gradientColors != null && scrollTheme.gradientColors!.isNotEmpty) {
+      gradientColors = scrollTheme.gradientColors!;
+    } else {
+      // Fallback: create default gradient from background color
+      final baseColor = effectiveTheme.backgroundColor ?? Theme.of(context).cardColor;
+      gradientColors = [
+        baseColor.withValues(alpha: 0.0),
+        baseColor,
+      ];
+    }
+    final borderRadius = BorderRadius.circular(overlayBorderRadius);
+
+    return ClipRRect(
+      borderRadius: borderRadius,
+      child: Stack(
+        children: [
+          child,
+          // Top gradient (visible when can scroll up)
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: ValueListenableBuilder<bool>(
+              valueListenable: _canScrollUp,
+              builder: (context, canScrollUp, _) {
+                return IgnorePointer(
+                  child: AnimatedOpacity(
+                    opacity: canScrollUp ? 1.0 : 0.0,
+                    duration: const Duration(milliseconds: 150),
+                    child: Container(
+                      height: gradientHeight,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: gradientColors,
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+          // Bottom gradient (visible when can scroll down)
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: ValueListenableBuilder<bool>(
+              valueListenable: _canScrollDown,
+              builder: (context, canScrollDown, _) {
+                return IgnorePointer(
+                  child: AnimatedOpacity(
+                    opacity: canScrollDown ? 1.0 : 0.0,
+                    duration: const Duration(milliseconds: 150),
+                    child: Container(
+                      height: gradientHeight,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: gradientColors.reversed.toList(),
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }

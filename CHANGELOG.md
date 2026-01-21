@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.5.4
+
+* **FIX**: Fixed scroll gradient direction - top gradient now properly fades from opaque to transparent downward, bottom gradient fades from transparent to opaque downward
+
 ## 1.5.3
 
 * **FIX**: Fixed ScrollbarTheme colors not being applied by correcting widget hierarchy (ScrollbarTheme must wrap Scrollbar, not vice versa)
