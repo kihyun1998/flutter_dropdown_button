@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.5.3
+
+* **FIX**: Fixed ScrollbarTheme colors not being applied by correcting widget hierarchy (ScrollbarTheme must wrap Scrollbar, not vice versa)
+
 ## 1.5.2
 
 * **PERF**: Improved scroll performance with many items by using ListView.builder (lazy loading) and ClampingScrollPhysics (removes bouncing effect)

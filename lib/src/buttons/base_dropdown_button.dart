@@ -471,7 +471,19 @@ abstract class BaseDropdownButtonState<W extends BaseDropdownButton<T>, T>
           content = _buildCustomScrollbar(content, scrollTheme);
         } else {
           // Use standard Scrollbar with unified thickness
-          // Apply ScrollbarTheme for colors first
+          // First wrap content with Scrollbar
+          Widget scrollbarWidget = Scrollbar(
+            controller: _scrollController,
+            thickness: scrollTheme.thickness,
+            radius: scrollTheme.radius,
+            thumbVisibility: scrollTheme.thumbVisibility,
+            trackVisibility: scrollTheme.trackVisibility,
+            interactive: scrollTheme.interactive,
+            child: content,
+          );
+
+          // Then wrap Scrollbar with ScrollbarTheme for colors
+          // ScrollbarTheme must be OUTSIDE Scrollbar to affect it
           if (scrollTheme.thumbColor != null ||
               scrollTheme.trackColor != null ||
               scrollTheme.trackBorderColor != null ||
@@ -493,20 +505,11 @@ abstract class BaseDropdownButtonState<W extends BaseDropdownButton<T>, T>
                 mainAxisMargin: scrollTheme.mainAxisMargin,
                 minThumbLength: scrollTheme.minThumbLength,
               ),
-              child: content,
+              child: scrollbarWidget,
             );
+          } else {
+            content = scrollbarWidget;
           }
-
-          // Then wrap with Scrollbar
-          content = Scrollbar(
-            controller: _scrollController,
-            thickness: scrollTheme.thickness,
-            radius: scrollTheme.radius,
-            thumbVisibility: scrollTheme.thumbVisibility,
-            trackVisibility: scrollTheme.trackVisibility,
-            interactive: scrollTheme.interactive,
-            child: content,
-          );
         }
       }
     } else {
