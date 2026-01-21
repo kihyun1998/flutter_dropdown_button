@@ -323,7 +323,8 @@ mixin DropdownMixin<T extends StatefulWidget> on State<T>, TickerProvider {
     final mediaQuery = MediaQuery.of(context);
     final screenHeight = mediaQuery.size.height;
     final topPadding = mediaQuery.padding.top; // status bar
-    final bottomPadding = mediaQuery.padding.bottom; // navigation bar / home indicator
+    final bottomPadding =
+        mediaQuery.padding.bottom; // navigation bar / home indicator
 
     final spaceBelow = screenHeight -
         bottomPadding -

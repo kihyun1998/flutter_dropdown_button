@@ -436,38 +436,7 @@ abstract class BaseDropdownButtonState<W extends BaseDropdownButton<T>, T>
     final totalItemsHeight = items.length * actualItemHeight;
     final needsScroll = totalItemsHeight > availableContentHeight;
 
-    // Build the items column with optional separators
-    final List<Widget> itemWidgets = [];
-    for (int index = 0; index < items.length; index++) {
-      final item = items[index];
-      final isSelected = isItemSelected(item);
-      final isFirst = index == 0;
-      final isLast = index == items.length - 1;
-
-      // Add the item
-      itemWidgets.add(
-        _buildItemWrapper(
-          item: item,
-          isSelected: isSelected,
-          isFirst: isFirst,
-          isLast: isLast,
-          child: buildItemWidget(item, isSelected),
-        ),
-      );
-
-      // Add separator after item (except for the last item)
-
-      // ignore: deprecated_member_use_from_same_package
-      if (widget.showSeparator && !isLast) {
-        // ignore: deprecated_member_use_from_same_package
-        itemWidgets.add(widget.separator ?? const Divider(height: 1));
-      }
-    }
-
-    Widget content = Column(
-      mainAxisSize: MainAxisSize.min,
-      children: itemWidgets,
-    );
+    Widget content;
 
     // Only apply scrolling if needed
     if (needsScroll) {
@@ -480,10 +449,15 @@ abstract class BaseDropdownButtonState<W extends BaseDropdownButton<T>, T>
         _scheduleScrollToSelectedItem();
       }
 
-      // Wrap with SingleChildScrollView
-      content = SingleChildScrollView(
+      // Use ListView.builder for better performance with many items (lazy loading)
+      // ClampingScrollPhysics prevents bouncing effect which can cause performance issues
+      content = ListView.builder(
         controller: _scrollController,
-        child: content,
+        physics: const ClampingScrollPhysics(),
+        padding: EdgeInsets.zero,
+        itemCount: _calculateItemCount(items.length),
+        itemBuilder: (context, index) =>
+            _buildListItem(items, index, items.length),
       );
 
       // Apply custom scrollbar theme if provided
@@ -535,6 +509,38 @@ abstract class BaseDropdownButtonState<W extends BaseDropdownButton<T>, T>
           );
         }
       }
+    } else {
+      // Build the items column for non-scrollable content
+      final List<Widget> itemWidgets = [];
+      for (int index = 0; index < items.length; index++) {
+        final item = items[index];
+        final isSelected = isItemSelected(item);
+        final isFirst = index == 0;
+        final isLast = index == items.length - 1;
+
+        // Add the item
+        itemWidgets.add(
+          _buildItemWrapper(
+            item: item,
+            isSelected: isSelected,
+            isFirst: isFirst,
+            isLast: isLast,
+            child: buildItemWidget(item, isSelected),
+          ),
+        );
+
+        // Add separator after item (except for the last item)
+        // ignore: deprecated_member_use_from_same_package
+        if (widget.showSeparator && !isLast) {
+          // ignore: deprecated_member_use_from_same_package
+          itemWidgets.add(widget.separator ?? const Divider(height: 1));
+        }
+      }
+
+      content = Column(
+        mainAxisSize: MainAxisSize.min,
+        children: itemWidgets,
+      );
     }
 
     // Apply overlay padding if specified
@@ -546,6 +552,48 @@ abstract class BaseDropdownButtonState<W extends BaseDropdownButton<T>, T>
     }
 
     return content;
+  }
+
+  /// Calculates the total item count for ListView.builder including separators.
+  int _calculateItemCount(int itemsLength) {
+    // ignore: deprecated_member_use_from_same_package
+    if (widget.showSeparator) {
+      // items + separators (n items + n-1 separators = 2n - 1)
+      return itemsLength * 2 - 1;
+    }
+    return itemsLength;
+  }
+
+  /// Builds a list item or separator for ListView.builder.
+  Widget _buildListItem(List<T> items, int index, int itemsLength) {
+    // ignore: deprecated_member_use_from_same_package
+    if (widget.showSeparator) {
+      // Even indices are items, odd indices are separators
+      if (index.isOdd) {
+        // ignore: deprecated_member_use_from_same_package
+        return widget.separator ?? const Divider(height: 1);
+      }
+      // Convert ListView index to item index
+      final itemIndex = index ~/ 2;
+      return _buildItemAtIndex(items, itemIndex, itemsLength);
+    }
+    return _buildItemAtIndex(items, index, itemsLength);
+  }
+
+  /// Builds an item widget at the given index.
+  Widget _buildItemAtIndex(List<T> items, int itemIndex, int itemsLength) {
+    final item = items[itemIndex];
+    final isSelected = isItemSelected(item);
+    final isFirst = itemIndex == 0;
+    final isLast = itemIndex == itemsLength - 1;
+
+    return _buildItemWrapper(
+      item: item,
+      isSelected: isSelected,
+      isFirst: isFirst,
+      isLast: isLast,
+      child: buildItemWidget(item, isSelected),
+    );
   }
 
   /// Builds the common item wrapper with theme and interaction handling.

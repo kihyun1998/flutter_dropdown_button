@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.5.2
+
+* **PERF**: Improved scroll performance with many items by using ListView.builder (lazy loading) and ClampingScrollPhysics (removes bouncing effect)
+* **FIX**: Fixed dropdown height calculation to account for safe areas (status bar, navigation bar, home indicator)
+
 ## 1.5.1
 
 * **FIX**: Fixed dropdown overlay remaining visible after screen transitions by immediately removing overlay on dispose without animation
