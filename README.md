@@ -126,6 +126,14 @@ TextOnlyDropdownButton(
     scroll: DropdownScrollTheme(
       thickness: 8.0,
       thumbColor: Colors.blue,
+      // Enable scroll gradient indicators
+      showScrollGradient: true,
+      gradientHeight: 20.0,
+      gradientColors: [
+        Colors.white,
+        Colors.white.withOpacity(0.5),
+        Colors.white.withOpacity(0.0),
+      ],
     ),
   ),
 )
