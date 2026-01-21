@@ -46,7 +46,7 @@ Add to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  flutter_dropdown_button: ^1.5.3
+  flutter_dropdown_button: ^1.5.4
 ```
 
 Import the package:
@@ -176,6 +176,30 @@ TextOnlyDropdownButton(
   menuAlignment: MenuAlignment.left,  // left (default), center, or right
 )
 ```
+
+### Scroll Gradient Indicators
+
+Show fade gradients at the edges when content is scrollable:
+
+```dart
+TextOnlyDropdownButton(
+  items: longItemList,
+  height: 200,  // Constrain height to enable scrolling
+  theme: DropdownStyleTheme(
+    scroll: DropdownScrollTheme(
+      showScrollGradient: true,        // Enable gradient indicators
+      gradientHeight: 24.0,            // Height of gradient effect
+      gradientColors: [                // Custom gradient colors (optional)
+        Colors.white,                  // Opaque at edge
+        Colors.white.withOpacity(0.5), // Semi-transparent
+        Colors.white.withOpacity(0.0), // Fully transparent
+      ],
+    ),
+  ),
+)
+```
+
+The gradient automatically appears at the top when you can scroll up and at the bottom when you can scroll down.
 
 ### Manual Dropdown Cleanup
 
