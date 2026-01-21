@@ -318,10 +318,17 @@ mixin DropdownMixin<T extends StatefulWidget> on State<T>, TickerProvider {
     Size buttonSize,
   ) {
     // Calculate available space for smart positioning
-    final screenHeight = MediaQuery.of(context).size.height;
-    final spaceBelow =
-        screenHeight - (buttonOffset.dy + buttonSize.height + screenMargin);
-    final spaceAbove = buttonOffset.dy - screenMargin;
+    // Account for safe areas (status bar, navigation bar, home indicator)
+    // On desktop platforms, these padding values are 0.0
+    final mediaQuery = MediaQuery.of(context);
+    final screenHeight = mediaQuery.size.height;
+    final topPadding = mediaQuery.padding.top; // status bar
+    final bottomPadding = mediaQuery.padding.bottom; // navigation bar / home indicator
+
+    final spaceBelow = screenHeight -
+        bottomPadding -
+        (buttonOffset.dy + buttonSize.height + screenMargin);
+    final spaceAbove = buttonOffset.dy - topPadding - screenMargin;
 
     // Calculate dynamic preferred height based on items with actual item heights
     final totalItemsHeight = itemCount * actualItemHeight;
