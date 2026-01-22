@@ -291,13 +291,24 @@ mixin DropdownMixin<T extends StatefulWidget> on State<T>, TickerProvider {
     if (!isDropdownOpen) return;
 
     dropdownAnimationController.reverse().then((_) {
+      // Check if widget is still mounted before removing overlay
+      if (!mounted) return;
+
       // Clear the tracked overlay if it matches before removing
       if (_currentOverlay == _overlayEntry) {
         _currentOverlay = null;
       }
 
-      _overlayEntry?.remove();
-      _overlayEntry = null;
+      // Safely remove overlay with error handling
+      try {
+        if (_overlayEntry != null) {
+          _overlayEntry!.remove();
+        }
+      } catch (e) {
+        // Overlay may have already been removed (e.g., during dispose), ignore the error
+      } finally {
+        _overlayEntry = null;
+      }
 
       // Update UI to reflect dropdown state change
       if (mounted) {

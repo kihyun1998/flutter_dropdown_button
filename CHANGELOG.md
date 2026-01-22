@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.5.5
+
+* **FIX**: Fixed overlay removal crash when dropdown is closed during widget disposal by adding mounted check and error handling to closeDropdown()
+
 ## 1.5.4
 
 * **FIX**: Fixed scroll gradient direction - top gradient now properly fades from opaque to transparent downward, bottom gradient fades from transparent to opaque downward
