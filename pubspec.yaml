@@ -1,6 +1,6 @@
 name: flutter_dropdown_button
 description: "A highly customizable dropdown package with overlay-based rendering, smooth animations, and specialized variants for different content types."
-version: 1.5.5
+version: 1.6.0
 homepage: https://github.com/kihyun1998/flutter_dropdown_button
 repository: https://github.com/kihyun1998/flutter_dropdown_button
 issue_tracker: https://github.com/kihyun1998/flutter_dropdown_button/issues
