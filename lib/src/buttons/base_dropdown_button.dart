@@ -701,7 +701,7 @@ abstract class BaseDropdownButtonState<W extends BaseDropdownButton<T>, T>
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          onTap: widget.enabled ? toggleDropdown : null,
+          onTap: isEnabled ? toggleDropdown : null,
           borderRadius: BorderRadius.circular(effectiveTheme.borderRadius),
           splashColor:
               effectiveTheme.buttonSplashColor ?? Theme.of(context).splashColor,
@@ -718,7 +718,7 @@ abstract class BaseDropdownButtonState<W extends BaseDropdownButton<T>, T>
     );
 
     // Apply opacity for disabled state
-    if (!widget.enabled) {
+    if (!isEnabled) {
       dropdownButton = Opacity(opacity: 0.6, child: dropdownButton);
     }
 
@@ -767,28 +767,29 @@ abstract class BaseDropdownButtonState<W extends BaseDropdownButton<T>, T>
           ),
 
           // Trailing widget (with rotation animation)
-          Padding(
-            padding:
-                effectiveTheme.iconPadding ?? const EdgeInsets.only(left: 8.0),
-            child: SizedBox(
-              height: effectiveIconSize,
-              child: Center(
-                child: RotationTransition(
-                  turns: dropdownIconRotationAnimation,
-                  child: widget.trailing ??
-                      Icon(
-                        effectiveTheme.icon ?? Icons.keyboard_arrow_down,
-                        size: effectiveIconSize,
-                        color: widget.enabled
-                            ? (effectiveTheme.iconColor ??
-                                Theme.of(context).iconTheme.color)
-                            : (effectiveTheme.iconDisabledColor ??
-                                Theme.of(context).disabledColor),
-                      ),
+          if (showTrailing)
+            Padding(
+              padding:
+                  effectiveTheme.iconPadding ?? const EdgeInsets.only(left: 8.0),
+              child: SizedBox(
+                height: effectiveIconSize,
+                child: Center(
+                  child: RotationTransition(
+                    turns: dropdownIconRotationAnimation,
+                    child: widget.trailing ??
+                        Icon(
+                          effectiveTheme.icon ?? Icons.keyboard_arrow_down,
+                          size: effectiveIconSize,
+                          color: widget.enabled
+                              ? (effectiveTheme.iconColor ??
+                                  Theme.of(context).iconTheme.color)
+                              : (effectiveTheme.iconDisabledColor ??
+                                  Theme.of(context).disabledColor),
+                        ),
+                  ),
                 ),
               ),
             ),
-          ),
         ],
       ),
     );
@@ -1044,6 +1045,12 @@ abstract class BaseDropdownButtonState<W extends BaseDropdownButton<T>, T>
       ),
     );
   }
+
+  /// Whether to show the trailing widget (dropdown icon).
+  ///
+  /// Subclasses can override this to conditionally hide the trailing widget.
+  /// Defaults to true.
+  bool get showTrailing => true;
 
   // Abstract methods that subclasses must implement
 

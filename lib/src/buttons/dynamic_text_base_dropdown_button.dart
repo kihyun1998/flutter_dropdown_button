@@ -3,18 +3,25 @@ import 'package:flutter/material.dart';
 import '../config/text_dropdown_config.dart';
 import '../widgets/smart_tooltip_text.dart';
 import 'base_dropdown_button.dart';
+import 'text_dropdown_mixin.dart';
 
 /// A dynamic text-based dropdown button widget that adapts its behavior based on the number of items.
 ///
 /// This widget provides intelligent behavior switching:
-/// - When [items] has only one element: displays as a non-interactive button (no dropdown)
-/// - When [items] has multiple elements: functions as a normal dropdown button
+/// - When [disableWhenSingleItem] is true and [items] has only one element:
+///   displays as a non-interactive button (no dropdown)
+/// - Otherwise: functions as a normal dropdown button
+///
+/// Unlike [TextOnlyDropdownButton], this widget does not require a fixed width.
+/// Instead, the width is determined by the content (text, leading, trailing widgets),
+/// with optional [minWidth] and [maxWidth] constraints.
 ///
 /// This is particularly useful for forms or interfaces where options may vary,
 /// and you want to avoid showing a dropdown for single-option scenarios.
 ///
 /// Features:
-/// - Automatic behavior switching based on item count
+/// - Content-based dynamic width with minWidth/maxWidth constraints
+/// - Automatic behavior switching based on item count (configurable)
 /// - Same text rendering controls as [TextOnlyDropdownButton]
 /// - Optional leading widget support via [leading] and [selectedLeading]
 /// - Customizable leading widget padding
@@ -27,7 +34,10 @@ import 'base_dropdown_button.dart';
 ///   items: availableOptions, // May have 1 or more items
 ///   value: selectedValue,
 ///   hint: 'Select an option',
-///   theme: DropdownTheme(borderRadius: 12.0),
+///   minWidth: 120,
+///   theme: DropdownStyleTheme(
+///     dropdown: DropdownTheme(borderRadius: 12.0),
+///   ),
 ///   config: TextDropdownConfig(
 ///     overflow: TextOverflow.ellipsis,
 ///     maxLines: 1,
@@ -52,16 +62,17 @@ class DynamicTextBaseDropdownButton extends BaseDropdownButton<String> {
     this.hint,
     super.theme,
     this.config,
-    super.width,
     super.maxWidth,
     super.minWidth,
     super.height = 200.0,
     super.itemHeight = 48.0,
+    super.animationDuration = const Duration(milliseconds: 200),
     super.enabled = true,
     super.scrollToSelectedItem = true,
     super.scrollToSelectedDuration,
     super.expand = false,
     super.trailing,
+    this.disableWhenSingleItem = true,
     this.hideIconWhenSingleItem = true,
     this.leading,
     this.selectedLeading,
@@ -73,8 +84,9 @@ class DynamicTextBaseDropdownButton extends BaseDropdownButton<String> {
 
   /// The list of text options to display in the dropdown.
   ///
-  /// - If [items.length] == 1: displays as a non-interactive button
-  /// - If [items.length] > 1: displays as a normal dropdown button
+  /// - If [disableWhenSingleItem] is true and [items.length] == 1:
+  ///   displays as a non-interactive button
+  /// - Otherwise: displays as a normal dropdown button
   final List<String> items;
 
   /// The text to display when no item is selected.
@@ -88,11 +100,20 @@ class DynamicTextBaseDropdownButton extends BaseDropdownButton<String> {
   /// properties. If null, uses [TextDropdownConfig.defaultConfig].
   final TextDropdownConfig? config;
 
+  /// Whether to disable the dropdown when there's only one item.
+  ///
+  /// When true (default), a single-item dropdown becomes a non-interactive
+  /// display widget. When false, the dropdown behaves normally regardless
+  /// of item count.
+  final bool disableWhenSingleItem;
+
   /// Whether to hide the dropdown icon when there's only one item.
   ///
   /// When true (default), the icon is hidden for single-item scenarios
   /// to make it clear the button is not interactive.
   /// When false, the icon is always shown.
+  ///
+  /// Only applies when [disableWhenSingleItem] is true.
   final bool hideIconWhenSingleItem;
 
   /// Widget to display before the text in all dropdown items.
@@ -137,28 +158,49 @@ class DynamicTextBaseDropdownButton extends BaseDropdownButton<String> {
 }
 
 /// The state class for [DynamicTextBaseDropdownButton].
-///
-/// Manages the dropdown's behavior switching and delegates to
-/// [BaseDropdownButtonState] for common functionality.
 class _DynamicTextBaseDropdownButtonState
-    extends BaseDropdownButtonState<DynamicTextBaseDropdownButton, String> {
-  /// The effective config, using provided config or default.
-  TextDropdownConfig get _config =>
-      widget.config ?? TextDropdownConfig.defaultConfig;
-
-  /// Whether the dropdown should behave as interactive.
-  ///
-  /// Returns false when there's only one item (non-interactive mode).
-  bool get _isDropdownEnabled => widget.items.length > 1 && widget.enabled;
-
-  /// Whether to show the dropdown icon.
-  ///
-  /// Hidden when there's only one item and [hideIconWhenSingleItem] is true.
-  bool get _shouldShowIcon =>
-      !widget.hideIconWhenSingleItem || widget.items.length > 1;
+    extends BaseDropdownButtonState<DynamicTextBaseDropdownButton, String>
+    with TextDropdownRenderMixin<DynamicTextBaseDropdownButton> {
+  @override
+  String? get hint => widget.hint;
 
   @override
-  bool get isEnabled => _isDropdownEnabled;
+  TextDropdownConfig get textConfig =>
+      widget.config ?? TextDropdownConfig.defaultConfig;
+
+  /// Whether the dropdown is in single-item non-interactive mode.
+  bool get _isSingleItemDisabled =>
+      widget.disableWhenSingleItem && widget.items.length == 1;
+
+  @override
+  bool get isEnabled => !_isSingleItemDisabled && widget.enabled;
+
+  @override
+  void initState() {
+    super.initState();
+    _autoSelectSingleItem();
+  }
+
+  @override
+  void didUpdateWidget(DynamicTextBaseDropdownButton oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _autoSelectSingleItem();
+  }
+
+  /// Automatically selects the only item when in single-item mode.
+  void _autoSelectSingleItem() {
+    if (_isSingleItemDisabled && widget.value != widget.items.first) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          widget.onChanged(widget.items.first);
+        }
+      });
+    }
+  }
+
+  @override
+  bool get showTrailing =>
+      !(_isSingleItemDisabled && widget.hideIconWhenSingleItem);
 
   @override
   Widget buildSelectedWidget() {
@@ -169,14 +211,14 @@ class _DynamicTextBaseDropdownButtonState
     final textWidget = SmartTooltipText(
       text: displayText,
       tooltipTheme: effectiveTooltipTheme,
-      style: isHint ? _config.hintStyle : _config.textStyle,
-      textAlign: _config.textAlign,
-      maxLines: _config.maxLines,
-      overflow: _config.overflow,
-      softWrap: _config.softWrap,
-      textDirection: _config.textDirection,
-      locale: _config.locale,
-      textScaler: _config.textScaler,
+      style: isHint ? textConfig.hintStyle : textConfig.textStyle,
+      textAlign: textConfig.textAlign,
+      maxLines: textConfig.maxLines,
+      overflow: textConfig.overflow,
+      softWrap: textConfig.softWrap,
+      textDirection: textConfig.textDirection,
+      locale: textConfig.locale,
+      textScaler: textConfig.textScaler,
     );
 
     // Determine which leading widget to use
@@ -184,12 +226,10 @@ class _DynamicTextBaseDropdownButtonState
         ? (widget.selectedLeading ?? widget.leading)
         : null;
 
-    // If no leading widget or no value selected, return text only
     if (leadingWidget == null) {
       return textWidget;
     }
 
-    // Return Row with leading widget and text
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -197,9 +237,7 @@ class _DynamicTextBaseDropdownButtonState
           padding: widget.leadingPadding ?? const EdgeInsets.only(right: 8.0),
           child: SizedBox(
             height: effectiveTheme.iconSize ?? 24.0,
-            child: Center(
-              child: leadingWidget,
-            ),
+            child: Center(child: leadingWidget),
           ),
         ),
         Flexible(child: textWidget),
@@ -213,24 +251,22 @@ class _DynamicTextBaseDropdownButtonState
       text: item,
       tooltipTheme: effectiveTooltipTheme,
       style: isSelected
-          ? _config.selectedTextStyle ?? _config.textStyle
-          : _config.textStyle,
-      textAlign: _config.textAlign,
-      maxLines: _config.maxLines,
-      overflow: _config.overflow,
-      softWrap: _config.softWrap,
-      textDirection: _config.textDirection,
-      locale: _config.locale,
-      textScaler: _config.textScaler,
-      semanticsLabel: _config.semanticsLabel,
+          ? textConfig.selectedTextStyle ?? textConfig.textStyle
+          : textConfig.textStyle,
+      textAlign: textConfig.textAlign,
+      maxLines: textConfig.maxLines,
+      overflow: textConfig.overflow,
+      softWrap: textConfig.softWrap,
+      textDirection: textConfig.textDirection,
+      locale: textConfig.locale,
+      textScaler: textConfig.textScaler,
+      semanticsLabel: textConfig.semanticsLabel,
     );
 
-    // If no leading widget, return text only
     if (widget.leading == null) {
       return textWidget;
     }
 
-    // Return Row with leading widget and text
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -238,9 +274,7 @@ class _DynamicTextBaseDropdownButtonState
           padding: widget.leadingPadding ?? const EdgeInsets.only(right: 8.0),
           child: SizedBox(
             height: effectiveTheme.iconSize ?? 24.0,
-            child: Center(
-              child: widget.leading!,
-            ),
+            child: Center(child: widget.leading!),
           ),
         ),
         Flexible(child: textWidget),
@@ -251,91 +285,5 @@ class _DynamicTextBaseDropdownButtonState
   @override
   List<String> getItems() {
     return widget.items;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    // If there's only one item, show a simple non-interactive button
-    if (widget.items.length == 1) {
-      Widget dropdownButton = Container(
-        key: dropdownButtonKey,
-        width: widget.width,
-        padding: effectiveTheme.buttonPadding,
-        decoration: buildButtonDecoration(),
-        child: Row(
-          mainAxisAlignment: widget.width != null || widget.expand
-              ? MainAxisAlignment.spaceBetween
-              : MainAxisAlignment.start,
-          mainAxisSize: widget.width != null || widget.expand
-              ? MainAxisSize.max
-              : MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Flexible(
-              child: SizedBox(
-                height: effectiveTheme.iconSize ?? 24.0,
-                child: widget.width != null || widget.expand
-                    ? Container(
-                        alignment: Alignment.centerLeft,
-                        child: buildSelectedWidget(),
-                      )
-                    : Align(
-                        alignment: Alignment.centerLeft,
-                        widthFactor: 1.0,
-                        child: buildSelectedWidget(),
-                      ),
-              ),
-            ),
-            // Conditionally show icon/trailing for single item
-            if (_shouldShowIcon)
-              Padding(
-                padding: effectiveTheme.iconPadding ??
-                    const EdgeInsets.only(left: 8.0),
-                child: SizedBox(
-                  height: effectiveTheme.iconSize ?? 24.0,
-                  child: Center(
-                    child: widget.trailing ??
-                        Icon(
-                          effectiveTheme.icon ?? Icons.keyboard_arrow_down,
-                          size: effectiveTheme.iconSize ?? 24.0,
-                          color: widget.enabled
-                              ? (effectiveTheme.iconColor ??
-                                  Theme.of(context).iconTheme.color)
-                              : (effectiveTheme.iconDisabledColor ??
-                                  Theme.of(context).disabledColor),
-                        ),
-                  ),
-                ),
-              ),
-          ],
-        ),
-      );
-
-      // Apply opacity for disabled state
-      if (!widget.enabled) {
-        dropdownButton = Opacity(opacity: 0.6, child: dropdownButton);
-      }
-
-      // Apply width constraints if specified
-      return _applyWidthConstraints(dropdownButton);
-    }
-
-    // For multiple items, use the default dropdown behavior
-    return super.build(context);
-  }
-
-  /// Applies width constraints to the dropdown button.
-  Widget _applyWidthConstraints(Widget child) {
-    if (widget.width == null &&
-        (widget.minWidth != null || widget.maxWidth != null)) {
-      return ConstrainedBox(
-        constraints: BoxConstraints(
-          minWidth: widget.minWidth ?? 0,
-          maxWidth: widget.maxWidth ?? double.infinity,
-        ),
-        child: child,
-      );
-    }
-    return child;
   }
 }

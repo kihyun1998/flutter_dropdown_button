@@ -1,19 +1,23 @@
 import 'package:flutter/material.dart';
 
 import '../config/text_dropdown_config.dart';
-import '../theme/dropdown_theme.dart';
-import '../widgets/smart_tooltip_text.dart';
 import 'base_dropdown_button.dart';
+import 'text_dropdown_mixin.dart';
 
-/// A dropdown button widget specifically designed for text-only content.
+/// A dropdown button widget specifically designed for text-only content
+/// with a fixed width.
 ///
 /// This widget provides precise control over text rendering, overflow behavior,
 /// and typography while maintaining the visual consistency defined by [DropdownTheme].
 /// Unlike [BasicDropdownButton], this widget only accepts string values, allowing
 /// for better text-specific optimizations and controls.
 ///
+/// The [width] parameter is required because this widget is designed for
+/// fixed-width layouts. For content-based dynamic width, use
+/// [DynamicTextBaseDropdownButton] instead.
+///
 /// Features:
-/// - Text overflow control (ellipsis, fade, clip, visible)
+/// - Fixed width with text overflow control (ellipsis, fade, clip, visible)
 /// - Multi-line text support
 /// - Custom text styling and alignment
 /// - Shared theme with other dropdown variants
@@ -24,8 +28,11 @@ import 'base_dropdown_button.dart';
 /// TextOnlyDropdownButton(
 ///   items: ['Apple', 'Banana', 'Very Long Orange Name That Might Overflow'],
 ///   value: selectedValue,
+///   width: 200,
 ///   hint: 'Select a fruit',
-///   theme: DropdownTheme(borderRadius: 12.0),
+///   theme: DropdownStyleTheme(
+///     dropdown: DropdownTheme(borderRadius: 12.0),
+///   ),
 ///   config: TextDropdownConfig(
 ///     overflow: TextOverflow.ellipsis,
 ///     maxLines: 1,
@@ -35,33 +42,31 @@ import 'base_dropdown_button.dart';
 /// )
 /// ```
 class TextOnlyDropdownButton extends BaseDropdownButton<String> {
-  /// Creates a text-only dropdown button widget.
+  /// Creates a text-only dropdown button widget with a fixed width.
   ///
-  /// The [items] and [onChanged] parameters are required.
+  /// The [items], [onChanged], and [width] parameters are required.
   const TextOnlyDropdownButton({
     super.key,
     required this.items,
     required super.onChanged,
+    required double width,
     super.value,
     this.hint,
     super.theme,
     this.config,
-    super.width,
-    super.maxWidth,
-    super.minWidth,
     super.height = 200.0,
     super.itemHeight = 48.0,
+    super.animationDuration = const Duration(milliseconds: 200),
     super.enabled = true,
     super.scrollToSelectedItem = true,
     super.scrollToSelectedDuration,
-    super.expand = false,
     super.trailing,
     super.showSeparator = false,
     super.separator,
     super.minMenuWidth,
     super.maxMenuWidth,
     super.menuAlignment,
-  });
+  }) : super(width: width);
 
   /// The list of text options to display in the dropdown.
   ///
@@ -85,53 +90,15 @@ class TextOnlyDropdownButton extends BaseDropdownButton<String> {
 }
 
 /// The state class for [TextOnlyDropdownButton].
-///
-/// Manages the dropdown's open/closed state, animations, and overlay positioning.
-/// Uses [BaseDropdownButtonState] to provide common dropdown functionality.
 class _TextOnlyDropdownButtonState
-    extends BaseDropdownButtonState<TextOnlyDropdownButton, String> {
-  /// The effective config, using provided config or default.
-  TextDropdownConfig get _config =>
+    extends BaseDropdownButtonState<TextOnlyDropdownButton, String>
+    with TextDropdownRenderMixin<TextOnlyDropdownButton> {
+  @override
+  String? get hint => widget.hint;
+
+  @override
+  TextDropdownConfig get textConfig =>
       widget.config ?? TextDropdownConfig.defaultConfig;
-
-  @override
-  Widget buildSelectedWidget() {
-    final selectedText = widget.value;
-    final displayText = selectedText ?? widget.hint ?? '';
-    final isHint = selectedText == null;
-
-    return SmartTooltipText(
-      text: displayText,
-      tooltipTheme: effectiveTooltipTheme,
-      style: isHint ? _config.hintStyle : _config.textStyle,
-      textAlign: _config.textAlign,
-      maxLines: _config.maxLines,
-      overflow: _config.overflow,
-      softWrap: _config.softWrap,
-      textDirection: _config.textDirection,
-      locale: _config.locale,
-      textScaler: _config.textScaler,
-    );
-  }
-
-  @override
-  Widget buildItemWidget(String item, bool isSelected) {
-    return SmartTooltipText(
-      text: item,
-      tooltipTheme: effectiveTooltipTheme,
-      style: isSelected
-          ? _config.selectedTextStyle ?? _config.textStyle
-          : _config.textStyle,
-      textAlign: _config.textAlign,
-      maxLines: _config.maxLines,
-      overflow: _config.overflow,
-      softWrap: _config.softWrap,
-      textDirection: _config.textDirection,
-      locale: _config.locale,
-      textScaler: _config.textScaler,
-      semanticsLabel: _config.semanticsLabel,
-    );
-  }
 
   @override
   List<String> getItems() {

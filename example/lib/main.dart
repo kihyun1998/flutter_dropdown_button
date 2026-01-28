@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'pages/home_page.dart';
+import 'pages/playground_page.dart';
 import 'pages/bug_test_page.dart';
 import 'pages/result_page.dart';
 
@@ -14,12 +14,12 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Flutter Dropdown Button Demo',
+      title: 'Flutter Dropdown Button Playground',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const MyHomePage(),
+      home: const PlaygroundPage(),
       routes: {
         '/dropdown-bug-test': (context) => const DropdownBugTestPage(),
         '/result-page': (context) => const ResultPage(),

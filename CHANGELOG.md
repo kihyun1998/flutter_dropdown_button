@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.6.0
+
+* **BREAKING**: `TextOnlyDropdownButton.width` is now required (fixed-width dropdown by design)
+* **BREAKING**: Removed `minWidth`, `maxWidth`, `expand` from `TextOnlyDropdownButton` (use `DynamicTextBaseDropdownButton` for content-based width)
+* **BREAKING**: Removed `width` from `DynamicTextBaseDropdownButton` (content-based width by design, use `minWidth`/`maxWidth` for constraints)
+* **FEAT**: Added `disableWhenSingleItem` parameter to `DynamicTextBaseDropdownButton` for toggling single-item non-interactive mode (defaults to true)
+* **FEAT**: Added `showTrailing` getter to `BaseDropdownButtonState` allowing subclasses to conditionally hide the trailing icon
+* **FEAT**: `DynamicTextBaseDropdownButton` now auto-selects the only item when in single-item disabled mode
+* **FIX**: Fixed `DynamicTextBaseDropdownButton` single-item mode not blocking tap interactions (was using `widget.enabled` instead of `isEnabled`)
+* **FIX**: Fixed disabled opacity check using `widget.enabled` instead of `isEnabled`, causing incorrect visual state for dynamic dropdowns
+* **FIX**: Removed duplicated `build()` and `_applyWidthConstraints()` in `DynamicTextBaseDropdownButton` (was missing `expand` support)
+* **REFACTOR**: Extracted common text rendering logic into `TextDropdownRenderMixin` to eliminate duplication between `TextOnlyDropdownButton` and `DynamicTextBaseDropdownButton`
+* **REFACTOR**: Replaced example showcase app with interactive Playground for live parameter configuration
+
 ## 1.5.5
 
 * **FIX**: Fixed overlay removal crash when dropdown is closed during widget disposal by adding mounted check and error handling to closeDropdown()

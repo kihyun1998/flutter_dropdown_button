@@ -239,7 +239,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             items: basicItems,
                             value: basicValue,
                             hint: 'Select an option',
-                            maxWidth: 280,
+                            width: 280,
                             theme: _getTheme(basicTextStyle),
                             onChanged: (value) =>
                                 setState(() => basicValue = value),
@@ -255,7 +255,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             items: longTextItems,
                             value: longTextValue,
                             hint: 'Select long text option',
-                            maxWidth: 280,
+                            width: 280,
                             config: const TextDropdownConfig(
                               overflow: TextOverflow.ellipsis,
                               maxLines: 1,
@@ -276,7 +276,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             items: longTextItems,
                             value: tooltipBasicValue,
                             hint: 'Hover to see tooltip',
-                            maxWidth: 280,
+                            width: 280,
                             config: const TextDropdownConfig(
                               overflow: TextOverflow.ellipsis,
                               maxLines: 1,
@@ -297,7 +297,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             items: longTextItems,
                             value: tooltipCustomValue,
                             hint: 'Styled tooltip demo',
-                            maxWidth: 280,
+                            width: 280,
                             config: const TextDropdownConfig(
                               overflow: TextOverflow.ellipsis,
                               maxLines: 1,
@@ -342,7 +342,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             items: multiLineItems,
                             value: multiLineValue,
                             hint: 'Multi-line demo',
-                            maxWidth: 280,
+                            width: 280,
                             itemHeight: 70,
                             config: const TextDropdownConfig(
                               overflow: TextOverflow.visible,
@@ -381,7 +381,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             items: countries,
                             value: scrollValue,
                             hint: 'Select a country',
-                            maxWidth: 280,
+                            width: 280,
                             height: 200,
                             scrollToSelectedItem: true, // Enable auto-scroll
                             scrollToSelectedDuration: const Duration(
@@ -412,7 +412,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             items: basicItems,
                             value: centerValue,
                             hint: 'Center aligned',
-                            maxWidth: 280,
+                            width: 280,
                             config: const TextDropdownConfig(
                               textAlign: TextAlign.center,
                             ),
@@ -452,7 +452,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             items: basicItems,
                             value: darkModeValue,
                             hint: 'Select option',
-                            maxWidth: 280,
+                            width: 280,
                             config: const TextDropdownConfig(
                               textStyle: TextStyle(color: Colors.white),
                               hintStyle: TextStyle(color: Colors.white70),
@@ -473,7 +473,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             items: basicItems,
                             value: customIconValue,
                             hint: 'Custom icon demo',
-                            maxWidth: 280,
+                            width: 280,
                             theme: _getTheme(customIconStyle),
                             onChanged: (value) =>
                                 setState(() => customIconValue = value),
@@ -489,7 +489,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             items: basicItems,
                             value: disabledValue,
                             hint: 'Disabled state',
-                            maxWidth: 280,
+                            width: 280,
                             enabled:
                                 false, // Disabled to show iconDisabledColor
                             theme: _getTheme(disabledStyle),
@@ -508,7 +508,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             items: basicItems,
                             value: basicValue,
                             hint: 'Custom trailing',
-                            maxWidth: 280,
+                            width: 280,
                             trailing: Container(
                               padding: const EdgeInsets.all(4),
                               decoration: BoxDecoration(
@@ -536,7 +536,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             items: basicItems,
                             value: separatorBasicValue,
                             hint: 'With separator',
-                            maxWidth: 280,
+                            width: 280,
                             showSeparator: true,
                             theme: _getTheme(separatorBasicStyle),
                             onChanged: (value) =>
@@ -554,7 +554,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             items: countries.take(8).toList(),
                             value: separatorCustomValue,
                             hint: 'Custom separator',
-                            maxWidth: 280,
+                            width: 280,
                             showSeparator: true,
                             separator: Divider(
                               height: 8,
@@ -635,7 +635,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             items: longTextItems,
                             value: maxWidthValue,
                             hint: 'Very long text with limits',
-                            maxWidth: 300,
+                            width: 300,
                             maxMenuWidth: 200,
                             config: const TextDropdownConfig(
                               overflow: TextOverflow.ellipsis,
@@ -657,6 +657,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             items: mixedLengthItems,
                             value: combinedWidthValue,
                             hint: 'Flexible menu',
+                            width: 200,
                             minMenuWidth: 180,
                             maxMenuWidth: 280,
                             menuAlignment: MenuAlignment.center,
@@ -721,8 +722,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   items: stylePresets.map((s) => s.name).toList(),
                   value: selectedStyle,
                   hint: 'Select style',
-                  expand: true,
-                  maxWidth: 180,
+                  width: 180,
                   config: const TextDropdownConfig(
                     textStyle: TextStyle(fontSize: 12),
                   ),
@@ -782,8 +782,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   items: stylePresets.map((s) => s.name).toList(),
                   value: dynamicStyle,
                   hint: 'Select style',
-                  expand: true,
-                  maxWidth: 180,
+                  width: 180,
                   config: const TextDropdownConfig(
                     textStyle: TextStyle(fontSize: 12),
                   ),
