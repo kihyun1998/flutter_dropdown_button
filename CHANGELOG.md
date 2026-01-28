@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.6.1
+
+* **FIX**: Removed disabled opacity override that forced 0.6 opacity on single-item dropdowns, preserving original button styling
+
 ## 1.6.0
 
 * **BREAKING**: `TextOnlyDropdownButton.width` is now required (fixed-width dropdown by design)

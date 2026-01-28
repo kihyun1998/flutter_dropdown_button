@@ -717,11 +717,6 @@ abstract class BaseDropdownButtonState<W extends BaseDropdownButton<T>, T>
       ),
     );
 
-    // Apply opacity for disabled state
-    if (!isEnabled) {
-      dropdownButton = Opacity(opacity: 0.6, child: dropdownButton);
-    }
-
     // Apply width constraints if specified
     return _applyWidthConstraints(dropdownButton);
   }
