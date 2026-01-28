@@ -88,10 +88,7 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
 
   DropdownStyleTheme _getTheme() {
     return stylePresets
-        .firstWhere(
-          (s) => s.name == _themeName,
-          orElse: () => stylePresets[0],
-        )
+        .firstWhere((s) => s.name == _themeName, orElse: () => stylePresets[0])
         .theme;
   }
 
@@ -107,8 +104,7 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
           IconButton(
             icon: const Icon(Icons.bug_report),
             tooltip: 'Overlay Bug Test',
-            onPressed: () =>
-                Navigator.pushNamed(context, '/dropdown-bug-test'),
+            onPressed: () => Navigator.pushNamed(context, '/dropdown-bug-test'),
           ),
         ],
       ),
@@ -116,10 +112,7 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
           ? Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(
-                  width: 380,
-                  child: _buildSettingsPanel(),
-                ),
+                SizedBox(width: 380, child: _buildSettingsPanel()),
                 const VerticalDivider(width: 1),
                 Expanded(child: _buildPreview()),
               ],
@@ -149,8 +142,14 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
           _sectionTitle('Dropdown Type'),
           SegmentedButton<DropdownType>(
             segments: const [
-              ButtonSegment(value: DropdownType.textOnly, label: Text('TextOnly')),
-              ButtonSegment(value: DropdownType.dynamic, label: Text('Dynamic')),
+              ButtonSegment(
+                value: DropdownType.textOnly,
+                label: Text('TextOnly'),
+              ),
+              ButtonSegment(
+                value: DropdownType.dynamic,
+                label: Text('Dynamic'),
+              ),
               ButtonSegment(value: DropdownType.basic, label: Text('Basic')),
             ],
             selected: {_type},
@@ -172,30 +171,61 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
 
           // --- Common ---
           _sectionTitle('Common Settings'),
-          _sliderRow('height', _height, 100, 400,
-              (v) => setState(() => _height = v)),
-          _sliderRow('itemHeight', _itemHeight, 24, 80,
-              (v) => setState(() => _itemHeight = v)),
-          _sliderRow('animation (ms)', _animationMs.toDouble(), 0, 600,
-              (v) => setState(() => _animationMs = v.round()),
-              divisions: 12),
-          _switchRow('enabled', _enabled,
-              (v) => setState(() => _enabled = v)),
-          _switchRow('scrollToSelectedItem', _scrollToSelected,
-              (v) => setState(() => _scrollToSelected = v)),
-          _switchRow('Custom trailing', _useCustomTrailing,
-              (v) => setState(() => _useCustomTrailing = v)),
+          _sliderRow(
+            'height',
+            _height,
+            100,
+            400,
+            (v) => setState(() => _height = v),
+          ),
+          _sliderRow(
+            'itemHeight',
+            _itemHeight,
+            24,
+            80,
+            (v) => setState(() => _itemHeight = v),
+          ),
+          _sliderRow(
+            'animation (ms)',
+            _animationMs.toDouble(),
+            0,
+            600,
+            (v) => setState(() => _animationMs = v.round()),
+            divisions: 12,
+          ),
+          _switchRow('enabled', _enabled, (v) => setState(() => _enabled = v)),
+          _switchRow(
+            'scrollToSelectedItem',
+            _scrollToSelected,
+            (v) => setState(() => _scrollToSelected = v),
+          ),
+          _switchRow(
+            'Custom trailing',
+            _useCustomTrailing,
+            (v) => setState(() => _useCustomTrailing = v),
+          ),
           if (_useCustomTrailing)
-            _sliderRow('trailing size', _trailingSize, 10, 40,
-                (v) => setState(() => _trailingSize = v)),
+            _sliderRow(
+              'trailing size',
+              _trailingSize,
+              10,
+              40,
+              (v) => setState(() => _trailingSize = v),
+            ),
           const SizedBox(height: 8),
           _buildThemeSelector(),
           const SizedBox(height: 8),
           _buildMenuAlignmentSelector(),
-          _buildOptionalDouble('minMenuWidth', _minMenuWidth,
-              (v) => setState(() => _minMenuWidth = v)),
-          _buildOptionalDouble('maxMenuWidth', _maxMenuWidth,
-              (v) => setState(() => _maxMenuWidth = v)),
+          _buildOptionalDouble(
+            'minMenuWidth',
+            _minMenuWidth,
+            (v) => setState(() => _minMenuWidth = v),
+          ),
+          _buildOptionalDouble(
+            'maxMenuWidth',
+            _maxMenuWidth,
+            (v) => setState(() => _maxMenuWidth = v),
+          ),
           const SizedBox(height: 20),
 
           // --- Type-specific ---
@@ -211,8 +241,13 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
   List<Widget> _buildTextOnlySettings() {
     return [
       _sectionTitle('TextOnly Settings'),
-      _sliderRow('width (required)', _fixedWidth, 80, 400,
-          (v) => setState(() => _fixedWidth = v)),
+      _sliderRow(
+        'width (required)',
+        _fixedWidth,
+        80,
+        400,
+        (v) => setState(() => _fixedWidth = v),
+      ),
       _buildHintField(),
       const SizedBox(height: 20),
     ];
@@ -221,21 +256,40 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
   List<Widget> _buildDynamicSettings() {
     return [
       _sectionTitle('Dynamic Settings'),
-      _buildOptionalDouble('minWidth', _minWidth,
-          (v) => setState(() => _minWidth = v)),
-      _buildOptionalDouble('maxWidth', _maxWidth,
-          (v) => setState(() => _maxWidth = v)),
-      _switchRow('disableWhenSingleItem', _disableWhenSingleItem,
-          (v) => setState(() => _disableWhenSingleItem = v)),
-      _switchRow('hideIconWhenSingleItem', _hideIconWhenSingleItem,
-          (v) => setState(() => _hideIconWhenSingleItem = v)),
-      _switchRow('leading icon', _showLeading,
-          (v) => setState(() => _showLeading = v)),
+      _buildOptionalDouble(
+        'minWidth',
+        _minWidth,
+        (v) => setState(() => _minWidth = v),
+      ),
+      _buildOptionalDouble(
+        'maxWidth',
+        _maxWidth,
+        (v) => setState(() => _maxWidth = v),
+      ),
+      _switchRow(
+        'disableWhenSingleItem',
+        _disableWhenSingleItem,
+        (v) => setState(() => _disableWhenSingleItem = v),
+      ),
+      _switchRow(
+        'hideIconWhenSingleItem',
+        _hideIconWhenSingleItem,
+        (v) => setState(() => _hideIconWhenSingleItem = v),
+      ),
+      _switchRow(
+        'leading icon',
+        _showLeading,
+        (v) => setState(() => _showLeading = v),
+      ),
       if (_showLeading)
-        _sliderRow('leading size', _leadingSize, 8, 32,
-            (v) => setState(() => _leadingSize = v)),
-      _switchRow('expand', _expand,
-          (v) => setState(() => _expand = v)),
+        _sliderRow(
+          'leading size',
+          _leadingSize,
+          8,
+          32,
+          (v) => setState(() => _leadingSize = v),
+        ),
+      _switchRow('expand', _expand, (v) => setState(() => _expand = v)),
       _buildHintField(),
       const SizedBox(height: 20),
     ];
@@ -245,9 +299,14 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
     return [
       _sectionTitle('TextDropdownConfig'),
       _buildOverflowSelector(),
-      _sliderRow('maxLines', _maxLines.toDouble(), 1, 5,
-          (v) => setState(() => _maxLines = v.round()),
-          divisions: 4),
+      _sliderRow(
+        'maxLines',
+        _maxLines.toDouble(),
+        1,
+        5,
+        (v) => setState(() => _maxLines = v.round()),
+        divisions: 4,
+      ),
       _buildTextAlignSelector(),
       const SizedBox(height: 20),
     ];
@@ -320,8 +379,11 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
               color: Colors.blue.shade100,
               shape: BoxShape.circle,
             ),
-            child: Icon(Icons.arrow_drop_down, size: _trailingSize,
-                color: Colors.blue.shade700),
+            child: Icon(
+              Icons.arrow_drop_down,
+              size: _trailingSize,
+              color: Colors.blue.shade700,
+            ),
           )
         : null;
 
@@ -379,10 +441,7 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
       case DropdownType.basic:
         return BasicDropdownButton<String>(
           items: _items
-              .map((item) => DropdownItem(
-                    value: item,
-                    child: Text(item),
-                  ))
+              .map((item) => DropdownItem(value: item, child: Text(item)))
               .toList(),
           value: _selectedValue,
           hint: const Text('Select an option'),
@@ -415,8 +474,14 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
     );
   }
 
-  Widget _sliderRow(String label, double value, double min, double max,
-      ValueChanged<double> onChanged, {int? divisions}) {
+  Widget _sliderRow(
+    String label,
+    double value,
+    double min,
+    double max,
+    ValueChanged<double> onChanged, {
+    int? divisions,
+  }) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
@@ -461,7 +526,10 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
   }
 
   Widget _buildOptionalDouble(
-      String label, double? value, ValueChanged<double?> onChanged) {
+    String label,
+    double? value,
+    ValueChanged<double?> onChanged,
+  ) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
@@ -512,10 +580,12 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
             isExpanded: true,
             style: const TextStyle(fontSize: 12, color: Colors.black),
             items: stylePresets
-                .map((s) => DropdownMenuItem(
-                      value: s.name,
-                      child: Text(s.name, style: const TextStyle(fontSize: 12)),
-                    ))
+                .map(
+                  (s) => DropdownMenuItem(
+                    value: s.name,
+                    child: Text(s.name, style: const TextStyle(fontSize: 12)),
+                  ),
+                )
                 .toList(),
             onChanged: (v) => setState(() => _themeName = v!),
           ),
@@ -566,7 +636,9 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
                 ButtonSegment(value: TextOverflow.fade, label: Text('fade')),
                 ButtonSegment(value: TextOverflow.clip, label: Text('clip')),
                 ButtonSegment(
-                    value: TextOverflow.visible, label: Text('visible')),
+                  value: TextOverflow.visible,
+                  label: Text('visible'),
+                ),
               ],
               selected: {_overflow},
               onSelectionChanged: (v) => setState(() => _overflow = v.first),
@@ -617,8 +689,10 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
               style: const TextStyle(fontSize: 12),
               decoration: const InputDecoration(
                 isDense: true,
-                contentPadding:
-                    EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: 8,
+                  vertical: 8,
+                ),
                 border: OutlineInputBorder(),
               ),
               onChanged: (v) => _hint = v,
@@ -658,8 +732,7 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
               hintText: 'New item (or leave empty)',
               hintStyle: TextStyle(fontSize: 11),
               isDense: true,
-              contentPadding:
-                  EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+              contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
               border: OutlineInputBorder(),
             ),
             onSubmitted: (_) => _addItem(),

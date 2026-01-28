@@ -769,8 +769,8 @@ abstract class BaseDropdownButtonState<W extends BaseDropdownButton<T>, T>
           // Trailing widget (with rotation animation)
           if (showTrailing)
             Padding(
-              padding:
-                  effectiveTheme.iconPadding ?? const EdgeInsets.only(left: 8.0),
+              padding: effectiveTheme.iconPadding ??
+                  const EdgeInsets.only(left: 8.0),
               child: SizedBox(
                 height: effectiveIconSize,
                 child: Center(
