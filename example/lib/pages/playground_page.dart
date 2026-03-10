@@ -3,7 +3,7 @@ import 'package:flutter_dropdown_button/flutter_dropdown_button.dart';
 
 import '../data/style_presets.dart';
 
-enum DropdownType { textOnly, dynamic, basic }
+enum DropdownType { text, custom }
 
 class PlaygroundPage extends StatefulWidget {
   const PlaygroundPage({super.key});
@@ -14,7 +14,7 @@ class PlaygroundPage extends StatefulWidget {
 
 class _PlaygroundPageState extends State<PlaygroundPage> {
   // --- Dropdown type ---
-  DropdownType _type = DropdownType.textOnly;
+  DropdownType _type = DropdownType.text;
 
   // --- Items ---
   List<String> _items = ['Option 1', 'Option 2', 'Option 3', 'Option 4'];
@@ -35,17 +35,17 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
   double? _minMenuWidth;
   double? _maxMenuWidth;
 
-  // --- TextOnly specific ---
-  double _fixedWidth = 250;
+  // --- Text specific ---
+  double? _fixedWidth = 250;
   String _hint = 'Select an option';
   TextOverflow _overflow = TextOverflow.ellipsis;
   int _maxLines = 1;
   TextAlign _textAlign = TextAlign.start;
 
-  // --- Dynamic specific ---
+  // --- Width constraints ---
   double? _minWidth;
   double? _maxWidth = 300;
-  bool _disableWhenSingleItem = true;
+  bool _disableWhenSingleItem = false;
   bool _hideIconWhenSingleItem = true;
   bool _showLeading = false;
   double _leadingSize = 14;
@@ -142,15 +142,8 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
           _sectionTitle('Dropdown Type'),
           SegmentedButton<DropdownType>(
             segments: const [
-              ButtonSegment(
-                value: DropdownType.textOnly,
-                label: Text('TextOnly'),
-              ),
-              ButtonSegment(
-                value: DropdownType.dynamic,
-                label: Text('Dynamic'),
-              ),
-              ButtonSegment(value: DropdownType.basic, label: Text('Basic')),
+              ButtonSegment(value: DropdownType.text, label: Text('Text')),
+              ButtonSegment(value: DropdownType.custom, label: Text('Custom')),
             ],
             selected: {_type},
             onSelectionChanged: (v) => setState(() {
@@ -229,33 +222,21 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
           const SizedBox(height: 20),
 
           // --- Type-specific ---
-          if (_type == DropdownType.textOnly) ..._buildTextOnlySettings(),
-          if (_type == DropdownType.dynamic) ..._buildDynamicSettings(),
-          if (_type == DropdownType.textOnly || _type == DropdownType.dynamic)
-            ..._buildTextConfigSettings(),
+          if (_type == DropdownType.text) ..._buildTextSettings(),
+          if (_type == DropdownType.text) ..._buildTextConfigSettings(),
         ],
       ),
     );
   }
 
-  List<Widget> _buildTextOnlySettings() {
+  List<Widget> _buildTextSettings() {
     return [
-      _sectionTitle('TextOnly Settings'),
-      _sliderRow(
-        'width (required)',
+      _sectionTitle('Text Settings'),
+      _buildOptionalDouble(
+        'width (fixed)',
         _fixedWidth,
-        80,
-        400,
         (v) => setState(() => _fixedWidth = v),
       ),
-      _buildHintField(),
-      const SizedBox(height: 20),
-    ];
-  }
-
-  List<Widget> _buildDynamicSettings() {
-    return [
-      _sectionTitle('Dynamic Settings'),
       _buildOptionalDouble(
         'minWidth',
         _minWidth,
@@ -342,7 +323,7 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
                     ),
                   ),
                   const SizedBox(height: 24),
-                  if (_type == DropdownType.dynamic && _expand)
+                  if (_type == DropdownType.text && _expand)
                     Row(children: [_buildDropdown()])
                   else
                     _buildDropdown(),
@@ -388,31 +369,12 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
         : null;
 
     switch (_type) {
-      case DropdownType.textOnly:
-        return TextOnlyDropdownButton(
+      case DropdownType.text:
+        return FlutterDropdownButton<String>.text(
           items: _items,
           value: _selectedValue,
           hint: _hint,
           width: _fixedWidth,
-          height: _height,
-          itemHeight: _itemHeight,
-          enabled: _enabled,
-          scrollToSelectedItem: _scrollToSelected,
-          animationDuration: Duration(milliseconds: _animationMs),
-          theme: theme,
-          config: config,
-          trailing: trailing,
-          minMenuWidth: _minMenuWidth,
-          maxMenuWidth: _maxMenuWidth,
-          menuAlignment: _menuAlignment,
-          onChanged: (v) => setState(() => _selectedValue = v),
-        );
-
-      case DropdownType.dynamic:
-        return DynamicTextBaseDropdownButton(
-          items: _items,
-          value: _selectedValue,
-          hint: _hint,
           minWidth: _minWidth,
           maxWidth: _maxWidth,
           height: _height,
@@ -438,13 +400,11 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
           onChanged: (v) => setState(() => _selectedValue = v),
         );
 
-      case DropdownType.basic:
-        return BasicDropdownButton<String>(
-          items: _items
-              .map((item) => DropdownItem(value: item, child: Text(item)))
-              .toList(),
+      case DropdownType.custom:
+        return FlutterDropdownButton<String>(
+          items: _items,
           value: _selectedValue,
-          hint: const Text('Select an option'),
+          hintWidget: const Text('Select an option'),
           height: _height,
           itemHeight: _itemHeight,
           enabled: _enabled,
@@ -455,6 +415,7 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
           minMenuWidth: _minMenuWidth,
           maxMenuWidth: _maxMenuWidth,
           menuAlignment: _menuAlignment,
+          itemBuilder: (item, isSelected) => Text(item),
           onChanged: (v) => setState(() => _selectedValue = v),
         );
     }

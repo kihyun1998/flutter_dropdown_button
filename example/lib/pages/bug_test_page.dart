@@ -169,7 +169,7 @@ class _DropdownBugTestPageState extends State<DropdownBugTestPage> {
                 // Dropdown for testing
                 ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 300),
-                  child: TextOnlyDropdownButton(
+                  child: FlutterDropdownButton<String>.text(
                     items: _items,
                     value: _selectedValue,
                     hint: 'Select an option',

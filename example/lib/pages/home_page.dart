@@ -81,48 +81,18 @@ class _MyHomePageState extends State<MyHomePage> {
     'Multi-line option with\nexplicit line breaks',
   ];
 
-  final List<DropdownItem<String>> iconItems = [
-    const DropdownItem(
-      value: 'home',
-      child: Row(
-        children: [
-          Icon(Icons.home, size: 20),
-          SizedBox(width: 8),
-          Text('Home'),
-        ],
-      ),
-    ),
-    const DropdownItem(
-      value: 'settings',
-      child: Row(
-        children: [
-          Icon(Icons.settings, size: 20),
-          SizedBox(width: 8),
-          Text('Settings'),
-        ],
-      ),
-    ),
-    const DropdownItem(
-      value: 'profile',
-      child: Row(
-        children: [
-          Icon(Icons.person, size: 20),
-          SizedBox(width: 8),
-          Text('Profile'),
-        ],
-      ),
-    ),
-    const DropdownItem(
-      value: 'notifications',
-      child: Row(
-        children: [
-          Icon(Icons.notifications, size: 20),
-          SizedBox(width: 8),
-          Text('Notifications'),
-        ],
-      ),
-    ),
+  final List<String> iconItemValues = [
+    'home',
+    'settings',
+    'profile',
+    'notifications',
   ];
+  static const _iconItemData = {
+    'home': (Icons.home, 'Home'),
+    'settings': (Icons.settings, 'Settings'),
+    'profile': (Icons.person, 'Profile'),
+    'notifications': (Icons.notifications, 'Notifications'),
+  };
 
   final List<String> countries = [
     'United States',
@@ -235,7 +205,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           selectedStyle: basicTextStyle,
                           onStyleChanged: (style) =>
                               setState(() => basicTextStyle = style),
-                          demoDropdown: TextOnlyDropdownButton(
+                          demoDropdown: FlutterDropdownButton<String>.text(
                             items: basicItems,
                             value: basicValue,
                             hint: 'Select an option',
@@ -251,7 +221,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           selectedStyle: longTextStyle,
                           onStyleChanged: (style) =>
                               setState(() => longTextStyle = style),
-                          demoDropdown: TextOnlyDropdownButton(
+                          demoDropdown: FlutterDropdownButton<String>.text(
                             items: longTextItems,
                             value: longTextValue,
                             hint: 'Select long text option',
@@ -272,7 +242,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           selectedStyle: tooltipBasicStyle,
                           onStyleChanged: (style) =>
                               setState(() => tooltipBasicStyle = style),
-                          demoDropdown: TextOnlyDropdownButton(
+                          demoDropdown: FlutterDropdownButton<String>.text(
                             items: longTextItems,
                             value: tooltipBasicValue,
                             hint: 'Hover to see tooltip',
@@ -293,7 +263,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           selectedStyle: tooltipCustomStyle,
                           onStyleChanged: (style) =>
                               setState(() => tooltipCustomStyle = style),
-                          demoDropdown: TextOnlyDropdownButton(
+                          demoDropdown: FlutterDropdownButton<String>.text(
                             items: longTextItems,
                             value: tooltipCustomValue,
                             hint: 'Styled tooltip demo',
@@ -338,7 +308,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           selectedStyle: multiLineStyle,
                           onStyleChanged: (style) =>
                               setState(() => multiLineStyle = style),
-                          demoDropdown: TextOnlyDropdownButton(
+                          demoDropdown: FlutterDropdownButton<String>.text(
                             items: multiLineItems,
                             value: multiLineValue,
                             hint: 'Multi-line demo',
@@ -360,12 +330,22 @@ class _MyHomePageState extends State<MyHomePage> {
                           selectedStyle: iconTextStyle,
                           onStyleChanged: (style) =>
                               setState(() => iconTextStyle = style),
-                          demoDropdown: BasicDropdownButton<String>(
-                            items: iconItems,
+                          demoDropdown: FlutterDropdownButton<String>(
+                            items: iconItemValues,
                             value: iconValue,
-                            hint: const Text('Choose option'),
+                            hintWidget: const Text('Choose option'),
                             maxWidth: 280,
                             theme: _getTheme(iconTextStyle),
+                            itemBuilder: (item, isSelected) {
+                              final data = _iconItemData[item]!;
+                              return Row(
+                                children: [
+                                  Icon(data.$1, size: 20),
+                                  const SizedBox(width: 8),
+                                  Text(data.$2),
+                                ],
+                              );
+                            },
                             onChanged: (value) =>
                                 setState(() => iconValue = value),
                           ),
@@ -377,7 +357,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           selectedStyle: scrollListStyle,
                           onStyleChanged: (style) =>
                               setState(() => scrollListStyle = style),
-                          demoDropdown: TextOnlyDropdownButton(
+                          demoDropdown: FlutterDropdownButton<String>.text(
                             items: countries,
                             value: scrollValue,
                             hint: 'Select a country',
@@ -408,7 +388,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           selectedStyle: centerAlignStyle,
                           onStyleChanged: (style) =>
                               setState(() => centerAlignStyle = style),
-                          demoDropdown: TextOnlyDropdownButton(
+                          demoDropdown: FlutterDropdownButton<String>.text(
                             items: basicItems,
                             value: centerValue,
                             hint: 'Center aligned',
@@ -428,7 +408,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           selectedStyle: fixedWidthStyle,
                           onStyleChanged: (style) =>
                               setState(() => fixedWidthStyle = style),
-                          demoDropdown: TextOnlyDropdownButton(
+                          demoDropdown: FlutterDropdownButton<String>.text(
                             items: mixedLengthItems,
                             value: fixedWidthValue,
                             hint: 'Select any length',
@@ -448,7 +428,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           selectedStyle: darkModeStyle,
                           onStyleChanged: (style) =>
                               setState(() => darkModeStyle = style),
-                          demoDropdown: TextOnlyDropdownButton(
+                          demoDropdown: FlutterDropdownButton<String>.text(
                             items: basicItems,
                             value: darkModeValue,
                             hint: 'Select option',
@@ -469,7 +449,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           selectedStyle: customIconStyle,
                           onStyleChanged: (style) =>
                               setState(() => customIconStyle = style),
-                          demoDropdown: TextOnlyDropdownButton(
+                          demoDropdown: FlutterDropdownButton<String>.text(
                             items: basicItems,
                             value: customIconValue,
                             hint: 'Custom icon demo',
@@ -485,7 +465,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           selectedStyle: disabledStyle,
                           onStyleChanged: (style) =>
                               setState(() => disabledStyle = style),
-                          demoDropdown: TextOnlyDropdownButton(
+                          demoDropdown: FlutterDropdownButton<String>.text(
                             items: basicItems,
                             value: disabledValue,
                             hint: 'Disabled state',
@@ -504,7 +484,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           selectedStyle: basicValue,
                           onStyleChanged: (style) =>
                               setState(() => basicValue = style),
-                          demoDropdown: TextOnlyDropdownButton(
+                          demoDropdown: FlutterDropdownButton<String>.text(
                             items: basicItems,
                             value: basicValue,
                             hint: 'Custom trailing',
@@ -527,43 +507,56 @@ class _MyHomePageState extends State<MyHomePage> {
                           ),
                         ),
                         _buildFeatureCard(
-                          title: 'Basic Separator',
-                          description: 'Default divider between dropdown items',
+                          title: 'Item Border Separator',
+                          description: 'Border between dropdown items',
                           selectedStyle: separatorBasicStyle,
                           onStyleChanged: (style) =>
                               setState(() => separatorBasicStyle = style),
-                          demoDropdown: TextOnlyDropdownButton(
+                          demoDropdown: FlutterDropdownButton<String>.text(
                             items: basicItems,
                             value: separatorBasicValue,
                             hint: 'With separator',
                             width: 280,
-                            showSeparator: true,
-                            theme: _getTheme(separatorBasicStyle),
+                            theme: _getTheme(separatorBasicStyle).copyWith(
+                              dropdown: _getTheme(separatorBasicStyle).dropdown
+                                  .copyWith(
+                                    itemBorder: const Border(
+                                      bottom: BorderSide(
+                                        color: Colors.grey,
+                                        width: 0.5,
+                                      ),
+                                    ),
+                                    excludeLastItemBorder: true,
+                                  ),
+                            ),
                             onChanged: (value) =>
                                 setState(() => separatorBasicValue = value),
                           ),
                         ),
                         _buildFeatureCard(
-                          title: 'Custom Separator',
+                          title: 'Custom Item Border',
                           description:
-                              'Custom styled separator with color and thickness',
+                              'Custom styled border with color and thickness',
                           selectedStyle: separatorCustomStyle,
                           onStyleChanged: (style) =>
                               setState(() => separatorCustomStyle = style),
-                          demoDropdown: TextOnlyDropdownButton(
+                          demoDropdown: FlutterDropdownButton<String>.text(
                             items: countries.take(8).toList(),
                             value: separatorCustomValue,
                             hint: 'Custom separator',
                             width: 280,
-                            showSeparator: true,
-                            separator: Divider(
-                              height: 8,
-                              thickness: 2,
-                              color: Colors.deepPurple.shade200,
-                              indent: 16,
-                              endIndent: 16,
+                            theme: _getTheme(separatorCustomStyle).copyWith(
+                              dropdown: _getTheme(separatorCustomStyle).dropdown
+                                  .copyWith(
+                                    itemBorder: Border(
+                                      bottom: BorderSide(
+                                        color: Colors.deepPurple.shade200,
+                                        width: 2,
+                                      ),
+                                    ),
+                                    excludeLastItemBorder: true,
+                                  ),
                             ),
-                            theme: _getTheme(separatorCustomStyle),
                             onChanged: (value) =>
                                 setState(() => separatorCustomValue = value),
                           ),
@@ -575,7 +568,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           selectedStyle: minWidthLeftStyle,
                           onStyleChanged: (style) =>
                               setState(() => minWidthLeftStyle = style),
-                          demoDropdown: TextOnlyDropdownButton(
+                          demoDropdown: FlutterDropdownButton<String>.text(
                             items: basicItems,
                             value: minWidthLeftValue,
                             hint: 'Narrow button',
@@ -594,7 +587,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           selectedStyle: minWidthCenterStyle,
                           onStyleChanged: (style) =>
                               setState(() => minWidthCenterStyle = style),
-                          demoDropdown: TextOnlyDropdownButton(
+                          demoDropdown: FlutterDropdownButton<String>.text(
                             items: basicItems,
                             value: minWidthCenterValue,
                             hint: 'Narrow button',
@@ -613,7 +606,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           selectedStyle: minWidthRightStyle,
                           onStyleChanged: (style) =>
                               setState(() => minWidthRightStyle = style),
-                          demoDropdown: TextOnlyDropdownButton(
+                          demoDropdown: FlutterDropdownButton<String>.text(
                             items: basicItems,
                             value: minWidthRightValue,
                             hint: 'Narrow button',
@@ -631,7 +624,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           selectedStyle: maxWidthStyle,
                           onStyleChanged: (style) =>
                               setState(() => maxWidthStyle = style),
-                          demoDropdown: TextOnlyDropdownButton(
+                          demoDropdown: FlutterDropdownButton<String>.text(
                             items: longTextItems,
                             value: maxWidthValue,
                             hint: 'Very long text with limits',
@@ -653,7 +646,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           selectedStyle: combinedWidthStyle,
                           onStyleChanged: (style) =>
                               setState(() => combinedWidthStyle = style),
-                          demoDropdown: TextOnlyDropdownButton(
+                          demoDropdown: FlutterDropdownButton<String>.text(
                             items: mixedLengthItems,
                             value: combinedWidthValue,
                             hint: 'Flexible menu',
@@ -718,7 +711,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   style: TextStyle(fontSize: 12, color: Colors.grey[700]),
                 ),
                 const SizedBox(width: 8),
-                TextOnlyDropdownButton(
+                FlutterDropdownButton<String>.text(
                   items: stylePresets.map((s) => s.name).toList(),
                   value: selectedStyle,
                   hint: 'Select style',
@@ -778,7 +771,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   style: TextStyle(fontSize: 12, color: Colors.grey[700]),
                 ),
                 const SizedBox(width: 8),
-                TextOnlyDropdownButton(
+                FlutterDropdownButton<String>.text(
                   items: stylePresets.map((s) => s.name).toList(),
                   value: dynamicStyle,
                   hint: 'Select style',
@@ -949,11 +942,13 @@ class _MyHomePageState extends State<MyHomePage> {
             const SizedBox(height: 16),
             // Demo dropdown
             Builder(
-              builder: (context) => DynamicTextBaseDropdownButton(
+              builder: (context) => FlutterDropdownButton<String>.text(
                 items: dynamicItems,
                 value: dynamicValue,
                 hint: 'Select option',
                 maxWidth: MediaQuery.of(context).size.width * 0.45,
+                disableWhenSingleItem: true,
+                hideIconWhenSingleItem: true,
                 theme: _getTheme(dynamicStyle),
                 config: const TextDropdownConfig(
                   overflow: TextOverflow.ellipsis,
@@ -968,7 +963,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   color: Colors.blue,
                 ),
                 leadingPadding: const EdgeInsets.only(right: 8.0),
-                // Custom trailing widget (rotates on multi-item, static on single-item)
+                // Custom trailing widget
                 trailing: Container(
                   padding: const EdgeInsets.all(4),
                   decoration: BoxDecoration(

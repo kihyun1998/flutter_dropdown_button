@@ -1,24 +1,25 @@
 # Flutter Dropdown Button
 
-A highly customizable dropdown package for Flutter with overlay-based rendering, smooth animations, and specialized variants for different content types.
+A highly customizable dropdown package for Flutter with overlay-based rendering, smooth animations, and full control over appearance and behavior — all in a single widget.
 
 [![pub package](https://img.shields.io/pub/v/flutter_dropdown_button.svg)](https://pub.dev/packages/flutter_dropdown_button)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## Features
 
-- 🎨 **Highly Customizable**: Complete control over appearance and behavior
-- 📱 **Overlay-based Rendering**: Better positioning and visual effects
-- ✨ **Smooth Animations**: Scale and fade effects with configurable timing
-- 🎯 **Outside-tap Dismissal**: Automatic closure when tapping outside
-- 📏 **Dynamic Width**: Fixed, min/max width constraints, or content-based sizing
-- 📐 **Independent Menu Width**: Set menu width separately from button with min/max constraints and alignment control
-- 📝 **Text Overflow Control**: Ellipsis, fade, clip, or visible overflow options
-- 🎭 **Multiple Variants**: Generic BasicDropdownButton and specialized TextOnlyDropdownButton
-- 🎨 **Shared Theme System**: Consistent styling across all dropdown variants
-- 📜 **Custom Scrollbar**: Scrollbar theming with colors, thickness, and visibility options
-- 💬 **Smart Tooltip**: Automatic tooltip on overflow with full customization
-- ♿ **Accessibility Support**: Screen reader friendly with proper semantics
+- **Single Unified Widget**: One `FlutterDropdownButton<T>` for all use cases
+- **Two Modes**: Custom widget rendering (default) or text-only (`.text()`)
+- **Overlay-based Rendering**: Better positioning and visual effects than Flutter's built-in DropdownButton
+- **Smart Positioning**: Automatically opens up/down based on available space
+- **Smooth Animations**: Scale and fade effects with configurable timing
+- **Outside-tap Dismissal**: Automatic closure when tapping outside
+- **Flexible Width**: Fixed, min/max constraints, content-based, or flex expansion
+- **Independent Menu Width**: Set menu width separately from button with alignment control
+- **Text Overflow Control**: Ellipsis, fade, clip, or visible overflow options
+- **Smart Tooltip**: Automatic tooltip on overflow with full customization
+- **Custom Scrollbar**: Scrollbar theming with colors, thickness, and visibility
+- **Single-Item Mode**: Auto-disable when only one option exists
+- **Leading Widgets**: Optional icons/widgets before text content
 
 ## Screenshots
 
@@ -33,21 +34,13 @@ A highly customizable dropdown package for Flutter with overlay-based rendering,
   </tr>
 </table>
 
-## Variants
-
-| Variant | Description | Width |
-|---------|-------------|-------|
-| `BasicDropdownButton<T>` | Generic dropdown supporting any widget as items | Fixed, min/max, or content-based |
-| `TextOnlyDropdownButton` | Text-only dropdown with fixed width | **Required** fixed `width` |
-| `DynamicTextBaseDropdownButton` | Text dropdown with dynamic width and single-item mode | Content-based with min/max constraints |
-
 ## Quick Start
 
 Add to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  flutter_dropdown_button: ^1.6.1
+  flutter_dropdown_button: ^2.0.0
 ```
 
 Import the package:
@@ -58,67 +51,64 @@ import 'package:flutter_dropdown_button/flutter_dropdown_button.dart';
 
 ## Basic Usage
 
-### BasicDropdownButton
+### Text Dropdown (Fixed Width)
 
 ```dart
-BasicDropdownButton<String>(
-  items: [
-    DropdownItem(
-      value: 'apple',
-      child: Row(
-        children: [
-          Icon(Icons.apple),
-          SizedBox(width: 8),
-          Text('Apple'),
-        ],
-      ),
-      onTap: () => print('Apple selected!'),
-    ),
-    DropdownItem(
-      value: 'banana',
-      child: Text('Banana'),
-    ),
-  ],
+FlutterDropdownButton<String>.text(
+  items: ['Apple', 'Banana', 'Cherry'],
   value: selectedValue,
-  hint: Text('Select a fruit'),
+  hint: 'Select a fruit',
+  width: 200,
   onChanged: (value) {
     setState(() => selectedValue = value);
   },
 )
 ```
 
-### TextOnlyDropdownButton
+### Text Dropdown (Dynamic Width)
 
 ```dart
-TextOnlyDropdownButton(
-  items: ['Short', 'Medium length text', 'Very long text that overflows'],
-  value: selectedText,
-  hint: 'Select an option',
-  width: 200,
-  config: TextDropdownConfig(
-    overflow: TextOverflow.ellipsis,
-    maxLines: 1,
-  ),
+FlutterDropdownButton<String>.text(
+  items: ['Apple', 'Banana', 'Cherry'],
+  value: selectedValue,
+  hint: 'Select a fruit',
+  minWidth: 120,
+  maxWidth: 300,
   onChanged: (value) {
-    setState(() => selectedText = value);
+    setState(() => selectedValue = value);
   },
 )
 ```
 
-### DynamicTextBaseDropdownButton
+### Custom Widget Dropdown
 
 ```dart
-DynamicTextBaseDropdownButton(
-  items: availableOptions,  // Adapts behavior based on item count
+FlutterDropdownButton<String>(
+  items: ['home', 'settings', 'profile'],
   value: selectedValue,
-  hint: 'Select an option',
-  minWidth: 120,
-  maxWidth: 300,
-  leading: Icon(Icons.star, size: 20),
-  selectedLeading: Icon(Icons.star, size: 20, color: Colors.blue),
-  config: TextDropdownConfig(
-    overflow: TextOverflow.ellipsis,
-    maxLines: 1,
+  hintWidget: Text('Choose option'),
+  itemBuilder: (item, isSelected) => Row(
+    children: [
+      Icon(_getIcon(item), size: 20),
+      SizedBox(width: 8),
+      Text(item),
+    ],
+  ),
+  onChanged: (value) {
+    setState(() => selectedValue = value);
+  },
+)
+```
+
+### Custom Selected Display
+
+```dart
+FlutterDropdownButton<String>(
+  items: ['apple', 'banana'],
+  value: selectedValue,
+  itemBuilder: (item, isSelected) => Text(item),
+  selectedBuilder: (item) => Text(item.toUpperCase(),
+    style: TextStyle(fontWeight: FontWeight.bold),
   ),
   onChanged: (value) {
     setState(() => selectedValue = value);
@@ -130,19 +120,38 @@ DynamicTextBaseDropdownButton(
 
 ## API Reference
 
-### BasicDropdownButton\<T\>
+### FlutterDropdownButton\<T\>
 
-Generic dropdown supporting any widget as items.
+The unified dropdown widget. Use the default constructor for custom widget rendering, or `.text()` for text-only content.
+
+#### Custom Mode (Default Constructor)
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
-| **`items`** | `List<DropdownItem<T>>` | **required** | List of items to display |
+| **`items`** | `List<T>` | **required** | List of item values |
 | **`onChanged`** | `ValueChanged<T?>` | **required** | Called when an item is selected |
+| **`itemBuilder`** | `Widget Function(T, bool)` | **required** | Builds widget for each item (`item`, `isSelected`) |
+| `selectedBuilder` | `Widget Function(T)?` | `null` | Builds widget for selected item on button face (falls back to `itemBuilder`) |
+| `hintWidget` | `Widget?` | `null` | Widget shown when no item is selected |
+
+#### Text Mode (.text Constructor)
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| **`items`** | `List<T>` | **required** | List of string items |
+| **`onChanged`** | `ValueChanged<T?>` | **required** | Called when an item is selected |
+| `hint` | `String?` | `null` | Text shown when no item is selected |
+| `config` | `TextDropdownConfig?` | `null` | Text rendering configuration |
+| `leading` | `Widget?` | `null` | Widget before text in all items |
+| `selectedLeading` | `Widget?` | `null` | Widget before text in selected item (falls back to `leading`) |
+| `leadingPadding` | `EdgeInsets?` | `right: 8.0` | Padding around the leading widget |
+
+#### Common Parameters (Both Modes)
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
 | `value` | `T?` | `null` | Currently selected value |
-| `hint` | `Widget?` | `null` | Widget shown when no item is selected |
-| `borderRadius` | `double` | `8.0` | Border radius for button and overlay |
-| `decoration` | `BoxDecoration?` | `null` | Custom decoration for overlay |
-| `width` | `double?` | `null` | Fixed width of button |
+| `width` | `double?` | `null` | Fixed width (`null` = content-based) |
 | `minWidth` | `double?` | `null` | Minimum width constraint |
 | `maxWidth` | `double?` | `null` | Maximum width constraint |
 | `height` | `double` | `200.0` | Maximum height of dropdown overlay |
@@ -153,81 +162,12 @@ Generic dropdown supporting any widget as items.
 | `trailing` | `Widget?` | `null` | Custom widget replacing default arrow icon |
 | `scrollToSelectedItem` | `bool` | `true` | Auto-scroll to selected item on open |
 | `scrollToSelectedDuration` | `Duration?` | `null` | Scroll animation duration (`null` = instant jump) |
-| `showSeparator` | `bool` | `false` | Show separators between items (**deprecated**, use `DropdownTheme.itemBorder`) |
-| `separator` | `Widget?` | `null` | Custom separator widget (**deprecated**) |
-| `minMenuWidth` | `double?` | `null` | Minimum width of dropdown menu |
-| `maxMenuWidth` | `double?` | `null` | Maximum width of dropdown menu |
-| `menuAlignment` | `MenuAlignment` | `.left` | Menu alignment when wider than button |
-| `theme` | `DropdownStyleTheme?` | `null` | Theme configuration |
-
-### TextOnlyDropdownButton
-
-Text-only dropdown with **required fixed width**.
-
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| **`items`** | `List<String>` | **required** | List of text options |
-| **`onChanged`** | `ValueChanged<String?>` | **required** | Called when an item is selected |
-| **`width`** | `double` | **required** | Fixed width of dropdown |
-| `value` | `String?` | `null` | Currently selected value |
-| `hint` | `String?` | `null` | Text shown when no item is selected |
-| `config` | `TextDropdownConfig?` | `null` | Text rendering configuration |
-| `height` | `double` | `200.0` | Maximum height of dropdown overlay |
-| `itemHeight` | `double` | `48.0` | Height of each dropdown item |
-| `animationDuration` | `Duration` | `200ms` | Duration of show/hide animation |
-| `enabled` | `bool` | `true` | Whether the dropdown is interactive |
-| `trailing` | `Widget?` | `null` | Custom widget replacing default arrow icon |
-| `scrollToSelectedItem` | `bool` | `true` | Auto-scroll to selected item on open |
-| `scrollToSelectedDuration` | `Duration?` | `null` | Scroll animation duration (`null` = instant jump) |
-| `showSeparator` | `bool` | `false` | **Deprecated**: use `DropdownTheme.itemBorder` |
-| `separator` | `Widget?` | `null` | **Deprecated**: use `DropdownTheme.itemBorder` |
-| `minMenuWidth` | `double?` | `null` | Minimum width of dropdown menu |
-| `maxMenuWidth` | `double?` | `null` | Maximum width of dropdown menu |
-| `menuAlignment` | `MenuAlignment` | `.left` | Menu alignment when wider than button |
-| `theme` | `DropdownStyleTheme?` | `null` | Theme configuration |
-
-### DynamicTextBaseDropdownButton
-
-Text dropdown with **content-based dynamic width** and automatic single-item mode.
-
-When `disableWhenSingleItem` is `true` and the list has only one item, the widget becomes a non-interactive display (no dropdown arrow, auto-selects the only item).
-
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| **`items`** | `List<String>` | **required** | List of text options |
-| **`onChanged`** | `ValueChanged<String?>` | **required** | Called when an item is selected |
-| `value` | `String?` | `null` | Currently selected value |
-| `hint` | `String?` | `null` | Text shown when no item is selected |
-| `config` | `TextDropdownConfig?` | `null` | Text rendering configuration |
-| `minWidth` | `double?` | `null` | Minimum width constraint |
-| `maxWidth` | `double?` | `null` | Maximum width constraint |
-| `height` | `double` | `200.0` | Maximum height of dropdown overlay |
-| `itemHeight` | `double` | `48.0` | Height of each dropdown item |
-| `animationDuration` | `Duration` | `200ms` | Duration of show/hide animation |
-| `enabled` | `bool` | `true` | Whether the dropdown is interactive |
-| `expand` | `bool` | `false` | Expand to fill available space in flex container |
-| `trailing` | `Widget?` | `null` | Custom widget replacing default arrow icon |
-| `disableWhenSingleItem` | `bool` | `true` | Disable dropdown when only one item exists |
+| `disableWhenSingleItem` | `bool` | `false` | Disable dropdown when only one item exists |
 | `hideIconWhenSingleItem` | `bool` | `true` | Hide arrow icon in single-item mode |
-| `leading` | `Widget?` | `null` | Widget displayed before text in all items |
-| `selectedLeading` | `Widget?` | `null` | Widget displayed before text in selected item only |
-| `leadingPadding` | `EdgeInsets?` | `EdgeInsets.only(right: 8.0)` | Padding around the leading widget |
-| `scrollToSelectedItem` | `bool` | `true` | Auto-scroll to selected item on open |
-| `scrollToSelectedDuration` | `Duration?` | `null` | Scroll animation duration (`null` = instant jump) |
 | `minMenuWidth` | `double?` | `null` | Minimum width of dropdown menu |
 | `maxMenuWidth` | `double?` | `null` | Maximum width of dropdown menu |
 | `menuAlignment` | `MenuAlignment` | `.left` | Menu alignment when wider than button |
 | `theme` | `DropdownStyleTheme?` | `null` | Theme configuration |
-
-### DropdownItem\<T\>
-
-Item model for `BasicDropdownButton`.
-
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| **`value`** | `T` | **required** | The value for this item (should be unique) |
-| **`child`** | `Widget` | **required** | Widget to display for this item |
-| `onTap` | `VoidCallback?` | `null` | Additional callback when item is selected |
 
 ### MenuAlignment
 
@@ -279,7 +219,6 @@ Controls general styling for button, overlay, and items.
 | `backgroundColor` | `Color?` | `null` | Overlay background color (falls back to `Theme.cardColor`) |
 | `border` | `Border?` | `null` | Border for button and overlay (falls back to `Theme.dividerColor`) |
 | `shadowColor` | `Color?` | `null` | Overlay shadow color |
-| `animationDuration` | `Duration` | `200ms` | Animation duration |
 
 #### Item Styling
 
@@ -311,14 +250,12 @@ Controls scrollbar appearance inside the dropdown overlay.
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
-| `thickness` | `double?` | `null` | Unified scrollbar thickness (**deprecated**: use `thumbWidth`/`trackWidth`) |
 | `thumbWidth` | `double?` | `null` | Width of the scrollbar thumb |
 | `trackWidth` | `double?` | `null` | Width of the scrollbar track |
 | `radius` | `Radius?` | `null` | Corner radius of scrollbar thumb |
 | `thumbColor` | `Color?` | `null` | Color of the scrollbar thumb |
 | `trackColor` | `Color?` | `null` | Color of the scrollbar track |
 | `trackBorderColor` | `Color?` | `null` | Border color of the scrollbar track |
-| `alwaysVisible` | `bool?` | `null` | Always show scrollbar |
 | `thumbVisibility` | `bool?` | `null` | Show/hide scrollbar thumb |
 | `trackVisibility` | `bool?` | `null` | Show/hide scrollbar track |
 | `interactive` | `bool?` | `null` | Allow dragging the scrollbar thumb |
@@ -331,73 +268,47 @@ Controls scrollbar appearance inside the dropdown overlay.
 
 ### DropdownTooltipTheme
 
-Controls tooltip styling and behavior for text-based dropdowns. Tooltips appear when text overflows.
+Controls tooltip styling and behavior for text-based dropdowns.
 
 #### Visual Styling
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
-| `decoration` | `Decoration?` | `null` | Custom tooltip decoration (overrides individual style properties below) |
+| `decoration` | `Decoration?` | `null` | Custom tooltip decoration |
 | `backgroundColor` | `Color?` | `null` | Tooltip background color |
-| `textColor` | `Color?` | `null` | Tooltip text color (ignored if `textStyle` is set) |
+| `textColor` | `Color?` | `null` | Tooltip text color |
 | `textStyle` | `TextStyle?` | `null` | Tooltip text style (overrides `textColor`) |
 | `borderRadius` | `BorderRadius?` | `null` | Tooltip corner radius |
 | `borderColor` | `Color?` | `null` | Tooltip border color |
-| `borderWidth` | `double?` | `1.0` | Tooltip border width (only if `borderColor` is set) |
+| `borderWidth` | `double?` | `1.0` | Tooltip border width |
 | `shadow` | `List<BoxShadow>?` | `null` | Tooltip shadow |
 | `padding` | `EdgeInsetsGeometry?` | `null` | Padding inside tooltip |
 | `margin` | `EdgeInsetsGeometry?` | `null` | Margin around tooltip |
-| `constraints` | `BoxConstraints?` | `null` | Min/max width/height constraints |
-| `textAlign` | `TextAlign?` | `null` | Tooltip text alignment |
 
 #### Behavior
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
 | `enabled` | `bool` | `true` | Enable/disable tooltip |
-| `mode` | `TooltipMode` | `.onlyWhenOverflow` | When to show tooltip (see below) |
+| `mode` | `TooltipMode` | `.onlyWhenOverflow` | When to show tooltip |
 | `waitDuration` | `Duration` | `500ms` | Delay before showing on hover |
 | `showDuration` | `Duration` | `3s` | How long tooltip stays visible |
-| `exitDuration` | `Duration` | `100ms` | Fade-out duration |
 | `verticalOffset` | `double?` | `null` | Gap between widget and tooltip |
-| `preferBelow` | `bool?` | `null` | Force tooltip below (`null` = auto-calculate) |
-| `enableTapToDismiss` | `bool?` | `true` | Dismiss tooltip by tapping it |
-| `triggerMode` | `TooltipTriggerMode?` | `null` | How tooltip is triggered (hover/long-press/tap) |
-
-#### TooltipMode
-
-| Value | Description |
-|-------|-------------|
-| `TooltipMode.onlyWhenOverflow` | Show only when text is clipped **(default, recommended)** |
-| `TooltipMode.always` | Always show on hover/long-press |
-| `TooltipMode.disabled` | Never show tooltips |
+| `triggerMode` | `TooltipTriggerMode?` | `null` | How tooltip is triggered |
 
 ### TextDropdownConfig
 
-Configuration for text rendering in `TextOnlyDropdownButton` and `DynamicTextBaseDropdownButton`.
+Configuration for text rendering in `.text()` mode.
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
-| `overflow` | `TextOverflow` | `.ellipsis` | How to handle text overflow (`ellipsis`, `fade`, `clip`, `visible`) |
-| `maxLines` | `int?` | `1` | Maximum number of lines (`null` = unlimited) |
+| `overflow` | `TextOverflow` | `.ellipsis` | How to handle text overflow |
+| `maxLines` | `int?` | `1` | Maximum number of lines |
 | `textStyle` | `TextStyle?` | `null` | Style for item text |
 | `hintStyle` | `TextStyle?` | `null` | Style for hint text |
-| `selectedTextStyle` | `TextStyle?` | `null` | Style for selected item text (falls back to `textStyle`) |
+| `selectedTextStyle` | `TextStyle?` | `null` | Style for selected item text |
 | `textAlign` | `TextAlign` | `.start` | Horizontal text alignment |
 | `softWrap` | `bool` | `true` | Allow line breaks at word boundaries |
-| `textDirection` | `TextDirection?` | `null` | Text direction (LTR/RTL) |
-| `locale` | `Locale?` | `null` | Locale for text rendering |
-| `textScaler` | `TextScaler?` | `null` | Text scaling for accessibility |
-| `semanticsLabel` | `String?` | `null` | Semantic label for screen readers |
-
-**Built-in presets:**
-
-| Preset | Description |
-|--------|-------------|
-| `TextDropdownConfig.defaultConfig` | Single-line with ellipsis |
-| `TextDropdownConfig.multiLine` | Unlimited lines, visible overflow, soft wrap |
-| `TextDropdownConfig.centered` | Center-aligned, single-line with ellipsis |
-| `TextDropdownConfig.fadeOverflow` | Single-line with fade overflow |
 
 ---
 
@@ -406,8 +317,10 @@ Configuration for text rendering in `TextOnlyDropdownButton` and `DynamicTextBas
 ### Custom Theme
 
 ```dart
-TextOnlyDropdownButton(
-  // ... other properties
+FlutterDropdownButton<String>.text(
+  items: items,
+  value: selected,
+  width: 200,
   theme: DropdownStyleTheme(
     dropdown: DropdownTheme(
       borderRadius: 12.0,
@@ -415,56 +328,58 @@ TextOnlyDropdownButton(
       backgroundColor: Colors.white,
       selectedItemColor: Colors.blue.withOpacity(0.1),
       itemHoverColor: Colors.grey.withOpacity(0.1),
-      buttonDecoration: BoxDecoration(
-        border: Border.all(color: Colors.blue),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      itemBorder: Border(bottom: BorderSide(color: Colors.grey.shade300, width: 1)),
-      itemMargin: EdgeInsets.symmetric(horizontal: 4),
-      itemBorderRadius: 8.0,
-      overlayPadding: EdgeInsets.symmetric(vertical: 4),
+      itemBorder: Border(bottom: BorderSide(color: Colors.grey.shade300)),
+      excludeLastItemBorder: true,
     ),
     scroll: DropdownScrollTheme(
       thumbWidth: 6.0,
-      trackWidth: 10.0,
       thumbColor: Colors.blue,
-      trackColor: Colors.grey.withOpacity(0.2),
-      trackVisibility: true,
-      interactive: true,
       showScrollGradient: true,
-      gradientHeight: 20.0,
     ),
     tooltip: DropdownTooltipTheme(
       backgroundColor: Colors.black87,
-      textStyle: TextStyle(color: Colors.white, fontSize: 14),
+      textStyle: TextStyle(color: Colors.white),
       borderRadius: BorderRadius.circular(8),
-      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       mode: TooltipMode.onlyWhenOverflow,
-      waitDuration: Duration(milliseconds: 300),
     ),
   ),
+  onChanged: (value) => setState(() => selected = value),
 )
 ```
 
 ### Menu Width & Alignment
 
 ```dart
-TextOnlyDropdownButton(
-  // ... other properties
-  width: 120,              // Button width
-  minMenuWidth: 250,       // Menu minimum width (wider than button)
-  maxMenuWidth: 400,       // Menu maximum width
-  menuAlignment: MenuAlignment.center,  // left (default), center, or right
+FlutterDropdownButton<String>.text(
+  items: items,
+  width: 120,
+  minMenuWidth: 250,
+  maxMenuWidth: 400,
+  menuAlignment: MenuAlignment.center,
+  onChanged: (value) {},
 )
 ```
 
-### Scroll to Selected Item
+### Single-Item Mode
 
 ```dart
-TextOnlyDropdownButton(
-  // ... other properties
-  scrollToSelectedItem: true,                     // Enable (default)
-  scrollToSelectedDuration: Duration(milliseconds: 300),  // Animate (null = instant jump)
+FlutterDropdownButton<String>.text(
+  items: ['Only Option'],
+  disableWhenSingleItem: true,
+  hideIconWhenSingleItem: true,
+  onChanged: (value) {},
+)
+```
+
+### Leading Widget
+
+```dart
+FlutterDropdownButton<String>.text(
+  items: ['USD', 'EUR', 'JPY'],
+  leading: Icon(Icons.attach_money, size: 20),
+  selectedLeading: Icon(Icons.attach_money, size: 20, color: Colors.blue),
+  leadingPadding: EdgeInsets.only(right: 12),
+  onChanged: (value) {},
 )
 ```
 
@@ -474,53 +389,21 @@ TextOnlyDropdownButton(
 Row(
   children: [
     Text('Label:'),
-    BasicDropdownButton<String>(
-      expand: true,   // Takes remaining space in Row
+    FlutterDropdownButton<String>.text(
+      items: items,
+      expand: true,
       maxWidth: 200,
-      // ...
+      onChanged: (value) {},
     ),
   ],
-)
-```
-
-### Custom Trailing Icon
-
-```dart
-TextOnlyDropdownButton(
-  trailing: Icon(Icons.expand_more, color: Colors.blue),
-  // ...
-)
-```
-
-### Single-Item Mode (DynamicTextBaseDropdownButton)
-
-```dart
-DynamicTextBaseDropdownButton(
-  items: ['Only Option'],            // Single item
-  disableWhenSingleItem: true,       // Becomes non-interactive (default)
-  hideIconWhenSingleItem: true,      // Hides arrow icon (default)
-  // ...
-)
-```
-
-### Leading Widget (DynamicTextBaseDropdownButton)
-
-```dart
-DynamicTextBaseDropdownButton(
-  items: ['USD', 'EUR', 'JPY'],
-  leading: Icon(Icons.attach_money, size: 20),
-  selectedLeading: Icon(Icons.attach_money, size: 20, color: Colors.blue),
-  leadingPadding: EdgeInsets.only(right: 12),
-  // ...
 )
 ```
 
 ### Manual Dropdown Cleanup
 
 ```dart
-// Close dropdown before navigation
 void navigateToHome() {
-  DropdownMixin.closeAll();
+  FlutterDropdownButton.closeAll();
   Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
 }
 ```
@@ -529,22 +412,91 @@ void navigateToHome() {
 
 ---
 
-## Documentation
+## Migration from 1.x
 
-For detailed documentation and advanced usage examples, see:
+### BasicDropdownButton → FlutterDropdownButton
 
-- [Complete API Reference](documentation/api_reference.md)
-- [Theming Guide](documentation/theming.md)
-- [Text Configuration Guide](documentation/text_configuration.md)
-- [Migration from DropdownButton](documentation/migration.md)
+```dart
+// Before (1.x)
+BasicDropdownButton<String>(
+  items: [
+    DropdownItem(value: 'apple', child: Text('Apple'), onTap: () {}),
+    DropdownItem(value: 'banana', child: Text('Banana')),
+  ],
+  value: selected,
+  hint: Text('Select'),
+  onChanged: (v) {},
+)
+
+// After (2.0)
+FlutterDropdownButton<String>(
+  items: ['apple', 'banana'],
+  value: selected,
+  hintWidget: Text('Select'),
+  itemBuilder: (item, isSelected) => Text(item),
+  onChanged: (v) {},
+)
+```
+
+### TextOnlyDropdownButton → FlutterDropdownButton.text
+
+```dart
+// Before (1.x)
+TextOnlyDropdownButton(
+  items: ['A', 'B', 'C'],
+  value: selected,
+  hint: 'Select',
+  width: 200,
+  onChanged: (v) {},
+)
+
+// After (2.0)
+FlutterDropdownButton<String>.text(
+  items: ['A', 'B', 'C'],
+  value: selected,
+  hint: 'Select',
+  width: 200,
+  onChanged: (v) {},
+)
+```
+
+### DynamicTextBaseDropdownButton → FlutterDropdownButton.text
+
+```dart
+// Before (1.x)
+DynamicTextBaseDropdownButton(
+  items: items,
+  value: selected,
+  disableWhenSingleItem: true,
+  leading: Icon(Icons.star),
+  onChanged: (v) {},
+)
+
+// After (2.0)
+FlutterDropdownButton<String>.text(
+  items: items,
+  value: selected,
+  disableWhenSingleItem: true,
+  leading: Icon(Icons.star),
+  onChanged: (v) {},
+)
+```
+
+### Removed APIs
+
+| Removed | Replacement |
+|---------|-------------|
+| `DropdownItem<T>` | `itemBuilder` callback |
+| `showSeparator` / `separator` | `DropdownTheme.itemBorder` |
+| `BasicDropdownButton.borderRadius` | `DropdownTheme.borderRadius` |
+| `BasicDropdownButton.decoration` | `DropdownTheme.overlayDecoration` |
+| `DropdownItem.onTap` | Handle in `onChanged` callback |
+
+---
 
 ## Example
 
 Check out the [example app](example/) for a comprehensive demonstration of all features and customization options.
-
-## Contributing
-
-Contributions are welcome! Please read our [Contributing Guide](CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests.
 
 ## License
 

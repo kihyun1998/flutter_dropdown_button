@@ -1,5 +1,22 @@
 # Changelog
 
+## 2.0.0
+
+* **BREAKING**: Unified all dropdown variants into a single `FlutterDropdownButton<T>` widget
+* **BREAKING**: Removed `BasicDropdownButton`, `TextOnlyDropdownButton`, `DynamicTextBaseDropdownButton` (use `FlutterDropdownButton` and `FlutterDropdownButton.text` instead)
+* **BREAKING**: Removed `DropdownItem<T>` model class (use `itemBuilder` callback instead)
+* **BREAKING**: Removed `BaseDropdownButton` and `BaseDropdownButtonState` (no longer needed as public API)
+* **BREAKING**: Removed `TextDropdownRenderMixin` (absorbed into `FlutterDropdownButton`)
+* **BREAKING**: Removed deprecated `showSeparator` and `separator` parameters (use `DropdownTheme.itemBorder` instead)
+* **FEAT**: `FlutterDropdownButton<T>()` default constructor with `itemBuilder` for custom widget rendering (replaces `BasicDropdownButton`)
+* **FEAT**: `FlutterDropdownButton<T>.text()` named constructor for text-only dropdowns (replaces both `TextOnlyDropdownButton` and `DynamicTextBaseDropdownButton`)
+* **FEAT**: `width` is now optional in text mode — omit for content-based dynamic width, provide for fixed width
+* **FEAT**: All features (leading, disableWhenSingleItem, expand, etc.) available in a single widget
+* **FEAT**: `FlutterDropdownButton.closeAll()` static method for manual dropdown cleanup
+* **MIGRATION**: `BasicDropdownButton(items: [DropdownItem(value: v, child: w)])` → `FlutterDropdownButton(items: [v], itemBuilder: (item, isSelected) => w)`
+* **MIGRATION**: `TextOnlyDropdownButton(items: items, width: 200)` → `FlutterDropdownButton.text(items: items, width: 200)`
+* **MIGRATION**: `DynamicTextBaseDropdownButton(items: items)` → `FlutterDropdownButton.text(items: items, disableWhenSingleItem: true)`
+
 ## 1.6.1
 
 * **FIX**: Removed disabled opacity override that forced 0.6 opacity on single-item dropdowns, preserving original button styling
