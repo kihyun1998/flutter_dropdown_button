@@ -409,8 +409,7 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
                 item.length > 20 ? '${item.substring(0, 20)}…' : item,
                 style: TextStyle(
                   fontSize: 10,
-                  fontWeight:
-                      isSelected ? FontWeight.bold : FontWeight.normal,
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                 ),
               ),
               backgroundColor: isSelected ? Colors.blue.shade100 : null,
@@ -510,10 +509,7 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
                       value: MenuAlignment.center,
                       label: Text('C'),
                     ),
-                    ButtonSegment(
-                      value: MenuAlignment.right,
-                      label: Text('R'),
-                    ),
+                    ButtonSegment(value: MenuAlignment.right, label: Text('R')),
                   ],
                   selected: {_menuAlignment},
                   onSelectionChanged: (v) =>
@@ -710,18 +706,12 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
               Expanded(
                 child: SegmentedButton<TextAlign>(
                   segments: const [
-                    ButtonSegment(
-                      value: TextAlign.start,
-                      label: Text('start'),
-                    ),
+                    ButtonSegment(value: TextAlign.start, label: Text('start')),
                     ButtonSegment(
                       value: TextAlign.center,
                       label: Text('center'),
                     ),
-                    ButtonSegment(
-                      value: TextAlign.end,
-                      label: Text('end'),
-                    ),
+                    ButtonSegment(value: TextAlign.end, label: Text('end')),
                   ],
                   selected: {_textAlign},
                   onSelectionChanged: (v) =>
@@ -731,11 +721,7 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
             ],
           ),
         ),
-        _switchRow(
-          'softWrap',
-          _softWrap,
-          (v) => setState(() => _softWrap = v),
-        ),
+        _switchRow('softWrap', _softWrap, (v) => setState(() => _softWrap = v)),
       ],
     );
   }
@@ -1063,10 +1049,7 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
         'DropdownTooltipTheme',
         style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
       ),
-      subtitle: const Text(
-        'text type only',
-        style: TextStyle(fontSize: 11),
-      ),
+      subtitle: const Text('text type only', style: TextStyle(fontSize: 11)),
       initiallyExpanded: false,
       childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
       children: [
@@ -1088,10 +1071,7 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
                   segments: const [
                     ButtonSegment(
                       value: TooltipMode.onlyWhenOverflow,
-                      label: Text(
-                        'overflow',
-                        style: TextStyle(fontSize: 10),
-                      ),
+                      label: Text('overflow', style: TextStyle(fontSize: 10)),
                     ),
                     ButtonSegment(
                       value: TooltipMode.always,
@@ -1103,8 +1083,7 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
                     ),
                   ],
                   selected: {_dttMode},
-                  onSelectionChanged: (v) =>
-                      setState(() => _dttMode = v.first),
+                  onSelectionChanged: (v) => setState(() => _dttMode = v.first),
                 ),
               ),
             ],
@@ -1175,18 +1154,12 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
                   const SizedBox(height: 16),
                   Text(
                     'Selected: ${_selectedValue ?? '(none)'}',
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: Colors.grey.shade700,
-                    ),
+                    style: TextStyle(fontSize: 13, color: Colors.grey.shade700),
                   ),
                   const SizedBox(height: 8),
                   Text(
                     'Items: ${_items.length}',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.grey.shade500,
-                    ),
+                    style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
                   ),
                 ],
               ),
@@ -1381,7 +1354,8 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
             child: Text(label, style: const TextStyle(fontSize: 12)),
           ),
           GestureDetector(
-            onTap: () => _showColorPicker(value, onChange, solidOnly: solidOnly),
+            onTap: () =>
+                _showColorPicker(value, onChange, solidOnly: solidOnly),
             child: Container(
               width: 32,
               height: 22,
@@ -1523,8 +1497,7 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
                         width: 36,
                         height: 36,
                         decoration: BoxDecoration(
-                          color:
-                              isSelected ? Colors.blue.shade50 : null,
+                          color: isSelected ? Colors.blue.shade50 : null,
                           border: Border.all(
                             color: isSelected
                                 ? Colors.blue
@@ -1535,10 +1508,7 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
                         ),
                         child: Center(
                           child: icon == null
-                              ? const Text(
-                                  'def',
-                                  style: TextStyle(fontSize: 9),
-                                )
+                              ? const Text('def', style: TextStyle(fontSize: 9))
                               : Icon(icon, size: 18),
                         ),
                       ),
