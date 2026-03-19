@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.1.0
+
+* **FEAT**: `TextDropdownConfig.textAlign` now controls item alignment in the dropdown menu and button (previously hardcoded to left-align)
+* **FEAT**: Supports `TextAlign.center`, `TextAlign.end`, `TextAlign.right` for both menu items and selected value display
+
 ## 2.0.0
 
 * **BREAKING**: Unified all dropdown variants into a single `FlutterDropdownButton<T>` widget

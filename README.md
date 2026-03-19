@@ -40,7 +40,7 @@ Add to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  flutter_dropdown_button: ^2.0.0
+  flutter_dropdown_button: ^2.1.0
 ```
 
 Import the package:
@@ -307,7 +307,7 @@ Configuration for text rendering in `.text()` mode.
 | `textStyle` | `TextStyle?` | `null` | Style for item text |
 | `hintStyle` | `TextStyle?` | `null` | Style for hint text |
 | `selectedTextStyle` | `TextStyle?` | `null` | Style for selected item text |
-| `textAlign` | `TextAlign` | `.start` | Horizontal text alignment |
+| `textAlign` | `TextAlign` | `.start` | Horizontal text alignment (also controls item alignment in menu) |
 | `softWrap` | `bool` | `true` | Allow line breaks at word boundaries |
 
 ---

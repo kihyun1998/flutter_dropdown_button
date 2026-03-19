@@ -477,11 +477,15 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
               height: effectiveContentHeight,
               child: widget.width != null || widget.expand
                   ? Container(
-                      alignment: Alignment.centerLeft,
+                      alignment: widget.isTextMode
+                          ? _alignmentFromTextAlign(_textConfig.textAlign)
+                          : Alignment.centerLeft,
                       child: _buildSelectedWidget(),
                     )
                   : Align(
-                      alignment: Alignment.centerLeft,
+                      alignment: widget.isTextMode
+                          ? _alignmentFromTextAlign(_textConfig.textAlign)
+                          : Alignment.centerLeft,
                       widthFactor: 1.0,
                       child: _buildSelectedWidget(),
                     ),
@@ -649,6 +653,9 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
         height - overlayBorderThickness - paddingVertical;
     final totalItemsHeight = items.length * actualItemHeight;
     final needsScroll = totalItemsHeight > availableContentHeight;
+    final itemAlignment = widget.isTextMode
+        ? _alignmentFromTextAlign(_textConfig.textAlign)
+        : Alignment.centerLeft;
 
     Widget content;
 
@@ -677,6 +684,7 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
             isSelected: isSelected,
             isFirst: index == 0,
             isLast: index == items.length - 1,
+            alignment: itemAlignment,
             child: _buildItemWidget(item, isSelected),
           );
         },
@@ -700,6 +708,7 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
             isSelected: isSelected,
             isFirst: index == 0,
             isLast: index == items.length - 1,
+            alignment: itemAlignment,
             child: _buildItemWidget(item, isSelected),
           ),
         );
@@ -718,12 +727,27 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
     return content;
   }
 
+  Alignment _alignmentFromTextAlign(TextAlign textAlign) {
+    switch (textAlign) {
+      case TextAlign.center:
+        return Alignment.center;
+      case TextAlign.right:
+      case TextAlign.end:
+        return Alignment.centerRight;
+      case TextAlign.left:
+      case TextAlign.start:
+      case TextAlign.justify:
+        return Alignment.centerLeft;
+    }
+  }
+
   Widget _buildItemWrapper({
     required T item,
     required bool isSelected,
     required bool isFirst,
     required bool isLast,
     required Widget child,
+    Alignment alignment = Alignment.centerLeft,
   }) {
     return Material(
       color: Colors.transparent,
@@ -761,7 +785,7 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
                   : effectiveTheme.itemBorder,
             ),
             child: Align(
-              alignment: Alignment.centerLeft,
+              alignment: alignment,
               child: child,
             ),
           ),
