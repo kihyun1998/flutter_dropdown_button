@@ -1,158 +1,326 @@
 # Migration Guide
 
-Learn how to migrate from Flutter's built-in DropdownButton to flutter_dropdown_button widgets.
+## Migrating from 1.x to 2.0.0
 
-## Why Migrate?
+Version 2.0.0 unifies all dropdown variants (`BasicDropdownButton`, `TextOnlyDropdownButton`, `DynamicTextBaseDropdownButton`) into a single `FlutterDropdownButton<T>` widget with two modes.
 
-### Limitations of Flutter's DropdownButton
+### What Changed
 
-- Limited customization options
-- Fixed positioning and layout constraints  
-- No built-in animation control
-- Difficulty with text overflow handling
-- Platform-specific rendering issues
-- No overlay-based positioning
+| Removed (1.x) | Replacement (2.0) |
+|---|---|
+| `BasicDropdownButton` | `FlutterDropdownButton<T>()` (default constructor with `itemBuilder`) |
+| `TextOnlyDropdownButton` | `FlutterDropdownButton<T>.text()` |
+| `DynamicTextBaseDropdownButton` | `FlutterDropdownButton<T>.text()` with `disableWhenSingleItem: true` |
+| `DropdownItem<T>` model class | `itemBuilder` callback |
+| `BaseDropdownButton` / `BaseDropdownButtonState` | Internal only (not public API) |
+| `TextDropdownRenderMixin` | Absorbed into `FlutterDropdownButton` |
+| `showSeparator` / `separator` | `DropdownTheme.itemBorder` |
 
-### Benefits of flutter_dropdown_button
+### BasicDropdownButton
 
-- ✅ Complete visual customization
-- ✅ Smooth, configurable animations
-- ✅ Precise text overflow control
-- ✅ Overlay-based positioning
-- ✅ Multiple specialized variants
-- ✅ Consistent cross-platform behavior
-
-## Basic Migration
-
-### From DropdownButton to BasicDropdownButton
-
-**Before (DropdownButton):**
-```dart
-DropdownButton<String>(
-  value: selectedValue,
-  hint: Text('Select an option'),
-  items: [
-    DropdownMenuItem(value: 'apple', child: Text('Apple')),
-    DropdownMenuItem(value: 'banana', child: Text('Banana')),
-    DropdownMenuItem(value: 'orange', child: Text('Orange')),
-  ],
-  onChanged: (value) {
-    setState(() {
-      selectedValue = value;
-    });
-  },
-)
-```
-
-**After (BasicDropdownButton):**
+**Before (1.x):**
 ```dart
 BasicDropdownButton<String>(
-  value: selectedValue,
-  hint: Text('Select an option'),
   items: [
     DropdownItem(value: 'apple', child: Text('Apple')),
     DropdownItem(value: 'banana', child: Text('Banana')),
     DropdownItem(value: 'orange', child: Text('Orange')),
   ],
-  onChanged: (value) {
-    setState(() {
-      selectedValue = value;
-    });
-  },
-)
-```
-
-### From DropdownButton to TextOnlyDropdownButton
-
-**Before (DropdownButton):**
-```dart
-DropdownButton<String>(
   value: selectedValue,
-  hint: Text('Select fruit'),
-  items: [
-    DropdownMenuItem(value: 'apple', child: Text('Apple')),
-    DropdownMenuItem(value: 'banana', child: Text('Banana')),
-  ],
-  onChanged: (value) {
-    setState(() {
-      selectedValue = value;
-    });
-  },
+  hint: Text('Select a fruit'),
+  width: 200,
+  onChanged: (value) => setState(() => selectedValue = value),
 )
 ```
 
-**After (TextOnlyDropdownButton):**
+**After (2.0):**
+```dart
+FlutterDropdownButton<String>(
+  items: ['apple', 'banana', 'orange'],
+  value: selectedValue,
+  hintWidget: Text('Select a fruit'),
+  itemBuilder: (item, isSelected) => Text(
+    item,
+    style: TextStyle(
+      fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+    ),
+  ),
+  onChanged: (value) => setState(() => selectedValue = value),
+)
+```
+
+Key differences:
+- `items` is now `List<T>` (values only), not `List<DropdownItem<T>>`
+- `hint` (Widget) is now `hintWidget`
+- Rendering is handled by `itemBuilder(item, isSelected)` callback
+- Use `selectedBuilder` to customize how the selected item looks on the button face
+- `DropdownItem.onTap` is removed, handle in `onChanged` instead
+
+### TextOnlyDropdownButton
+
+**Before (1.x):**
 ```dart
 TextOnlyDropdownButton(
+  items: ['Apple', 'Banana', 'Cherry'],
   value: selectedValue,
-  hint: 'Select fruit',
-  items: ['Apple', 'Banana'],
-  onChanged: (value) {
-    setState(() {
-      selectedValue = value;
-    });
-  },
+  hint: 'Select a fruit',
+  width: 200,
+  theme: DropdownStyleTheme(
+    dropdown: DropdownTheme(borderRadius: 12.0),
+  ),
+  config: TextDropdownConfig(overflow: TextOverflow.ellipsis),
+  onChanged: (value) => setState(() => selectedValue = value),
 )
 ```
 
-## Migration Mapping
+**After (2.0):**
+```dart
+FlutterDropdownButton<String>.text(
+  items: ['Apple', 'Banana', 'Cherry'],
+  value: selectedValue,
+  hint: 'Select a fruit',
+  width: 200,
+  theme: DropdownStyleTheme(
+    dropdown: DropdownTheme(borderRadius: 12.0),
+  ),
+  config: TextDropdownConfig(overflow: TextOverflow.ellipsis),
+  onChanged: (value) => setState(() => selectedValue = value),
+)
+```
 
-### Constructor Parameters
+Almost identical - just change the class name to `FlutterDropdownButton<String>.text()`.
 
-| DropdownButton | BasicDropdownButton | TextOnlyDropdownButton |
-|---------------|----------------|------------------|
-| `value` | `value` | `value` |
-| `items` | `items` | `items` |
-| `onChanged` | `onChanged` | `onChanged` |
-| `hint` | `hint` | `hint` |
-| `disabledHint` | N/A | N/A (use `enabled: false`) |
-| `elevation` | `decoration` | `theme.elevation` |
-| `style` | N/A | `config.textStyle` |
-| `underline` | N/A | `theme.border` |
-| `icon` | N/A | N/A (always arrow) |
-| `iconSize` | N/A | N/A |
-| `isDense` | `itemHeight` | `itemHeight` |
-| `isExpanded` | `width` | `width` |
-| `itemHeight` | `itemHeight` | `itemHeight` |
-| `focusColor` | `theme.selectedItemColor` | `theme.selectedItemColor` |
-| `autofocus` | N/A | N/A |
-| `dropdownColor` | `decoration` | `theme.backgroundColor` |
-| `borderRadius` | `borderRadius` | `theme.borderRadius` |
-| `enableFeedback` | N/A | N/A |
+### DynamicTextBaseDropdownButton
 
-### DropdownMenuItem vs DropdownItem
+**Before (1.x):**
+```dart
+DynamicTextBaseDropdownButton(
+  items: items,
+  value: selectedValue,
+  disableWhenSingleItem: true,
+  hideIconWhenSingleItem: true,
+  leading: Icon(Icons.star, size: 16),
+  selectedLeading: Icon(Icons.star, size: 16, color: Colors.blue),
+  minWidth: 100,
+  maxWidth: 250,
+  onChanged: (value) => setState(() => selectedValue = value),
+)
+```
+
+**After (2.0):**
+```dart
+FlutterDropdownButton<String>.text(
+  items: items,
+  value: selectedValue,
+  disableWhenSingleItem: true,
+  hideIconWhenSingleItem: true,
+  leading: Icon(Icons.star, size: 16),
+  selectedLeading: Icon(Icons.star, size: 16, color: Colors.blue),
+  minWidth: 100,
+  maxWidth: 250,
+  onChanged: (value) => setState(() => selectedValue = value),
+)
+```
+
+All `DynamicTextBaseDropdownButton` features (`leading`, `disableWhenSingleItem`, `expand`, etc.) are now built into `FlutterDropdownButton.text()`.
+
+> **Important differences from DynamicTextBaseDropdownButton:**
+> 1. `disableWhenSingleItem` default changed from **`true`** → **`false`**. If you relied on the old default, you must explicitly set `disableWhenSingleItem: true`.
+> 2. `width` is optional. Omit it for content-based dynamic width (same as DynamicTextBaseDropdownButton), or provide it for fixed width (same as TextOnlyDropdownButton).
+
+### Custom Widget with Icons
+
+**Before (1.x):**
+```dart
+BasicDropdownButton<String>(
+  items: [
+    DropdownItem(
+      value: 'home',
+      child: Row(
+        children: [
+          Icon(Icons.home, size: 20),
+          SizedBox(width: 8),
+          Text('Home'),
+        ],
+      ),
+    ),
+    DropdownItem(
+      value: 'settings',
+      child: Row(
+        children: [
+          Icon(Icons.settings, size: 20),
+          SizedBox(width: 8),
+          Text('Settings'),
+        ],
+      ),
+    ),
+  ],
+  value: selectedValue,
+  onChanged: (value) => setState(() => selectedValue = value),
+)
+```
+
+**After (2.0):**
+```dart
+FlutterDropdownButton<String>(
+  items: ['home', 'settings'],
+  value: selectedValue,
+  hintWidget: Text('Choose option'),
+  itemBuilder: (item, isSelected) => Row(
+    children: [
+      Icon(
+        item == 'home' ? Icons.home : Icons.settings,
+        size: 20,
+      ),
+      SizedBox(width: 8),
+      Text(item),
+    ],
+  ),
+  onChanged: (value) => setState(() => selectedValue = value),
+)
+```
+
+### Separator → Item Border
+
+**Before (1.x):**
+```dart
+TextOnlyDropdownButton(
+  items: items,
+  showSeparator: true,
+  separator: Divider(height: 1, color: Colors.grey.shade300),
+  // ...
+)
+```
+
+**After (2.0):**
+```dart
+FlutterDropdownButton<String>.text(
+  items: items,
+  theme: DropdownStyleTheme(
+    dropdown: DropdownTheme(
+      itemBorder: Border(
+        bottom: BorderSide(color: Colors.grey.shade300, width: 1),
+      ),
+      excludeLastItemBorder: true,
+    ),
+  ),
+  // ...
+)
+```
+
+### Width Behavior Changes
+
+In 1.x, `TextOnlyDropdownButton` required a fixed `width`, and `DynamicTextBaseDropdownButton` was content-based. In 2.0, `FlutterDropdownButton.text()` handles both:
+
+```dart
+// Fixed width (like TextOnlyDropdownButton)
+FlutterDropdownButton<String>.text(
+  items: items,
+  width: 200,
+  // ...
+)
+
+// Dynamic width (like DynamicTextBaseDropdownButton)
+FlutterDropdownButton<String>.text(
+  items: items,
+  // width omitted = content-based
+  minWidth: 100,
+  maxWidth: 300,
+  // ...
+)
+```
+
+### Static closeAll Method
+
+**Before (1.x):**
+```dart
+DropdownMixin.closeAll();
+```
+
+**After (2.0):**
+```dart
+FlutterDropdownButton.closeAll();
+```
+
+`DropdownMixin.closeAll()` still works internally, but the public API is now `FlutterDropdownButton.closeAll()`.
+
+### Quick Find & Replace Guide
+
+For most projects, these replacements cover the majority of cases:
+
+1. `TextOnlyDropdownButton(` → `FlutterDropdownButton<String>.text(`
+2. `DynamicTextBaseDropdownButton(` → `FlutterDropdownButton<String>.text(`
+3. `BasicDropdownButton<` → `FlutterDropdownButton<` (then refactor items/itemBuilder)
+4. `DropdownMixin.closeAll()` → `FlutterDropdownButton.closeAll()`
+
+---
+
+## Migrating from Flutter's DropdownButton
+
+### Why Migrate?
+
+Flutter's built-in `DropdownButton` has limitations:
+- Limited customization options
+- Fixed positioning and layout constraints
+- No built-in animation control
+- Difficulty with text overflow handling
+- Platform-specific rendering issues
+
+`flutter_dropdown_button` provides:
+- Complete visual customization via `DropdownStyleTheme`
+- Overlay-based positioning with smart up/down detection
+- Smooth, configurable animations
+- Precise text overflow control with tooltip support
+- Consistent cross-platform behavior
+
+### Simple Text Dropdown
 
 **Before:**
 ```dart
-DropdownMenuItem<String>(
-  value: 'apple',
-  child: Row(
-    children: [
-      Icon(Icons.apple),
-      SizedBox(width: 8),
-      Text('Apple'),
-    ],
-  ),
-  onTap: () => print('Apple tapped'),
+DropdownButton<String>(
+  value: selectedValue,
+  hint: Text('Select a fruit'),
+  items: [
+    DropdownMenuItem(value: 'apple', child: Text('Apple')),
+    DropdownMenuItem(value: 'banana', child: Text('Banana')),
+    DropdownMenuItem(value: 'orange', child: Text('Orange')),
+  ],
+  onChanged: (value) => setState(() => selectedValue = value),
 )
 ```
 
 **After:**
 ```dart
-DropdownItem<String>(
-  value: 'apple',
-  child: Row(
-    children: [
-      Icon(Icons.apple),
-      SizedBox(width: 8),
-      Text('Apple'),
-    ],
-  ),
-  onTap: () => print('Apple tapped'),
+FlutterDropdownButton<String>.text(
+  items: ['Apple', 'Banana', 'Orange'],
+  value: selectedValue,
+  hint: 'Select a fruit',
+  onChanged: (value) => setState(() => selectedValue = value),
 )
 ```
 
-## Advanced Migration Examples
+### Custom Widget Dropdown
+
+**Before:**
+```dart
+DropdownButton<String>(
+  value: selectedValue,
+  items: options.map((option) =>
+    DropdownMenuItem(value: option, child: Text(option))
+  ).toList(),
+  onChanged: (value) => setState(() => selectedValue = value),
+)
+```
+
+**After:**
+```dart
+FlutterDropdownButton<String>(
+  items: options,
+  value: selectedValue,
+  itemBuilder: (item, isSelected) => Text(item),
+  onChanged: (value) => setState(() => selectedValue = value),
+)
+```
 
 ### Custom Styling
 
@@ -174,19 +342,23 @@ DropdownButtonFormField<String>(
 
 **After:**
 ```dart
-TextOnlyDropdownButton(
+FlutterDropdownButton<String>.text(
+  items: itemStrings,
   value: selectedValue,
   hint: 'Select Option',
-  items: itemStrings,
-  onChanged: onChanged,
-  theme: DropdownTheme(
-    backgroundColor: Colors.grey[50],
-    border: Border.all(color: Colors.grey),
-    borderRadius: 4.0,
+  theme: DropdownStyleTheme(
+    dropdown: DropdownTheme(
+      backgroundColor: Colors.grey[50],
+      border: Border.all(color: Colors.grey),
+      borderRadius: 4.0,
+      iconColor: Colors.blue,
+      icon: Icons.arrow_drop_down,
+    ),
   ),
   config: TextDropdownConfig(
     textStyle: TextStyle(fontSize: 16),
   ),
+  onChanged: onChanged,
 )
 ```
 
@@ -207,84 +379,49 @@ SizedBox(
 
 **After:**
 ```dart
-BasicDropdownButton<String>(
-  width: 200,
-  value: selectedValue,
-  items: items,
-  onChanged: onChanged,
-)
-```
-
-### Dense Dropdown
-
-**Before:**
-```dart
-DropdownButton<String>(
-  isDense: true,
-  itemHeight: 40,
-  value: selectedValue,
-  items: items,
-  onChanged: onChanged,
-)
-```
-
-**After:**
-```dart
-TextOnlyDropdownButton(
-  itemHeight: 40,
-  value: selectedValue,
+FlutterDropdownButton<String>.text(
   items: itemStrings,
+  value: selectedValue,
+  width: 200,
   onChanged: onChanged,
-  theme: DropdownTheme(
-    itemPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-  ),
 )
 ```
 
-## Handling Breaking Changes
+### Parameter Mapping
 
-### 1. No Direct Style Inheritance
+| Flutter DropdownButton | FlutterDropdownButton (2.0) |
+|---|---|
+| `value` | `value` |
+| `items` (DropdownMenuItem list) | `items` (value list) + `itemBuilder` |
+| `onChanged` | `onChanged` |
+| `hint` (Widget) | `hintWidget` (custom) or `hint` (text mode) |
+| `disabledHint` | `enabled: false` |
+| `elevation` | `theme.dropdown.elevation` |
+| `style` | `config.textStyle` |
+| `underline` | `theme.dropdown.border` |
+| `icon` | `theme.dropdown.icon` |
+| `iconSize` | `theme.dropdown.iconSize` |
+| `isDense` | `itemHeight` + `theme.dropdown.itemPadding` |
+| `isExpanded` | `width` or `expand: true` |
+| `itemHeight` | `itemHeight` |
+| `focusColor` | `theme.dropdown.selectedItemColor` |
+| `dropdownColor` | `theme.dropdown.backgroundColor` |
+| `borderRadius` | `theme.dropdown.borderRadius` |
 
-DropdownButton inherits text style from parent. Our dropdowns don't.
+### Form Field Integration
 
-**Solution:**
-```dart
-TextOnlyDropdownButton(
-  config: TextDropdownConfig(
-    textStyle: DefaultTextStyle.of(context).style,
-  ),
-  // ... other properties
-)
-```
+No direct FormField equivalent yet. Use `FormField` wrapper:
 
-### 2. Different Animation Behavior
-
-DropdownButton has platform-specific animations. Our dropdowns have consistent animations.
-
-**Solution:**
-```dart
-TextOnlyDropdownButton(
-  theme: DropdownTheme(
-    animationDuration: Duration(milliseconds: 150), // Adjust as needed
-  ),
-  // ... other properties
-)
-```
-
-### 3. Form Field Integration
-
-No direct FormField equivalent yet.
-
-**Workaround:**
 ```dart
 FormField<String>(
   builder: (FormFieldState<String> state) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        TextOnlyDropdownButton(
-          value: state.value,
+        FlutterDropdownButton<String>.text(
           items: items,
+          value: state.value,
+          hint: 'Select option',
           onChanged: state.didChange,
         ),
         if (state.hasError)
@@ -298,113 +435,3 @@ FormField<String>(
   validator: (value) => value == null ? 'Required' : null,
 )
 ```
-
-## Step-by-Step Migration
-
-### 1. Install Package
-```yaml
-dependencies:
-  flutter_dropdown_button: ^1.0.0
-```
-
-### 2. Replace Imports
-```dart
-// Remove
-import 'package:flutter/material.dart';
-
-// Add
-import 'package:flutter/material.dart';
-import 'package:flutter_dropdown_button/flutter_dropdown_button.dart';
-```
-
-### 3. Update Widget Declarations
-
-For simple text dropdowns, replace `DropdownButton` with `TextOnlyDropdownButton`:
-```dart
-// Before
-DropdownButton<String>
-
-// After  
-TextOnlyDropdownButton
-```
-
-For complex dropdowns with custom widgets, use `BasicDropdownButton`:
-```dart
-// Before
-DropdownButton<String>
-
-// After
-BasicDropdownButton<String>
-```
-
-### 4. Update Items
-
-For TextOnlyDropdownButton:
-```dart
-// Before
-items: options.map((option) => 
-  DropdownMenuItem(value: option, child: Text(option))
-).toList(),
-
-// After
-items: options,
-```
-
-For BasicDropdownButton:
-```dart
-// Before
-items: options.map((option) => 
-  DropdownMenuItem(value: option.value, child: option.widget)
-).toList(),
-
-// After
-items: options.map((option) => 
-  DropdownItem(value: option.value, child: option.widget)
-).toList(),
-```
-
-### 5. Test and Customize
-
-After migration, test your dropdowns and add customizations:
-```dart
-TextOnlyDropdownButton(
-  // ... migrated properties
-  theme: DropdownTheme(
-    borderRadius: 8.0,
-    animationDuration: Duration(milliseconds: 200),
-  ),
-  config: TextDropdownConfig(
-    overflow: TextOverflow.ellipsis,
-  ),
-)
-```
-
-## Common Issues and Solutions
-
-### Issue: Text Overflow
-**Problem:** Long text gets cut off awkwardly.
-**Solution:** Use TextOnlyDropdownButton with proper overflow configuration.
-
-### Issue: Inconsistent Styling
-**Problem:** Dropdowns look different across platforms.
-**Solution:** Use DropdownTheme for consistent styling.
-
-### Issue: Animation Feels Wrong
-**Problem:** Animation doesn't match app's feel.
-**Solution:** Customize animationDuration in DropdownTheme.
-
-### Issue: Width Problems
-**Problem:** Dropdown width doesn't behave as expected.
-**Solution:** Use width, maxWidth, or minWidth parameters for precise control.
-
-## Performance Considerations
-
-The new dropdowns are generally more performant due to:
-- Efficient overlay rendering
-- Proper animation disposal
-- Minimal rebuilds
-
-However, ensure you:
-1. Reuse theme instances
-2. Don't create new configurations unnecessarily
-3. Use const constructors where possible
