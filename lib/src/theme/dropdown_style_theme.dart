@@ -1,5 +1,6 @@
 import 'dropdown_scroll_theme.dart';
 import 'dropdown_theme.dart';
+import 'search_field_theme.dart';
 import 'tooltip_theme.dart';
 
 /// Main theme container for all dropdown styling configurations.
@@ -34,6 +35,7 @@ class DropdownStyleTheme {
     this.dropdown = const DropdownTheme(),
     this.scroll = const DropdownScrollTheme(),
     this.tooltip = const DropdownTooltipTheme(),
+    this.search = const SearchFieldTheme(),
   });
 
   /// General dropdown styling configuration.
@@ -55,16 +57,25 @@ class DropdownStyleTheme {
   /// padding, shadows, and text styling.
   final DropdownTooltipTheme tooltip;
 
+  /// Search field styling configuration.
+  ///
+  /// Controls the appearance and behavior of the search text field
+  /// displayed at the top of the dropdown overlay when searchable
+  /// is enabled.
+  final SearchFieldTheme search;
+
   /// Creates a copy of this theme with the given fields replaced.
   DropdownStyleTheme copyWith({
     DropdownTheme? dropdown,
     DropdownScrollTheme? scroll,
     DropdownTooltipTheme? tooltip,
+    SearchFieldTheme? search,
   }) {
     return DropdownStyleTheme(
       dropdown: dropdown ?? this.dropdown,
       scroll: scroll ?? this.scroll,
       tooltip: tooltip ?? this.tooltip,
+      search: search ?? this.search,
     );
   }
 

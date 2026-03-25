@@ -110,6 +110,38 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
   double _dtItemBorderWidth = 1.0;
   bool _dtExcludeLastItemBorder = true;
 
+  // ── Search ─────────────────────────────────────────────────────────────
+  bool _searchable = false;
+
+  // ── SearchFieldTheme ──────────────────────────────────────────────────
+  Color? _sftBackgroundColor;
+  double _sftHeight = 36;
+  double _sftBorderRadius = 8;
+  double _sftMarginH = 8;
+  double _sftMarginTop = 8;
+  double _sftMarginBottom = 4;
+  double _sftContentPaddingH = 12;
+  double _sftContentPaddingV = 8;
+  double _sftPaddingH = 0;
+  double _sftPaddingV = 0;
+  bool _sftAutofocus = true;
+  bool _sftShowDivider = false;
+  Color? _sftCursorColor;
+  double _sftCursorWidth = 2.0;
+  double? _sftCursorHeight;
+  double? _sftCursorRadius;
+  Color? _sftTextColor;
+  double _sftTextFontSize = 14;
+  TextAlign _sftTextAlign = TextAlign.start;
+  bool _sftBorderEnabled = false;
+  Color _sftBorderColor = Colors.grey;
+  double _sftBorderWidth = 1.0;
+  bool _sftFocusedBorderEnabled = false;
+  Color _sftFocusedBorderColor = Colors.blue;
+  double _sftFocusedBorderWidth = 2.0;
+  TextInputType _sftKeyboardType = TextInputType.text;
+  TextInputAction _sftTextInputAction = TextInputAction.search;
+
   // ── DropdownScrollTheme ─────────────────────────────────────────────────
   bool _dstEnabled = false;
   double? _dstThumbWidth;
@@ -274,6 +306,48 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
         backgroundColor: _dttBackgroundColor,
         textColor: _dttTextColor,
       ),
+      search: SearchFieldTheme(
+        backgroundColor: _sftBackgroundColor,
+        height: _sftHeight,
+        borderRadius: BorderRadius.circular(_sftBorderRadius),
+        margin: EdgeInsets.fromLTRB(
+          _sftMarginH,
+          _sftMarginTop,
+          _sftMarginH,
+          _sftMarginBottom,
+        ),
+        contentPadding: EdgeInsets.symmetric(
+          horizontal: _sftContentPaddingH,
+          vertical: _sftContentPaddingV,
+        ),
+        padding: (_sftPaddingH > 0 || _sftPaddingV > 0)
+            ? EdgeInsets.symmetric(
+                horizontal: _sftPaddingH,
+                vertical: _sftPaddingV,
+              )
+            : null,
+        autofocus: _sftAutofocus,
+        cursorColor: _sftCursorColor,
+        cursorWidth: _sftCursorWidth,
+        cursorHeight: _sftCursorHeight,
+        cursorRadius: _sftCursorRadius != null
+            ? Radius.circular(_sftCursorRadius!)
+            : null,
+        textStyle: TextStyle(fontSize: _sftTextFontSize, color: _sftTextColor),
+        textAlign: _sftTextAlign,
+        border: _sftBorderEnabled
+            ? Border.all(color: _sftBorderColor, width: _sftBorderWidth)
+            : null,
+        focusedBorder: _sftFocusedBorderEnabled
+            ? Border.all(
+                color: _sftFocusedBorderColor,
+                width: _sftFocusedBorderWidth,
+              )
+            : null,
+        keyboardType: _sftKeyboardType,
+        textInputAction: _sftTextInputAction,
+        divider: _sftShowDivider ? const Divider(height: 1) : null,
+      ),
     );
   }
 
@@ -334,6 +408,7 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
           if (_type == DropdownType.text) _buildTextDropdownButtonSection(),
           if (_type == DropdownType.text) _buildTextDropdownConfigSection(),
           _buildDropdownThemeSection(),
+          if (_searchable) _buildSearchThemeSection(),
           _buildScrollThemeSection(),
           _buildTooltipThemeSection(),
           const SizedBox(height: 24),
@@ -492,6 +567,11 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
           'scrollToSelectedItem',
           _scrollToSelected,
           (v) => setState(() => _scrollToSelected = v),
+        ),
+        _switchRow(
+          'searchable',
+          _searchable,
+          (v) => setState(() => _searchable = v),
         ),
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 4),
@@ -950,6 +1030,368 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
     );
   }
 
+  // ── Section: SearchFieldTheme ───────────────────────────────────────────
+  Widget _buildSearchThemeSection() {
+    return ExpansionTile(
+      title: const Text(
+        'SearchFieldTheme',
+        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+      ),
+      childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+      children: [
+        // ── Layout ──
+        const Align(
+          alignment: Alignment.centerLeft,
+          child: Padding(
+            padding: EdgeInsets.only(top: 8, bottom: 4),
+            child: Text(
+              'Layout',
+              style: TextStyle(fontSize: 11, color: Colors.grey),
+            ),
+          ),
+        ),
+        _sliderRow(
+          'height',
+          _sftHeight,
+          24,
+          60,
+          (v) => setState(() => _sftHeight = v),
+        ),
+        _sliderRow(
+          'borderRadius',
+          _sftBorderRadius,
+          0,
+          20,
+          (v) => setState(() => _sftBorderRadius = v),
+        ),
+        _sliderRow(
+          'margin H',
+          _sftMarginH,
+          0,
+          24,
+          (v) => setState(() => _sftMarginH = v),
+        ),
+        _sliderRow(
+          'margin top',
+          _sftMarginTop,
+          0,
+          24,
+          (v) => setState(() => _sftMarginTop = v),
+        ),
+        _sliderRow(
+          'margin bottom',
+          _sftMarginBottom,
+          0,
+          24,
+          (v) => setState(() => _sftMarginBottom = v),
+        ),
+        _sliderRow(
+          'contentPadding H',
+          _sftContentPaddingH,
+          0,
+          24,
+          (v) => setState(() => _sftContentPaddingH = v),
+        ),
+        _sliderRow(
+          'contentPadding V',
+          _sftContentPaddingV,
+          0,
+          16,
+          (v) => setState(() => _sftContentPaddingV = v),
+        ),
+        _sliderRow(
+          'padding H',
+          _sftPaddingH,
+          0,
+          16,
+          (v) => setState(() => _sftPaddingH = v),
+        ),
+        _sliderRow(
+          'padding V',
+          _sftPaddingV,
+          0,
+          16,
+          (v) => setState(() => _sftPaddingV = v),
+        ),
+
+        // ── Colors ──
+        const Align(
+          alignment: Alignment.centerLeft,
+          child: Padding(
+            padding: EdgeInsets.only(top: 12, bottom: 4),
+            child: Text(
+              'Colors',
+              style: TextStyle(fontSize: 11, color: Colors.grey),
+            ),
+          ),
+        ),
+        _colorRow(
+          'backgroundColor',
+          _sftBackgroundColor,
+          (v) => setState(() => _sftBackgroundColor = v),
+        ),
+        _colorRow(
+          'textColor',
+          _sftTextColor,
+          (v) => setState(() => _sftTextColor = v),
+        ),
+        _colorRow(
+          'cursorColor',
+          _sftCursorColor,
+          (v) => setState(() => _sftCursorColor = v),
+        ),
+
+        // ── Text ──
+        const Align(
+          alignment: Alignment.centerLeft,
+          child: Padding(
+            padding: EdgeInsets.only(top: 12, bottom: 4),
+            child: Text(
+              'Text',
+              style: TextStyle(fontSize: 11, color: Colors.grey),
+            ),
+          ),
+        ),
+        _sliderRow(
+          'fontSize',
+          _sftTextFontSize,
+          10,
+          24,
+          (v) => setState(() => _sftTextFontSize = v),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 4),
+          child: Row(
+            children: [
+              const SizedBox(
+                width: 100,
+                child: Text('textAlign', style: TextStyle(fontSize: 12)),
+              ),
+              Expanded(
+                child: SegmentedButton<TextAlign>(
+                  segments: const [
+                    ButtonSegment(value: TextAlign.start, label: Text('start')),
+                    ButtonSegment(
+                      value: TextAlign.center,
+                      label: Text('center'),
+                    ),
+                    ButtonSegment(value: TextAlign.end, label: Text('end')),
+                  ],
+                  selected: {_sftTextAlign},
+                  onSelectionChanged: (v) =>
+                      setState(() => _sftTextAlign = v.first),
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        // ── Cursor ──
+        const Align(
+          alignment: Alignment.centerLeft,
+          child: Padding(
+            padding: EdgeInsets.only(top: 12, bottom: 4),
+            child: Text(
+              'Cursor',
+              style: TextStyle(fontSize: 11, color: Colors.grey),
+            ),
+          ),
+        ),
+        _sliderRow(
+          'cursorWidth',
+          _sftCursorWidth,
+          1,
+          6,
+          (v) => setState(() => _sftCursorWidth = v),
+        ),
+        _optionalSliderRow(
+          'cursorHeight',
+          _sftCursorHeight,
+          10,
+          30,
+          (v) => setState(() => _sftCursorHeight = v),
+          enableDefault: 18,
+        ),
+        _optionalSliderRow(
+          'cursorRadius',
+          _sftCursorRadius,
+          0,
+          10,
+          (v) => setState(() => _sftCursorRadius = v),
+          enableDefault: 2,
+        ),
+
+        // ── Border ──
+        const Align(
+          alignment: Alignment.centerLeft,
+          child: Padding(
+            padding: EdgeInsets.only(top: 12, bottom: 4),
+            child: Text(
+              'Border',
+              style: TextStyle(fontSize: 11, color: Colors.grey),
+            ),
+          ),
+        ),
+        _switchRow(
+          'border',
+          _sftBorderEnabled,
+          (v) => setState(() => _sftBorderEnabled = v),
+        ),
+        if (_sftBorderEnabled) ...[
+          _colorRow(
+            'borderColor',
+            _sftBorderColor,
+            (v) => setState(() => _sftBorderColor = v ?? Colors.grey),
+          ),
+          _sliderRow(
+            'borderWidth',
+            _sftBorderWidth,
+            0.5,
+            4,
+            (v) => setState(() => _sftBorderWidth = v),
+          ),
+        ],
+        _switchRow(
+          'focusedBorder',
+          _sftFocusedBorderEnabled,
+          (v) => setState(() => _sftFocusedBorderEnabled = v),
+        ),
+        if (_sftFocusedBorderEnabled) ...[
+          _colorRow(
+            'focusedBorderColor',
+            _sftFocusedBorderColor,
+            (v) => setState(() => _sftFocusedBorderColor = v ?? Colors.blue),
+          ),
+          _sliderRow(
+            'focusedBorderWidth',
+            _sftFocusedBorderWidth,
+            0.5,
+            4,
+            (v) => setState(() => _sftFocusedBorderWidth = v),
+          ),
+        ],
+
+        // ── Input ──
+        const Align(
+          alignment: Alignment.centerLeft,
+          child: Padding(
+            padding: EdgeInsets.only(top: 12, bottom: 4),
+            child: Text(
+              'Input',
+              style: TextStyle(fontSize: 11, color: Colors.grey),
+            ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 4),
+          child: Row(
+            children: [
+              const SizedBox(
+                width: 120,
+                child: Text('keyboardType', style: TextStyle(fontSize: 12)),
+              ),
+              Expanded(
+                child: DropdownButton<TextInputType>(
+                  value: _sftKeyboardType,
+                  isExpanded: true,
+                  isDense: true,
+                  style: const TextStyle(fontSize: 12, color: Colors.black87),
+                  items: const [
+                    DropdownMenuItem(
+                      value: TextInputType.text,
+                      child: Text('text'),
+                    ),
+                    DropdownMenuItem(
+                      value: TextInputType.number,
+                      child: Text('number'),
+                    ),
+                    DropdownMenuItem(
+                      value: TextInputType.emailAddress,
+                      child: Text('emailAddress'),
+                    ),
+                    DropdownMenuItem(
+                      value: TextInputType.url,
+                      child: Text('url'),
+                    ),
+                  ],
+                  onChanged: (v) => setState(
+                    () => _sftKeyboardType = v ?? TextInputType.text,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 4),
+          child: Row(
+            children: [
+              const SizedBox(
+                width: 120,
+                child: Text('textInputAction', style: TextStyle(fontSize: 12)),
+              ),
+              Expanded(
+                child: DropdownButton<TextInputAction>(
+                  value: _sftTextInputAction,
+                  isExpanded: true,
+                  isDense: true,
+                  style: const TextStyle(fontSize: 12, color: Colors.black87),
+                  items: const [
+                    DropdownMenuItem(
+                      value: TextInputAction.search,
+                      child: Text('search'),
+                    ),
+                    DropdownMenuItem(
+                      value: TextInputAction.done,
+                      child: Text('done'),
+                    ),
+                    DropdownMenuItem(
+                      value: TextInputAction.go,
+                      child: Text('go'),
+                    ),
+                    DropdownMenuItem(
+                      value: TextInputAction.next,
+                      child: Text('next'),
+                    ),
+                    DropdownMenuItem(
+                      value: TextInputAction.none,
+                      child: Text('none'),
+                    ),
+                  ],
+                  onChanged: (v) => setState(
+                    () => _sftTextInputAction = v ?? TextInputAction.search,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        // ── Behavior ──
+        const Align(
+          alignment: Alignment.centerLeft,
+          child: Padding(
+            padding: EdgeInsets.only(top: 12, bottom: 4),
+            child: Text(
+              'Behavior',
+              style: TextStyle(fontSize: 11, color: Colors.grey),
+            ),
+          ),
+        ),
+        _switchRow(
+          'autofocus',
+          _sftAutofocus,
+          (v) => setState(() => _sftAutofocus = v),
+        ),
+        _switchRow(
+          'showDivider',
+          _sftShowDivider,
+          (v) => setState(() => _sftShowDivider = v),
+        ),
+      ],
+    );
+  }
+
   // ── Section: DropdownScrollTheme ────────────────────────────────────────
   Widget _buildScrollThemeSection() {
     return ExpansionTile(
@@ -1217,6 +1659,7 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
           minMenuWidth: _minMenuWidth,
           maxMenuWidth: _maxMenuWidth,
           menuAlignment: _menuAlignment,
+          searchable: _searchable,
           onChanged: (v) => setState(() => _selectedValue = v),
         );
 
@@ -1235,6 +1678,9 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
           minMenuWidth: _minMenuWidth,
           maxMenuWidth: _maxMenuWidth,
           menuAlignment: _menuAlignment,
+          searchable: _searchable,
+          searchFilter: (item, query) =>
+              item.toLowerCase().contains(query.toLowerCase()),
           itemBuilder: (item, isSelected) => Text(item),
           onChanged: (v) => setState(() => _selectedValue = v),
         );

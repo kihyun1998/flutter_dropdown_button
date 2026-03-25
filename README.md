@@ -20,6 +20,7 @@ A highly customizable dropdown package for Flutter with overlay-based rendering,
 - **Custom Scrollbar**: Scrollbar theming with colors, thickness, and visibility
 - **Single-Item Mode**: Auto-disable when only one option exists
 - **Leading Widgets**: Optional icons/widgets before text content
+- **Searchable Dropdown**: Real-time filtering with customizable search field
 
 ## Screenshots
 
@@ -40,7 +41,7 @@ Add to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  flutter_dropdown_button: ^2.1.0
+  flutter_dropdown_button: ^2.2.0
 ```
 
 Import the package:
@@ -168,6 +169,9 @@ The unified dropdown widget. Use the default constructor for custom widget rende
 | `maxMenuWidth` | `double?` | `null` | Maximum width of dropdown menu |
 | `menuAlignment` | `MenuAlignment` | `.left` | Menu alignment when wider than button |
 | `theme` | `DropdownStyleTheme?` | `null` | Theme configuration |
+| `searchable` | `bool` | `false` | Enable search/filter field in dropdown |
+| `searchFilter` | `bool Function(T, String)?` | `null` | Custom filter function (required for custom mode) |
+| `emptyBuilder` | `Widget Function(String)?` | `null` | Widget builder for empty search results |
 
 ### MenuAlignment
 
@@ -183,13 +187,14 @@ Alignment of the dropdown menu relative to the button when the menu is wider.
 
 ## Theme System
 
-Theme is applied via the `theme` parameter using `DropdownStyleTheme`, which groups three theme objects:
+Theme is applied via the `theme` parameter using `DropdownStyleTheme`, which groups four theme objects:
 
 ```dart
 DropdownStyleTheme(
-  dropdown: DropdownTheme(...),   // General dropdown styling
-  scroll: DropdownScrollTheme(...), // Scrollbar styling
-  tooltip: DropdownTooltipTheme(...), // Tooltip styling
+  dropdown: DropdownTheme(...),        // General dropdown styling
+  scroll: DropdownScrollTheme(...),    // Scrollbar styling
+  tooltip: DropdownTooltipTheme(...),  // Tooltip styling
+  search: SearchFieldTheme(...),       // Search field styling
 )
 ```
 
@@ -296,6 +301,49 @@ Controls tooltip styling and behavior for text-based dropdowns.
 | `verticalOffset` | `double?` | `null` | Gap between widget and tooltip |
 | `triggerMode` | `TooltipTriggerMode?` | `null` | How tooltip is triggered |
 
+### SearchFieldTheme
+
+Controls the appearance and behavior of the search text field when `searchable` is enabled.
+
+#### Layout
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `height` | `double?` | `36.0` | Height of the search field |
+| `borderRadius` | `BorderRadius?` | `circular(8)` | Corner radius of the search field |
+| `margin` | `EdgeInsets?` | `fromLTRB(8, 8, 8, 4)` | Outer margin around the search field |
+| `padding` | `EdgeInsets?` | `null` | Inner padding of the search field container |
+| `contentPadding` | `EdgeInsets?` | `horizontal: 12, vertical: 8` | Content padding inside the text field |
+
+#### Styling
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `decoration` | `InputDecoration?` | `null` | Full InputDecoration override (ignores individual properties when set) |
+| `textStyle` | `TextStyle?` | `null` | Text style for search input |
+| `backgroundColor` | `Color?` | `null` | Background color of the search field |
+| `border` | `BoxBorder?` | `null` | Border when not focused |
+| `focusedBorder` | `BoxBorder?` | `null` | Border when focused |
+| `divider` | `Widget?` | `null` | Widget between search field and item list |
+
+#### Cursor
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `cursorColor` | `Color?` | `null` | Cursor color |
+| `cursorWidth` | `double?` | `2.0` | Cursor width |
+| `cursorHeight` | `double?` | `null` | Cursor height |
+| `cursorRadius` | `Radius?` | `null` | Cursor corner radius |
+
+#### Behavior
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `autofocus` | `bool` | `true` | Auto-focus search field on dropdown open |
+| `textAlign` | `TextAlign` | `.start` | Text alignment |
+| `keyboardType` | `TextInputType?` | `.text` | Keyboard type |
+| `textInputAction` | `TextInputAction?` | `.search` | Keyboard action button |
+
 ### TextDropdownConfig
 
 Configuration for text rendering in `.text()` mode.
@@ -313,6 +361,62 @@ Configuration for text rendering in `.text()` mode.
 ---
 
 ## Advanced Features
+
+### Searchable Dropdown (Text Mode)
+
+```dart
+FlutterDropdownButton<String>.text(
+  items: ['Apple', 'Banana', 'Cherry', 'Date', 'Elderberry'],
+  value: selected,
+  hint: 'Select a fruit',
+  width: 250,
+  searchable: true,
+  onChanged: (value) => setState(() => selected = value),
+)
+```
+
+### Searchable Dropdown (Custom Mode)
+
+```dart
+FlutterDropdownButton<User>(
+  items: users,
+  value: selectedUser,
+  searchable: true,
+  searchFilter: (user, query) =>
+    user.name.toLowerCase().contains(query.toLowerCase()),
+  emptyBuilder: (query) => Center(
+    child: Text('No users matching "$query"'),
+  ),
+  itemBuilder: (user, isSelected) => Row(
+    children: [
+      CircleAvatar(radius: 14, child: Text(user.name[0])),
+      SizedBox(width: 8),
+      Text(user.name),
+    ],
+  ),
+  onChanged: (value) => setState(() => selectedUser = value),
+)
+```
+
+### Searchable Dropdown with Custom Theme
+
+```dart
+FlutterDropdownButton<String>.text(
+  items: countries,
+  value: selected,
+  searchable: true,
+  theme: DropdownStyleTheme(
+    search: SearchFieldTheme(
+      backgroundColor: Colors.grey.shade100,
+      height: 40,
+      borderRadius: BorderRadius.circular(12),
+      cursorColor: Colors.blue,
+      divider: Divider(height: 1),
+    ),
+  ),
+  onChanged: (value) => setState(() => selected = value),
+)
+```
 
 ### Custom Theme
 

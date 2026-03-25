@@ -252,6 +252,14 @@ mixin DropdownMixin<T extends StatefulWidget> on State<T>, TickerProvider {
     }
   }
 
+  /// Marks the overlay entry as needing rebuild.
+  ///
+  /// Call this when the overlay content has changed (e.g., filtered items)
+  /// and the overlay needs to reflect those changes.
+  void rebuildOverlay() {
+    _overlayEntry?.markNeedsBuild();
+  }
+
   /// Toggles the dropdown between open and closed states.
   void toggleDropdown() {
     if (!isEnabled) return;
@@ -508,7 +516,9 @@ mixin DropdownMixin<T extends StatefulWidget> on State<T>, TickerProvider {
                     color: Colors.transparent,
                     borderRadius: BorderRadius.circular(overlayBorderRadius),
                     child: Container(
-                      height: position.height,
+                      constraints: BoxConstraints(
+                        maxHeight: position.height,
+                      ),
                       decoration: buildOverlayDecoration() ??
                           BoxDecoration(
                             color: Theme.of(context).cardColor,

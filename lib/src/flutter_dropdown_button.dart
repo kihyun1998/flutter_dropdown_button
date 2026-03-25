@@ -7,6 +7,7 @@ import 'config/text_dropdown_config.dart';
 import 'theme/dropdown_scroll_theme.dart';
 import 'theme/dropdown_style_theme.dart';
 import 'theme/dropdown_theme.dart';
+import 'theme/search_field_theme.dart';
 import 'theme/tooltip_theme.dart';
 import 'widgets/smart_tooltip_text.dart';
 
@@ -79,6 +80,9 @@ class FlutterDropdownButton<T> extends StatefulWidget {
     this.menuAlignment = MenuAlignment.left,
     this.disableWhenSingleItem = false,
     this.hideIconWhenSingleItem = true,
+    this.searchable = false,
+    this.searchFilter,
+    this.emptyBuilder,
   })  : hintText = null,
         config = null,
         leading = null,
@@ -125,6 +129,9 @@ class FlutterDropdownButton<T> extends StatefulWidget {
     this.menuAlignment = MenuAlignment.left,
     this.disableWhenSingleItem = false,
     this.hideIconWhenSingleItem = true,
+    this.searchable = false,
+    this.searchFilter,
+    this.emptyBuilder,
   })  : hintText = hint,
         hintWidget = null,
         itemBuilder = null,
@@ -253,6 +260,49 @@ class FlutterDropdownButton<T> extends StatefulWidget {
   /// Only applies when [disableWhenSingleItem] is true. Defaults to true.
   final bool hideIconWhenSingleItem;
 
+  // --- Search fields ---
+
+  /// Whether the dropdown supports searching/filtering items.
+  ///
+  /// When true, a search text field is displayed at the top of the
+  /// dropdown overlay. Items are filtered in real-time as the user types.
+  ///
+  /// For text mode, items are filtered using case-insensitive `contains`
+  /// matching by default. For custom mode, [searchFilter] must be provided.
+  ///
+  /// The search field appearance can be customized via [DropdownStyleTheme.search].
+  ///
+  /// Defaults to false.
+  final bool searchable;
+
+  /// Custom filter function for search.
+  ///
+  /// Called for each item with the current search query to determine
+  /// if the item should be shown. Return true to include the item.
+  ///
+  /// Required for custom mode when [searchable] is true.
+  /// Optional for text mode (defaults to case-insensitive contains matching).
+  ///
+  /// Example:
+  /// ```dart
+  /// searchFilter: (item, query) =>
+  ///   item.name.toLowerCase().contains(query.toLowerCase()),
+  /// ```
+  final bool Function(T item, String query)? searchFilter;
+
+  /// Builder for the empty state when search yields no results.
+  ///
+  /// Called with the current search query. If null, a default
+  /// "No results found" text is displayed.
+  ///
+  /// Example:
+  /// ```dart
+  /// emptyBuilder: (query) => Center(
+  ///   child: Text('No items matching "$query"'),
+  /// ),
+  /// ```
+  final Widget Function(String query)? emptyBuilder;
+
   /// Whether this dropdown uses text mode rendering.
   bool get isTextMode => itemBuilder == null;
 
@@ -284,6 +334,9 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
 
   DropdownTooltipTheme get effectiveTooltipTheme =>
       widget.theme?.tooltip ?? DropdownTooltipTheme.defaultTheme;
+
+  SearchFieldTheme get effectiveSearchTheme =>
+      widget.theme?.search ?? SearchFieldTheme.defaultTheme;
 
   TextDropdownConfig get _textConfig =>
       widget.config ?? TextDropdownConfig.defaultConfig;
@@ -354,6 +407,49 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
   bool get _showTrailing =>
       !(_isSingleItemDisabled && widget.hideIconWhenSingleItem);
 
+  // ===== Search =====
+
+  TextEditingController? _searchController;
+  FocusNode? _searchFocusNode;
+  List<T> _filteredItems = [];
+  String _searchQuery = '';
+
+  /// The height occupied by the search field including margin and divider.
+  double get _searchFieldHeight {
+    if (!widget.searchable) return 0.0;
+    final searchTheme = effectiveSearchTheme;
+    final margin = searchTheme.margin ?? const EdgeInsets.fromLTRB(8, 8, 8, 4);
+    final fieldHeight = searchTheme.height ?? 36.0;
+    final dividerHeight = searchTheme.divider != null ? 1.0 : 0.0;
+    return fieldHeight + margin.top + margin.bottom + dividerHeight;
+  }
+
+  bool _defaultTextFilter(T item, String query) {
+    return (item as String).toLowerCase().contains(query.toLowerCase());
+  }
+
+  void _onSearchChanged(String query) {
+    _searchQuery = query;
+    if (query.isEmpty) {
+      _filteredItems = List<T>.from(widget.items);
+    } else {
+      final filter = widget.searchFilter ??
+          (widget.isTextMode ? _defaultTextFilter : null);
+      if (filter != null) {
+        _filteredItems =
+            widget.items.where((item) => filter(item, query)).toList();
+      }
+    }
+
+    // Reset scroll position
+    if (_scrollController != null && _scrollController!.hasClients) {
+      _scrollController!.jumpTo(0);
+    }
+
+    // Rebuild overlay with new filtered items
+    rebuildOverlay();
+  }
+
   // ===== Lifecycle =====
 
   ScrollController? _scrollController;
@@ -365,12 +461,27 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
     super.initState();
     initializeDropdown();
     _autoSelectSingleItem();
+    _filteredItems = List<T>.from(widget.items);
+    if (widget.searchable) {
+      _searchController = TextEditingController();
+      _searchFocusNode = FocusNode();
+    }
   }
 
   @override
   void didUpdateWidget(FlutterDropdownButton<T> oldWidget) {
     super.didUpdateWidget(oldWidget);
     _autoSelectSingleItem();
+    if (oldWidget.items != widget.items) {
+      _filteredItems = List<T>.from(widget.items);
+      _searchQuery = '';
+      _searchController?.clear();
+    }
+    // Handle searchable toggled on at runtime
+    if (widget.searchable && _searchController == null) {
+      _searchController = TextEditingController();
+      _searchFocusNode = FocusNode();
+    }
   }
 
   @override
@@ -379,6 +490,8 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
     _scrollController?.dispose();
     _canScrollUp.dispose();
     _canScrollDown.dispose();
+    _searchController?.dispose();
+    _searchFocusNode?.dispose();
     disposeDropdown();
     super.dispose();
   }
@@ -396,7 +509,34 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
   // ===== Overlay =====
 
   @override
-  void onDropdownItemSelected() => closeDropdown();
+  void onDropdownItemSelected() {
+    _resetSearch();
+    closeDropdown();
+  }
+
+  void _resetSearch() {
+    _searchQuery = '';
+    _searchController?.clear();
+    _filteredItems = List<T>.from(widget.items);
+  }
+
+  @override
+  void openDropdown() {
+    _resetSearch();
+    super.openDropdown();
+    if (widget.searchable && effectiveSearchTheme.autofocus) {
+      // Request focus after overlay is inserted
+      SchedulerBinding.instance.addPostFrameCallback((_) {
+        _searchFocusNode?.requestFocus();
+      });
+    }
+  }
+
+  @override
+  void closeDropdown() {
+    _resetSearch();
+    super.closeDropdown();
+  }
 
   @override
   BoxDecoration? buildOverlayDecoration() => _buildOverlayDecoration();
@@ -644,13 +784,15 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
 
   @override
   Widget buildOverlayContent(double height) {
-    final items = widget.items;
+    final items = widget.searchable ? _filteredItems : widget.items;
     final scrollTheme = effectiveScrollTheme;
     final padding = effectiveTheme.overlayPadding;
     final paddingVertical =
         padding != null ? (padding.top + padding.bottom) : 0.0;
+    final searchHeight = _searchFieldHeight;
     final availableContentHeight =
-        height - overlayBorderThickness - paddingVertical;
+        (height - overlayBorderThickness - paddingVertical - searchHeight)
+            .clamp(0.0, double.infinity);
     final totalItemsHeight = items.length * actualItemHeight;
     final needsScroll = totalItemsHeight > availableContentHeight;
     final itemAlignment = widget.isTextMode
@@ -659,7 +801,25 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
 
     Widget content;
 
-    if (needsScroll) {
+    if (items.isEmpty && widget.searchable && _searchQuery.isNotEmpty) {
+      // Empty state for search with no results
+      content = SizedBox(
+        height: availableContentHeight,
+        child: widget.emptyBuilder?.call(_searchQuery) ??
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Text(
+                  'No results found',
+                  style: TextStyle(
+                    color: Theme.of(context).hintColor,
+                    fontSize: 14,
+                  ),
+                ),
+              ),
+            ),
+      );
+    } else if (needsScroll) {
       if (_scrollController == null) {
         _scrollController = ScrollController();
         _scrollController!.addListener(_updateScrollGradients);
@@ -667,27 +827,32 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
 
       _initializeScrollGradients();
 
-      if (widget.scrollToSelectedItem && widget.value != null) {
+      if (widget.scrollToSelectedItem &&
+          widget.value != null &&
+          _searchQuery.isEmpty) {
         _scheduleScrollToSelectedItem();
       }
 
-      content = ListView.builder(
-        controller: _scrollController,
-        physics: const ClampingScrollPhysics(),
-        padding: EdgeInsets.zero,
-        itemCount: items.length,
-        itemBuilder: (context, index) {
-          final item = items[index];
-          final isSelected = widget.value == item;
-          return _buildItemWrapper(
-            item: item,
-            isSelected: isSelected,
-            isFirst: index == 0,
-            isLast: index == items.length - 1,
-            alignment: itemAlignment,
-            child: _buildItemWidget(item, isSelected),
-          );
-        },
+      content = SizedBox(
+        height: availableContentHeight,
+        child: ListView.builder(
+          controller: _scrollController,
+          physics: const ClampingScrollPhysics(),
+          padding: EdgeInsets.zero,
+          itemCount: items.length,
+          itemBuilder: (context, index) {
+            final item = items[index];
+            final isSelected = widget.value == item;
+            return _buildItemWrapper(
+              item: item,
+              isSelected: isSelected,
+              isFirst: index == 0,
+              isLast: index == items.length - 1,
+              alignment: itemAlignment,
+              child: _buildItemWidget(item, isSelected),
+            );
+          },
+        ),
       );
 
       if (scrollTheme != null) {
@@ -724,7 +889,92 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
       content = Padding(padding: padding, child: content);
     }
 
+    if (widget.searchable) {
+      content = Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _buildSearchField(),
+          Flexible(child: content),
+        ],
+      );
+    }
+
     return content;
+  }
+
+  // ===== Search field =====
+
+  Widget _buildSearchField() {
+    final searchTheme = effectiveSearchTheme;
+    final margin = searchTheme.margin ?? const EdgeInsets.fromLTRB(8, 8, 8, 4);
+    final fieldHeight = searchTheme.height ?? 36.0;
+    final borderRadius = searchTheme.borderRadius ?? BorderRadius.circular(8);
+    final contentPadding = searchTheme.contentPadding ??
+        const EdgeInsets.symmetric(horizontal: 12, vertical: 8);
+
+    final defaultDecoration = InputDecoration(
+      hintText: 'Search...',
+      prefixIcon: const Icon(Icons.search, size: 20),
+      prefixIconConstraints: const BoxConstraints(
+        minWidth: 36,
+        minHeight: 0,
+      ),
+      contentPadding: contentPadding,
+      isDense: true,
+      border: OutlineInputBorder(
+        borderRadius: borderRadius,
+        borderSide: BorderSide(
+          color: Theme.of(context).dividerColor,
+        ),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: borderRadius,
+        borderSide: BorderSide(
+          color: searchTheme.border is Border
+              ? (searchTheme.border! as Border).top.color
+              : Theme.of(context).dividerColor,
+        ),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: borderRadius,
+        borderSide: BorderSide(
+          color: searchTheme.focusedBorder is Border
+              ? (searchTheme.focusedBorder! as Border).top.color
+              : Theme.of(context).primaryColor,
+        ),
+      ),
+      filled: searchTheme.backgroundColor != null,
+      fillColor: searchTheme.backgroundColor,
+    );
+
+    Widget field = Container(
+      margin: margin,
+      padding: searchTheme.padding,
+      height: fieldHeight,
+      child: TextField(
+        controller: _searchController,
+        focusNode: _searchFocusNode,
+        onChanged: _onSearchChanged,
+        style: searchTheme.textStyle,
+        cursorColor: searchTheme.cursorColor,
+        cursorWidth: searchTheme.cursorWidth ?? 2.0,
+        cursorHeight: searchTheme.cursorHeight,
+        cursorRadius: searchTheme.cursorRadius,
+        textAlign: searchTheme.textAlign,
+        keyboardType: searchTheme.keyboardType ?? TextInputType.text,
+        textInputAction: searchTheme.textInputAction ?? TextInputAction.search,
+        decoration: searchTheme.decoration ?? defaultDecoration,
+      ),
+    );
+
+    if (searchTheme.divider != null) {
+      field = Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [field, searchTheme.divider!],
+      );
+    }
+
+    return field;
   }
 
   Alignment _alignmentFromTextAlign(TextAlign textAlign) {

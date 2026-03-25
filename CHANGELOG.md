@@ -1,5 +1,18 @@
 # Changelog
 
+## 2.2.0
+
+* **FEAT**: Added searchable dropdown support with real-time item filtering
+* **FEAT**: Added `searchable` parameter to enable search text field at the top of the dropdown overlay
+* **FEAT**: Added `searchFilter` parameter for custom filter logic (required for custom mode, optional for text mode with default case-insensitive contains matching)
+* **FEAT**: Added `emptyBuilder` parameter for customizing the empty state when search yields no results
+* **FEAT**: Added `SearchFieldTheme` class for comprehensive search field styling (text style, cursor, colors, border, padding, margin, border radius, divider, keyboard type, text input action, and more)
+* **FEAT**: Added `search` field to `DropdownStyleTheme` for centralized search field theming
+* **FEAT**: Dynamic overlay height — dropdown shrinks to fit filtered results instead of keeping fixed height
+* **FEAT**: Auto-reset search query on item selection, outside-tap dismissal, and dropdown reopen
+* **FEAT**: Added `rebuildOverlay()` method to `DropdownMixin` for triggering overlay rebuilds
+* **CHANGE**: `DropdownMixin` overlay container now uses `BoxConstraints(maxHeight:)` instead of fixed height to support dynamic content sizing
+
 ## 2.1.0
 
 * **FEAT**: `TextDropdownConfig.textAlign` now controls item alignment in the dropdown menu and button (previously hardcoded to left-align)
