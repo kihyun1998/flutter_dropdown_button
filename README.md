@@ -41,7 +41,7 @@ Add to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  flutter_dropdown_button: ^2.2.0
+  flutter_dropdown_button: ^2.2.1
 ```
 
 Import the package:
@@ -506,10 +506,12 @@ Row(
 ### Manual Dropdown Cleanup
 
 ```dart
-void navigateToHome() {
-  FlutterDropdownButton.closeAll();
-  Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
-}
+// Close with animation (trailing icon rotates back)
+FlutterDropdownButton.closeAll();
+
+// Close immediately without animation (useful before navigation)
+FlutterDropdownButton.closeAll(animate: false);
+Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
 ```
 
 **Note**: Dropdowns are automatically cleaned up during widget disposal. Use `closeAll()` only when you need explicit control.

@@ -61,6 +61,20 @@ class _DropdownBugTestPageState extends State<DropdownBugTestPage> {
     });
   }
 
+  void _closeAllAfterDelay() {
+    setState(() => _countdown = 2);
+
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (_countdown == 1) {
+        timer.cancel();
+        DropdownMixin.closeAll();
+        setState(() => _countdown = null);
+      } else {
+        setState(() => _countdown = _countdown! - 1);
+      }
+    });
+  }
+
   @override
   void dispose() {
     _timer?.cancel();
@@ -214,8 +228,10 @@ class _DropdownBugTestPageState extends State<DropdownBugTestPage> {
                 if (_countdown != null) const SizedBox(height: 32),
 
                 // Buttons
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                Wrap(
+                  alignment: WrapAlignment.center,
+                  spacing: 16,
+                  runSpacing: 12,
                   children: [
                     ElevatedButton.icon(
                       onPressed: _countdown == null ? _startCountdown : null,
@@ -235,7 +251,6 @@ class _DropdownBugTestPageState extends State<DropdownBugTestPage> {
                         ),
                       ),
                     ),
-                    const SizedBox(width: 16),
                     ElevatedButton.icon(
                       onPressed: _countdown == null
                           ? _startCountdownWithCloseAll
@@ -255,6 +270,28 @@ class _DropdownBugTestPageState extends State<DropdownBugTestPage> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                         backgroundColor: Colors.green,
+                        foregroundColor: Colors.white,
+                      ),
+                    ),
+                    ElevatedButton.icon(
+                      onPressed: _countdown == null
+                          ? _closeAllAfterDelay
+                          : null,
+                      icon: const Icon(Icons.timer, size: 24),
+                      label: const Text(
+                        '2s closeAll\n(no navigate)',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 14),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 16,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        backgroundColor: Colors.orange,
                         foregroundColor: Colors.white,
                       ),
                     ),

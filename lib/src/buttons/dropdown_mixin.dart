@@ -59,9 +59,9 @@ mixin DropdownMixin<T extends StatefulWidget> on State<T>, TickerProvider {
   /// The overlay entry that contains the dropdown options when open.
   OverlayEntry? _overlayEntry;
 
-  /// Tracks the currently open dropdown overlay for manual cleanup.
+  /// Tracks the currently open dropdown instance for cleanup via [closeAll].
   /// Only one dropdown can be open at a time due to overlay behavior.
-  static OverlayEntry? _currentOverlay;
+  static DropdownMixin? _currentInstance;
 
   /// Whether the dropdown is currently open.
   bool get isDropdownOpen => _overlayEntry != null;
@@ -207,9 +207,9 @@ mixin DropdownMixin<T extends StatefulWidget> on State<T>, TickerProvider {
     // Immediately remove overlay without animation when disposing
     // to prevent overlay from remaining after screen transitions
     if (_overlayEntry != null) {
-      // Clear the tracked overlay if it matches before removing
-      if (_currentOverlay == _overlayEntry) {
-        _currentOverlay = null;
+      // Clear the tracked instance if it matches before removing
+      if (_currentInstance == this) {
+        _currentInstance = null;
       }
 
       try {
@@ -225,29 +225,47 @@ mixin DropdownMixin<T extends StatefulWidget> on State<T>, TickerProvider {
     dropdownAnimationController.dispose();
   }
 
-  /// Closes all currently open dropdowns immediately without animation.
+  /// Closes the currently open dropdown.
   ///
-  /// This is useful when you need to manually close any open dropdown
-  /// before performing a navigation or other action. Since only one
-  /// dropdown can be open at a time, this removes that single overlay.
+  /// When [animate] is true (default), closes with the reverse animation
+  /// so the trailing icon and all state update properly.
+  /// When [animate] is false, removes the overlay immediately without
+  /// animation — useful right before navigation where the widget may
+  /// be disposed before the animation completes.
   ///
   /// Example usage:
   /// ```dart
-  /// // Close any open dropdown before navigation
+  /// // Close with animation (icon rotates back)
   /// DropdownMixin.closeAll();
+  ///
+  /// // Close immediately before navigation
+  /// DropdownMixin.closeAll(animate: false);
   /// Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
   /// ```
-  ///
-  /// Note: This removes the overlay immediately without animation,
-  /// similar to the behavior in [disposeDropdown].
-  static void closeAll() {
-    if (_currentOverlay != null) {
+  static void closeAll({bool animate = true}) {
+    if (_currentInstance == null) return;
+
+    final instance = _currentInstance!;
+    if (!instance.isDropdownOpen) {
+      _currentInstance = null;
+      return;
+    }
+
+    if (animate && instance.mounted) {
+      instance.closeDropdown();
+    } else {
+      // Immediate removal without animation
       try {
-        _currentOverlay!.remove();
+        instance._overlayEntry?.remove();
       } catch (e) {
         // Overlay may have already been removed, ignore the error
       } finally {
-        _currentOverlay = null;
+        instance.dropdownAnimationController.reset();
+        instance._overlayEntry = null;
+        _currentInstance = null;
+        if (instance.mounted) {
+          instance.setState(() {});
+        }
       }
     }
   }
@@ -272,8 +290,15 @@ mixin DropdownMixin<T extends StatefulWidget> on State<T>, TickerProvider {
   }
 
   /// Opens the dropdown by creating and inserting an overlay entry.
+  ///
+  /// If another dropdown is already open, it will be closed first.
   void openDropdown() {
     if (isDropdownOpen || !isEnabled) return;
+
+    // Close any previously open dropdown before opening a new one
+    if (_currentInstance != null && _currentInstance != this) {
+      _currentInstance!.closeDropdown();
+    }
 
     final renderBox =
         dropdownButtonKey.currentContext!.findRenderObject() as RenderBox;
@@ -283,8 +308,8 @@ mixin DropdownMixin<T extends StatefulWidget> on State<T>, TickerProvider {
     _overlayEntry = _createOverlayEntry(buttonOffset, buttonSize);
     Overlay.of(context).insert(_overlayEntry!);
 
-    // Track the current overlay for manual cleanup via closeAll()
-    _currentOverlay = _overlayEntry;
+    // Track the current instance for cleanup via closeAll()
+    _currentInstance = this;
 
     dropdownAnimationController.forward();
 
@@ -302,9 +327,9 @@ mixin DropdownMixin<T extends StatefulWidget> on State<T>, TickerProvider {
       // Check if widget is still mounted before removing overlay
       if (!mounted) return;
 
-      // Clear the tracked overlay if it matches before removing
-      if (_currentOverlay == _overlayEntry) {
-        _currentOverlay = null;
+      // Clear the tracked instance if it matches before removing
+      if (_currentInstance == this) {
+        _currentInstance = null;
       }
 
       // Safely remove overlay with error handling

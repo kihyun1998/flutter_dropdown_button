@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.2.1
+
+* **FIX**: Fixed `closeAll()` not resetting trailing icon rotation and internal state — overlay was removed but `_overlayEntry`, animation controller, and `setState` were not handled, leaving the icon in the open (rotated) state
+* **FIX**: Fixed `openDropdown()` not closing the previously open dropdown when another dropdown is opened, which could leave orphaned overlays
+* **FEAT**: Added `animate` parameter to `closeAll()` — defaults to `true` for animated close with icon rotation, set to `false` for immediate removal before navigation
+
 ## 2.2.0
 
 * **FEAT**: Added searchable dropdown support with real-time item filtering
