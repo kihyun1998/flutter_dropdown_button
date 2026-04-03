@@ -604,6 +604,14 @@ FlutterDropdownButton<String>.text(
 
 Check out the [example app](example/) for a comprehensive demonstration of all features and customization options.
 
+## Documentation
+
+- [Use Cases](documentation/use_cases.md) - Font picker, dynamic width, color picker, country picker examples
+- [API Reference](documentation/api_reference.md) - Complete API documentation
+- [Theming](documentation/theming.md) - Theming and styling guide
+- [Text Configuration](documentation/text_configuration.md) - Text-specific configuration guide
+- [Migration](documentation/migration.md) - Migration guide from previous versions
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
