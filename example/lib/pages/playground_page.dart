@@ -110,6 +110,15 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
   double _dtItemBorderWidth = 1.0;
   bool _dtExcludeLastItemBorder = true;
 
+  // ── Disabled Styling ────────────────────────────────────────────────────
+  Color? _dtDisabledBackgroundColor;
+  bool _dtDisabledBorderEnabled = false;
+  Color _dtDisabledBorderColor = Colors.grey;
+  double _dtDisabledBorderWidth = 1.0;
+  bool _cfgDisabledTextStyleEnabled = false;
+  Color _cfgDisabledTextColor = Colors.grey;
+  double _cfgDisabledTextFontSize = 14;
+
   // ── Search ─────────────────────────────────────────────────────────────
   bool _searchable = false;
 
@@ -282,6 +291,13 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
               )
             : null,
         excludeLastItemBorder: _dtExcludeLastItemBorder,
+        disabledBackgroundColor: _dtDisabledBackgroundColor,
+        disabledBorder: _dtDisabledBorderEnabled
+            ? Border.all(
+                color: _dtDisabledBorderColor,
+                width: _dtDisabledBorderWidth,
+              )
+            : null,
       ),
       scroll: _dstEnabled
           ? DropdownScrollTheme(
@@ -357,6 +373,12 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
       maxLines: _cfgMaxLines,
       textAlign: _textAlign,
       softWrap: _softWrap,
+      disabledTextStyle: _cfgDisabledTextStyleEnabled
+          ? TextStyle(
+              color: _cfgDisabledTextColor,
+              fontSize: _cfgDisabledTextFontSize,
+            )
+          : null,
     );
   }
 
@@ -408,6 +430,7 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
           if (_type == DropdownType.text) _buildTextDropdownButtonSection(),
           if (_type == DropdownType.text) _buildTextDropdownConfigSection(),
           _buildDropdownThemeSection(),
+          _buildDisabledStylingSection(),
           if (_searchable) _buildSearchThemeSection(),
           _buildScrollThemeSection(),
           _buildTooltipThemeSection(),
@@ -1025,6 +1048,83 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
             _dtExcludeLastItemBorder,
             (v) => setState(() => _dtExcludeLastItemBorder = v),
           ),
+        ],
+      ],
+    );
+  }
+
+  // ── Section: Disabled Styling ───────────────────────────────────────────
+  Widget _buildDisabledStylingSection() {
+    return ExpansionTile(
+      title: const Text(
+        'Disabled Styling',
+        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+      ),
+      subtitle: Text(
+        _enabled
+            ? 'Toggle "enabled" off to preview'
+            : 'Preview active (enabled = false)',
+        style: TextStyle(
+          fontSize: 11,
+          color: _enabled ? Colors.grey : Colors.deepPurple,
+        ),
+      ),
+      initiallyExpanded: false,
+      childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+      children: [
+        const _SubSectionLabel('Button Background'),
+        _colorRow(
+          'disabledBackgroundColor',
+          _dtDisabledBackgroundColor,
+          (c) => setState(() => _dtDisabledBackgroundColor = c),
+          solidOnly: false,
+        ),
+        const _SubSectionLabel('Button Border'),
+        _switchRow(
+          'disabledBorder',
+          _dtDisabledBorderEnabled,
+          (v) => setState(() => _dtDisabledBorderEnabled = v),
+        ),
+        if (_dtDisabledBorderEnabled) ...[
+          _colorRow(
+            '  borderColor',
+            _dtDisabledBorderColor,
+            (c) =>
+                setState(() => _dtDisabledBorderColor = c ?? Colors.grey),
+            solidOnly: true,
+          ),
+          _sliderRow(
+            '  borderWidth',
+            _dtDisabledBorderWidth,
+            0.5,
+            8,
+            (v) => setState(() => _dtDisabledBorderWidth = v),
+            divisions: 15,
+          ),
+        ],
+        if (_type == DropdownType.text) ...[
+          const _SubSectionLabel('Text (TextDropdownConfig)'),
+          _switchRow(
+            'disabledTextStyle',
+            _cfgDisabledTextStyleEnabled,
+            (v) => setState(() => _cfgDisabledTextStyleEnabled = v),
+          ),
+          if (_cfgDisabledTextStyleEnabled) ...[
+            _colorRow(
+              '  color',
+              _cfgDisabledTextColor,
+              (c) =>
+                  setState(() => _cfgDisabledTextColor = c ?? Colors.grey),
+              solidOnly: true,
+            ),
+            _sliderRow(
+              '  fontSize',
+              _cfgDisabledTextFontSize,
+              8,
+              32,
+              (v) => setState(() => _cfgDisabledTextFontSize = v),
+            ),
+          ],
         ],
       ],
     );

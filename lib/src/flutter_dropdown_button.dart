@@ -585,6 +585,21 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
   }
 
   BoxDecoration _buildButtonDecoration() {
+    if (!isEnabled) {
+      if (effectiveTheme.disabledButtonDecoration != null) {
+        return effectiveTheme.disabledButtonDecoration!;
+      }
+      if (effectiveTheme.disabledBackgroundColor != null ||
+          effectiveTheme.disabledBorder != null) {
+        return BoxDecoration(
+          color: effectiveTheme.disabledBackgroundColor,
+          border: effectiveTheme.disabledBorder ??
+              effectiveTheme.border ??
+              Border.all(color: Theme.of(context).dividerColor),
+          borderRadius: BorderRadius.circular(effectiveTheme.borderRadius),
+        );
+      }
+    }
     return effectiveTheme.buttonDecoration ??
         BoxDecoration(
           border: effectiveTheme.border ??
@@ -703,10 +718,16 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
     final displayText = selectedText ?? widget.hintText ?? '';
     final isHint = selectedText == null;
 
+    final baseStyle = isHint ? _textConfig.hintStyle : _textConfig.textStyle;
+    final resolvedStyle = !isEnabled && _textConfig.disabledTextStyle != null
+        ? (baseStyle?.merge(_textConfig.disabledTextStyle) ??
+            _textConfig.disabledTextStyle)
+        : baseStyle;
+
     final textWidget = SmartTooltipText(
       text: displayText,
       tooltipTheme: effectiveTooltipTheme,
-      style: isHint ? _textConfig.hintStyle : _textConfig.textStyle,
+      style: resolvedStyle,
       textAlign: _textConfig.textAlign,
       maxLines: _textConfig.maxLines,
       overflow: _textConfig.overflow,

@@ -48,6 +48,9 @@ class DropdownTheme {
     this.overlayPadding,
     this.itemBorder,
     this.excludeLastItemBorder = true,
+    this.disabledBackgroundColor,
+    this.disabledBorder,
+    this.disabledButtonDecoration,
   });
 
   /// The duration of the dropdown show/hide animation.
@@ -252,6 +255,27 @@ class DropdownTheme {
   /// Defaults to true.
   final bool excludeLastItemBorder;
 
+  /// The background color of the dropdown button when disabled.
+  ///
+  /// If null, falls back to the regular button background (transparent /
+  /// [buttonDecoration]). Use this together with [disabledBorder] to give
+  /// the disabled button a visually distinct appearance.
+  final Color? disabledBackgroundColor;
+
+  /// The border of the dropdown button when disabled.
+  ///
+  /// If null, falls back to the regular [border]. Only applied when
+  /// [disabledButtonDecoration] is not provided.
+  final Border? disabledBorder;
+
+  /// Custom decoration for the dropdown button when disabled.
+  ///
+  /// If provided, this takes full precedence over [disabledBackgroundColor]
+  /// and [disabledBorder] when the button is disabled. If null, the disabled
+  /// appearance is composed from [disabledBackgroundColor] and
+  /// [disabledBorder], falling back to [buttonDecoration] / [border].
+  final BoxDecoration? disabledButtonDecoration;
+
   /// Creates a copy of this theme with the given fields replaced.
   DropdownTheme copyWith({
     Duration? animationDuration,
@@ -282,6 +306,9 @@ class DropdownTheme {
     EdgeInsets? overlayPadding,
     Border? itemBorder,
     bool? excludeLastItemBorder,
+    Color? disabledBackgroundColor,
+    Border? disabledBorder,
+    BoxDecoration? disabledButtonDecoration,
   }) {
     return DropdownTheme(
       animationDuration: animationDuration ?? this.animationDuration,
@@ -313,6 +340,11 @@ class DropdownTheme {
       itemBorder: itemBorder ?? this.itemBorder,
       excludeLastItemBorder:
           excludeLastItemBorder ?? this.excludeLastItemBorder,
+      disabledBackgroundColor:
+          disabledBackgroundColor ?? this.disabledBackgroundColor,
+      disabledBorder: disabledBorder ?? this.disabledBorder,
+      disabledButtonDecoration:
+          disabledButtonDecoration ?? this.disabledButtonDecoration,
     );
   }
 

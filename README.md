@@ -41,7 +41,7 @@ Add to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  flutter_dropdown_button: ^2.2.1
+  flutter_dropdown_button: ^2.3.0
 ```
 
 Import the package:
@@ -249,6 +249,16 @@ Controls general styling for button, overlay, and items.
 | `iconDisabledColor` | `Color?` | `null` | Icon color when disabled |
 | `iconPadding` | `EdgeInsets?` | `EdgeInsets.only(left: 8.0)` | Padding around the icon |
 
+#### Disabled State
+
+Applied when `enabled: false` (or when the single-item auto-disable kicks in). If none of these are set, the disabled button falls back to the regular `buttonDecoration` / `border`.
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `disabledButtonDecoration` | `BoxDecoration?` | `null` | Full custom decoration for the disabled button (takes precedence over the two below) |
+| `disabledBackgroundColor` | `Color?` | `null` | Background color of the button when disabled |
+| `disabledBorder` | `Border?` | `null` | Border of the button when disabled (falls back to `border`) |
+
 ### DropdownScrollTheme
 
 Controls scrollbar appearance inside the dropdown overlay.
@@ -355,6 +365,7 @@ Configuration for text rendering in `.text()` mode.
 | `textStyle` | `TextStyle?` | `null` | Style for item text |
 | `hintStyle` | `TextStyle?` | `null` | Style for hint text |
 | `selectedTextStyle` | `TextStyle?` | `null` | Style for selected item text |
+| `disabledTextStyle` | `TextStyle?` | `null` | Style for button text (value and hint) when disabled — merged over `textStyle` / `hintStyle` |
 | `textAlign` | `TextAlign` | `.start` | Horizontal text alignment (also controls item alignment in menu) |
 | `softWrap` | `bool` | `true` | Allow line breaks at word boundaries |
 

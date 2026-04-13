@@ -47,6 +47,7 @@ class TextDropdownConfig {
     this.textStyle,
     this.hintStyle,
     this.selectedTextStyle,
+    this.disabledTextStyle,
     this.textAlign = TextAlign.start,
     this.softWrap = true,
     this.textDirection,
@@ -87,6 +88,14 @@ class TextDropdownConfig {
   /// Applied to the selected item's text in both the button
   /// and the dropdown overlay. If null, uses [textStyle].
   final TextStyle? selectedTextStyle;
+
+  /// The text style used on the dropdown button when it is disabled.
+  ///
+  /// Applied to both the selected value and hint text while the button
+  /// is disabled (either via `enabled: false` or single-item auto-disable
+  /// with `disableWhenSingleItem`). If null, falls back to [textStyle] /
+  /// [hintStyle] with no disabled-specific treatment.
+  final TextStyle? disabledTextStyle;
 
   /// How to align text within dropdown items.
   ///
@@ -131,6 +140,7 @@ class TextDropdownConfig {
     TextStyle? textStyle,
     TextStyle? hintStyle,
     TextStyle? selectedTextStyle,
+    TextStyle? disabledTextStyle,
     TextAlign? textAlign,
     bool? softWrap,
     TextDirection? textDirection,
@@ -144,6 +154,7 @@ class TextDropdownConfig {
       textStyle: textStyle ?? this.textStyle,
       hintStyle: hintStyle ?? this.hintStyle,
       selectedTextStyle: selectedTextStyle ?? this.selectedTextStyle,
+      disabledTextStyle: disabledTextStyle ?? this.disabledTextStyle,
       textAlign: textAlign ?? this.textAlign,
       softWrap: softWrap ?? this.softWrap,
       textDirection: textDirection ?? this.textDirection,

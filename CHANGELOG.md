@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.3.0
+
+* **FEAT**: Added `DropdownTheme.disabledBackgroundColor` for the dropdown button background when disabled
+* **FEAT**: Added `DropdownTheme.disabledBorder` for the dropdown button border when disabled
+* **FEAT**: Added `DropdownTheme.disabledButtonDecoration` for a full custom button decoration when disabled (takes precedence over `disabledBackgroundColor` / `disabledBorder`)
+* **FEAT**: Added `TextDropdownConfig.disabledTextStyle` for styling the button text (both value and hint) when disabled — merged over the base `textStyle` / `hintStyle`
+* **FEAT**: Added "Disabled Styling" section to the example playground to live-preview the new options (toggle `enabled: false` to see the effect)
+
 ## 2.2.1
 
 * **FIX**: Fixed `closeAll()` not resetting trailing icon rotation and internal state — overlay was removed but `_overlayEntry`, animation controller, and `setState` were not handled, leaving the icon in the open (rotated) state
