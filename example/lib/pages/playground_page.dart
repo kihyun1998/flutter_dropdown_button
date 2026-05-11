@@ -1089,8 +1089,7 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
           _colorRow(
             '  borderColor',
             _dtDisabledBorderColor,
-            (c) =>
-                setState(() => _dtDisabledBorderColor = c ?? Colors.grey),
+            (c) => setState(() => _dtDisabledBorderColor = c ?? Colors.grey),
             solidOnly: true,
           ),
           _sliderRow(
@@ -1113,8 +1112,7 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
             _colorRow(
               '  color',
               _cfgDisabledTextColor,
-              (c) =>
-                  setState(() => _cfgDisabledTextColor = c ?? Colors.grey),
+              (c) => setState(() => _cfgDisabledTextColor = c ?? Colors.grey),
               solidOnly: true,
             ),
             _sliderRow(
