@@ -566,6 +566,9 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
         color: Colors.transparent,
         child: InkWell(
           onTap: isEnabled ? toggleDropdown : null,
+          mouseCursor: isEnabled
+              ? SystemMouseCursors.click
+              : SystemMouseCursors.forbidden,
           borderRadius: BorderRadius.circular(effectiveTheme.borderRadius),
           splashColor:
               effectiveTheme.buttonSplashColor ?? Theme.of(context).splashColor,
@@ -1029,6 +1032,7 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
             widget.onChanged(item);
             onDropdownItemSelected();
           },
+          mouseCursor: SystemMouseCursors.click,
           splashColor:
               effectiveTheme.itemSplashColor ?? Theme.of(context).splashColor,
           highlightColor: effectiveTheme.itemHighlightColor ??

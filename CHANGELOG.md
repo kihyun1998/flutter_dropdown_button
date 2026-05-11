@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.3.1
+
+* **FIX**: Explicitly set `mouseCursor` on `InkWell` widgets to restore hover cursor behavior on web/desktop after recent Flutter versions changed the default `MaterialStateMouseCursor.clickable` resolution
+* **FIX**: Dropdown button now shows `SystemMouseCursors.click` when enabled and `SystemMouseCursors.forbidden` when disabled (matches HTML `<button disabled>` `cursor: not-allowed` convention)
+* **FIX**: Dropdown items now consistently show `SystemMouseCursors.click` on hover
+
 ## 2.3.0
 
 * **FEAT**: Added `DropdownTheme.disabledBackgroundColor` for the dropdown button background when disabled
