@@ -1,7 +1,6 @@
 library;
 
 export 'src/flutter_dropdown_button.dart';
-export 'src/buttons/dropdown_mixin.dart';
 export 'src/buttons/menu_alignment.dart';
 export 'src/overlay/dropdown_overlay_controller.dart';
 export 'src/config/text_dropdown_config.dart';

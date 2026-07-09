@@ -57,15 +57,15 @@ The second half is where the bugs are, and it is the half worth testing. When ad
 
 ## Deprecated
 
-`DropdownMixin` (`lib/src/buttons/dropdown_mixin.dart`) is deprecated as of 2.4.0 and slated for removal in 3.0.0 (issue #7). It survives only as a delegating shim over `DropdownOverlayController`, and shares the controller's registry so that mixin-based and controller-based menus obey the same single-open rule.
+Nothing. 3.0.0 removed the last of it — `DropdownMixin`, `DropdownTheme.animationDuration`, and `DropdownTooltipTheme.borderColor` / `.borderWidth`.
 
-Nothing in this package uses it. Do not build on it.
+When you deprecate a member, annotate the **field, the constructor parameter and the `copyWith` parameter** separately. `@Deprecated` does not propagate from a field to its initializing formal, so annotating only the field lets `DropdownTheme(animationDuration: ...)` compile silently. Verify from `example/`, which is a separate package — within this package the analyzer stays quiet.
 
 ## Development Commands
 
 ```bash
 flutter pub get              # install dependencies
-flutter test                 # run the suite (107 tests)
+flutter test                 # run the suite (103 tests)
 flutter analyze              # static analysis; must be clean
 dart format .                # formatting; must produce no changes
 flutter pub publish --dry-run   # validate the package before release
@@ -75,7 +75,7 @@ cd example && flutter run    # run the playground app
 
 ## Testing
 
-107 tests. 59 of them run without mounting a widget at all.
+103 tests. 56 of them run without mounting a widget at all.
 
 | Suite | What it covers |
 | --- | --- |
@@ -116,9 +116,7 @@ lib/
     │   ├── search_field_theme.dart
     │   └── tooltip_theme.dart
     ├── config/text_dropdown_config.dart  # text overflow, alignment, styles
-    ├── buttons/
-    │   ├── dropdown_mixin.dart           # DEPRECATED shim; removed in 3.0.0
-    │   └── menu_alignment.dart
+    ├── buttons/menu_alignment.dart
     └── widgets/smart_tooltip_text.dart   # tooltip on overflow
 ```
 

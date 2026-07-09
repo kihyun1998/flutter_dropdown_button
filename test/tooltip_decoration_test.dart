@@ -78,7 +78,7 @@ void main() {
   testWidgets('a border does not blank the box', (tester) async {
     final tooltip = await pumpTooltip(
       tester,
-      const DropdownTooltipTheme(borderColor: Colors.red, borderWidth: 3),
+      DropdownTooltipTheme(border: Border.all(color: Colors.red, width: 3)),
     );
 
     final border = boxOf(tooltip).border! as Border;

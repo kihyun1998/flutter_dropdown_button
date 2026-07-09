@@ -41,19 +41,6 @@ Full parameter tables live in `README.md`. The two constructors share every layo
 |--------|-------------|
 | `closeAll({bool animate = true})` | Closes every open menu. Pass `animate: false` right before navigation, when the widget may be disposed before an animation could finish |
 
-## DropdownPositionResult
-
-Position calculation result, returned by the deprecated `DropdownMixin.calculateDropdownPosition()`. New code reads a `DropdownPlacementResult` from `DropdownOverlayController.measurePlacement()` instead. Removed alongside the mixin in 3.0.0.
-
-### Properties
-
-| Property | Type | Description |
-|----------|------|-------------|
-| `height` | `double` | The calculated height for the dropdown overlay |
-| `openDown` | `bool` | Whether the dropdown should open downward (true) or upward (false) |
-| `transformAlignment` | `Alignment` | The transform alignment for animations |
-| `topPosition` | `double` | The calculated top position for the overlay |
-
 ## DropdownTheme
 
 Shared theme configuration for all dropdown widgets.
@@ -140,7 +127,7 @@ Drives a dropdown menu: its overlay's lifetime, its open/close animation, the wi
 
 **Hold one; do not inherit from it.** This package's own `FlutterDropdownButton` holds the same controller, so a custom dropdown built on it behaves identically.
 
-Replaces `DropdownMixin`, which is deprecated and will be removed in 3.0.0.
+Replaces `DropdownMixin`, which was removed in 3.0.0.
 
 ### Usage
 
@@ -223,46 +210,18 @@ Describes one rendering of the menu. Everything that is not an item — the sear
 | `borderRadius` | `double` | `8.0` | Corner radius |
 | `shadowColor` | `Color?` | `null` | Shadow colour |
 
-## DropdownMixin<T>
+## Manual Dropdown Cleanup
 
-**Deprecated since 2.4.0. Removed in 3.0.0.** Hold a `DropdownOverlayController` instead.
+`FlutterDropdownButton.closeAll()` closes every open menu without needing a reference to the widget that opened it. Use it before navigating away, or before showing a dialog, when a menu may still be on screen.
 
-The mixin still works — it now delegates to a controller — so mixin-based and controller-based menus share one "only one menu open" registry and both answer `closeAll()`.
+`DropdownOverlayController.closeAll()` is the same call one layer down, and closes menus opened by either.
 
-Migration: the twenty-three members the mixin asked you to implement collapse into a single `DropdownOverlaySpec`.
-
-```dart
-// Before
-class _MyDropdownState extends State<MyDropdown>
-    with SingleTickerProviderStateMixin, DropdownMixin<MyDropdown> {
-  @override
-  Widget buildOverlayContent(double height) => ListView(...);
-  @override
-  int get itemCount => widget.items.length;
-  @override
-  Duration get animationDuration => Duration(milliseconds: 200);
-  // ...twenty more
-}
-
-// After — see DropdownOverlayController above
-```
-
-### Manual Dropdown Cleanup
-
-The `closeAll()` static method provides a way to manually close any open dropdown overlay. This is useful when you need to ensure all dropdowns are closed before navigation or other actions.
-
-#### Features
-- **Static Method**: Can be called without a dropdown instance
-- **Immediate Cleanup**: Removes overlay instantly without animation
-- **Safe Execution**: Handles already-removed overlays gracefully
-- **Single Overlay**: Only one dropdown can be open at a time
-
-#### Example Usage
+Pass `animate: false` when the widget may be disposed before the closing animation could finish — navigation is the usual case. It defaults to `true`.
 
 ```dart
 // Close any open dropdown before navigation
 void navigateAway() {
-  DropdownMixin.closeAll();
+  FlutterDropdownButton.closeAll(animate: false);
   Navigator.pushNamedAndRemoveUntil(
     context,
     '/home',
@@ -272,13 +231,15 @@ void navigateAway() {
 
 // Close dropdown before showing dialog
 void showConfirmDialog() {
-  DropdownMixin.closeAll();
+  FlutterDropdownButton.closeAll();
   showDialog(
     context: context,
     builder: (context) => AlertDialog(...),
   );
 }
 ```
+
+Only one menu is open at a time **within an `Overlay`**. Two dropdowns living in two different `Overlay`s — a side panel and the root route, say — do not close each other, and `closeAll()` closes both.
 
 #### Automatic vs Manual Cleanup
 

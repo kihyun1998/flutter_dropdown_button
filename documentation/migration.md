@@ -1,5 +1,94 @@
 # Migration Guide
 
+## Migrating from 2.x to 3.0.0
+
+Version 3.0.0 removes everything deprecated during the 2.x line. Nothing was renamed and no behaviour changed — each removed member already had a replacement that was doing the work.
+
+| Removed (2.x) | Replacement |
+|---|---|
+| `DropdownMixin<T>` | `DropdownOverlayController` |
+| `DropdownMixin.calculateMenuWidth()` / `.calculateMenuLeftPosition()` | `DropdownPlacement.resolve()` |
+| `DropdownMixin.calculateDropdownPosition()` / `DropdownPositionResult` | `DropdownOverlayController.measurePlacement()` → `DropdownPlacementResult` |
+| `DropdownTheme.animationDuration` | `FlutterDropdownButton.animationDuration` |
+| `DropdownTooltipTheme.borderColor` / `.borderWidth` | `DropdownTooltipTheme.border` |
+
+**If you only ever used `FlutterDropdownButton`, nothing here affects you.** The removals are all on classes you had to reach for deliberately.
+
+### DropdownMixin
+
+Hold a controller instead of mixing one in. The twenty-three members the mixin asked you to override collapse into one `DropdownOverlaySpec`.
+
+**Before (2.x):**
+```dart
+class _MyDropdownState extends State<MyDropdown>
+    with SingleTickerProviderStateMixin, DropdownMixin<MyDropdown> {
+  @override
+  Widget buildOverlayContent(double height) => ListView(...);
+  @override
+  int get itemCount => widget.items.length;
+  // ...twenty more overrides
+}
+```
+
+**After (3.0):**
+```dart
+class _MyDropdownState extends State<MyDropdown>
+    with SingleTickerProviderStateMixin {
+  late final _menu = DropdownOverlayController(
+    vsync: this,
+    spec: () => DropdownOverlaySpec(
+      itemCount: widget.items.length,
+      actualItemHeight: 48,
+      maxDropdownHeight: 300,
+    ),
+    contentBuilder: (height) => ListView(...),
+    decorationBuilder: () => null,
+    onOpenStateChanged: (_) => setState(() {}),
+  );
+
+  @override
+  void dispose() {
+    _menu.dispose();
+    super.dispose();
+  }
+}
+```
+
+`spec` is a **callback**, not a value: it is re-read on every overlay build, so an open menu resizes when its items change. See `example/lib/pages/domain_type_page.dart` for a working dropdown built this way.
+
+### DropdownTheme.animationDuration
+
+This field was never read. Setting it did nothing; the animation has always been driven by the widget.
+
+```dart
+// Before — silently ignored
+theme: DropdownStyleTheme(
+  dropdown: DropdownTheme(animationDuration: Duration(milliseconds: 300)),
+)
+
+// After
+FlutterDropdownButton<String>.text(
+  animationDuration: const Duration(milliseconds: 300),
+  // ...
+)
+```
+
+If you were setting it on the theme, your menus were animating at 200ms and still are. Move the value across only if you actually wanted the slower animation.
+
+### DropdownTooltipTheme.borderColor / borderWidth
+
+```dart
+// Before
+DropdownTooltipTheme(borderColor: Colors.red, borderWidth: 2)
+
+// After
+DropdownTooltipTheme(border: Border.all(color: Colors.red, width: 2))
+```
+
+`border` takes any `BoxBorder`, so a one-sided border is now expressible, and a width without a colour no longer is.
+
+---
+
 ## Migrating from 1.x to 2.0.0
 
 Version 2.0.0 unifies all dropdown variants (`BasicDropdownButton`, `TextOnlyDropdownButton`, `DynamicTextBaseDropdownButton`) into a single `FlutterDropdownButton<T>` widget with two modes.
@@ -242,7 +331,7 @@ DropdownMixin.closeAll();
 FlutterDropdownButton.closeAll();
 ```
 
-`DropdownMixin.closeAll()` still works internally, but the public API is now `FlutterDropdownButton.closeAll()`.
+`DropdownMixin` was removed in 3.0.0; the public API is `FlutterDropdownButton.closeAll()`.
 
 ### Quick Find & Replace Guide
 
