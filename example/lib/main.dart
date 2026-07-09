@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'pages/playground_page.dart';
 import 'pages/bug_test_page.dart';
+import 'pages/domain_type_page.dart';
 import 'pages/result_page.dart';
 
 void main() {
@@ -22,6 +23,7 @@ class MyApp extends StatelessWidget {
       home: const PlaygroundPage(),
       routes: {
         '/dropdown-bug-test': (context) => const DropdownBugTestPage(),
+        '/domain-type': (context) => const DomainTypePage(),
         '/result-page': (context) => const ResultPage(),
       },
     );

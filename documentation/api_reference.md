@@ -228,72 +228,118 @@ DropdownTheme({
 | `itemSplashColor` | `Color?` | null | Splash color for item interactions |
 | `itemHighlightColor` | `Color?` | null | Highlight color for item touch |
 
-## DropdownMixin<T>
+## DropdownOverlayController
 
-A mixin that provides common dropdown functionality including positioning, animations, and overlay management.
+Drives a dropdown menu: its overlay's lifetime, its open/close animation, the widget tree the menu is drawn into, and the rule that only one menu is open at a time within an `Overlay`.
 
-This mixin eliminates code duplication between different dropdown variants by providing shared functionality for smart positioning, animation setup, overlay management, and common state management.
+**Hold one; do not inherit from it.** This package's own `FlutterDropdownButton` holds the same controller, so a custom dropdown built on it behaves identically.
 
-### Key Features
-
-- **Smart Positioning**: Automatically opens upward when insufficient space below
-- **Dynamic Height Adjustment**: Prevents screen overflow with adaptive height
-- **Animation Management**: Consistent scale and opacity animations
-- **Overlay Lifecycle**: Proper creation, insertion, and disposal
-- **Outside-tap Dismissal**: Automatic closure when tapping outside
+Replaces `DropdownMixin`, which is deprecated and will be removed in 3.0.0.
 
 ### Usage
 
 ```dart
-class _MyDropdownState extends State<MyDropdown> 
-    with SingleTickerProviderStateMixin, DropdownMixin<MyDropdown> {
-  
+class _MyDropdownState extends State<MyDropdown>
+    with SingleTickerProviderStateMixin {
+  late final _menu = DropdownOverlayController(
+    vsync: this,
+    spec: () => DropdownOverlaySpec(
+      itemCount: widget.items.length,
+      actualItemHeight: 48,
+      maxDropdownHeight: 200,
+    ),
+    contentBuilder: (height) => ListView(...),
+    decorationBuilder: () => null,
+    onOpenStateChanged: (_) => setState(() {}),
+  );
+
   @override
-  Widget buildOverlayContent(double height) {
-    return Container(height: height, child: ListView(...));
+  void dispose() {
+    _menu.dispose();
+    super.dispose();
   }
-  
+
   @override
-  Duration get animationDuration => Duration(milliseconds: 200);
-  // ... other required implementations
+  Widget build(BuildContext context) => InkWell(
+        key: _menu.buttonKey,
+        onTap: () => _menu.toggle(context),
+        child: ...,
+      );
 }
 ```
 
-### Abstract Properties
+A working example lives in `example/lib/pages/domain_type_page.dart`.
 
-| Property | Type | Description |
-|----------|------|-------------|
-| `animationDuration` | `Duration` | Duration of show/hide animations |
-| `itemHeight` | `double` | Height of each dropdown item |
-| `maxDropdownHeight` | `double` | Maximum height of dropdown overlay |
-| `itemCount` | `int` | Number of items in the dropdown |
-| `isEnabled` | `bool` | Whether dropdown is interactive (default: true) |
-| `screenMargin` | `double` | Safety margin from screen edges (default: 8.0) |
-| `buttonGap` | `double` | Gap between button and overlay (default: 4.0) |
-| `minVisibleItems` | `int` | Minimum visible items when constrained (default: 2) |
-| `overlayElevation` | `double` | Elevation of overlay Material (default: 8.0) |
-| `overlayBorderRadius` | `double` | Border radius for overlay (default: 8.0) |
-| `overlayShadowColor` | `Color?` | Shadow color for overlay (default: null) |
+### Constructor
 
-### Abstract Methods
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| **`vsync`** | `TickerProvider` | Drives the open/close animation |
+| **`spec`** | `DropdownOverlaySpec Function()` | Called on every overlay build. A callback, not a value: the item count and theme change while the menu is open |
+| **`contentBuilder`** | `Widget Function(double height)` | Builds the menu's content, given the height available to it |
+| **`decorationBuilder`** | `BoxDecoration? Function()` | Decorates the overlay container. Return null for a themed default |
+| `animationDuration` | `Duration` | Defaults to 200ms |
+| `onOpenStateChanged` | `ValueChanged<bool>?` | Called after the menu opens or closes, so the owner can rebuild |
 
-| Method | Return Type | Description |
-|--------|-------------|-------------|
-| `buildOverlayContent(double height)` | `Widget` | Builds the scrollable content for the overlay |
-| `buildOverlayDecoration()` | `BoxDecoration?` | Builds custom decoration (null for default) |
-| `onDropdownItemSelected()` | `void` | Called when an item is selected |
+### Members
 
-### Available Methods
-
-| Method | Description |
+| Member | Description |
 |--------|-------------|
-| `initializeDropdown()` | Initialize animations and controllers |
-| `disposeDropdown()` | Dispose of dropdown resources |
-| `toggleDropdown()` | Toggle between open/closed states |
-| `openDropdown()` | Open the dropdown overlay |
-| `closeDropdown()` | Close the dropdown overlay |
-| `calculateDropdownPosition()` | Calculate optimal position and height |
-| `closeAll()` (static) | Manually close any open dropdown immediately |
+| `buttonKey` | Attach to the button so the controller can measure it |
+| `isOpen` | Whether the menu is showing |
+| `animation` | Runs forward as the menu opens. Drive your own transitions from it — a rotating trailing icon, say |
+| `open(context)` | Shows the menu, closing whichever menu is open in the same `Overlay` |
+| `close({animate = true})` | Hides the menu. Pass `animate: false` to tear it down at once |
+| `toggle(context)` | Opens if closed, closes if open |
+| `rebuild()` | Rebuilds and re-measures the menu in place. Not legal during a build — defer to a post-frame callback |
+| `dispose()` | Releases the animation and removes the overlay |
+| `closeAll({animate = true})` (static) | Closes every open menu, in every `Overlay` |
+
+### DropdownOverlaySpec
+
+Describes one rendering of the menu. Everything that is not an item — the search field, the border, the overlay's padding — is summed into the space the menu reserves for chrome, so a short list never acquires a scrollbar just because search is enabled.
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| **`itemCount`** | `int` | required | How many items the menu holds |
+| **`actualItemHeight`** | `double` | required | Vertical space one item occupies, including its margin |
+| **`maxDropdownHeight`** | `double` | required | The tallest the item list may grow |
+| `chromeHeight` | `double` | `0.0` | Space taken by furniture that is not an item — a search field |
+| `borderThickness` | `double` | `0.0` | Total thickness of the overlay's top and bottom borders |
+| `overlayPadding` | `EdgeInsets?` | `null` | Padding inside the overlay container |
+| `screenMargin` | `double` | `8.0` | Gap kept between the menu and the safe-area edge |
+| `buttonGap` | `double` | `4.0` | Gap kept between the button and the menu |
+| `minVisibleItems` | `int` | `2` | Items kept visible when space runs out, even at the cost of the margin |
+| `minMenuWidth` | `double?` | `null` | Narrowest the menu may be |
+| `maxMenuWidth` | `double?` | `null` | Widest the menu may be |
+| `menuAlignment` | `MenuAlignment` | `.left` | How the menu lines up with a narrower button |
+| `elevation` | `double` | `8.0` | Shadow depth |
+| `borderRadius` | `double` | `8.0` | Corner radius |
+| `shadowColor` | `Color?` | `null` | Shadow colour |
+
+## DropdownMixin<T>
+
+**Deprecated since 2.4.0. Removed in 3.0.0.** Hold a `DropdownOverlayController` instead.
+
+The mixin still works — it now delegates to a controller — so mixin-based and controller-based menus share one "only one menu open" registry and both answer `closeAll()`.
+
+Migration: the twenty-three members the mixin asked you to implement collapse into a single `DropdownOverlaySpec`.
+
+```dart
+// Before
+class _MyDropdownState extends State<MyDropdown>
+    with SingleTickerProviderStateMixin, DropdownMixin<MyDropdown> {
+  @override
+  Widget buildOverlayContent(double height) => ListView(...);
+  @override
+  int get itemCount => widget.items.length;
+  @override
+  Duration get animationDuration => Duration(milliseconds: 200);
+  // ...twenty more
+}
+
+// After — see DropdownOverlayController above
+```
 
 ### Manual Dropdown Cleanup
 

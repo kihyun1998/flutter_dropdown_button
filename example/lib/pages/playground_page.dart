@@ -393,6 +393,11 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
         title: const Text('Dropdown Playground'),
         actions: [
           IconButton(
+            icon: const Icon(Icons.travel_explore),
+            tooltip: 'Domain Types & Controller',
+            onPressed: () => Navigator.pushNamed(context, '/domain-type'),
+          ),
+          IconButton(
             icon: const Icon(Icons.bug_report),
             tooltip: 'Overlay Bug Test',
             onPressed: () => Navigator.pushNamed(context, '/dropdown-bug-test'),

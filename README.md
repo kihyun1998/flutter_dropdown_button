@@ -9,6 +9,7 @@ A highly customizable dropdown package for Flutter with overlay-based rendering,
 
 - **Single Unified Widget**: One `FlutterDropdownButton<T>` for all use cases
 - **Two Modes**: Custom widget rendering (default) or text-only (`.text()`)
+- **Any Type in Text Mode**: Supply a `label` callback and keep tooltips, overflow handling and search
 - **Overlay-based Rendering**: Better positioning and visual effects than Flutter's built-in DropdownButton
 - **Smart Positioning**: Automatically opens up/down based on available space
 - **Smooth Animations**: Scale and fade effects with configurable timing
@@ -21,6 +22,7 @@ A highly customizable dropdown package for Flutter with overlay-based rendering,
 - **Single-Item Mode**: Auto-disable when only one option exists
 - **Leading Widgets**: Optional icons/widgets before text content
 - **Searchable Dropdown**: Real-time filtering with customizable search field
+- **Build Your Own**: `DropdownOverlayController` exposes the overlay machinery
 
 ## Screenshots
 
@@ -41,7 +43,7 @@ Add to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  flutter_dropdown_button: ^2.3.2
+  flutter_dropdown_button: ^2.4.0
 ```
 
 Import the package:
