@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
-import 'buttons/dropdown_mixin.dart';
 import 'buttons/menu_alignment.dart';
 import 'config/text_dropdown_config.dart';
+import 'overlay/dropdown_overlay_controller.dart';
 import 'theme/dropdown_scroll_theme.dart';
 import 'theme/dropdown_style_theme.dart';
 import 'theme/dropdown_theme.dart';
@@ -342,7 +342,7 @@ class FlutterDropdownButton<T> extends StatefulWidget {
   /// Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
   /// ```
   static void closeAll({bool animate = true}) =>
-      DropdownMixin.closeAll(animate: animate);
+      DropdownOverlayController.closeAll(animate: animate);
 
   @override
   State<FlutterDropdownButton<T>> createState() =>
@@ -350,9 +350,28 @@ class FlutterDropdownButton<T> extends StatefulWidget {
 }
 
 class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
-    with
-        SingleTickerProviderStateMixin,
-        DropdownMixin<FlutterDropdownButton<T>> {
+    with SingleTickerProviderStateMixin {
+  late final DropdownOverlayController _menu = DropdownOverlayController(
+    vsync: this,
+    animationDuration: widget.animationDuration,
+    spec: _buildSpec,
+    contentBuilder: _buildOverlayContent,
+    decorationBuilder: _buildOverlayDecoration,
+    // Opening, closing and selecting all start the search over. The overlay's
+    // dismiss barrier closes the menu without going through this State, so the
+    // reset has to be driven from the controller rather than from our callers.
+    onOpenStateChanged: (_) {
+      _resetSearch();
+      if (mounted) setState(() {});
+    },
+  );
+
+  /// The trailing icon turns half a revolution while the menu is open.
+  late final Animation<double> _iconRotation =
+      Tween<double>(begin: 0.0, end: 0.5).animate(
+    CurvedAnimation(parent: _menu.animation, curve: Curves.easeInOut),
+  );
+
   // ===== Theme =====
 
   DropdownTheme get effectiveTheme =>
@@ -390,24 +409,10 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
     );
   }
 
-  // ===== DropdownMixin implementation =====
+  // ===== Overlay =====
 
-  @override
-  Duration get animationDuration => widget.animationDuration;
-
-  @override
-  double get itemHeight => widget.itemHeight;
-
-  @override
-  double get maxDropdownHeight => widget.height;
-
-  @override
-  int get itemCount => widget.items.length;
-
-  @override
   bool get isEnabled => !_isSingleItemDisabled && widget.enabled;
 
-  @override
   double get actualItemHeight {
     final itemMargin = effectiveTheme.itemMargin;
     final marginHeight =
@@ -415,41 +420,30 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
     return widget.itemHeight + marginHeight;
   }
 
-  @override
-  double get overlayElevation => effectiveTheme.elevation;
-
-  @override
-  double get overlayBorderRadius => effectiveTheme.borderRadius;
-
-  @override
   double get overlayBorderThickness {
-    final decoration = _buildOverlayDecoration();
-    if (decoration?.border != null) {
-      final border = decoration!.border!;
-      if (border is Border) {
-        return border.top.width + border.bottom.width;
-      }
-    }
+    final border = _buildOverlayDecoration()?.border;
+    if (border is Border) return border.top.width + border.bottom.width;
     return 0.0;
   }
 
-  @override
-  Color? get overlayShadowColor => effectiveTheme.shadowColor;
-
-  @override
-  EdgeInsets? get overlayPadding => effectiveTheme.overlayPadding;
-
-  @override
-  double get chromeHeight => _searchFieldHeight;
-
-  @override
-  double? get minMenuWidth => widget.minMenuWidth;
-
-  @override
-  double? get maxMenuWidth => widget.maxMenuWidth;
-
-  @override
-  MenuAlignment get menuAlignment => widget.menuAlignment;
+  /// Read afresh on every overlay build, so a menu open while its items or
+  /// theme change re-measures against the new values.
+  DropdownOverlaySpec _buildSpec() {
+    return DropdownOverlaySpec(
+      itemCount: widget.items.length,
+      actualItemHeight: actualItemHeight,
+      maxDropdownHeight: widget.height,
+      chromeHeight: _searchFieldHeight,
+      borderThickness: overlayBorderThickness,
+      overlayPadding: effectiveTheme.overlayPadding,
+      minMenuWidth: widget.minMenuWidth,
+      maxMenuWidth: widget.maxMenuWidth,
+      menuAlignment: widget.menuAlignment,
+      elevation: effectiveTheme.elevation,
+      borderRadius: effectiveTheme.borderRadius,
+      shadowColor: effectiveTheme.shadowColor,
+    );
+  }
 
   // ===== Single-item mode =====
 
@@ -511,7 +505,7 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
     }
 
     // Rebuild overlay with new filtered items
-    rebuildOverlay();
+    _menu.rebuild();
   }
 
   // ===== Lifecycle =====
@@ -530,7 +524,6 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
       'into a String. Supply `label: (item) => item.someTextProperty`, or '
       'use the default constructor with `itemBuilder` instead.',
     );
-    initializeDropdown();
     _autoSelectSingleItem();
     if (widget.searchable) {
       _searchController = TextEditingController();
@@ -554,9 +547,9 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
     //
     // Deferred to after the frame: the overlay's element is not a descendant
     // of this one, so marking it dirty mid-build is not allowed.
-    if (isDropdownOpen) {
+    if (_menu.isOpen) {
       SchedulerBinding.instance.addPostFrameCallback((_) {
-        if (mounted) rebuildOverlay();
+        if (mounted) _menu.rebuild();
       });
     }
 
@@ -575,7 +568,7 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
     _canScrollDown.dispose();
     _searchController?.dispose();
     _searchFocusNode?.dispose();
-    disposeDropdown();
+    _menu.dispose();
     super.dispose();
   }
 
@@ -591,21 +584,15 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
 
   // ===== Overlay =====
 
-  @override
-  void onDropdownItemSelected() {
-    _resetSearch();
-    closeDropdown();
-  }
+  void _onItemSelected() => _menu.close();
 
   void _resetSearch() {
     _searchQuery = '';
     _searchController?.clear();
   }
 
-  @override
-  void openDropdown() {
-    _resetSearch();
-    super.openDropdown();
+  void _openDropdown() {
+    _menu.open(context);
     if (widget.searchable && effectiveSearchTheme.autofocus) {
       // Request focus after overlay is inserted
       SchedulerBinding.instance.addPostFrameCallback((_) {
@@ -614,14 +601,7 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
     }
   }
 
-  @override
-  void closeDropdown() {
-    _resetSearch();
-    super.closeDropdown();
-  }
-
-  @override
-  BoxDecoration? buildOverlayDecoration() => _buildOverlayDecoration();
+  void _toggleDropdown() => _menu.isOpen ? _menu.close() : _openDropdown();
 
   BoxDecoration? _buildOverlayDecoration() {
     return effectiveTheme.overlayDecoration ??
@@ -641,13 +621,13 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
   @override
   Widget build(BuildContext context) {
     Widget button = Container(
-      key: dropdownButtonKey,
+      key: _menu.buttonKey,
       width: widget.width,
       decoration: _buildButtonDecoration(),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          onTap: isEnabled ? toggleDropdown : null,
+          onTap: isEnabled ? _toggleDropdown : null,
           mouseCursor: isEnabled
               ? SystemMouseCursors.click
               : SystemMouseCursors.forbidden,
@@ -739,7 +719,7 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
                 height: effectiveIconSize,
                 child: Center(
                   child: RotationTransition(
-                    turns: dropdownIconRotationAnimation,
+                    turns: _iconRotation,
                     child: widget.trailing ??
                         Icon(
                           effectiveTheme.icon ?? Icons.keyboard_arrow_down,
@@ -889,8 +869,7 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
 
   // ===== Overlay content =====
 
-  @override
-  Widget buildOverlayContent(double height) {
+  Widget _buildOverlayContent(double height) {
     final items = _visibleItems;
     final scrollTheme = effectiveScrollTheme;
     final padding = effectiveTheme.overlayPadding;
@@ -1113,7 +1092,7 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
         child: InkWell(
           onTap: () {
             widget.onChanged(item);
-            onDropdownItemSelected();
+            _onItemSelected();
           },
           mouseCursor: SystemMouseCursors.click,
           splashColor:
@@ -1300,7 +1279,7 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
         baseColor,
       ];
     }
-    final borderRadius = BorderRadius.circular(overlayBorderRadius);
+    final borderRadius = BorderRadius.circular(effectiveTheme.borderRadius);
 
     return ClipRRect(
       borderRadius: borderRadius,
