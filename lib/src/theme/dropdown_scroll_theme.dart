@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'resolved_dropdown_style.dart';
+
 /// Theme configuration for dropdown scrollbar styling.
 ///
 /// This class contains all properties related to scrollbar appearance
@@ -195,6 +197,24 @@ class DropdownScrollTheme {
       showScrollGradient: showScrollGradient ?? this.showScrollGradient,
       gradientHeight: gradientHeight ?? this.gradientHeight,
       gradientColors: gradientColors ?? this.gradientColors,
+    );
+  }
+
+  /// The scrollbar's measurements as they should be applied.
+  ///
+  /// Pure: it needs no ambient palette and no [BuildContext].
+  ResolvedScrollStyle resolve() {
+    return ResolvedScrollStyle(
+      thumbWidth: thumbWidth ?? thickness ?? 8.0,
+      trackWidth: trackWidth ?? thickness ?? 8.0,
+      gradientHeight: gradientHeight ?? 24.0,
+      hasCustomWidths: thumbWidth != null || trackWidth != null,
+      thumbVisibility: thumbVisibility ?? false,
+      trackVisibility: trackVisibility ?? false,
+      interactive: interactive ?? true,
+      crossAxisMargin: crossAxisMargin ?? 0,
+      mainAxisMargin: mainAxisMargin ?? 0,
+      minThumbLength: minThumbLength ?? 18,
     );
   }
 

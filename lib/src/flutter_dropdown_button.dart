@@ -386,6 +386,9 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
   ResolvedOverlayStyle get _overlayStyle =>
       effectiveTheme.resolveOverlay(_ambient);
 
+  ResolvedSearchFieldStyle get _searchStyle =>
+      effectiveSearchTheme.resolve(_ambient);
+
   DropdownScrollTheme? get effectiveScrollTheme => widget.theme?.scroll;
 
   DropdownTooltipTheme get effectiveTooltipTheme =>
@@ -475,14 +478,8 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
       : widget.items;
 
   /// The height occupied by the search field including margin and divider.
-  double get _searchFieldHeight {
-    if (!widget.searchable) return 0.0;
-    final searchTheme = effectiveSearchTheme;
-    final margin = searchTheme.margin ?? const EdgeInsets.fromLTRB(8, 8, 8, 4);
-    final fieldHeight = searchTheme.height ?? 36.0;
-    final dividerHeight = searchTheme.divider != null ? 1.0 : 0.0;
-    return fieldHeight + margin.top + margin.bottom + dividerHeight;
-  }
+  double get _searchFieldHeight =>
+      widget.searchable ? _searchStyle.totalHeight : 0.0;
 
   /// Case-insensitive `contains` over the item's label. The default in text
   /// mode, whatever `T` is.
@@ -860,10 +857,7 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
                 padding: const EdgeInsets.all(16.0),
                 child: Text(
                   'No results found',
-                  style: TextStyle(
-                    color: Theme.of(context).hintColor,
-                    fontSize: 14,
-                  ),
+                  style: TextStyle(color: _ambient.hint, fontSize: 14),
                 ),
               ),
             ),
@@ -954,72 +948,37 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
   // ===== Search field =====
 
   Widget _buildSearchField() {
-    final searchTheme = effectiveSearchTheme;
-    final margin = searchTheme.margin ?? const EdgeInsets.fromLTRB(8, 8, 8, 4);
-    final fieldHeight = searchTheme.height ?? 36.0;
-    final borderRadius = searchTheme.borderRadius ?? BorderRadius.circular(8);
-    final contentPadding = searchTheme.contentPadding ??
-        const EdgeInsets.symmetric(horizontal: 12, vertical: 8);
-
-    final defaultDecoration = InputDecoration(
-      hintText: 'Search...',
-      prefixIcon: const Icon(Icons.search, size: 20),
-      prefixIconConstraints: const BoxConstraints(
-        minWidth: 36,
-        minHeight: 0,
-      ),
-      contentPadding: contentPadding,
-      isDense: true,
-      border: OutlineInputBorder(
-        borderRadius: borderRadius,
-        borderSide: BorderSide(
-          color: Theme.of(context).dividerColor,
-        ),
-      ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: borderRadius,
-        borderSide: BorderSide(
-          color: searchTheme.border is Border
-              ? (searchTheme.border! as Border).top.color
-              : Theme.of(context).dividerColor,
-        ),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: borderRadius,
-        borderSide: BorderSide(
-          color: searchTheme.focusedBorder is Border
-              ? (searchTheme.focusedBorder! as Border).top.color
-              : Theme.of(context).primaryColor,
-        ),
-      ),
-      filled: searchTheme.backgroundColor != null,
-      fillColor: searchTheme.backgroundColor,
-    );
+    final style = _searchStyle;
 
     Widget field = Container(
-      margin: margin,
-      padding: searchTheme.padding,
-      height: fieldHeight,
+      margin: style.margin,
+      padding: style.padding,
+      height: style.fieldHeight,
       child: TextField(
         controller: _searchController,
         focusNode: _searchFocusNode,
         onChanged: _onSearchChanged,
-        style: searchTheme.textStyle,
-        cursorColor: searchTheme.cursorColor,
-        cursorWidth: searchTheme.cursorWidth ?? 2.0,
-        cursorHeight: searchTheme.cursorHeight,
-        cursorRadius: searchTheme.cursorRadius,
-        textAlign: searchTheme.textAlign,
-        keyboardType: searchTheme.keyboardType ?? TextInputType.text,
-        textInputAction: searchTheme.textInputAction ?? TextInputAction.search,
-        decoration: searchTheme.decoration ?? defaultDecoration,
+        style: style.textStyle,
+        cursorColor: style.cursorColor,
+        cursorWidth: style.cursorWidth,
+        cursorHeight: style.cursorHeight,
+        cursorRadius: style.cursorRadius,
+        textAlign: style.textAlign,
+        keyboardType: style.keyboardType,
+        textInputAction: style.textInputAction,
+        decoration: style.decoration,
       ),
     );
 
-    if (searchTheme.divider != null) {
+    if (style.divider != null) {
       field = Column(
         mainAxisSize: MainAxisSize.min,
-        children: [field, searchTheme.divider!],
+        children: [
+          field,
+          // Constrained to the height reserved for it in the resolved style,
+          // so what the overlay set aside and what gets drawn cannot disagree.
+          SizedBox(height: style.dividerHeight, child: style.divider),
+        ],
       );
     }
 
@@ -1087,10 +1046,7 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
   // ===== Scrollbar =====
 
   Widget _applyScrollbarTheme(Widget content, DropdownScrollTheme scrollTheme) {
-    final bool hasCustomWidths =
-        scrollTheme.thumbWidth != null || scrollTheme.trackWidth != null;
-
-    if (hasCustomWidths) {
+    if (scrollTheme.resolve().hasCustomWidths) {
       return _buildCustomScrollbar(content, scrollTheme);
     }
 
@@ -1136,10 +1092,9 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
     Widget child,
     DropdownScrollTheme scrollTheme,
   ) {
-    final double effectiveThumbWidth =
-        scrollTheme.thumbWidth ?? scrollTheme.thickness ?? 8.0;
-    final double effectiveTrackWidth =
-        scrollTheme.trackWidth ?? scrollTheme.thickness ?? 8.0;
+    final resolved = scrollTheme.resolve();
+    final double effectiveThumbWidth = resolved.thumbWidth;
+    final double effectiveTrackWidth = resolved.trackWidth;
 
     final scrollbarThemeData = ScrollbarThemeData(
       thumbColor: scrollTheme.thumbColor != null
@@ -1170,15 +1125,15 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
           controller: _scrollController,
           thickness: effectiveThumbWidth,
           radius: scrollTheme.radius,
-          thumbVisibility: scrollTheme.thumbVisibility ?? false,
-          trackVisibility: scrollTheme.trackVisibility ?? false,
-          interactive: scrollTheme.interactive ?? true,
+          thumbVisibility: resolved.thumbVisibility,
+          trackVisibility: resolved.trackVisibility,
+          interactive: resolved.interactive,
           thumbColor: scrollTheme.thumbColor,
           trackColor: scrollTheme.trackColor,
           trackBorderColor: scrollTheme.trackBorderColor,
-          crossAxisMargin: scrollTheme.crossAxisMargin ?? 0,
-          mainAxisMargin: scrollTheme.mainAxisMargin ?? 0,
-          minThumbLength: scrollTheme.minThumbLength ?? 18,
+          crossAxisMargin: resolved.crossAxisMargin,
+          mainAxisMargin: resolved.mainAxisMargin,
+          minThumbLength: resolved.minThumbLength,
           child: child,
         ),
       );
@@ -1219,7 +1174,7 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
     Widget child,
     DropdownScrollTheme scrollTheme,
   ) {
-    final gradientHeight = scrollTheme.gradientHeight ?? 24.0;
+    final gradientHeight = scrollTheme.resolve().gradientHeight;
     final List<Color> gradientColors;
     if (scrollTheme.gradientColors != null &&
         scrollTheme.gradientColors!.isNotEmpty) {

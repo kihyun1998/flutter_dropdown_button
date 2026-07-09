@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'resolved_dropdown_style.dart';
+
 /// Theme configuration for the search field in searchable dropdowns.
 ///
 /// This class provides comprehensive control over the appearance and behavior
@@ -38,6 +40,7 @@ class SearchFieldTheme {
     this.focusedBorder,
     this.contentPadding,
     this.divider,
+    this.dividerHeight = 1.0,
     this.autofocus = true,
     this.keyboardType,
     this.textInputAction,
@@ -124,7 +127,27 @@ class SearchFieldTheme {
   /// A widget displayed between the search field and the items list.
   ///
   /// Typically a [Divider]. If null, no divider is shown.
+  ///
+  /// The widget is laid out at exactly [dividerHeight]; see there for why.
   final Widget? divider;
+
+  /// The height reserved for [divider], in logical pixels.
+  ///
+  /// The overlay reserves this much space and constrains [divider] to it, so
+  /// the space reserved and the space drawn cannot disagree. Getting that
+  /// wrong overflows the item list — Flutter's `Divider` is **16px** tall by
+  /// default, not one, and a hardcoded reservation of 1.0 used to make a
+  /// three-item searchable menu overflow by fifteen pixels.
+  ///
+  /// Raise it if your divider needs more room:
+  ///
+  /// ```dart
+  /// SearchFieldTheme(
+  ///   divider: const Divider(),
+  ///   dividerHeight: 16,
+  /// )
+  /// ```
+  final double dividerHeight;
 
   /// Whether the search field should be focused automatically when
   /// the dropdown opens.
@@ -165,6 +188,7 @@ class SearchFieldTheme {
     BoxBorder? focusedBorder,
     EdgeInsets? contentPadding,
     Widget? divider,
+    double? dividerHeight,
     bool? autofocus,
     TextInputType? keyboardType,
     TextInputAction? textInputAction,
@@ -186,10 +210,74 @@ class SearchFieldTheme {
       focusedBorder: focusedBorder ?? this.focusedBorder,
       contentPadding: contentPadding ?? this.contentPadding,
       divider: divider ?? this.divider,
+      dividerHeight: dividerHeight ?? this.dividerHeight,
       autofocus: autofocus ?? this.autofocus,
       keyboardType: keyboardType ?? this.keyboardType,
       textInputAction: textInputAction ?? this.textInputAction,
       textAlign: textAlign ?? this.textAlign,
+    );
+  }
+
+  /// The search field as it should be drawn.
+  ///
+  /// Pure: hand it the ambient palette, not a [BuildContext].
+  ResolvedSearchFieldStyle resolve(DropdownAmbientColors ambient) {
+    final resolvedMargin = margin ?? const EdgeInsets.fromLTRB(8, 8, 8, 4);
+    final resolvedHeight = height ?? 36.0;
+    final resolvedRadius = borderRadius ?? BorderRadius.circular(8);
+    final resolvedDividerHeight = divider != null ? dividerHeight : 0.0;
+
+    return ResolvedSearchFieldStyle(
+      decoration: decoration ?? _defaultDecoration(ambient, resolvedRadius),
+      fieldHeight: resolvedHeight,
+      margin: resolvedMargin,
+      cursorWidth: cursorWidth ?? 2.0,
+      keyboardType: keyboardType ?? TextInputType.text,
+      textInputAction: textInputAction ?? TextInputAction.search,
+      textAlign: textAlign,
+      autofocus: autofocus,
+      dividerHeight: resolvedDividerHeight,
+      totalHeight: resolvedHeight +
+          resolvedMargin.top +
+          resolvedMargin.bottom +
+          resolvedDividerHeight,
+      textStyle: textStyle,
+      cursorColor: cursorColor,
+      cursorHeight: cursorHeight,
+      cursorRadius: cursorRadius,
+      padding: padding,
+      divider: divider,
+    );
+  }
+
+  InputDecoration _defaultDecoration(
+    DropdownAmbientColors ambient,
+    BorderRadius radius,
+  ) {
+    Color edge(BoxBorder? candidate, Color fallback) =>
+        candidate is Border ? candidate.top.color : fallback;
+
+    return InputDecoration(
+      hintText: 'Search...',
+      prefixIcon: const Icon(Icons.search, size: 20),
+      prefixIconConstraints: const BoxConstraints(minWidth: 36, minHeight: 0),
+      contentPadding: contentPadding ??
+          const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      isDense: true,
+      border: OutlineInputBorder(
+        borderRadius: radius,
+        borderSide: BorderSide(color: ambient.divider),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: radius,
+        borderSide: BorderSide(color: edge(border, ambient.divider)),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: radius,
+        borderSide: BorderSide(color: edge(focusedBorder, ambient.primary)),
+      ),
+      filled: backgroundColor != null,
+      fillColor: backgroundColor,
     );
   }
 
