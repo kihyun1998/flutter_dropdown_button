@@ -1,5 +1,15 @@
 # Changelog
 
+## 2.4.1
+
+* **FIX**: The trailing arrow now honours the single-item auto-disable. A dropdown disabled by `disableWhenSingleItem` blocked taps, switched its decoration to the disabled form and applied `disabledTextStyle`, while the arrow kept its **enabled** colour. Visible whenever `hideIconWhenSingleItem: false`. The icon asked `widget.enabled`; everything else asked `isEnabled`
+* **DEPRECATED**: `DropdownTheme.animationDuration`. Nothing has ever read it — the animation is driven by `FlutterDropdownButton.animationDuration`, and setting it on the theme was silently ignored. It is being removed rather than wired up: honouring it now would slow the animation for everyone who set it and has been living with the widget's 200ms. Pass the duration to the widget. Removed in 3.0.0
+* **REFACTOR**: `DropdownTheme` resolves itself. `resolveButton()`, `resolveOverlay()` and `resolveItem()` return styles whose slots are all filled in, and take a plain `DropdownAmbientColors` palette rather than a `BuildContext` — so styling rules are pure functions, testable without mounting a widget. Thirteen inline `??` fallback chains and fourteen `Theme.of(context)` calls left `build()`. `SearchFieldTheme` and `DropdownScrollTheme` are not converted yet
+* **CHANGE**: Exported `DropdownAmbientColors`, `ResolvedButtonStyle`, `ResolvedOverlayStyle` and `ResolvedItemStyle`. Additive; existing theme fields are unchanged
+* **CHANGE**: `pubspec.yaml`'s description no longer advertises "specialized variants for different content types" — there has been one widget since 2.0.0
+* **TEST**: 77 tests, up from 50. Fourteen exercise theme resolution with no widget tree at all
+* **DOCS**: `CLAUDE.md` and `documentation/` rewritten around the current architecture. `api_reference.md` documented five classes deleted in 2.0.0 (`BaseDropdownButton`, `BasicDropdownButton`, `TextOnlyDropdownButton`, `DynamicTextBaseDropdownButton`, `DropdownItem`) and never mentioned `FlutterDropdownButton`. Seventeen examples in `theming.md` and `text_configuration.md` called widgets that no longer exist; three passed `theme: DropdownTheme(...)` where a `DropdownStyleTheme` is required
+
 ## 2.4.0
 
 * **FEAT**: `FlutterDropdownButton.text()` now accepts a `label` callback, so text mode renders **any** type — not just `String`. Overflow handling, the tooltip and the default search filter all work off the label, so a `List<User>` no longer has to drop to `itemBuilder` and give those up. Omitting `label` for a non-`String` `T` now fails loudly at construction in debug builds instead of throwing a cast error at paint time
