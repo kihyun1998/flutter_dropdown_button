@@ -139,5 +139,7 @@ When changing a public class name or signature, update `README.md` and `document
 - Breaking changes require a major bump. Adding a member, or deprecating one, does not.
 - `CHANGELOG.md` entries take the form `* **TYPE**: Description`, where TYPE is one of `FEAT`, `FIX`, `BREAKING`, `DEPRECATED`, `REFACTOR`, `PERF`, `CHANGE`, `TEST`, `MIGRATION`.
 - Record deprecations and behaviour changes even when they are small. A silent deprecation surprises people; a four-pixel layout change that nobody wrote down is a bug report waiting to happen.
+- A bug found while refactoring is fixed in the same change, not deferred to a new issue — you have the code loaded, and reloading it later costs more than the tidiness is worth. But it **must** get a `FIX` entry naming the symptom, not just the cause. Six of the ten bugs fixed across 2.3.2–3.0.0 arrived this way and never had an issue of their own.
+- Consequently, **`CHANGELOG.md` is the bug inventory, not the issue tracker.** The tracker records work that was planned; the changelog records what actually changed. Do not answer "what has this package fixed?" by listing issues.
 - Cut a release in its own commit (`chore: release X.Y.Z`) that bumps `pubspec.yaml`, adds the `CHANGELOG.md` section, and updates the version in `README.md`'s quick start.
 - Run `flutter pub publish --dry-run` before releasing; it must report zero warnings.
