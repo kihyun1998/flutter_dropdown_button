@@ -1,7 +1,6 @@
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 
+import '../placement/dropdown_placement.dart';
 import 'menu_alignment.dart';
 
 /// Position calculation result for dropdown overlay positioning.
@@ -130,6 +129,14 @@ mixin DropdownMixin<T extends StatefulWidget> on State<T>, TickerProvider {
   /// This padding creates internal spacing between the overlay edges
   /// and the item list. If null, no padding is applied.
   EdgeInsets? get overlayPadding => null;
+
+  /// Vertical space inside the overlay taken by furniture that is not an
+  /// item — a search field, for example.
+  ///
+  /// The overlay grows to hold it rather than shrinking the item list, so a
+  /// short list does not acquire a scrollbar just because search is enabled.
+  /// The border and [overlayPadding] are accounted for separately.
+  double get chromeHeight => 0.0;
 
   /// The minimum width of the dropdown menu overlay.
   ///
@@ -361,164 +368,105 @@ mixin DropdownMixin<T extends StatefulWidget> on State<T>, TickerProvider {
     Offset buttonOffset,
     Size buttonSize,
   ) {
-    // Calculate available space for smart positioning
-    // Account for safe areas (status bar, navigation bar, home indicator)
-    // On desktop platforms, these padding values are 0.0
-    final mediaQuery = MediaQuery.of(context);
-    final screenHeight = mediaQuery.size.height;
-    final topPadding = mediaQuery.padding.top; // status bar
-    final bottomPadding =
-        mediaQuery.padding.bottom; // navigation bar / home indicator
-
-    final spaceBelow = screenHeight -
-        bottomPadding -
-        (buttonOffset.dy + buttonSize.height + screenMargin);
-    final spaceAbove = buttonOffset.dy - topPadding - screenMargin;
-
-    // Calculate dynamic preferred height based on items with actual item heights
-    final totalItemsHeight = itemCount * actualItemHeight;
-    // Calculate total overlay padding
-    final overlayPaddingVertical = overlayPadding != null
-        ? (overlayPadding!.top + overlayPadding!.bottom)
-        : 0.0;
-    // Add border thickness and overlay padding to ensure enough space for content + border + padding
-    final preferredHeight = math.min(totalItemsHeight, maxDropdownHeight) +
-        overlayBorderThickness +
-        overlayPaddingVertical;
-
-    // Determine positioning and height
-    double menuHeight;
-    bool openDown;
-    Alignment transformAlignment;
-
-    if (spaceBelow >= preferredHeight) {
-      // Sufficient space below - open downward
-      menuHeight = preferredHeight;
-      openDown = true;
-      transformAlignment = Alignment.topCenter;
-    } else if (spaceAbove >= preferredHeight) {
-      // Sufficient space above - open upward
-      menuHeight = preferredHeight;
-      openDown = false;
-      transformAlignment = Alignment.bottomCenter;
-    } else {
-      // Insufficient space in both directions - choose the larger space
-      if (spaceBelow >= spaceAbove) {
-        menuHeight = spaceBelow - screenMargin; // Extra margin for safety
-        openDown = true;
-        transformAlignment = Alignment.topCenter;
-      } else {
-        menuHeight = spaceAbove - screenMargin;
-        openDown = false;
-        transformAlignment = Alignment.bottomCenter;
-      }
-
-      // Ensure minimum height for usability with actual item heights + border + padding
-      final minHeight = minVisibleItems * actualItemHeight +
-          overlayBorderThickness +
-          overlayPaddingVertical;
-      menuHeight = math.max(menuHeight, minHeight);
-    }
-
-    final topPosition = openDown
-        ? buttonOffset.dy + buttonSize.height + buttonGap
-        : buttonOffset.dy - menuHeight - buttonGap;
+    final placement = resolvePlacement(buttonOffset, buttonSize);
 
     return DropdownPositionResult(
-      height: menuHeight,
-      openDown: openDown,
-      transformAlignment: transformAlignment,
-      topPosition: topPosition,
+      height: placement.height,
+      openDown: placement.openDown,
+      transformAlignment: placement.transformAlignment,
+      topPosition: placement.top,
+    );
+  }
+
+  /// Reads the screen from [MediaQuery] and resolves the menu's full geometry.
+  ///
+  /// This is the adapter: it gathers plain values and hands them to
+  /// [DropdownPlacement], which does the arithmetic without a [BuildContext].
+  DropdownPlacementResult resolvePlacement(
+    Offset buttonOffset,
+    Size buttonSize,
+  ) {
+    // Safe areas (status bar, navigation bar, home indicator). Zero on desktop.
+    final mediaQuery = MediaQuery.of(context);
+
+    final padding = overlayPadding;
+    final overlayPaddingVertical =
+        padding != null ? padding.top + padding.bottom : 0.0;
+
+    return DropdownPlacement.resolve(
+      DropdownPlacementInput(
+        screenSize: mediaQuery.size,
+        safeInsetTop: mediaQuery.padding.top,
+        safeInsetBottom: mediaQuery.padding.bottom,
+        buttonOffset: buttonOffset,
+        buttonSize: buttonSize,
+        itemCount: itemCount,
+        actualItemHeight: actualItemHeight,
+        maxDropdownHeight: maxDropdownHeight,
+        // The border and the overlay's padding occupy the overlay the same
+        // way a search field does; the module need not tell them apart.
+        chromeHeight:
+            chromeHeight + overlayBorderThickness + overlayPaddingVertical,
+        screenMargin: screenMargin,
+        buttonGap: buttonGap,
+        minVisibleItems: minVisibleItems,
+        minMenuWidth: minMenuWidth,
+        maxMenuWidth: maxMenuWidth,
+        menuAlignment: menuAlignment,
+      ),
     );
   }
 
   /// Calculates the effective width for the dropdown menu.
   ///
   /// Applies [minMenuWidth] and [maxMenuWidth] constraints to the button width.
-  /// Returns a width between minMenuWidth and maxMenuWidth, preferring buttonWidth.
+  @Deprecated(
+    'Use resolvePlacement() and read .width. '
+    'This method will be removed in 3.0.0.',
+  )
   double calculateMenuWidth(double buttonWidth) {
-    double menuWidth = buttonWidth;
-
-    // Apply minMenuWidth if provided
-    if (minMenuWidth != null && menuWidth < minMenuWidth!) {
-      menuWidth = minMenuWidth!;
-    }
-
-    // Apply maxMenuWidth if provided
-    if (maxMenuWidth != null && menuWidth > maxMenuWidth!) {
-      menuWidth = maxMenuWidth!;
-    }
-
-    return menuWidth;
+    return resolvePlacement(Offset.zero, Size(buttonWidth, 0)).width;
   }
 
-  /// Calculates the left position for the dropdown menu based on alignment.
-  ///
-  /// When the menu is wider than the button, aligns according to [menuAlignment]:
-  /// - [MenuAlignment.left]: Left edges align
-  /// - [MenuAlignment.center]: Centers menu over button
-  /// - [MenuAlignment.right]: Right edges align
-  ///
-  /// Also ensures the menu stays within screen bounds.
+  /// Calculates the left position for the dropdown menu based on alignment,
+  /// keeping the menu inside the screen.
+  @Deprecated(
+    'Use resolvePlacement() and read .left. '
+    'This method will be removed in 3.0.0.',
+  )
   double calculateMenuLeftPosition(
     double buttonLeft,
     double buttonWidth,
     double menuWidth,
   ) {
-    double leftPosition;
+    // Pinning both bounds to menuWidth makes the resolved width exactly the
+    // width the caller asked about, so .left is computed against it.
+    final mediaQuery = MediaQuery.of(context);
 
-    // Calculate initial position based on alignment
-    if (menuWidth <= buttonWidth) {
-      // Menu is not wider than button, use button position
-      leftPosition = buttonLeft;
-    } else {
-      // Menu is wider than button, apply alignment
-      final widthDiff = menuWidth - buttonWidth;
-
-      switch (menuAlignment) {
-        case MenuAlignment.left:
-          // Left edges align: menu extends to the right
-          leftPosition = buttonLeft;
-          break;
-
-        case MenuAlignment.center:
-          // Center menu over button
-          leftPosition = buttonLeft - (widthDiff / 2);
-          break;
-
-        case MenuAlignment.right:
-          // Right edges align: menu extends to the left
-          leftPosition = buttonLeft - widthDiff;
-          break;
-      }
-    }
-
-    // Ensure menu stays within screen bounds
-    final screenWidth = MediaQuery.of(context).size.width;
-    final rightEdge = leftPosition + menuWidth;
-
-    // Check right edge overflow
-    if (rightEdge > screenWidth - screenMargin) {
-      leftPosition = screenWidth - screenMargin - menuWidth;
-    }
-
-    // Check left edge overflow
-    if (leftPosition < screenMargin) {
-      leftPosition = screenMargin;
-    }
-
-    return leftPosition;
+    return DropdownPlacement.resolve(
+      DropdownPlacementInput(
+        screenSize: mediaQuery.size,
+        safeInsetTop: mediaQuery.padding.top,
+        safeInsetBottom: mediaQuery.padding.bottom,
+        buttonOffset: Offset(buttonLeft, 0),
+        buttonSize: Size(buttonWidth, 0),
+        itemCount: itemCount,
+        actualItemHeight: actualItemHeight,
+        maxDropdownHeight: maxDropdownHeight,
+        screenMargin: screenMargin,
+        buttonGap: buttonGap,
+        minMenuWidth: menuWidth,
+        maxMenuWidth: menuWidth,
+        menuAlignment: menuAlignment,
+      ),
+    ).left;
   }
 
   /// Creates the overlay entry that contains the dropdown options.
   OverlayEntry _createOverlayEntry(Offset buttonOffset, Size buttonSize) {
-    final position = calculateDropdownPosition(buttonOffset, buttonSize);
-    final menuWidth = calculateMenuWidth(buttonSize.width);
-    final leftPosition = calculateMenuLeftPosition(
-      buttonOffset.dx,
-      buttonSize.width,
-      menuWidth,
-    );
+    final position = resolvePlacement(buttonOffset, buttonSize);
+    final menuWidth = position.width;
+    final leftPosition = position.left;
 
     return OverlayEntry(
       builder: (context) => GestureDetector(
@@ -530,7 +478,7 @@ mixin DropdownMixin<T extends StatefulWidget> on State<T>, TickerProvider {
             children: [
               Positioned(
                 left: leftPosition,
-                top: position.topPosition,
+                top: position.top,
                 width: menuWidth,
                 child: AnimatedBuilder(
                   animation: dropdownAnimationController,

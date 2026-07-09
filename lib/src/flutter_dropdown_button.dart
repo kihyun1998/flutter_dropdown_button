@@ -391,6 +391,9 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
   EdgeInsets? get overlayPadding => effectiveTheme.overlayPadding;
 
   @override
+  double get chromeHeight => _searchFieldHeight;
+
+  @override
   double? get minMenuWidth => widget.minMenuWidth;
 
   @override
