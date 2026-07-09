@@ -2,16 +2,15 @@ import 'package:flutter/material.dart';
 
 import 'resolved_dropdown_style.dart';
 
-/// Shared theme configuration for all dropdown widgets.
+/// Visual styling for [FlutterDropdownButton]'s button, overlay and items.
 ///
-/// This class contains styling and behavior properties that are common
-/// across all dropdown variants (BasicDropdownButton, TextOnlyDropdownButton, etc.)
-/// to maintain visual consistency throughout the application.
+/// The theme fills in its own gaps: [resolveButton], [resolveOverlay] and
+/// [resolveItem] return styles whose slots are all filled, so the widget reads
+/// a decision rather than making one.
 ///
 /// Example:
 /// ```dart
 /// DropdownTheme(
-///   animationDuration: Duration(milliseconds: 300),
 ///   borderRadius: 12.0,
 ///   elevation: 4.0,
 ///   backgroundColor: Colors.white,
@@ -21,6 +20,10 @@ import 'resolved_dropdown_style.dart';
 class DropdownTheme {
   /// Creates a dropdown theme configuration.
   const DropdownTheme({
+    @Deprecated(
+      'Never read. Pass animationDuration to FlutterDropdownButton instead. '
+      'This parameter will be removed in 3.0.0.',
+    )
     this.animationDuration = const Duration(milliseconds: 200),
     this.borderRadius = 8.0,
     this.elevation = 8.0,
@@ -57,8 +60,27 @@ class DropdownTheme {
 
   /// The duration of the dropdown show/hide animation.
   ///
-  /// All dropdown variants will use this animation duration for
-  /// consistent behavior across the application.
+  /// **Deprecated, and it never worked.** Nothing has ever read this field;
+  /// the animation is driven by `FlutterDropdownButton.animationDuration`.
+  /// Setting it here has always been silently ignored.
+  ///
+  /// It is being removed rather than wired up. Honouring it now would slow the
+  /// animation for everyone who set it and has been living with the widget's
+  /// 200ms — a change nobody asked for. Pass the duration to the widget:
+  ///
+  /// ```dart
+  /// FlutterDropdownButton<String>.text(
+  ///   items: items,
+  ///   animationDuration: const Duration(milliseconds: 300),
+  ///   onChanged: (_) {},
+  /// )
+  /// ```
+  ///
+  /// `DropdownTheme` describes appearance; the widget owns behaviour.
+  @Deprecated(
+    'Never read. Pass animationDuration to FlutterDropdownButton instead. '
+    'This field will be removed in 3.0.0.',
+  )
   final Duration animationDuration;
 
   /// The border radius for both the dropdown button and overlay.
@@ -280,6 +302,10 @@ class DropdownTheme {
 
   /// Creates a copy of this theme with the given fields replaced.
   DropdownTheme copyWith({
+    @Deprecated(
+      'Never read. Pass animationDuration to FlutterDropdownButton instead. '
+      'This parameter will be removed in 3.0.0.',
+    )
     Duration? animationDuration,
     double? borderRadius,
     double? elevation,
@@ -313,6 +339,7 @@ class DropdownTheme {
     BoxDecoration? disabledButtonDecoration,
   }) {
     return DropdownTheme(
+      // ignore: deprecated_member_use_from_same_package
       animationDuration: animationDuration ?? this.animationDuration,
       borderRadius: borderRadius ?? this.borderRadius,
       elevation: elevation ?? this.elevation,
