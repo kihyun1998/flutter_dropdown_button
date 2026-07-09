@@ -17,6 +17,7 @@ class DropdownAmbientColors {
     required this.primary,
     required this.disabled,
     this.icon,
+    this.hint,
   });
 
   /// Reads the palette from the enclosing [Theme].
@@ -31,6 +32,7 @@ class DropdownAmbientColors {
       primary: theme.primaryColor,
       disabled: theme.disabledColor,
       icon: theme.iconTheme.color,
+      hint: theme.hintColor,
     );
   }
 
@@ -57,6 +59,130 @@ class DropdownAmbientColors {
 
   /// Default icon colour. Null when the ambient theme leaves it unset.
   final Color? icon;
+
+  /// Foreground of placeholder text — the empty-search message.
+  final Color? hint;
+}
+
+/// The search field's appearance, with every slot filled in.
+class ResolvedSearchFieldStyle {
+  /// Creates a resolved search field style.
+  const ResolvedSearchFieldStyle({
+    required this.decoration,
+    required this.fieldHeight,
+    required this.margin,
+    required this.cursorWidth,
+    required this.keyboardType,
+    required this.textInputAction,
+    required this.textAlign,
+    required this.autofocus,
+    required this.dividerHeight,
+    required this.totalHeight,
+    this.textStyle,
+    this.cursorColor,
+    this.cursorHeight,
+    this.cursorRadius,
+    this.padding,
+    this.divider,
+  });
+
+  /// The text field's decoration, already merged with the theme's borders.
+  final InputDecoration decoration;
+
+  /// Height of the field itself, excluding margin and divider.
+  final double fieldHeight;
+
+  /// Space around the field.
+  final EdgeInsets margin;
+
+  /// Cursor width.
+  final double cursorWidth;
+
+  /// Soft keyboard type.
+  final TextInputType keyboardType;
+
+  /// Soft keyboard action button.
+  final TextInputAction textInputAction;
+
+  /// Horizontal alignment of the query text.
+  final TextAlign textAlign;
+
+  /// Whether the field takes focus when the menu opens.
+  final bool autofocus;
+
+  /// Height reserved for [divider], and the height it is drawn at.
+  final double dividerHeight;
+
+  /// Everything the search field occupies: field, margin and divider.
+  ///
+  /// This is what the overlay reserves as chrome. Reserving less than the
+  /// field draws overflows the item list.
+  final double totalHeight;
+
+  /// Style of the query text.
+  final TextStyle? textStyle;
+
+  /// Cursor colour.
+  final Color? cursorColor;
+
+  /// Cursor height.
+  final double? cursorHeight;
+
+  /// Cursor corner radius.
+  final Radius? cursorRadius;
+
+  /// Padding inside the field's container.
+  final EdgeInsets? padding;
+
+  /// Separator between the field and the item list.
+  final Widget? divider;
+}
+
+/// The scrollbar's measurements, with every slot filled in.
+class ResolvedScrollStyle {
+  /// Creates a resolved scroll style.
+  const ResolvedScrollStyle({
+    required this.thumbWidth,
+    required this.trackWidth,
+    required this.gradientHeight,
+    required this.hasCustomWidths,
+    required this.thumbVisibility,
+    required this.trackVisibility,
+    required this.interactive,
+    required this.crossAxisMargin,
+    required this.mainAxisMargin,
+    required this.minThumbLength,
+  });
+
+  /// Width of the thumb.
+  final double thumbWidth;
+
+  /// Width of the track.
+  final double trackWidth;
+
+  /// Height of the fade shown when the list can scroll.
+  final double gradientHeight;
+
+  /// Whether the caller asked for widths the stock `Scrollbar` cannot honour.
+  final bool hasCustomWidths;
+
+  /// Whether the thumb is always shown.
+  final bool thumbVisibility;
+
+  /// Whether the track is always shown.
+  final bool trackVisibility;
+
+  /// Whether the thumb can be dragged.
+  final bool interactive;
+
+  /// Distance from the scroll view's edge.
+  final double crossAxisMargin;
+
+  /// Distance from the scroll view's ends.
+  final double mainAxisMargin;
+
+  /// Shortest the thumb is allowed to become.
+  final double minThumbLength;
 }
 
 /// The button's appearance, with every slot filled in.
