@@ -49,7 +49,7 @@ class _DropdownBugTestPageState extends State<DropdownBugTestPage> {
       if (_countdown == 1) {
         timer.cancel();
         // Use closeAll() before navigation to manually close dropdown
-        DropdownMixin.closeAll();
+        FlutterDropdownButton.closeAll();
         Navigator.pushNamedAndRemoveUntil(
           context,
           '/result-page',
@@ -67,7 +67,7 @@ class _DropdownBugTestPageState extends State<DropdownBugTestPage> {
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (_countdown == 1) {
         timer.cancel();
-        DropdownMixin.closeAll();
+        FlutterDropdownButton.closeAll();
         setState(() => _countdown = null);
       } else {
         setState(() => _countdown = _countdown! - 1);
