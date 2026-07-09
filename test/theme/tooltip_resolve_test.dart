@@ -17,16 +17,6 @@ void main() {
         isNull);
   });
 
-  test('borderWidth alone names no box, because it draws nothing alone', () {
-    expect(
-      const DropdownTooltipTheme(borderWidth: 3)
-          .resolve(Brightness.light)
-          .decoration,
-      isNull,
-      reason: 'synthesising a box here would override an ambient TooltipTheme',
-    );
-  });
-
   test('any one box property fills all the others', () {
     final box = boxOf(DropdownTooltipTheme(borderRadius: BorderRadius.zero));
 
@@ -57,19 +47,7 @@ void main() {
     expect(boxOf(theme, Brightness.dark).color, Colors.red);
   });
 
-  test('borderWidth defaults to one, and applies once a colour is given', () {
-    final thin = boxOf(const DropdownTooltipTheme(borderColor: Colors.red))
-        .border! as Border;
-    expect(thin.top.width, 1.0);
-
-    final thick = boxOf(const DropdownTooltipTheme(
-      borderColor: Colors.red,
-      borderWidth: 3,
-    )).border! as Border;
-    expect(thick.top.width, 3.0);
-  });
-
-  test('border takes a BoxBorder, like the other themes do', () {
+  test('a border is a BoxBorder, and it fills the box too', () {
     final theme = DropdownTooltipTheme(
       border: Border.all(color: Colors.blue, width: 2),
     );
@@ -77,25 +55,16 @@ void main() {
     final border = boxOf(theme).border! as Border;
     expect(border.top.color, Colors.blue);
     expect(border.top.width, 2.0);
-    expect(boxOf(theme).color, grey700, reason: 'and it fills the box too');
-  });
-
-  test('border wins over the deprecated borderColor pair', () {
-    final theme = DropdownTooltipTheme(
-      border: Border.all(color: Colors.blue),
-      // ignore: deprecated_member_use_from_same_package
-      borderColor: Colors.red,
-    );
-
-    expect((boxOf(theme).border! as Border).top.color, Colors.blue);
+    expect(boxOf(theme).color, grey700);
+    expect(boxOf(theme).borderRadius, radius4);
   });
 
   test('an explicit decoration wins over every individual property', () {
     const override = BoxDecoration(color: Colors.green);
-    const theme = DropdownTooltipTheme(
+    final theme = DropdownTooltipTheme(
       decoration: override,
       backgroundColor: Colors.red,
-      borderColor: Colors.blue,
+      border: Border.all(color: Colors.blue),
     );
 
     expect(theme.resolve(Brightness.light).decoration, same(override));

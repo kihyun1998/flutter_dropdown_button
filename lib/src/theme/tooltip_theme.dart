@@ -45,8 +45,6 @@ class DropdownTooltipTheme {
     this.decoration,
     this.borderRadius,
     this.border,
-    @Deprecated('Use border instead. Removed in 3.0.0.') this.borderColor,
-    @Deprecated('Use border instead. Removed in 3.0.0.') this.borderWidth,
     this.shadow,
     this.padding,
     this.margin,
@@ -106,29 +104,10 @@ class DropdownTooltipTheme {
 
   /// The border of the tooltip.
   ///
-  /// If null, no border is displayed. Takes precedence over [borderColor] and
-  /// [borderWidth]. If [decoration] is provided, this property is ignored.
-  ///
-  /// This is the same shape [DropdownTheme.border] and [SearchFieldTheme.border]
-  /// take; the older colour-and-width pair is kept only for compatibility.
-  final BoxBorder? border;
-
-  /// The border color of the tooltip.
-  ///
   /// If null, no border is displayed.
   /// This is a convenience property that creates a BoxDecoration internally.
   /// If [decoration] is provided, this property is ignored.
-  @Deprecated('Use border instead. Removed in 3.0.0.')
-  final Color? borderColor;
-
-  /// The border width of the tooltip.
-  ///
-  /// Only applies if [borderColor] is also set.
-  /// Defaults to 1.0 if [borderColor] is provided.
-  /// This is a convenience property that creates a BoxDecoration internally.
-  /// If [decoration] is provided, this property is ignored.
-  @Deprecated('Use border instead. Removed in 3.0.0.')
-  final double? borderWidth;
+  final BoxBorder? border;
 
   /// The shadow for the tooltip.
   ///
@@ -252,8 +231,6 @@ class DropdownTooltipTheme {
     Decoration? decoration,
     BorderRadius? borderRadius,
     BoxBorder? border,
-    @Deprecated('Use border instead. Removed in 3.0.0.') Color? borderColor,
-    @Deprecated('Use border instead. Removed in 3.0.0.') double? borderWidth,
     List<BoxShadow>? shadow,
     EdgeInsetsGeometry? padding,
     EdgeInsetsGeometry? margin,
@@ -276,10 +253,6 @@ class DropdownTooltipTheme {
       decoration: decoration ?? this.decoration,
       borderRadius: borderRadius ?? this.borderRadius,
       border: border ?? this.border,
-      // ignore: deprecated_member_use_from_same_package
-      borderColor: borderColor ?? this.borderColor,
-      // ignore: deprecated_member_use_from_same_package
-      borderWidth: borderWidth ?? this.borderWidth,
       shadow: shadow ?? this.shadow,
       padding: padding ?? this.padding,
       margin: margin ?? this.margin,
@@ -320,32 +293,18 @@ class DropdownTooltipTheme {
   Decoration? _resolveDecoration(Brightness brightness) {
     if (decoration != null) return decoration;
 
-    final resolvedBorder = _resolveBorder();
-
-    // `borderWidth` is deliberately absent: on its own it draws nothing, and
-    // synthesising a box for it would override an ambient `TooltipTheme` to
-    // no visible end.
     final touchesTheBox = backgroundColor != null ||
         borderRadius != null ||
-        resolvedBorder != null ||
+        border != null ||
         shadow != null;
     if (!touchesTheBox) return null;
 
     return BoxDecoration(
       color: backgroundColor ?? _defaultBackground(brightness),
       borderRadius: borderRadius ?? _defaultRadius,
-      border: resolvedBorder,
+      border: border,
       boxShadow: shadow,
     );
-  }
-
-  BoxBorder? _resolveBorder() {
-    if (border != null) return border;
-    // ignore: deprecated_member_use_from_same_package
-    final color = borderColor;
-    if (color == null) return null;
-    // ignore: deprecated_member_use_from_same_package
-    return Border.all(color: color, width: borderWidth ?? 1.0);
   }
 
   /// Default theme that works well with Material Design.

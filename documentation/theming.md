@@ -45,7 +45,7 @@ DropdownTheme(
 )
 
 // Animation timing is a widget parameter, not a theme field.
-// `DropdownTheme.animationDuration` exists but is never read — see issue #27.
+// `DropdownTheme` describes appearance; the widget owns behaviour.
 FlutterDropdownButton<String>.text(
   items: items,
   animationDuration: const Duration(milliseconds: 250),

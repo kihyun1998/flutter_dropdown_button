@@ -321,8 +321,6 @@ Controls tooltip styling and behavior for text-based dropdowns.
 | `textStyle` | `TextStyle?` | `null` | Tooltip text style (overrides `textColor`) |
 | `borderRadius` | `BorderRadius?` | `null` | Tooltip corner radius |
 | `border` | `BoxBorder?` | `null` | Tooltip border |
-| `borderColor` | `Color?` | `null` | **Deprecated** — use `border`. Removed in 3.0.0 |
-| `borderWidth` | `double?` | `1.0` | **Deprecated** — use `border`. Removed in 3.0.0 |
 | `shadow` | `List<BoxShadow>?` | `null` | Tooltip shadow |
 | `padding` | `EdgeInsetsGeometry?` | `null` | Padding inside tooltip |
 | `margin` | `EdgeInsetsGeometry?` | `null` | Margin around tooltip |

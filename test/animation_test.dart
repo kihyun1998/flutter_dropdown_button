@@ -40,35 +40,4 @@ void main() {
     await tester.pumpAndSettle();
     expect(menuOpacity(tester), 1.0);
   });
-
-  testWidgets('DropdownTheme.animationDuration has no effect', (tester) async {
-    // The field is deprecated precisely because nothing reads it. Honouring it
-    // now would silently slow the animation for anyone who set it and has been
-    // living with the widget's 200ms all along. This test says so out loud, and
-    // fails if someone quietly wires it up.
-    await tester.pumpWidget(
-      host(
-        FlutterDropdownButton<String>.text(
-          items: const ['Apple', 'Banana'],
-          hint: 'Pick a fruit',
-          // ignore: deprecated_member_use_from_same_package
-          theme: const DropdownStyleTheme(
-            dropdown: DropdownTheme(
-              // ignore: deprecated_member_use_from_same_package
-              animationDuration: Duration(milliseconds: 1000),
-            ),
-          ),
-          onChanged: (_) {},
-        ),
-      ),
-    );
-
-    await tester.tap(find.byType(FlutterDropdownButton<String>));
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 250));
-
-    // The widget's default 200ms has already finished. The theme's 1000ms
-    // never entered the picture.
-    expect(menuOpacity(tester), 1.0);
-  });
 }

@@ -20,11 +20,6 @@ import 'resolved_dropdown_style.dart';
 class DropdownTheme {
   /// Creates a dropdown theme configuration.
   const DropdownTheme({
-    @Deprecated(
-      'Never read. Pass animationDuration to FlutterDropdownButton instead. '
-      'This parameter will be removed in 3.0.0.',
-    )
-    this.animationDuration = const Duration(milliseconds: 200),
     this.borderRadius = 8.0,
     this.elevation = 8.0,
     this.backgroundColor,
@@ -57,31 +52,6 @@ class DropdownTheme {
     this.disabledBorder,
     this.disabledButtonDecoration,
   });
-
-  /// The duration of the dropdown show/hide animation.
-  ///
-  /// **Deprecated, and it never worked.** Nothing has ever read this field;
-  /// the animation is driven by `FlutterDropdownButton.animationDuration`.
-  /// Setting it here has always been silently ignored.
-  ///
-  /// It is being removed rather than wired up. Honouring it now would slow the
-  /// animation for everyone who set it and has been living with the widget's
-  /// 200ms — a change nobody asked for. Pass the duration to the widget:
-  ///
-  /// ```dart
-  /// FlutterDropdownButton<String>.text(
-  ///   items: items,
-  ///   animationDuration: const Duration(milliseconds: 300),
-  ///   onChanged: (_) {},
-  /// )
-  /// ```
-  ///
-  /// `DropdownTheme` describes appearance; the widget owns behaviour.
-  @Deprecated(
-    'Never read. Pass animationDuration to FlutterDropdownButton instead. '
-    'This field will be removed in 3.0.0.',
-  )
-  final Duration animationDuration;
 
   /// The border radius for both the dropdown button and overlay.
   ///
@@ -302,11 +272,6 @@ class DropdownTheme {
 
   /// Creates a copy of this theme with the given fields replaced.
   DropdownTheme copyWith({
-    @Deprecated(
-      'Never read. Pass animationDuration to FlutterDropdownButton instead. '
-      'This parameter will be removed in 3.0.0.',
-    )
-    Duration? animationDuration,
     double? borderRadius,
     double? elevation,
     Color? backgroundColor,
@@ -340,7 +305,6 @@ class DropdownTheme {
   }) {
     return DropdownTheme(
       // ignore: deprecated_member_use_from_same_package
-      animationDuration: animationDuration ?? this.animationDuration,
       borderRadius: borderRadius ?? this.borderRadius,
       elevation: elevation ?? this.elevation,
       backgroundColor: backgroundColor ?? this.backgroundColor,
