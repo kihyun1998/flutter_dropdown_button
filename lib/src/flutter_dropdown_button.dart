@@ -724,7 +724,9 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
                         Icon(
                           effectiveTheme.icon ?? Icons.keyboard_arrow_down,
                           size: effectiveIconSize,
-                          color: widget.enabled
+                          // `isEnabled`, not `widget.enabled`: a single-item
+                          // dropdown disabled by policy is disabled here too.
+                          color: isEnabled
                               ? (effectiveTheme.iconColor ??
                                   Theme.of(context).iconTheme.color)
                               : (effectiveTheme.iconDisabledColor ??
