@@ -1,5 +1,20 @@
 # Changelog
 
+## 3.0.0
+
+Removes everything deprecated during the 2.x line. Nothing was renamed and no behaviour changed — every removed member already had a replacement that was doing the work. **If you only ever used `FlutterDropdownButton`, nothing here affects you.**
+
+The deprecations landed across 2.3.2, 2.4.0, 2.4.1 and 2.5.0. Upgrading straight from an earlier 2.x skips the versions that warned, so the table below is the warning.
+
+* **BREAKING**: Removed `DropdownMixin<T>`. Hold a `DropdownOverlayController` instead of mixing one in — the twenty-three members the mixin asked you to override collapse into one `DropdownOverlaySpec`. Deprecated in 2.4.0
+* **BREAKING**: Removed `DropdownMixin.calculateMenuWidth()` and `DropdownMixin.calculateMenuLeftPosition()`. Use `DropdownPlacement.resolve()`, which returns the menu's full geometry in one call. Deprecated in 2.3.2
+* **BREAKING**: Removed `DropdownPositionResult` and `DropdownMixin.calculateDropdownPosition()`. Use `DropdownOverlayController.measurePlacement()`, which returns a `DropdownPlacementResult`
+* **BREAKING**: Removed `DropdownTheme.animationDuration`. Nothing ever read it; setting it did nothing. Pass `animationDuration` to `FlutterDropdownButton`. If you were setting it on the theme your menus animated at 200ms and still do — move the value across only if you actually wanted the slower animation. Deprecated in 2.4.1
+* **BREAKING**: Removed `DropdownTooltipTheme.borderColor` and `DropdownTooltipTheme.borderWidth`. Use `border`, which takes any `BoxBorder`: `DropdownTooltipTheme(border: Border.all(color: Colors.red, width: 2))`. Deprecated in 2.5.0
+* **CHANGE**: `lib/src/buttons/dropdown_mixin.dart` is gone, and with it the last `@Deprecated` annotation in the package
+* **TEST**: 103 tests, down from 107. Four guarded members that no longer exist. One of them — "a tooltip `borderWidth` with no `borderColor` draws nothing" — is now unrepresentable rather than untested: a `BoxBorder` cannot carry a width without a colour
+* **DOCS**: `documentation/migration.md` gains a 2.x → 3.0.0 section. `api_reference.md` no longer documents `DropdownMixin`, and its `closeAll()` section no longer claims the call is unanimated or that only one menu can be open process-wide — both stopped being true in 2.4.0
+
 ## 2.5.0
 
 * **FIX**: A `SearchFieldTheme.divider` taller than one pixel no longer overflows the item list. The overlay reserved a hardcoded `1.0` for any divider, but Flutter's `Divider()` — the widget almost everyone reaches for — is **16px** tall, so a three-item searchable menu threw `A RenderFlex overflowed by 15 pixels on the bottom`
