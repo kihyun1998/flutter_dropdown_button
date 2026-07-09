@@ -81,6 +81,27 @@ FlutterDropdownButton<String>.text(
 )
 ```
 
+### Text Dropdown of a Domain Type
+
+Pass a `label` to render any type as text. Overflow handling, the tooltip, and
+the default search filter all work off the label.
+
+```dart
+FlutterDropdownButton<User>.text(
+  items: users,
+  value: selectedUser,
+  label: (user) => user.name,
+  hint: 'Select a user',
+  searchable: true,          // filters by name, no searchFilter needed
+  onChanged: (value) {
+    setState(() => selectedUser = value);
+  },
+)
+```
+
+Reach for the default constructor only when an item needs more than text —
+an avatar, an icon, a two-line layout.
+
 ### Custom Widget Dropdown
 
 ```dart
@@ -139,9 +160,10 @@ The unified dropdown widget. Use the default constructor for custom widget rende
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
-| **`items`** | `List<T>` | **required** | List of string items |
+| **`items`** | `List<T>` | **required** | List of item values |
 | **`onChanged`** | `ValueChanged<T?>` | **required** | Called when an item is selected |
 | `hint` | `String?` | `null` | Text shown when no item is selected |
+| `label` | `String Function(T)?` | `null` | Extracts the text to display for an item. Required unless `T` is `String` |
 | `config` | `TextDropdownConfig?` | `null` | Text rendering configuration |
 | `leading` | `Widget?` | `null` | Widget before text in all items |
 | `selectedLeading` | `Widget?` | `null` | Widget before text in selected item (falls back to `leading`) |
