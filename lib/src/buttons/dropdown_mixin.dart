@@ -306,6 +306,24 @@ mixin DropdownMixin<T extends StatefulWidget> on State<T>, TickerProvider {
   RenderBox? get overlayRenderBox =>
       Overlay.of(context).context.findRenderObject() as RenderBox?;
 
+  /// Measures the button and resolves where the menu should sit.
+  ///
+  /// Called afresh on every overlay build rather than once when the dropdown
+  /// opens, so a menu whose item list changes underneath it re-sizes and, if
+  /// it no longer fits below the button, flips above it.
+  ///
+  /// Returns null when the button has not been laid out.
+  DropdownPlacementResult? measurePlacement() {
+    final renderBox =
+        dropdownButtonKey.currentContext?.findRenderObject() as RenderBox?;
+    if (renderBox == null || !renderBox.hasSize) return null;
+
+    return resolvePlacement(
+      renderBox.localToGlobal(Offset.zero, ancestor: overlayRenderBox),
+      renderBox.size,
+    );
+  }
+
   /// Opens the dropdown by creating and inserting an overlay entry.
   ///
   /// If another dropdown is already open, it will be closed first.
@@ -317,22 +335,8 @@ mixin DropdownMixin<T extends StatefulWidget> on State<T>, TickerProvider {
       _currentInstance!.closeDropdown();
     }
 
-    final renderBox =
-        dropdownButtonKey.currentContext!.findRenderObject() as RenderBox;
-    final buttonSize = renderBox.size;
-
-    // The menu is positioned inside this Overlay's Stack, so the button's
-    // offset must be measured against the same origin. Resolving it against
-    // the root view instead would shift the menu by the Overlay's own offset
-    // whenever the Overlay does not start at (0, 0).
-    final overlay = Overlay.of(context);
-    final buttonOffset = renderBox.localToGlobal(
-      Offset.zero,
-      ancestor: overlayRenderBox,
-    );
-
-    _overlayEntry = _createOverlayEntry(buttonOffset, buttonSize);
-    overlay.insert(_overlayEntry!);
+    _overlayEntry = _createOverlayEntry();
+    Overlay.of(context).insert(_overlayEntry!);
 
     // Track the current instance for cleanup via closeAll()
     _currentInstance = this;
@@ -486,64 +490,68 @@ mixin DropdownMixin<T extends StatefulWidget> on State<T>, TickerProvider {
   }
 
   /// Creates the overlay entry that contains the dropdown options.
-  OverlayEntry _createOverlayEntry(Offset buttonOffset, Size buttonSize) {
-    final position = resolvePlacement(buttonOffset, buttonSize);
-    final menuWidth = position.width;
-    final leftPosition = position.left;
-
+  OverlayEntry _createOverlayEntry() {
     return OverlayEntry(
-      builder: (context) => GestureDetector(
-        // Detect taps outside the dropdown to close it
-        onTap: closeDropdown,
-        behavior: HitTestBehavior.translucent,
-        child: SizedBox.expand(
-          child: Stack(
-            children: [
-              Positioned(
-                left: leftPosition,
-                top: position.top,
-                width: menuWidth,
-                child: AnimatedBuilder(
-                  animation: dropdownAnimationController,
-                  // Build overlay content once and reuse it during animation
-                  child: Material(
-                    elevation: overlayElevation,
-                    shadowColor: overlayShadowColor,
-                    color: Colors.transparent,
-                    borderRadius: BorderRadius.circular(overlayBorderRadius),
-                    child: Container(
-                      constraints: BoxConstraints(
-                        maxHeight: position.height,
-                      ),
-                      decoration: buildOverlayDecoration() ??
-                          BoxDecoration(
-                            color: Theme.of(context).cardColor,
-                            borderRadius:
-                                BorderRadius.circular(overlayBorderRadius),
-                            border: Border.all(
-                              color: Theme.of(context).dividerColor,
-                              width: 1,
+      builder: (context) {
+        // Measured on every build, not captured once at open time. A menu
+        // whose items change underneath it must re-size, and flip above the
+        // button if the taller menu no longer fits below.
+        final position = measurePlacement();
+        if (position == null) return const SizedBox.shrink();
+
+        return GestureDetector(
+          // Detect taps outside the dropdown to close it
+          onTap: closeDropdown,
+          behavior: HitTestBehavior.translucent,
+          child: SizedBox.expand(
+            child: Stack(
+              children: [
+                Positioned(
+                  left: position.left,
+                  top: position.top,
+                  width: position.width,
+                  child: AnimatedBuilder(
+                    animation: dropdownAnimationController,
+                    // Build overlay content once and reuse it during animation
+                    child: Material(
+                      elevation: overlayElevation,
+                      shadowColor: overlayShadowColor,
+                      color: Colors.transparent,
+                      borderRadius: BorderRadius.circular(overlayBorderRadius),
+                      child: Container(
+                        constraints: BoxConstraints(
+                          maxHeight: position.height,
+                        ),
+                        decoration: buildOverlayDecoration() ??
+                            BoxDecoration(
+                              color: Theme.of(context).cardColor,
+                              borderRadius:
+                                  BorderRadius.circular(overlayBorderRadius),
+                              border: Border.all(
+                                color: Theme.of(context).dividerColor,
+                                width: 1,
+                              ),
                             ),
-                          ),
-                      child: buildOverlayContent(position.height),
-                    ),
-                  ),
-                  builder: (context, child) {
-                    return Transform.scale(
-                      scale: dropdownScaleAnimation.value,
-                      alignment: position.transformAlignment,
-                      child: Opacity(
-                        opacity: dropdownOpacityAnimation.value,
-                        child: child,
+                        child: buildOverlayContent(position.height),
                       ),
-                    );
-                  },
+                    ),
+                    builder: (context, child) {
+                      return Transform.scale(
+                        scale: dropdownScaleAnimation.value,
+                        alignment: position.transformAlignment,
+                        child: Opacity(
+                          opacity: dropdownOpacityAnimation.value,
+                          child: child,
+                        ),
+                      );
+                    },
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }
