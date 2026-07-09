@@ -135,10 +135,11 @@ TextOnlyDropdownButton({
 
 | Property | Type | Default | Description |
 |----------|------|---------|-------------|
-| `items` | `List<String>` | required | List of text options |
-| `onChanged` | `ValueChanged<String?>` | required | Callback when selection changes |
-| `value` | `String?` | null | Currently selected value |
+| `items` | `List<T>` | required | List of options |
+| `onChanged` | `ValueChanged<T?>` | required | Callback when selection changes |
+| `value` | `T?` | null | Currently selected value |
 | `hint` | `String?` | null | Hint text when no item selected |
+| `label` | `String Function(T)?` | null | Extracts the text to display for an item. Required unless `T` is `String` |
 | `theme` | `DropdownTheme?` | null | Visual theme configuration |
 | `config` | `TextDropdownConfig?` | null | Text-specific configuration |
 | `width` | `double?` | null | Fixed width for dropdown |

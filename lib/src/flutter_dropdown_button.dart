@@ -84,6 +84,7 @@ class FlutterDropdownButton<T> extends StatefulWidget {
     this.searchFilter,
     this.emptyBuilder,
   })  : hintText = null,
+        label = null,
         config = null,
         leading = null,
         selectedLeading = null,
@@ -107,6 +108,7 @@ class FlutterDropdownButton<T> extends StatefulWidget {
     required this.items,
     required this.onChanged,
     String? hint,
+    this.label,
     this.config,
     this.leading,
     this.selectedLeading,
@@ -171,6 +173,24 @@ class FlutterDropdownButton<T> extends StatefulWidget {
 
   /// Text displayed when no item is selected (text mode only).
   final String? hintText;
+
+  /// Extracts the text to display for an item (text mode only).
+  ///
+  /// Supply this to use text mode with any type:
+  ///
+  /// ```dart
+  /// FlutterDropdownButton<User>.text(
+  ///   items: users,
+  ///   label: (user) => user.name,
+  /// )
+  /// ```
+  ///
+  /// The label drives rendering, overflow handling, the tooltip, and the
+  /// default search filter.
+  ///
+  /// May be omitted only when `T` is [String], in which case the item is its
+  /// own label. Omitting it for any other type throws in debug builds.
+  final String Function(T item)? label;
 
   /// Text rendering configuration (text mode only).
   ///
@@ -341,6 +361,27 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
   TextDropdownConfig get _textConfig =>
       widget.config ?? TextDropdownConfig.defaultConfig;
 
+  /// The text to display for [item] in text mode.
+  ///
+  /// Uses [FlutterDropdownButton.label] when given. Without it, `T` must be
+  /// [String] — a string is its own label.
+  String _labelOf(T item) {
+    final label = widget.label;
+    if (label != null) return label(item);
+    if (item is String) return item;
+
+    throw FlutterError(
+      'FlutterDropdownButton<$T>.text() needs a `label` callback.\n'
+      'Text mode renders items as text, so it must know how to turn a $T '
+      'into a String. Supply one:\n\n'
+      '  FlutterDropdownButton<$T>.text(\n'
+      '    items: items,\n'
+      '    label: (item) => item.someTextProperty,\n'
+      '  )\n\n'
+      '`label` may only be omitted when T is String.',
+    );
+  }
+
   // ===== DropdownMixin implementation =====
 
   @override
@@ -427,8 +468,10 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
     return fieldHeight + margin.top + margin.bottom + dividerHeight;
   }
 
+  /// Case-insensitive `contains` over the item's label. The default in text
+  /// mode, whatever `T` is.
   bool _defaultTextFilter(T item, String query) {
-    return (item as String).toLowerCase().contains(query.toLowerCase());
+    return _labelOf(item).toLowerCase().contains(query.toLowerCase());
   }
 
   /// The items [query] leaves visible. A pure function of its arguments.
@@ -464,6 +507,13 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
   @override
   void initState() {
     super.initState();
+    assert(
+      !widget.isTextMode || widget.label != null || T == String,
+      'FlutterDropdownButton<$T>.text() needs a `label` callback.\n'
+      'Text mode renders items as text, so it must know how to turn a $T '
+      'into a String. Supply `label: (item) => item.someTextProperty`, or '
+      'use the default constructor with `itemBuilder` instead.',
+    );
     initializeDropdown();
     _autoSelectSingleItem();
     _filteredItems = List<T>.from(widget.items);
@@ -726,7 +776,8 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
   }
 
   Widget _buildTextSelectedWidget() {
-    final selectedText = widget.value as String?;
+    final selected = widget.value;
+    final selectedText = selected == null ? null : _labelOf(selected);
     final displayText = selectedText ?? widget.hintText ?? '';
     final isHint = selectedText == null;
 
@@ -774,14 +825,14 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
 
   Widget _buildItemWidget(T item, bool isSelected) {
     if (widget.isTextMode) {
-      return _buildTextItemWidget(item as String, isSelected);
+      return _buildTextItemWidget(item, isSelected);
     }
     return widget.itemBuilder!(item, isSelected);
   }
 
-  Widget _buildTextItemWidget(String item, bool isSelected) {
+  Widget _buildTextItemWidget(T item, bool isSelected) {
     final textWidget = SmartTooltipText(
-      text: item,
+      text: _labelOf(item),
       tooltipTheme: effectiveTooltipTheme,
       style: isSelected
           ? _textConfig.selectedTextStyle ?? _textConfig.textStyle
