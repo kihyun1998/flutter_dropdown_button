@@ -455,8 +455,17 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
 
   TextEditingController? _searchController;
   FocusNode? _searchFocusNode;
-  List<T> _filteredItems = [];
   String _searchQuery = '';
+
+  /// The items the menu should show right now.
+  ///
+  /// Derived from `items` and the query on every read rather than cached in a
+  /// field. A cache here has to be invalidated from `didUpdateWidget`, from
+  /// the search callback, and from open/close/select — and every past defect
+  /// in this area was a missed invalidation.
+  List<T> get _visibleItems => widget.searchable
+      ? _applyFilter(widget.items, _searchQuery)
+      : widget.items;
 
   /// The height occupied by the search field including margin and divider.
   double get _searchFieldHeight {
@@ -487,7 +496,6 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
 
   void _onSearchChanged(String query) {
     _searchQuery = query;
-    _filteredItems = _applyFilter(widget.items, query);
 
     // Reset scroll position
     if (_scrollController != null && _scrollController!.hasClients) {
@@ -516,7 +524,6 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
     );
     initializeDropdown();
     _autoSelectSingleItem();
-    _filteredItems = List<T>.from(widget.items);
     if (widget.searchable) {
       _searchController = TextEditingController();
       _searchFocusNode = FocusNode();
@@ -528,13 +535,22 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
     super.didUpdateWidget(oldWidget);
     _autoSelectSingleItem();
 
-    // Recompute unconditionally rather than guessing whether `items` changed.
-    // Comparing by identity is wrong for a list rebuilt each frame, and
-    // comparing by value is wrong for a `T` that does not override `==`;
-    // re-applying the current query is correct either way, and costs the
-    // same as one keystroke. The query is the user's — clearing it belongs
-    // to open, close and select, which `_resetSearch()` already handles.
-    _filteredItems = _applyFilter(widget.items, _searchQuery);
+    // Nothing to recompute: the visible items are derived, not stored. The
+    // query belongs to the user — clearing it is the job of open, close and
+    // select, which `_resetSearch()` already handles.
+    //
+    // The overlay lives in its own element subtree and does not rebuild when
+    // this widget does. Without this, a menu that is already open keeps showing
+    // the items it was opened with — a list that arrives asynchronously never
+    // appears until the user closes and reopens the dropdown.
+    //
+    // Deferred to after the frame: the overlay's element is not a descendant
+    // of this one, so marking it dirty mid-build is not allowed.
+    if (isDropdownOpen) {
+      SchedulerBinding.instance.addPostFrameCallback((_) {
+        if (mounted) rebuildOverlay();
+      });
+    }
 
     // Handle searchable toggled on at runtime
     if (widget.searchable && _searchController == null) {
@@ -576,7 +592,6 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
   void _resetSearch() {
     _searchQuery = '';
     _searchController?.clear();
-    _filteredItems = List<T>.from(widget.items);
   }
 
   @override
@@ -868,7 +883,7 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
 
   @override
   Widget buildOverlayContent(double height) {
-    final items = widget.searchable ? _filteredItems : widget.items;
+    final items = _visibleItems;
     final scrollTheme = effectiveScrollTheme;
     final padding = effectiveTheme.overlayPadding;
     final paddingVertical =
