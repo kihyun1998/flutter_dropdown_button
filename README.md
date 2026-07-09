@@ -43,7 +43,7 @@ Add to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  flutter_dropdown_button: ^2.4.0
+  flutter_dropdown_button: ^2.4.1
 ```
 
 Import the package:
@@ -225,6 +225,8 @@ DropdownStyleTheme(
 ### DropdownTheme
 
 Controls general styling for button, overlay, and items.
+
+The theme fills in its own gaps. `resolveButton()`, `resolveOverlay()` and `resolveItem()` return styles whose slots are all filled, taking a plain `DropdownAmbientColors` palette rather than a `BuildContext` — so the rule for "what colour is the arrow when disabled?" lives in one place and can be tested without a widget. You rarely call these directly; the widget does.
 
 #### Button Styling
 
