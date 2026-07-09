@@ -210,6 +210,51 @@ Describes one rendering of the menu. Everything that is not an item — the sear
 | `borderRadius` | `double` | `8.0` | Corner radius |
 | `shadowColor` | `Color?` | `null` | Shadow colour |
 
+The overlay's total non-item furniture is `spec.totalChromeHeight` — `chromeHeight + borderThickness + overlayPadding.vertical`. `DropdownPlacement` grows the menu by it. Anything laying out content inside the menu should shrink by *that same getter* rather than re-adding the parts; disagreeing about it is what made a searchable menu scroll for no reason in 2.3.2, and a `Divider()` overflow the item list in 2.5.0.
+
+## DropdownItemPresentation\<T\>
+
+How items and the button's face are drawn. One implementation per rendering mode.
+
+`FlutterDropdownButton` picks one and every render site asks it what to draw, rather than asking which constructor was used. If you are building your own dropdown on `DropdownOverlayController`, reach for `TextItemPresentation` rather than reimplementing overflow handling, the tooltip and the search filter.
+
+### Interface
+
+| Member | Type | Description |
+|--------|------|-------------|
+| `contentAlignment` | `Alignment` | Where the button's face and each item row sit horizontally |
+| `defaultSearchFilter` | `DropdownSearchFilter<T>?` | The filter used when the caller supplies none. Null means this mode has none to offer |
+| `buildItem(item, isSelected)` | `Widget` | One row of the open menu |
+| `buildSelected()` | `Widget` | The button's face: the selected item, or the hint |
+
+### TextItemPresentation\<T\>
+
+Renders items as text through a `label` extractor, and so can offer overflow handling, an automatic tooltip, and a case-insensitive `contains` filter over the label.
+
+Asserts that `label` is present unless `T` is `String` — a string is its own label.
+
+```dart
+final presentation = TextItemPresentation<User>(
+  label: (user) => user.name,
+  value: selectedUser,
+  hintText: 'Select a user',
+  config: TextDropdownConfig.defaultConfig,
+  tooltipTheme: DropdownTooltipTheme.defaultTheme,
+  enabled: true,
+  leadingHeight: 24,
+);
+
+presentation.buildItem(users.first, false);   // a menu row
+presentation.buildSelected();                 // the button's face
+presentation.defaultSearchFilter!(user, 'ann');
+```
+
+### CustomItemPresentation\<T\>
+
+Renders each item as whatever `itemBuilder` returns. `defaultSearchFilter` is null: it cannot match an arbitrary widget against a query, so a caller who wants search must supply `searchFilter`.
+
+`buildSelected()` falls back to `hintWidget` when `value` is null **or is not among `items`**.
+
 ## Manual Dropdown Cleanup
 
 `FlutterDropdownButton.closeAll()` closes every open menu without needing a reference to the widget that opened it. Use it before navigating away, or before showing a dialog, when a menu may still be on screen.

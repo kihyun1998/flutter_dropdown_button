@@ -116,6 +116,7 @@ class TextItemPresentation<T> implements DropdownItemPresentation<T> {
   @override
   Alignment get contentAlignment => _alignmentOf(config.textAlign);
 
+  /// Case-insensitive `contains` over the item's label, whatever `T` is.
   @override
   DropdownSearchFilter<T>? get defaultSearchFilter => (item, query) =>
       labelOf(item).toLowerCase().contains(query.toLowerCase());

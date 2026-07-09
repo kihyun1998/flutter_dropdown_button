@@ -498,9 +498,10 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
   double get _searchFieldHeight =>
       widget.searchable ? _searchStyle.totalHeight : 0.0;
 
-  /// Case-insensitive `contains` over the item's label. The default in text
-  /// mode, whatever `T` is.
-  /// The items [query] leaves visible. A pure function of its arguments.
+  /// The items [query] leaves visible.
+  ///
+  /// The caller's `searchFilter` wins; failing that, the presentation supplies
+  /// the default its mode can offer, and text mode is the only one that can.
   List<T> _applyFilter(List<T> items, String query) {
     if (query.isEmpty) return List<T>.from(items);
 
@@ -728,12 +729,12 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
     final items = _visibleItems;
     final scrollTheme = effectiveScrollTheme;
     final padding = effectiveTheme.overlayPadding;
-    final paddingVertical =
-        padding != null ? (padding.top + padding.bottom) : 0.0;
-    final searchHeight = _searchFieldHeight;
+
+    // The same quantity `DropdownPlacement` grew the menu by, asked of the same
+    // spec rather than re-added here. When these two disagreed, the item list
+    // overflowed — twice, in 2.3.2 and again in 2.5.0.
     final availableContentHeight =
-        (height - overlayBorderThickness - paddingVertical - searchHeight)
-            .clamp(0.0, double.infinity);
+        (height - _buildSpec().totalChromeHeight).clamp(0.0, double.infinity);
     final totalItemsHeight = items.length * actualItemHeight;
     final needsScroll = totalItemsHeight > availableContentHeight;
     final presentation = _presentation;
