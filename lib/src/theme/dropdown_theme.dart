@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'resolved_dropdown_style.dart';
+
 /// Shared theme configuration for all dropdown widgets.
 ///
 /// This class contains styling and behavior properties that are common
@@ -350,4 +352,121 @@ class DropdownTheme {
 
   /// Default theme that works well with Material Design.
   static const DropdownTheme defaultTheme = DropdownTheme();
+
+  // ===== Resolution =====
+  //
+  // Every fallback the doc comments above promise is honoured here, once.
+  // Callers read the result; they do not decide. None of this needs a
+  // BuildContext — hand it a [DropdownAmbientColors] and it is a pure
+  // function, testable without mounting a widget.
+
+  /// The button as it should be drawn.
+  ///
+  /// [enabled] must be the button's *effective* enabled state: a single-item
+  /// dropdown disabled by policy is disabled here too.
+  ResolvedButtonStyle resolveButton(
+    DropdownAmbientColors ambient, {
+    required bool enabled,
+  }) {
+    final resolvedIconSize = iconSize ?? 24.0;
+
+    return ResolvedButtonStyle(
+      decoration: _buttonDecoration(ambient, enabled: enabled),
+      padding: buttonPadding,
+      borderRadius: borderRadius,
+      splashColor: buttonSplashColor ?? ambient.splash,
+      highlightColor: buttonHighlightColor ?? ambient.highlight,
+      hoverColor: buttonHoverColor ?? ambient.hover,
+      contentHeight: buttonHeight ?? resolvedIconSize,
+      iconSize: resolvedIconSize,
+      icon: icon ?? Icons.keyboard_arrow_down,
+      iconPadding: iconPadding ?? const EdgeInsets.only(left: 8.0),
+      iconColor: enabled
+          ? (iconColor ?? ambient.icon)
+          : (iconDisabledColor ?? ambient.disabled),
+    );
+  }
+
+  BoxDecoration _buttonDecoration(
+    DropdownAmbientColors ambient, {
+    required bool enabled,
+  }) {
+    if (!enabled) {
+      // A full decoration overrides everything else.
+      if (disabledButtonDecoration != null) return disabledButtonDecoration!;
+
+      // Otherwise a disabled colour or border is enough to build one.
+      if (disabledBackgroundColor != null || disabledBorder != null) {
+        return BoxDecoration(
+          color: disabledBackgroundColor,
+          border:
+              disabledBorder ?? border ?? Border.all(color: ambient.divider),
+          borderRadius: BorderRadius.circular(borderRadius),
+        );
+      }
+      // With no disabled styling at all, fall through to the enabled look.
+    }
+
+    return buttonDecoration ??
+        BoxDecoration(
+          border: border ?? Border.all(color: ambient.divider),
+          borderRadius: BorderRadius.circular(borderRadius),
+        );
+  }
+
+  /// The menu container as it should be drawn.
+  ResolvedOverlayStyle resolveOverlay(DropdownAmbientColors ambient) {
+    final background = backgroundColor ?? ambient.card;
+    final decoration = overlayDecoration ??
+        BoxDecoration(
+          color: background,
+          borderRadius: BorderRadius.circular(borderRadius),
+          border: border ?? Border.all(color: ambient.divider, width: 1),
+        );
+
+    final decorationBorder = decoration.border;
+
+    return ResolvedOverlayStyle(
+      decoration: decoration,
+      backgroundColor: background,
+      borderRadius: borderRadius,
+      elevation: elevation,
+      shadowColor: shadowColor,
+      padding: overlayPadding,
+      borderThickness: decorationBorder is Border
+          ? decorationBorder.top.width + decorationBorder.bottom.width
+          : 0.0,
+    );
+  }
+
+  /// One item row as it should be drawn.
+  ///
+  /// [isFirst] and [isLast] matter because, absent an explicit
+  /// [itemBorderRadius], only the end rows are rounded — they sit against the
+  /// menu's own corners.
+  ResolvedItemStyle resolveItem(
+    DropdownAmbientColors ambient, {
+    required bool selected,
+    required bool isFirst,
+    required bool isLast,
+  }) {
+    return ResolvedItemStyle(
+      decoration: BoxDecoration(
+        color: selected
+            ? selectedItemColor ?? ambient.primary.withValues(alpha: 0.1)
+            : Colors.transparent,
+        borderRadius: itemBorderRadius != null
+            ? BorderRadius.circular(itemBorderRadius!)
+            : null,
+        border: (isLast && excludeLastItemBorder) ? null : itemBorder,
+      ),
+      padding: itemPadding,
+      margin: itemMargin,
+      inkBorderRadius:
+          itemBorderRadius ?? (isFirst || isLast ? borderRadius : 0.0),
+      splashColor: itemSplashColor ?? ambient.splash,
+      highlightColor: itemHighlightColor ?? ambient.highlight,
+      hoverColor: itemHoverColor ?? ambient.hover,
+    );
+  }
 }
