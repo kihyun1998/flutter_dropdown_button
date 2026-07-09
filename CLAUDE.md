@@ -4,120 +4,134 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Package Overview
 
-This is a Flutter package (`flutter_dropdown_button`) that provides highly customizable dropdown widgets with overlay-based rendering. The package consists of two main dropdown variants and a shared architecture for common functionality.
+`flutter_dropdown_button` is a Flutter package providing a single, highly customizable dropdown widget rendered through an `OverlayEntry` rather than Flutter's built-in menu machinery.
+
+There is **one** widget — `FlutterDropdownButton<T>` — with two constructors:
+
+- `FlutterDropdownButton<T>(...)` — custom mode. `itemBuilder` renders each item as an arbitrary widget.
+- `FlutterDropdownButton<T>.text(...)` — text mode. Items render as text through `SmartTooltipText`, gaining overflow handling, an automatic tooltip, and a default search filter. A `label` callback extracts the string, so `T` need not be `String`.
+
+The two are distinguished internally by `isTextMode`, which is `itemBuilder == null`.
 
 ## Core Architecture
 
-### Main Components
+The widget is a thin shell over three modules, each of which takes plain values and can be tested without mounting a widget.
 
-- **BasicDropdownButton**: Generic dropdown supporting any widget as items
-- **TextOnlyDropdownButton**: Specialized dropdown for text content with precise text rendering control
-- **DropdownMixin**: Shared functionality mixin that eliminates code duplication between dropdown variants
-- **DropdownTheme**: Shared theme system for consistent styling across variants
-- **TextDropdownConfig**: Text-specific configuration for overflow, styling, and alignment
-- **DropdownItem**: Generic model for BasicDropdownButton items
+### `DropdownPlacement` — `lib/src/placement/`
 
-### Shared Architecture Pattern
+Pure geometry. Given a screen size, safe insets, a button rectangle and item metrics, it returns where the menu goes: height, open direction, transform alignment, top, left, width.
 
-Both dropdown variants use the `DropdownMixin` which provides:
-- Smart positioning logic (automatically opens upward when insufficient space below)
-- Animation management (scale and opacity animations)
-- Overlay lifecycle management
-- Outside-tap dismissal functionality
-- Dynamic height adjustment to prevent screen overflow
+No `BuildContext`, no `MediaQuery`, no `State`. It does not know which coordinate space its inputs came from — that is the caller's business, and getting it wrong was the cause of a real bug (menus drawn off-screen inside a nested `Overlay`).
 
-The mixin eliminates ~150 lines of duplicate code between the two dropdown variants.
+Its `chromeHeight` input covers everything in the overlay that is *not* an item: the search field, the border, the overlay's own padding. Omitting it is a compile error rather than a layout bug.
+
+### `DropdownOverlayController` — `lib/src/overlay/`
+
+Owns the overlay's lifetime, the open/close animation, the widget tree the menu is drawn into, and the rule that only one menu is open at a time within an `Overlay`.
+
+**A `State` holds one; it does not inherit from it.** The controller is exported, so a third party building their own dropdown holds the same object `FlutterDropdownButton` does.
+
+It takes a `DropdownOverlaySpec` **callback**, not a value — the item count, the theme and the search field's height change while the menu is open, and `measurePlacement()` re-reads them on every overlay build. That is why an open menu re-sizes when its items change, and flips above the button when the taller menu no longer fits below.
+
+Single-open coordination lives in a registry keyed by `Overlay`, not in a process-wide static.
+
+### Theme resolution — `lib/src/theme/`
+
+`DropdownStyleTheme` composes four themes: `DropdownTheme`, `DropdownScrollTheme`, `DropdownTooltipTheme`, `SearchFieldTheme`.
+
+`DropdownTheme` **resolves itself**. `resolveButton()`, `resolveOverlay()` and `resolveItem()` return styles whose slots are all filled in; the widget reads the result rather than deciding. Resolution takes a `DropdownAmbientColors` — a plain palette lifted out of `ThemeData` — rather than a `BuildContext`, so it is a pure function.
+
+`SearchFieldTheme` and `DropdownScrollTheme` have **not** been converted yet; they still inline their fallbacks in `build()`. See issue #26.
+
+### The recurring pattern
+
+Every module here separates **reading from the element tree** from **deciding with what was read**. Pulling `MediaQuery.size` out of a context needs a context; computing a menu's height from it does not. Pulling `Theme.of(context).dividerColor` needs a context; choosing between it and a themed override does not.
+
+The second half is where the bugs are, and it is the half worth testing. When adding a module, keep the split.
+
+## Deprecated
+
+`DropdownMixin` (`lib/src/buttons/dropdown_mixin.dart`) is deprecated as of 2.4.0 and slated for removal in 3.0.0 (issue #7). It survives only as a delegating shim over `DropdownOverlayController`, and shares the controller's registry so that mixin-based and controller-based menus obey the same single-open rule.
+
+Nothing in this package uses it. Do not build on it.
 
 ## Development Commands
 
-### Package Development
 ```bash
-# Install dependencies
-flutter pub get
+flutter pub get              # install dependencies
+flutter test                 # run the suite (75 tests)
+flutter analyze              # static analysis; must be clean
+dart format .                # formatting; must produce no changes
+flutter pub publish --dry-run   # validate the package before release
 
-# Run static analysis
-flutter analyze
-
-# Run linter
-flutter pub run flutter_lints
-
-# Format code
-dart format .
-
-# Run tests (minimal test suite currently exists)
-flutter test
-
-# Run tests for specific file
-flutter test test/flutter_dropdown_button_test.dart
+cd example && flutter run    # run the playground app
 ```
 
-### Example App Development
-```bash
-# Run example app
-cd example && flutter run
+## Testing
 
-# Build example app
-cd example && flutter build web
-```
+75 tests. Around half run without mounting a widget at all.
 
-### Documentation
-The package includes comprehensive documentation in the `documentation/` directory:
-- `api_reference.md`: Complete API documentation
-- `theming.md`: Theming and styling guide
-- `text_configuration.md`: Text-specific configuration guide
-- `migration.md`: Migration guide from Flutter's built-in DropdownButton
+| Suite | What it covers |
+| --- | --- |
+| `test/placement/` | The geometry module, exhaustively. No widgets. |
+| `test/theme/` | `DropdownTheme.resolve*()`. No widgets. |
+| `test/overlay/` | The controller's lifecycle. No widgets. |
+| `test/overlay_bounds_test.dart` | Menus near screen edges, and inside a nested `Overlay` |
+| `test/overlay_resize_test.dart` | An open menu growing, shrinking, and flipping |
+| `test/overlay_lifecycle_test.dart` | Single-open, `closeAll`, dispose |
+| `test/search_invalidation_test.dart` | The query surviving rebuilds |
+| `test/text_label_test.dart` | `label` with a non-`String` `T` |
+| `test/theme_resolution_test.dart` | Resolution rules, observed at the rendered widget |
+| `test/disabled_state_test.dart` | The disabled state, including single-item auto-disable |
 
-## Key Implementation Details
+**Conventions that matter here:**
 
-### Overlay-Based Rendering
-Unlike Flutter's built-in DropdownButton, these widgets use `OverlayEntry` for better positioning control and visual effects. The overlay system allows for smart positioning that adapts to available screen space.
-
-### Positioning Algorithm
-The `DropdownMixin.calculateDropdownPosition()` method implements smart positioning:
-1. Calculates available space above and below the button
-2. Prefers to open downward if sufficient space exists
-3. Falls back to opening upward if more space is available above
-4. Dynamically adjusts height when space is constrained
-5. Ensures minimum visibility of items
-
-### Breaking Changes
-Version 1.0.0 includes breaking changes from initial development:
-- `CustomDropdown` → `BasicDropdownButton`  
-- `TextOnlyDropdown` → `TextOnlyDropdownButton`
-
-When making changes to class names or public APIs, ensure all documentation files are updated accordingly.
+- **Test at the public seam.** Widget tests assert on what is rendered — the `BoxDecoration` on the button, the presence of a `ListView` — never on private state. That is why the test suite survived the controller extraction and the theme resolution rewrite without a single edit.
+- **Prove a test can fail.** A test written *after* a fix has never been red. Before trusting it, revert the fix (`git stash` the lib change) and confirm the test catches the bug. Two tests in this repo were found to be vacuous this way.
+- **Say when a test cannot fail.** Some tests guard behaviour that was never broken, or exercise a capability that did not previously compile. Label them; do not let them masquerade as regression tests.
 
 ## Package Structure
+
 ```
 lib/
-├── flutter_dropdown_button.dart          # Main export file
+├── flutter_dropdown_button.dart          # public exports
 └── src/
-    ├── basic_dropdown_button.dart        # Generic dropdown widget
-    ├── text_only_dropdown_button.dart    # Text-specific dropdown widget
-    ├── dropdown_mixin.dart               # Shared functionality mixin
-    ├── dropdown_theme.dart               # Shared theme system
-    ├── text_dropdown_config.dart         # Text-specific configuration
-    └── dropdown_item.dart                # Item model for BasicDropdownButton
+    ├── flutter_dropdown_button.dart      # the widget
+    ├── placement/dropdown_placement.dart # pure geometry
+    ├── overlay/
+    │   └── dropdown_overlay_controller.dart  # overlay lifetime, animation, spec
+    ├── theme/
+    │   ├── dropdown_style_theme.dart     # composes the four below
+    │   ├── dropdown_theme.dart           # + resolveButton/Overlay/Item
+    │   ├── resolved_dropdown_style.dart  # ambient palette + resolved styles
+    │   ├── dropdown_scroll_theme.dart
+    │   ├── search_field_theme.dart
+    │   └── tooltip_theme.dart
+    ├── config/text_dropdown_config.dart  # text overflow, alignment, styles
+    ├── buttons/
+    │   ├── dropdown_mixin.dart           # DEPRECATED shim; removed in 3.0.0
+    │   └── menu_alignment.dart
+    └── widgets/smart_tooltip_text.dart   # tooltip on overflow
 ```
+
+## Documentation
+
+- `README.md` — features, quick start, full parameter tables
+- `documentation/api_reference.md`
+- `documentation/theming.md`
+- `documentation/text_configuration.md`
+- `documentation/migration.md`
+- `documentation/use_cases.md`
+
+`docs/agents/` holds configuration for coding agents (issue tracker, triage labels, domain docs). It is excluded from the published package by `docs/.pubignore`.
+
+When changing a public class name or signature, update `README.md` and `documentation/` in the same change. These files have drifted before, and stale docs sent readers to APIs that had been deleted three major versions earlier.
 
 ## Version Management
 
-- Current version: 1.0.0
-- Uses semantic versioning
-- Breaking changes require major version bump
-- Update version in both `pubspec.yaml` and documentation when releasing
-- CHANGELOG.md follows the format: `* **TYPE**: Description` (e.g., `* **FEAT**: New feature`)
-
-## Agent skills
-
-### Issue tracker
-
-Issues live in GitHub Issues on `kihyun1998/flutter_dropdown_button`, via the `gh` CLI. External pull requests are **not** a triage surface. See `docs/agents/issue-tracker.md`.
-
-### Triage labels
-
-The five canonical triage roles use their default label strings (`needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`). See `docs/agents/triage-labels.md`.
-
-### Domain docs
-
-Single-context: `CONTEXT.md` and `docs/adr/` at the repo root, created lazily. See `docs/agents/domain.md`.
+- Semantic versioning. The version lives in `pubspec.yaml`; do not restate it in prose.
+- Breaking changes require a major bump. Adding a member, or deprecating one, does not.
+- `CHANGELOG.md` entries take the form `* **TYPE**: Description`, where TYPE is one of `FEAT`, `FIX`, `BREAKING`, `DEPRECATED`, `REFACTOR`, `PERF`, `CHANGE`, `TEST`, `MIGRATION`.
+- Record deprecations and behaviour changes even when they are small. A silent deprecation surprises people; a four-pixel layout change that nobody wrote down is a bug report waiting to happen.
+- Cut a release in its own commit (`chore: release X.Y.Z`) that bumps `pubspec.yaml`, adds the `CHANGELOG.md` section, and updates the version in `README.md`'s quick start.
+- Run `flutter pub publish --dry-run` before releasing; it must report zero warnings.
