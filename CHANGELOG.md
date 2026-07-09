@@ -1,5 +1,18 @@
 # Changelog
 
+## 2.4.0
+
+* **FEAT**: `FlutterDropdownButton.text()` now accepts a `label` callback, so text mode renders **any** type — not just `String`. Overflow handling, the tooltip and the default search filter all work off the label, so a `List<User>` no longer has to drop to `itemBuilder` and give those up. Omitting `label` for a non-`String` `T` now fails loudly at construction in debug builds instead of throwing a cast error at paint time
+* **FEAT**: Added `DropdownOverlayController` and `DropdownOverlaySpec` — hold a controller instead of mixing in `DropdownMixin` to build your own dropdown. It manages the overlay's lifetime, the open/close animation, and the "only one menu open" rule behind nine members rather than twenty-three, and can be tested without a `State`. See `example/lib/pages/domain_type_page.dart`
+* **FEAT**: Only-one-menu-open is now scoped to the enclosing `Overlay` rather than to the process, so two dropdowns in two different `Overlay`s no longer close each other
+* **FIX**: `FlutterDropdownButton.closeAll()` now accepts `animate`, as `README.md` has documented since 2.2.1. The parameter existed only on `DropdownMixin.closeAll()`; the widget's facade never forwarded it, so the documented call did not compile
+* **FIX**: A dropdown menu that is already open now reflects items that change underneath it. Previously an item list arriving asynchronously never appeared until the user closed and reopened the menu
+* **FIX**: An open menu now grows when its item list gets longer, and flips above the button when the taller menu no longer fits below. Previously the height was fixed when the menu opened, so new items were pushed below the fold of a scrollbar that appeared for no visible reason
+* **DEPRECATED**: `DropdownMixin` is deprecated in favour of `DropdownOverlayController`. It still works — it now delegates to a controller, so mixin-based and controller-based menus share one registry and both answer `closeAll()`. It will be removed in 3.0.0
+* **REFACTOR**: `_FlutterDropdownButtonState` holds a controller instead of inheriting from a mixin. Fourteen one-line forwarders and the `static _currentInstance` global are gone
+* **REFACTOR**: The filtered item list is derived from the items and the query on read rather than cached in a field, removing four hand-written invalidation sites
+* **TEST**: 50 tests, up from 26 — placement geometry, search invalidation, overlay bounds and resizing, label extraction, and the controller itself (unit-tested with no widget tree)
+
 ## 2.3.2
 
 * **FIX**: Fixed dropdown menu rendering off-screen when the dropdown lives inside a nested `Overlay` or `Navigator` (side panels, shell routes, embedded views) — the button's position was resolved against the root view while the menu was placed against the enclosing `Overlay`'s origin, shifting the menu by that Overlay's offset. Position and screen-bounds clamping now both use the `Overlay`'s render box
