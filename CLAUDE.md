@@ -39,9 +39,11 @@ Single-open coordination lives in a registry keyed by `Overlay`, not in a proces
 
 `DropdownStyleTheme` composes four themes: `DropdownTheme`, `DropdownScrollTheme`, `DropdownTooltipTheme`, `SearchFieldTheme`.
 
-Each **resolves itself**. `DropdownTheme.resolveButton()`, `.resolveOverlay()` and `.resolveItem()`, `SearchFieldTheme.resolve()`, `DropdownScrollTheme.resolve()` and `DropdownTooltipTheme.resolve()` return styles whose slots are all filled in; the widget reads the result rather than deciding. There is no `??` chain and no `Theme.of(context)` left in `build()`.
+Each **resolves itself**. `DropdownTheme.resolveButton()`, `.resolveOverlay()` and `.resolveItem()`, `SearchFieldTheme.resolve()`, `DropdownScrollTheme.resolve()` and `DropdownTooltipTheme.resolve()` return styles whose slots are all filled in; the widget reads the result rather than deciding. No theme fallback chain is left in `flutter_dropdown_button.dart`.
 
 Resolution never takes a `BuildContext`. It takes whatever plain value it needs — a `DropdownAmbientColors` palette lifted out of `ThemeData`, a `Brightness`, or nothing at all — so every rule is a pure function.
+
+The `Theme.of(context)` calls that remain are the adapters, and each one only *reads*: `DropdownAmbientColors.of()` lifts the palette, `SmartTooltipText` lifts the brightness, and `DropdownOverlayController` lifts the colours for the default menu chrome. None of them chooses anything.
 
 A resolved style is **complete**, and that is load-bearing rather than tidy. `SearchFieldTheme` reserves the height it also constrains its divider to, so the two cannot disagree. `DropdownTooltipTheme` fills the whole `BoxDecoration` once the caller names any part of it, because Flutter's `Tooltip` treats a decoration as a total replacement and would otherwise blank the slots the caller left alone. Both of those were shipped bugs.
 
@@ -63,7 +65,7 @@ Nothing in this package uses it. Do not build on it.
 
 ```bash
 flutter pub get              # install dependencies
-flutter test                 # run the suite (75 tests)
+flutter test                 # run the suite (107 tests)
 flutter analyze              # static analysis; must be clean
 dart format .                # formatting; must produce no changes
 flutter pub publish --dry-run   # validate the package before release
@@ -73,19 +75,21 @@ cd example && flutter run    # run the playground app
 
 ## Testing
 
-75 tests. Around half run without mounting a widget at all.
+107 tests. 59 of them run without mounting a widget at all.
 
 | Suite | What it covers |
 | --- | --- |
 | `test/placement/` | The geometry module, exhaustively. No widgets. |
-| `test/theme/` | `DropdownTheme.resolve*()`. No widgets. |
+| `test/theme/` | Every `resolve()`. No widgets. |
 | `test/overlay/` | The controller's lifecycle. No widgets. |
 | `test/overlay_bounds_test.dart` | Menus near screen edges, and inside a nested `Overlay` |
 | `test/overlay_resize_test.dart` | An open menu growing, shrinking, and flipping |
 | `test/overlay_lifecycle_test.dart` | Single-open, `closeAll`, dispose |
 | `test/search_invalidation_test.dart` | The query surviving rebuilds |
+| `test/search_divider_height_test.dart` | The divider's reserved height matching its drawn height |
 | `test/text_label_test.dart` | `label` with a non-`String` `T` |
 | `test/theme_resolution_test.dart` | Resolution rules, observed at the rendered widget |
+| `test/tooltip_decoration_test.dart` | A partial tooltip theme keeping the box it did not name |
 | `test/disabled_state_test.dart` | The disabled state, including single-item auto-disable |
 
 **Conventions that matter here:**

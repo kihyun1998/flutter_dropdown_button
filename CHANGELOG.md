@@ -1,5 +1,18 @@
 # Changelog
 
+## 2.5.0
+
+* **FIX**: A `SearchFieldTheme.divider` taller than one pixel no longer overflows the item list. The overlay reserved a hardcoded `1.0` for any divider, but Flutter's `Divider()` — the widget almost everyone reaches for — is **16px** tall, so a three-item searchable menu threw `A RenderFlex overflowed by 15 pixels on the bottom`
+* **FIX**: A `DropdownTooltipTheme` that sets one visual property no longer blanks the rest of the tooltip's box. Flutter's `Tooltip` treats a non-null `decoration` as a total replacement rather than a merge, so `DropdownTooltipTheme(borderRadius: BorderRadius.circular(8))` produced a **transparent** tooltip — white text on nothing. The same held for `shadow` and `borderColor` alone. Unset slots now fall back to `Tooltip`'s own defaults
+* **FEAT**: Added `SearchFieldTheme.dividerHeight` (defaults to `1.0`). The overlay reserves this much space **and constrains the divider to it**, so the height reserved and the height drawn cannot disagree
+* **FEAT**: Added `DropdownTooltipTheme.border`, a `BoxBorder` — the same shape `DropdownTheme.border` and `SearchFieldTheme.border` take. It wins over `borderColor` / `borderWidth`
+* **CHANGE**: `SearchFieldTheme.divider` is now laid out at exactly `dividerHeight`. A caller passing `Divider()` and relying on its natural 16px must now pass `dividerHeight: 16` to keep it; otherwise the divider draws at 1px instead of overflowing
+* **CHANGE**: A `DropdownTooltipTheme` that sets `backgroundColor` and nothing else now keeps Flutter's 4px tooltip corners, where it previously squared them off. Set `borderRadius: BorderRadius.zero` for the old look
+* **DEPRECATED**: `DropdownTooltipTheme.borderColor` and `DropdownTooltipTheme.borderWidth` in favour of `border`. They still work. Removed in 3.0.0
+* **REFACTOR**: `SearchFieldTheme`, `DropdownScrollTheme` and `DropdownTooltipTheme` resolve themselves, completing the work `DropdownTheme` began in 2.4.1. `resolve()` takes a plain value — a `DropdownAmbientColors` palette, a `Brightness`, or nothing — never a `BuildContext`, so every styling rule is a pure function. The last four `Theme.of(context)` calls and twelve `??` fallback chains left the widget's `build()`
+* **CHANGE**: Exported `ResolvedSearchFieldStyle`, `ResolvedScrollStyle` and `ResolvedTooltipStyle`, and added `DropdownAmbientColors.hint`. Additive; existing theme fields are unchanged
+* **TEST**: 107 tests, up from 77. Thirty-five exercise theme resolution with no widget tree at all. `DropdownTooltipTheme` had no test coverage of any kind before this release, which is why its bug survived
+
 ## 2.4.1
 
 * **FIX**: The trailing arrow now honours the single-item auto-disable. A dropdown disabled by `disableWhenSingleItem` blocked taps, switched its decoration to the disabled form and applied `disabledTextStyle`, while the arrow kept its **enabled** colour. Visible whenever `hideIconWhenSingleItem: false`. The icon asked `widget.enabled`; everything else asked `isEnabled`
