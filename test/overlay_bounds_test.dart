@@ -22,6 +22,30 @@ Future<Rect> openAndMeasureMenu(WidgetTester tester) async {
 void main() {
   const screenWidth = 800.0;
 
+  // Issue #1 names two layouts: a Row aligned to the end, and an AppBar.
+  // Both are covered here. Neither reproduces the reported overflow — the
+  // clamp has handled them since 1.4.7. The nested-Overlay case below is the
+  // one that was actually broken.
+
+  testWidgets('menu in AppBar actions stays on screen', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          appBar: AppBar(
+            title: const Text('Title'),
+            actions: [dropdown()],
+          ),
+          body: const SizedBox.expand(),
+        ),
+      ),
+    );
+
+    final menu = await openAndMeasureMenu(tester);
+
+    expect(menu.right, lessThanOrEqualTo(screenWidth));
+    expect(menu.left, greaterThanOrEqualTo(0));
+  });
+
   testWidgets('menu pinned to the right edge stays on screen', (tester) async {
     await tester.pumpWidget(
       MaterialApp(
