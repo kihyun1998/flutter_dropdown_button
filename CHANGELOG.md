@@ -1,5 +1,15 @@
 # Changelog
 
+## 2.3.2
+
+* **FIX**: Fixed dropdown menu rendering off-screen when the dropdown lives inside a nested `Overlay` or `Navigator` (side panels, shell routes, embedded views) — the button's position was resolved against the root view while the menu was placed against the enclosing `Overlay`'s origin, shifting the menu by that Overlay's offset. Position and screen-bounds clamping now both use the `Overlay`'s render box
+* **FIX**: Fixed `searchable: true` forcing a scrollbar on dropdowns whose items would otherwise fit — the search field's height was subtracted from the item area instead of being added to the overlay height. A 3-item searchable dropdown under default theming no longer scrolls
+* **FIX**: Fixed the search query being cleared whenever an ancestor widget rebuilt. `didUpdateWidget` compared `items` by list identity, so any caller passing a derived list (`source.map(...).toList()`, or a non-const literal) reset the query on every rebuild. The filter is now recomputed from the current query, which is correct regardless of the equality semantics of `T`
+* **FIX**: Fixed the dropdown overrunning `screenMargin` by `buttonGap` (4px) when opening downward, and reserving a double margin (16px) when shrinking to fit. The menu now keeps exactly one `screenMargin` from the safe-area edge in both cases — a menu constrained for space is ~4px taller than before
+* **DEPRECATED**: `DropdownMixin.calculateMenuWidth()` and `DropdownMixin.calculateMenuLeftPosition()` are deprecated in favour of `resolvePlacement()`, which returns the menu's full geometry in one call. They still work and will be removed in 3.0.0
+* **REFACTOR**: Extracted all overlay positioning geometry out of `DropdownMixin` into a pure module that takes plain values and returns plain values — no `BuildContext`, no `MediaQuery`, no `State`. `DropdownMixin` remains as the adapter that reads the screen and delegates
+* **TEST**: Added the package's first test suite — 26 tests, 17 of which exercise the positioning geometry without mounting a widget
+
 ## 2.3.1
 
 * **FIX**: Explicitly set `mouseCursor` on `InkWell` widgets to restore hover cursor behavior on web/desktop after recent Flutter versions changed the default `MaterialStateMouseCursor.clickable` resolution
