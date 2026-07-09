@@ -4,7 +4,7 @@
 
 Removes everything deprecated during the 2.x line. Nothing was renamed and no behaviour changed — every removed member already had a replacement that was doing the work. **If you only ever used `FlutterDropdownButton`, nothing here affects you.**
 
-The deprecations landed across 2.3.2, 2.4.0, 2.4.1 and 2.5.0. Upgrading straight from an earlier 2.x skips the versions that warned, so the table below is the warning.
+The deprecations landed across 2.3.2, 2.4.0, 2.4.1 and 2.5.0. Upgrading straight from an earlier 2.x skips the versions that warned, so the list below is the warning.
 
 * **BREAKING**: Removed `DropdownMixin<T>`. Hold a `DropdownOverlayController` instead of mixing one in — the twenty-three members the mixin asked you to override collapse into one `DropdownOverlaySpec`. Deprecated in 2.4.0
 * **BREAKING**: Removed `DropdownMixin.calculateMenuWidth()` and `DropdownMixin.calculateMenuLeftPosition()`. Use `DropdownPlacement.resolve()`, which returns the menu's full geometry in one call. Deprecated in 2.3.2
@@ -12,7 +12,11 @@ The deprecations landed across 2.3.2, 2.4.0, 2.4.1 and 2.5.0. Upgrading straight
 * **BREAKING**: Removed `DropdownTheme.animationDuration`. Nothing ever read it; setting it did nothing. Pass `animationDuration` to `FlutterDropdownButton`. If you were setting it on the theme your menus animated at 200ms and still do — move the value across only if you actually wanted the slower animation. Deprecated in 2.4.1
 * **BREAKING**: Removed `DropdownTooltipTheme.borderColor` and `DropdownTooltipTheme.borderWidth`. Use `border`, which takes any `BoxBorder`: `DropdownTooltipTheme(border: Border.all(color: Colors.red, width: 2))`. Deprecated in 2.5.0
 * **CHANGE**: `lib/src/buttons/dropdown_mixin.dart` is gone, and with it the last `@Deprecated` annotation in the package
-* **TEST**: 103 tests, down from 107. Four guarded members that no longer exist. One of them — "a tooltip `borderWidth` with no `borderColor` draws nothing" — is now unrepresentable rather than untested: a `BoxBorder` cannot carry a width without a colour
+* **FEAT**: Added `DropdownItemPresentation<T>`, with `TextItemPresentation` and `CustomItemPresentation` behind it. Anyone building a dropdown on `DropdownOverlayController` can reuse `TextItemPresentation` and get overflow handling, the tooltip and the default search filter for free, rather than reimplementing them
+* **REFACTOR**: The widget no longer branches on `isTextMode`. Rendering is chosen once, in one factory; eight consult sites became zero, and four private render methods left `flutter_dropdown_button.dart` (1291 → 1166 lines). A third rendering mode is now a third implementation and a third branch in that factory, not another conditional at every render site
+* **CHANGE**: `isTextMode` remains public but is informational — nothing inside the widget reads it
+* **CHANGE**: The `label`-or-`String` invariant is now asserted by `TextItemPresentation` rather than in `initState`, so it fires on the first build. Still before anything paints, still an `AssertionError` in debug builds
+* **TEST**: 113 tests, up from 107. Four guarded members that no longer exist and were deleted; ten new ones exercise the presentation seam with no widget tree. One deletion is worth naming: "a tooltip `borderWidth` with no `borderColor` draws nothing" is now unrepresentable rather than untested, because a `BoxBorder` cannot carry a width without a colour
 * **DOCS**: `documentation/migration.md` gains a 2.x → 3.0.0 section. `api_reference.md` no longer documents `DropdownMixin`, and its `closeAll()` section no longer claims the call is unanimated or that only one menu can be open process-wide — both stopped being true in 2.4.0
 
 ## 2.5.0

@@ -15,7 +15,7 @@ The two are distinguished internally by `isTextMode`, which is `itemBuilder == n
 
 ## Core Architecture
 
-The widget is a thin shell over three modules, each of which takes plain values and can be tested without mounting a widget.
+The widget is a thin shell over four modules, each of which takes plain values rather than a `BuildContext`.
 
 ### `DropdownPlacement` — `lib/src/placement/`
 
@@ -34,6 +34,16 @@ Owns the overlay's lifetime, the open/close animation, the widget tree the menu 
 It takes a `DropdownOverlaySpec` **callback**, not a value — the item count, the theme and the search field's height change while the menu is open, and `measurePlacement()` re-reads them on every overlay build. That is why an open menu re-sizes when its items change, and flips above the button when the taller menu no longer fits below.
 
 Single-open coordination lives in a registry keyed by `Overlay`, not in a process-wide static.
+
+### `DropdownItemPresentation` — `lib/src/presentation/`
+
+How items and the button's face are drawn. `TextItemPresentation` renders through a `label` and gains overflow handling, the tooltip and a default search filter; `CustomItemPresentation` calls `itemBuilder`.
+
+The widget decides the mode **once**, in the `_presentation` getter, and every render site asks the result what to draw. It does not ask itself which constructor was used. `isTextMode` survives as a public informational getter that nothing branches on.
+
+A presentation takes plain values and no `BuildContext` — the resolved icon size, not a `ResolvedButtonStyle`; a `DropdownTooltipTheme`, not a `Theme.of`. It holds the invariants of its own mode: `TextItemPresentation` asserts that `label` is present unless `T` is `String`, which is a promise `.text()` makes and the default constructor knows nothing about.
+
+A third mode — grouped items, sections, multi-select — is a third implementation and a third branch in that one getter.
 
 ### Theme resolution — `lib/src/theme/`
 
@@ -65,7 +75,7 @@ When you deprecate a member, annotate the **field, the constructor parameter and
 
 ```bash
 flutter pub get              # install dependencies
-flutter test                 # run the suite (103 tests)
+flutter test                 # run the suite (113 tests)
 flutter analyze              # static analysis; must be clean
 dart format .                # formatting; must produce no changes
 flutter pub publish --dry-run   # validate the package before release
@@ -75,13 +85,14 @@ cd example && flutter run    # run the playground app
 
 ## Testing
 
-103 tests. 56 of them run without mounting a widget at all.
+113 tests. 66 of them run without mounting a widget at all.
 
 | Suite | What it covers |
 | --- | --- |
 | `test/placement/` | The geometry module, exhaustively. No widgets. |
 | `test/theme/` | Every `resolve()`. No widgets. |
 | `test/overlay/` | The controller's lifecycle. No widgets. |
+| `test/presentation/` | Alignment, the default filter, label extraction. No widgets. |
 | `test/overlay_bounds_test.dart` | Menus near screen edges, and inside a nested `Overlay` |
 | `test/overlay_resize_test.dart` | An open menu growing, shrinking, and flipping |
 | `test/overlay_lifecycle_test.dart` | Single-open, `closeAll`, dispose |
@@ -108,6 +119,8 @@ lib/
     ├── placement/dropdown_placement.dart # pure geometry
     ├── overlay/
     │   └── dropdown_overlay_controller.dart  # overlay lifetime, animation, spec
+    ├── presentation/
+    │   └── item_presentation.dart         # text vs custom rendering, behind one interface
     ├── theme/
     │   ├── dropdown_style_theme.dart     # composes the four below
     │   ├── dropdown_theme.dart           # + resolveButton/Overlay/Item
