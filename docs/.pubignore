@@ -1,0 +1,7 @@
+# This directory holds configuration for coding agents working on this repo
+# (issue tracker, triage labels, domain docs). It is repo tooling, not package
+# documentation, and has no value to anyone installing this package — so it is
+# kept out of the published archive.
+#
+# User-facing documentation lives in `documentation/`.
+*
