@@ -296,6 +296,16 @@ mixin DropdownMixin<T extends StatefulWidget> on State<T>, TickerProvider {
     }
   }
 
+  /// The render box of the [Overlay] the menu is inserted into.
+  ///
+  /// This is the coordinate space the menu is laid out in. For an app with a
+  /// single root Overlay it spans the window, so it agrees with `MediaQuery`.
+  /// A nested Overlay — a side panel with its own `Navigator`, a shell route —
+  /// does not, and the menu must be measured and clamped against this box
+  /// rather than against the window.
+  RenderBox? get overlayRenderBox =>
+      Overlay.of(context).context.findRenderObject() as RenderBox?;
+
   /// Opens the dropdown by creating and inserting an overlay entry.
   ///
   /// If another dropdown is already open, it will be closed first.
@@ -310,10 +320,19 @@ mixin DropdownMixin<T extends StatefulWidget> on State<T>, TickerProvider {
     final renderBox =
         dropdownButtonKey.currentContext!.findRenderObject() as RenderBox;
     final buttonSize = renderBox.size;
-    final buttonOffset = renderBox.localToGlobal(Offset.zero);
+
+    // The menu is positioned inside this Overlay's Stack, so the button's
+    // offset must be measured against the same origin. Resolving it against
+    // the root view instead would shift the menu by the Overlay's own offset
+    // whenever the Overlay does not start at (0, 0).
+    final overlay = Overlay.of(context);
+    final buttonOffset = renderBox.localToGlobal(
+      Offset.zero,
+      ancestor: overlayRenderBox,
+    );
 
     _overlayEntry = _createOverlayEntry(buttonOffset, buttonSize);
-    Overlay.of(context).insert(_overlayEntry!);
+    overlay.insert(_overlayEntry!);
 
     // Track the current instance for cleanup via closeAll()
     _currentInstance = this;
@@ -389,13 +408,17 @@ mixin DropdownMixin<T extends StatefulWidget> on State<T>, TickerProvider {
     // Safe areas (status bar, navigation bar, home indicator). Zero on desktop.
     final mediaQuery = MediaQuery.of(context);
 
+    // Bound the menu by the Overlay it lives in, not by the window. The two
+    // coincide for a root Overlay; only a nested one makes them differ.
+    final bounds = overlayRenderBox?.size ?? mediaQuery.size;
+
     final padding = overlayPadding;
     final overlayPaddingVertical =
         padding != null ? padding.top + padding.bottom : 0.0;
 
     return DropdownPlacement.resolve(
       DropdownPlacementInput(
-        screenSize: mediaQuery.size,
+        screenSize: bounds,
         safeInsetTop: mediaQuery.padding.top,
         safeInsetBottom: mediaQuery.padding.bottom,
         buttonOffset: buttonOffset,
@@ -445,7 +468,7 @@ mixin DropdownMixin<T extends StatefulWidget> on State<T>, TickerProvider {
 
     return DropdownPlacement.resolve(
       DropdownPlacementInput(
-        screenSize: mediaQuery.size,
+        screenSize: overlayRenderBox?.size ?? mediaQuery.size,
         safeInsetTop: mediaQuery.padding.top,
         safeInsetBottom: mediaQuery.padding.bottom,
         buttonOffset: Offset(buttonLeft, 0),
