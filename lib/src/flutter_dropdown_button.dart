@@ -431,18 +431,20 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
     return (item as String).toLowerCase().contains(query.toLowerCase());
   }
 
+  /// The items [query] leaves visible. A pure function of its arguments.
+  List<T> _applyFilter(List<T> items, String query) {
+    if (query.isEmpty) return List<T>.from(items);
+
+    final filter =
+        widget.searchFilter ?? (widget.isTextMode ? _defaultTextFilter : null);
+    if (filter == null) return List<T>.from(items);
+
+    return items.where((item) => filter(item, query)).toList();
+  }
+
   void _onSearchChanged(String query) {
     _searchQuery = query;
-    if (query.isEmpty) {
-      _filteredItems = List<T>.from(widget.items);
-    } else {
-      final filter = widget.searchFilter ??
-          (widget.isTextMode ? _defaultTextFilter : null);
-      if (filter != null) {
-        _filteredItems =
-            widget.items.where((item) => filter(item, query)).toList();
-      }
-    }
+    _filteredItems = _applyFilter(widget.items, query);
 
     // Reset scroll position
     if (_scrollController != null && _scrollController!.hasClients) {
@@ -475,11 +477,15 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
   void didUpdateWidget(FlutterDropdownButton<T> oldWidget) {
     super.didUpdateWidget(oldWidget);
     _autoSelectSingleItem();
-    if (oldWidget.items != widget.items) {
-      _filteredItems = List<T>.from(widget.items);
-      _searchQuery = '';
-      _searchController?.clear();
-    }
+
+    // Recompute unconditionally rather than guessing whether `items` changed.
+    // Comparing by identity is wrong for a list rebuilt each frame, and
+    // comparing by value is wrong for a `T` that does not override `==`;
+    // re-applying the current query is correct either way, and costs the
+    // same as one keystroke. The query is the user's — clearing it belongs
+    // to open, close and select, which `_resetSearch()` already handles.
+    _filteredItems = _applyFilter(widget.items, _searchQuery);
+
     // Handle searchable toggled on at runtime
     if (widget.searchable && _searchController == null) {
       _searchController = TextEditingController();
