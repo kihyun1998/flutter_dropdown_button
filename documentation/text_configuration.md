@@ -1,17 +1,19 @@
 # Text Configuration Guide
 
-Comprehensive guide for configuring text behavior in TextOnlyDropdownButton widgets.
+Comprehensive guide for configuring text behavior in `FlutterDropdownButton.text()`.
 
 ## TextDropdownConfig Overview
 
-The `TextDropdownConfig` class provides precise control over text rendering, overflow behavior, and styling in `TextOnlyDropdownButton` widgets.
+The `TextDropdownConfig` class provides precise control over text rendering, overflow behavior, and styling in text mode.
+
+Since 2.4.0 text mode is not limited to `String`: pass a `label` callback and any `T` renders as text, keeping the tooltip, the overflow handling and the default search filter.
 
 ## Basic Configuration
 
 ### Default Configuration
 
 ```dart
-TextOnlyDropdownButton(
+FlutterDropdownButton<String>.text(
   items: ['Short', 'Medium text', 'Very long text that might overflow'],
   onChanged: (value) {},
   // Uses TextDropdownConfig.defaultConfig by default
@@ -21,7 +23,7 @@ TextOnlyDropdownButton(
 ### Custom Configuration
 
 ```dart
-TextOnlyDropdownButton(
+FlutterDropdownButton<String>.text(
   items: ['Option 1', 'Option 2'],
   onChanged: (value) {},
   config: TextDropdownConfig(
@@ -109,7 +111,7 @@ TextDropdownConfig(
 Handle `\n` characters in text:
 
 ```dart
-TextOnlyDropdownButton(
+FlutterDropdownButton<String>.text(
   items: [
     'Single line',
     'Multi-line text\nwith explicit\nbreaks',
@@ -208,7 +210,7 @@ TextDropdownConfig(
 ### Default Single-line
 
 ```dart
-TextOnlyDropdownButton(
+FlutterDropdownButton<String>.text(
   config: TextDropdownConfig.defaultConfig,
   // Equivalent to:
   // TextDropdownConfig(
@@ -221,7 +223,7 @@ TextOnlyDropdownButton(
 ### Multi-line Display
 
 ```dart
-TextOnlyDropdownButton(
+FlutterDropdownButton<String>.text(
   config: TextDropdownConfig.multiLine,
   itemHeight: 80, // Increase height for multi-line
   // Equivalent to:
@@ -236,7 +238,7 @@ TextOnlyDropdownButton(
 ### Center Aligned
 
 ```dart
-TextOnlyDropdownButton(
+FlutterDropdownButton<String>.text(
   config: TextDropdownConfig.centered,
   // Equivalent to:
   // TextDropdownConfig(
@@ -248,7 +250,7 @@ TextOnlyDropdownButton(
 ### Fade Overflow
 
 ```dart
-TextOnlyDropdownButton(
+FlutterDropdownButton<String>.text(
   config: TextDropdownConfig.fadeOverflow,
   // Equivalent to:
   // TextDropdownConfig(
@@ -328,7 +330,7 @@ TextDropdownConfig buildThemedConfig(BuildContext context) {
 ### Search Dropdown with Long Options
 
 ```dart
-TextOnlyDropdownButton(
+FlutterDropdownButton<String>.text(
   items: [
     'Apple Inc. (AAPL)',
     'Microsoft Corporation (MSFT)',
@@ -346,7 +348,7 @@ TextOnlyDropdownButton(
 ### Multi-line Description Dropdown
 
 ```dart
-TextOnlyDropdownButton(
+FlutterDropdownButton<String>.text(
   items: [
     'Option 1\nShort description',
     'Option 2\nA longer description that explains the purpose of this option',
@@ -364,7 +366,7 @@ TextOnlyDropdownButton(
 ### Language Selector
 
 ```dart
-TextOnlyDropdownButton(
+FlutterDropdownButton<String>.text(
   items: ['English', '中文', 'العربية', 'עברית'],
   config: TextDropdownConfig(
     textAlign: TextAlign.center,

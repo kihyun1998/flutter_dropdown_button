@@ -2,156 +2,48 @@
 
 Complete reference for all classes and widgets in the flutter_dropdown_button package.
 
-## BaseDropdownButton<T>
+> Classes removed in 2.0.0 — `BaseDropdownButton`, `BasicDropdownButton`, `TextOnlyDropdownButton`, `DynamicTextBaseDropdownButton`, `DropdownItem` — were documented here long after they ceased to exist. See `documentation/migration.md`.
 
-Abstract base class for all dropdown button variants. Provides common properties and structure while allowing each variant to customize their specific rendering and behavior.
+## FlutterDropdownButton<T>
 
-### Constructor
+The one dropdown widget. Two constructors.
 
 ```dart
-BaseDropdownButton<T>({
-  Key? key,
+// Custom mode — render each item as any widget
+FlutterDropdownButton<T>({
+  required List<T> items,
   required ValueChanged<T?> onChanged,
-  T? value,
-  double height = 200.0,
-  double itemHeight = 48.0,
-  Duration animationDuration = const Duration(milliseconds: 200),
-  double? width,
-  double? maxWidth,
-  double? minWidth,
-  DropdownTheme? theme,
-  bool enabled = true,
+  required Widget Function(T item, bool isSelected) itemBuilder,
+  Widget Function(T item)? selectedBuilder,
+  Widget? hintWidget,
+  ...
 })
-```
 
-### Properties
-
-| Property | Type | Default | Description |
-|----------|------|---------|-------------|
-| `onChanged` | `ValueChanged<T?>` | required | Callback when selection changes |
-| `value` | `T?` | null | Currently selected value |
-| `height` | `double` | 200.0 | Maximum height of dropdown overlay |
-| `itemHeight` | `double` | 48.0 | Height of each dropdown item |
-| `animationDuration` | `Duration` | 200ms | Animation duration for show/hide |
-| `width` | `double?` | null | Fixed width for dropdown |
-| `maxWidth` | `double?` | null | Maximum width constraint |
-| `minWidth` | `double?` | null | Minimum width constraint |
-| `theme` | `DropdownTheme?` | null | Custom theme configuration |
-| `enabled` | `bool` | true | Whether dropdown is interactive |
-
-### Creating Custom Dropdowns
-
-To create a custom dropdown widget, extend `BaseDropdownButton` and implement the required abstract methods:
-
-```dart
-class MyCustomDropdown extends BaseDropdownButton<MyItemType> {
-  // Your custom properties
-}
-
-class _MyCustomDropdownState extends BaseDropdownButtonState<MyCustomDropdown, MyItemType> {
-  @override
-  Widget buildSelectedWidget() {
-    // Return widget for selected value display
-  }
-  
-  @override
-  Widget buildItemWidget(MyItemType item, bool isSelected) {
-    // Return widget for individual dropdown items
-  }
-  
-  @override
-  List<MyItemType> getItems() {
-    // Return list of available items
-  }
-}
-```
-
-## BasicDropdownButton<T>
-
-A highly customizable dropdown widget using OverlayEntry for better control.
-
-### Constructor
-
-```dart
-BasicDropdownButton<T>({
-  Key? key,
-  required List<DropdownItem<T>> items,
+// Text mode — items render as text, with tooltips and search for free
+FlutterDropdownButton<T>.text({
+  required List<T> items,
   required ValueChanged<T?> onChanged,
-  T? value,
-  Widget? hint,
-  double height = 200.0,
-  double itemHeight = 48.0,
-  double borderRadius = 8.0,
-  Duration animationDuration = const Duration(milliseconds: 200),
-  BoxDecoration? decoration,
-  double? width,
-  double? maxWidth,
-  double? minWidth,
-})
-```
-
-### Properties
-
-| Property | Type | Default | Description |
-|----------|------|---------|-------------|
-| `items` | `List<DropdownItem<T>>` | required | List of dropdown items |
-| `onChanged` | `ValueChanged<T?>` | required | Callback when selection changes |
-| `value` | `T?` | null | Currently selected value |
-| `hint` | `Widget?` | null | Widget to show when no item selected |
-| `height` | `double` | 200.0 | Maximum height of dropdown overlay |
-| `itemHeight` | `double` | 48.0 | Height of each dropdown item |
-| `borderRadius` | `double` | 8.0 | Border radius for button and overlay |
-| `animationDuration` | `Duration` | 200ms | Animation duration for show/hide |
-| `decoration` | `BoxDecoration?` | null | Custom decoration for overlay |
-| `width` | `double?` | null | Fixed width for dropdown |
-| `maxWidth` | `double?` | null | Maximum width constraint |
-| `minWidth` | `double?` | null | Minimum width constraint |
-
-## TextOnlyDropdownButton
-
-A dropdown widget specifically designed for text-only content with precise text control.
-
-### Constructor
-
-```dart
-TextOnlyDropdownButton({
-  Key? key,
-  required List<String> items,
-  required ValueChanged<String?> onChanged,
-  String? value,
   String? hint,
-  DropdownTheme? theme,
+  String Function(T item)? label,   // required unless T is String
   TextDropdownConfig? config,
-  double? width,
-  double? maxWidth,
-  double? minWidth,
-  double height = 200.0,
-  double itemHeight = 48.0,
-  bool enabled = true,
+  Widget? leading,
+  Widget? selectedLeading,
+  EdgeInsets? leadingPadding,
+  ...
 })
 ```
 
-### Properties
+Full parameter tables live in `README.md`. The two constructors share every layout, theming and search parameter; only the rendering parameters differ.
 
-| Property | Type | Default | Description |
-|----------|------|---------|-------------|
-| `items` | `List<T>` | required | List of options |
-| `onChanged` | `ValueChanged<T?>` | required | Callback when selection changes |
-| `value` | `T?` | null | Currently selected value |
-| `hint` | `String?` | null | Hint text when no item selected |
-| `label` | `String Function(T)?` | null | Extracts the text to display for an item. Required unless `T` is `String` |
-| `theme` | `DropdownTheme?` | null | Visual theme configuration |
-| `config` | `TextDropdownConfig?` | null | Text-specific configuration |
-| `width` | `double?` | null | Fixed width for dropdown |
-| `maxWidth` | `double?` | null | Maximum width constraint |
-| `minWidth` | `double?` | null | Minimum width constraint |
-| `height` | `double` | 200.0 | Maximum height of dropdown overlay |
-| `itemHeight` | `double` | 48.0 | Height of each dropdown item |
-| `enabled` | `bool` | true | Whether dropdown is interactive |
+### Statics
+
+| Member | Description |
+|--------|-------------|
+| `closeAll({bool animate = true})` | Closes every open menu. Pass `animate: false` right before navigation, when the widget may be disposed before an animation could finish |
 
 ## DropdownPositionResult
 
-Position calculation result for dropdown overlay positioning.
+Position calculation result, returned by the deprecated `DropdownMixin.calculateDropdownPosition()`. New code reads a `DropdownPlacementResult` from `DropdownOverlayController.measurePlacement()` instead. Removed alongside the mixin in 3.0.0.
 
 ### Properties
 
@@ -161,28 +53,6 @@ Position calculation result for dropdown overlay positioning.
 | `openDown` | `bool` | Whether the dropdown should open downward (true) or upward (false) |
 | `transformAlignment` | `Alignment` | The transform alignment for animations |
 | `topPosition` | `double` | The calculated top position for the overlay |
-
-## DropdownItem<T>
-
-Represents an item in a BasicDropdownButton.
-
-### Constructor
-
-```dart
-DropdownItem<T>({
-  required T value,
-  required Widget child,
-  VoidCallback? onTap,
-})
-```
-
-### Properties
-
-| Property | Type | Description |
-|----------|------|-------------|
-| `value` | `T` | The value associated with this item |
-| `child` | `Widget` | The widget to display for this item |
-| `onTap` | `VoidCallback?` | Optional callback when item is tapped |
 
 ## DropdownTheme
 
@@ -227,6 +97,42 @@ DropdownTheme({
 | `itemBorderRadius` | `double?` | null | Individual border radius for items |
 | `itemSplashColor` | `Color?` | null | Splash color for item interactions |
 | `itemHighlightColor` | `Color?` | null | Highlight color for item touch |
+
+## Theme resolution
+
+`DropdownTheme` fills in its own gaps. The widget reads a resolved style rather than deciding between a themed value and a framework default at each call site — so the rule for "what colour is the arrow when disabled?" exists in exactly one place.
+
+Resolution takes a **plain palette**, not a `BuildContext`. Reading values out of a `ThemeData` needs an element tree; deciding with them does not, and only the second half is worth testing.
+
+```dart
+final ambient = DropdownAmbientColors.of(context);   // once, in build
+final style = theme.resolveButton(ambient, enabled: isEnabled);
+
+Container(decoration: style.decoration, ...);
+```
+
+### Methods on DropdownTheme
+
+| Method | Returns | Description |
+|--------|---------|-------------|
+| `resolveButton(ambient, {required bool enabled})` | `ResolvedButtonStyle` | The button's box, ink colours, content height, and arrow. `enabled` must be the *effective* state — a single-item dropdown disabled by policy is disabled here too |
+| `resolveOverlay(ambient)` | `ResolvedOverlayStyle` | The menu container, plus the border thickness the placement module reserves |
+| `resolveItem(ambient, {required bool selected, required bool isFirst, required bool isLast})` | `ResolvedItemStyle` | One item row. The end rows are rounded to meet the menu's corners unless `itemBorderRadius` overrides |
+
+### DropdownAmbientColors
+
+The ambient palette, lifted out of `ThemeData`. Construct it with `.of(context)`, or by hand in a test.
+
+| Property | Description |
+|----------|-------------|
+| `card` | Background of surfaces above the page — the menu |
+| `divider` | Hairline borders |
+| `splash` / `highlight` / `hover` | Ink states |
+| `primary` | Accent, tinting the selected item at 10% opacity |
+| `disabled` | Foreground of anything switched off |
+| `icon` | Default icon colour; null when the ambient theme leaves it unset |
+
+`SearchFieldTheme` and `DropdownScrollTheme` do not resolve themselves yet — see issue #26.
 
 ## DropdownOverlayController
 
