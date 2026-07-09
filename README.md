@@ -315,16 +315,21 @@ Controls tooltip styling and behavior for text-based dropdowns.
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
-| `decoration` | `Decoration?` | `null` | Custom tooltip decoration |
+| `decoration` | `Decoration?` | `null` | Custom tooltip decoration; a total override |
 | `backgroundColor` | `Color?` | `null` | Tooltip background color |
 | `textColor` | `Color?` | `null` | Tooltip text color |
 | `textStyle` | `TextStyle?` | `null` | Tooltip text style (overrides `textColor`) |
 | `borderRadius` | `BorderRadius?` | `null` | Tooltip corner radius |
-| `borderColor` | `Color?` | `null` | Tooltip border color |
-| `borderWidth` | `double?` | `1.0` | Tooltip border width |
+| `border` | `BoxBorder?` | `null` | Tooltip border |
+| `borderColor` | `Color?` | `null` | **Deprecated** — use `border`. Removed in 3.0.0 |
+| `borderWidth` | `double?` | `1.0` | **Deprecated** — use `border`. Removed in 3.0.0 |
 | `shadow` | `List<BoxShadow>?` | `null` | Tooltip shadow |
 | `padding` | `EdgeInsetsGeometry?` | `null` | Padding inside tooltip |
 | `margin` | `EdgeInsetsGeometry?` | `null` | Margin around tooltip |
+
+Setting any of `backgroundColor`, `borderRadius`, `border` or `shadow` hands this
+theme the tooltip's whole box; the ones you leave unset fall back to Flutter's own
+tooltip defaults. Set none of them and an app-wide `TooltipTheme` still applies.
 
 #### Behavior
 

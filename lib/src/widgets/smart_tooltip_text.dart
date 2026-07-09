@@ -145,25 +145,8 @@ class SmartTooltipText extends StatelessWidget {
     // Get effective theme (use provided theme or default)
     final theme = tooltipTheme ?? DropdownTooltipTheme.defaultTheme;
 
-    // Build decoration from individual properties if not explicitly provided
-    Decoration? effectiveDecoration = theme.decoration;
-    if (effectiveDecoration == null &&
-        (theme.backgroundColor != null ||
-            theme.borderRadius != null ||
-            theme.borderColor != null ||
-            theme.shadow != null)) {
-      effectiveDecoration = BoxDecoration(
-        color: theme.backgroundColor,
-        borderRadius: theme.borderRadius,
-        border: theme.borderColor != null
-            ? Border.all(
-                color: theme.borderColor!,
-                width: theme.borderWidth ?? 1.0,
-              )
-            : null,
-        boxShadow: theme.shadow,
-      );
-    }
+    // Reading the brightness needs the element tree; deciding with it does not.
+    final style = theme.resolve(Theme.of(context).brightness);
 
     // Build text style from individual properties if not explicitly provided
     TextStyle? effectiveTextStyle = theme.textStyle;
@@ -180,7 +163,7 @@ class SmartTooltipText extends StatelessWidget {
       waitDuration: theme.waitDuration,
       showDuration: theme.showDuration,
       exitDuration: theme.exitDuration,
-      decoration: effectiveDecoration,
+      decoration: style.decoration,
       textStyle: effectiveTextStyle,
       textAlign: theme.textAlign,
       padding: theme.padding,

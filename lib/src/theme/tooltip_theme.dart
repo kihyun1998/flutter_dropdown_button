@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../config/text_dropdown_config.dart';
+import 'resolved_dropdown_style.dart';
 
 /// Theme configuration for tooltip styling and behavior in dropdown widgets.
 ///
@@ -30,6 +31,11 @@ import '../config/text_dropdown_config.dart';
 ///   showDuration: Duration(seconds: 3),
 /// )
 /// ```
+///
+/// Naming any one of [backgroundColor], [borderRadius], [border] or [shadow]
+/// hands this theme the tooltip's whole box; the ones left unset fall back to
+/// [Tooltip]'s own defaults. Naming none of them leaves the box alone, so an
+/// app-wide [TooltipTheme] still applies. See [resolve].
 class DropdownTooltipTheme {
   /// Creates a tooltip theme configuration.
   const DropdownTooltipTheme({
@@ -38,8 +44,9 @@ class DropdownTooltipTheme {
     this.textStyle,
     this.decoration,
     this.borderRadius,
-    this.borderColor,
-    this.borderWidth,
+    this.border,
+    @Deprecated('Use border instead. Removed in 3.0.0.') this.borderColor,
+    @Deprecated('Use border instead. Removed in 3.0.0.') this.borderWidth,
     this.shadow,
     this.padding,
     this.margin,
@@ -58,7 +65,8 @@ class DropdownTooltipTheme {
 
   /// The background color of the tooltip.
   ///
-  /// If null, uses Flutter's default tooltip background color (dark grey).
+  /// If null, uses Flutter's own tooltip background — dark grey on a light
+  /// theme, off-white on a dark one.
   /// This is a convenience property that creates a BoxDecoration internally.
   /// If [decoration] is provided, this property is ignored.
   final Color? backgroundColor;
@@ -79,24 +87,38 @@ class DropdownTooltipTheme {
   /// The decoration for the tooltip background.
   ///
   /// If provided, this takes precedence over [backgroundColor],
-  /// [borderRadius], [borderColor], [borderWidth], and [shadow].
+  /// [borderRadius], [border] and [shadow], and the tooltip's box is entirely
+  /// yours.
   ///
-  /// If null, a BoxDecoration is created from the individual style properties.
-  /// Customize this to match your app's design system.
+  /// If null, a [BoxDecoration] is built from the individual style properties
+  /// — but only if at least one of them is set. Naming one of them hands the
+  /// whole box to this theme, so the rest fall back to [Tooltip]'s own
+  /// defaults rather than to nothing. Naming none of them leaves the box to
+  /// the ambient [TooltipTheme].
   final Decoration? decoration;
 
   /// The border radius of the tooltip.
   ///
-  /// If null, uses Flutter's default rounded corners.
+  /// If null, uses Flutter's own tooltip corners — a 4-pixel radius.
   /// This is a convenience property that creates a BoxDecoration internally.
   /// If [decoration] is provided, this property is ignored.
   final BorderRadius? borderRadius;
+
+  /// The border of the tooltip.
+  ///
+  /// If null, no border is displayed. Takes precedence over [borderColor] and
+  /// [borderWidth]. If [decoration] is provided, this property is ignored.
+  ///
+  /// This is the same shape [DropdownTheme.border] and [SearchFieldTheme.border]
+  /// take; the older colour-and-width pair is kept only for compatibility.
+  final BoxBorder? border;
 
   /// The border color of the tooltip.
   ///
   /// If null, no border is displayed.
   /// This is a convenience property that creates a BoxDecoration internally.
   /// If [decoration] is provided, this property is ignored.
+  @Deprecated('Use border instead. Removed in 3.0.0.')
   final Color? borderColor;
 
   /// The border width of the tooltip.
@@ -105,11 +127,12 @@ class DropdownTooltipTheme {
   /// Defaults to 1.0 if [borderColor] is provided.
   /// This is a convenience property that creates a BoxDecoration internally.
   /// If [decoration] is provided, this property is ignored.
+  @Deprecated('Use border instead. Removed in 3.0.0.')
   final double? borderWidth;
 
   /// The shadow for the tooltip.
   ///
-  /// If null, uses Flutter's default tooltip shadow.
+  /// If null, the tooltip casts no shadow, as Flutter's own does not.
   /// This is a convenience property that creates a BoxDecoration internally.
   /// If [decoration] is provided, this property is ignored.
   final List<BoxShadow>? shadow;
@@ -228,8 +251,9 @@ class DropdownTooltipTheme {
     TextStyle? textStyle,
     Decoration? decoration,
     BorderRadius? borderRadius,
-    Color? borderColor,
-    double? borderWidth,
+    BoxBorder? border,
+    @Deprecated('Use border instead. Removed in 3.0.0.') Color? borderColor,
+    @Deprecated('Use border instead. Removed in 3.0.0.') double? borderWidth,
     List<BoxShadow>? shadow,
     EdgeInsetsGeometry? padding,
     EdgeInsetsGeometry? margin,
@@ -251,7 +275,10 @@ class DropdownTooltipTheme {
       textStyle: textStyle ?? this.textStyle,
       decoration: decoration ?? this.decoration,
       borderRadius: borderRadius ?? this.borderRadius,
+      border: border ?? this.border,
+      // ignore: deprecated_member_use_from_same_package
       borderColor: borderColor ?? this.borderColor,
+      // ignore: deprecated_member_use_from_same_package
       borderWidth: borderWidth ?? this.borderWidth,
       shadow: shadow ?? this.shadow,
       padding: padding ?? this.padding,
@@ -268,6 +295,57 @@ class DropdownTooltipTheme {
       enableTapToDismiss: enableTapToDismiss ?? this.enableTapToDismiss,
       triggerMode: triggerMode ?? this.triggerMode,
     );
+  }
+
+  /// The tooltip as it should be drawn.
+  ///
+  /// Pure: hand it the ambient [Brightness], not a [BuildContext]. Unlike the
+  /// other themes this one takes no [DropdownAmbientColors] — a tooltip's
+  /// defaults come from [Tooltip] itself, which switches on brightness alone
+  /// and never consults [ThemeData]'s palette.
+  ResolvedTooltipStyle resolve(Brightness brightness) {
+    return ResolvedTooltipStyle(decoration: _resolveDecoration(brightness));
+  }
+
+  /// Flutter's own tooltip corner radius.
+  static const BorderRadius _defaultRadius =
+      BorderRadius.all(Radius.circular(4));
+
+  /// Flutter's own tooltip background, which flips with the ambient brightness.
+  static Color _defaultBackground(Brightness brightness) =>
+      brightness == Brightness.dark
+          ? Colors.white.withValues(alpha: 0.9)
+          : Colors.grey.shade700.withValues(alpha: 0.9);
+
+  Decoration? _resolveDecoration(Brightness brightness) {
+    if (decoration != null) return decoration;
+
+    final resolvedBorder = _resolveBorder();
+
+    // `borderWidth` is deliberately absent: on its own it draws nothing, and
+    // synthesising a box for it would override an ambient `TooltipTheme` to
+    // no visible end.
+    final touchesTheBox = backgroundColor != null ||
+        borderRadius != null ||
+        resolvedBorder != null ||
+        shadow != null;
+    if (!touchesTheBox) return null;
+
+    return BoxDecoration(
+      color: backgroundColor ?? _defaultBackground(brightness),
+      borderRadius: borderRadius ?? _defaultRadius,
+      border: resolvedBorder,
+      boxShadow: shadow,
+    );
+  }
+
+  BoxBorder? _resolveBorder() {
+    if (border != null) return border;
+    // ignore: deprecated_member_use_from_same_package
+    final color = borderColor;
+    if (color == null) return null;
+    // ignore: deprecated_member_use_from_same_package
+    return Border.all(color: color, width: borderWidth ?? 1.0);
   }
 
   /// Default theme that works well with Material Design.
