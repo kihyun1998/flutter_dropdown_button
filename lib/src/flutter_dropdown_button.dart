@@ -4,6 +4,7 @@ import 'package:flutter/scheduler.dart';
 import 'buttons/menu_alignment.dart';
 import 'config/text_dropdown_config.dart';
 import 'overlay/dropdown_overlay_controller.dart';
+import 'presentation/item_presentation.dart';
 import 'theme/dropdown_scroll_theme.dart';
 import 'theme/dropdown_style_theme.dart';
 import 'theme/dropdown_theme.dart';
@@ -324,7 +325,12 @@ class FlutterDropdownButton<T> extends StatefulWidget {
   /// ```
   final Widget Function(String query)? emptyBuilder;
 
-  /// Whether this dropdown uses text mode rendering.
+  /// Whether this dropdown was built by [FlutterDropdownButton.text].
+  ///
+  /// Informational. Nothing inside the widget branches on this: rendering is
+  /// chosen once, by building a `DropdownItemPresentation`, and every render
+  /// site asks that what to draw. Adding a third mode therefore does not add a
+  /// third answer here.
   bool get isTextMode => itemBuilder == null;
 
   /// Closes all currently open dropdown overlays.
@@ -400,24 +406,35 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
   TextDropdownConfig get _textConfig =>
       widget.config ?? TextDropdownConfig.defaultConfig;
 
-  /// The text to display for [item] in text mode.
+  /// How this dropdown draws its items and its button face.
   ///
-  /// Uses [FlutterDropdownButton.label] when given. Without it, `T` must be
-  /// [String] — a string is its own label.
-  String _labelOf(T item) {
-    final label = widget.label;
-    if (label != null) return label(item);
-    if (item is String) return item;
+  /// **The one place the rendering mode is decided.** Everything downstream
+  /// asks the presentation what to draw rather than asking which constructor
+  /// was used. A third mode is a third implementation and a third branch here,
+  /// not another conditional at every render site.
+  DropdownItemPresentation<T> get _presentation {
+    final itemBuilder = widget.itemBuilder;
+    if (itemBuilder != null) {
+      return CustomItemPresentation<T>(
+        itemBuilder: itemBuilder,
+        items: widget.items,
+        value: widget.value,
+        selectedBuilder: widget.selectedBuilder,
+        hintWidget: widget.hintWidget,
+      );
+    }
 
-    throw FlutterError(
-      'FlutterDropdownButton<$T>.text() needs a `label` callback.\n'
-      'Text mode renders items as text, so it must know how to turn a $T '
-      'into a String. Supply one:\n\n'
-      '  FlutterDropdownButton<$T>.text(\n'
-      '    items: items,\n'
-      '    label: (item) => item.someTextProperty,\n'
-      '  )\n\n'
-      '`label` may only be omitted when T is String.',
+    return TextItemPresentation<T>(
+      label: widget.label,
+      value: widget.value,
+      hintText: widget.hintText,
+      config: _textConfig,
+      tooltipTheme: effectiveTooltipTheme,
+      enabled: isEnabled,
+      leadingHeight: _buttonStyle.iconSize,
+      leading: widget.leading,
+      selectedLeading: widget.selectedLeading,
+      leadingPadding: widget.leadingPadding,
     );
   }
 
@@ -483,16 +500,11 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
 
   /// Case-insensitive `contains` over the item's label. The default in text
   /// mode, whatever `T` is.
-  bool _defaultTextFilter(T item, String query) {
-    return _labelOf(item).toLowerCase().contains(query.toLowerCase());
-  }
-
   /// The items [query] leaves visible. A pure function of its arguments.
   List<T> _applyFilter(List<T> items, String query) {
     if (query.isEmpty) return List<T>.from(items);
 
-    final filter =
-        widget.searchFilter ?? (widget.isTextMode ? _defaultTextFilter : null);
+    final filter = widget.searchFilter ?? _presentation.defaultSearchFilter;
     if (filter == null) return List<T>.from(items);
 
     return items.where((item) => filter(item, query)).toList();
@@ -519,13 +531,8 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
   @override
   void initState() {
     super.initState();
-    assert(
-      !widget.isTextMode || widget.label != null || T == String,
-      'FlutterDropdownButton<$T>.text() needs a `label` callback.\n'
-      'Text mode renders items as text, so it must know how to turn a $T '
-      'into a String. Supply `label: (item) => item.someTextProperty`, or '
-      'use the default constructor with `itemBuilder` instead.',
-    );
+    // The `label`-or-String invariant is asserted by TextItemPresentation,
+    // which is built during the first build — still before anything paints.
     _autoSelectSingleItem();
     if (widget.searchable) {
       _searchController = TextEditingController();
@@ -645,6 +652,7 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
     final rowHeight = effectiveContentHeight > effectiveIconSize
         ? effectiveContentHeight
         : effectiveIconSize;
+    final presentation = _presentation;
 
     return SizedBox(
       height: rowHeight,
@@ -662,17 +670,13 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
               height: effectiveContentHeight,
               child: widget.width != null || widget.expand
                   ? Container(
-                      alignment: widget.isTextMode
-                          ? _alignmentFromTextAlign(_textConfig.textAlign)
-                          : Alignment.centerLeft,
-                      child: _buildSelectedWidget(),
+                      alignment: presentation.contentAlignment,
+                      child: presentation.buildSelected(),
                     )
                   : Align(
-                      alignment: widget.isTextMode
-                          ? _alignmentFromTextAlign(_textConfig.textAlign)
-                          : Alignment.centerLeft,
+                      alignment: presentation.contentAlignment,
                       widthFactor: 1.0,
-                      child: _buildSelectedWidget(),
+                      child: presentation.buildSelected(),
                     ),
             ),
           ),
@@ -718,115 +722,6 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
     return child;
   }
 
-  // ===== Selected widget rendering =====
-
-  Widget _buildSelectedWidget() {
-    if (widget.isTextMode) {
-      return _buildTextSelectedWidget();
-    }
-    return _buildCustomSelectedWidget();
-  }
-
-  Widget _buildCustomSelectedWidget() {
-    final value = widget.value;
-    if (value != null && widget.items.contains(value)) {
-      if (widget.selectedBuilder != null) {
-        return widget.selectedBuilder!(value);
-      }
-      return widget.itemBuilder!(value, true);
-    }
-    return widget.hintWidget ?? const SizedBox.shrink();
-  }
-
-  Widget _buildTextSelectedWidget() {
-    final selected = widget.value;
-    final selectedText = selected == null ? null : _labelOf(selected);
-    final displayText = selectedText ?? widget.hintText ?? '';
-    final isHint = selectedText == null;
-
-    final baseStyle = isHint ? _textConfig.hintStyle : _textConfig.textStyle;
-    final resolvedStyle = !isEnabled && _textConfig.disabledTextStyle != null
-        ? (baseStyle?.merge(_textConfig.disabledTextStyle) ??
-            _textConfig.disabledTextStyle)
-        : baseStyle;
-
-    final textWidget = SmartTooltipText(
-      text: displayText,
-      tooltipTheme: effectiveTooltipTheme,
-      style: resolvedStyle,
-      textAlign: _textConfig.textAlign,
-      maxLines: _textConfig.maxLines,
-      overflow: _textConfig.overflow,
-      softWrap: _textConfig.softWrap,
-      textDirection: _textConfig.textDirection,
-      locale: _textConfig.locale,
-      textScaler: _textConfig.textScaler,
-    );
-
-    final leadingWidget = selectedText != null
-        ? (widget.selectedLeading ?? widget.leading)
-        : null;
-
-    if (leadingWidget == null) return textWidget;
-
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Padding(
-          padding: widget.leadingPadding ?? const EdgeInsets.only(right: 8.0),
-          child: SizedBox(
-            height: _buttonStyle.iconSize,
-            child: Center(child: leadingWidget),
-          ),
-        ),
-        Flexible(child: textWidget),
-      ],
-    );
-  }
-
-  // ===== Item widget rendering =====
-
-  Widget _buildItemWidget(T item, bool isSelected) {
-    if (widget.isTextMode) {
-      return _buildTextItemWidget(item, isSelected);
-    }
-    return widget.itemBuilder!(item, isSelected);
-  }
-
-  Widget _buildTextItemWidget(T item, bool isSelected) {
-    final textWidget = SmartTooltipText(
-      text: _labelOf(item),
-      tooltipTheme: effectiveTooltipTheme,
-      style: isSelected
-          ? _textConfig.selectedTextStyle ?? _textConfig.textStyle
-          : _textConfig.textStyle,
-      textAlign: _textConfig.textAlign,
-      maxLines: _textConfig.maxLines,
-      overflow: _textConfig.overflow,
-      softWrap: _textConfig.softWrap,
-      textDirection: _textConfig.textDirection,
-      locale: _textConfig.locale,
-      textScaler: _textConfig.textScaler,
-      semanticsLabel: _textConfig.semanticsLabel,
-    );
-
-    if (widget.leading == null) return textWidget;
-
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Padding(
-          padding: widget.leadingPadding ?? const EdgeInsets.only(right: 8.0),
-          child: SizedBox(
-            height: _buttonStyle.iconSize,
-            child: Center(child: widget.leading!),
-          ),
-        ),
-        Flexible(child: textWidget),
-      ],
-    );
-  }
-
   // ===== Overlay content =====
 
   Widget _buildOverlayContent(double height) {
@@ -841,9 +736,8 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
             .clamp(0.0, double.infinity);
     final totalItemsHeight = items.length * actualItemHeight;
     final needsScroll = totalItemsHeight > availableContentHeight;
-    final itemAlignment = widget.isTextMode
-        ? _alignmentFromTextAlign(_textConfig.textAlign)
-        : Alignment.centerLeft;
+    final presentation = _presentation;
+    final itemAlignment = presentation.contentAlignment;
 
     Widget content;
 
@@ -892,7 +786,7 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
               isFirst: index == 0,
               isLast: index == items.length - 1,
               alignment: itemAlignment,
-              child: _buildItemWidget(item, isSelected),
+              child: presentation.buildItem(item, isSelected),
             );
           },
         ),
@@ -917,7 +811,7 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
             isFirst: index == 0,
             isLast: index == items.length - 1,
             alignment: itemAlignment,
-            child: _buildItemWidget(item, isSelected),
+            child: presentation.buildItem(item, isSelected),
           ),
         );
       }
@@ -983,20 +877,6 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
     }
 
     return field;
-  }
-
-  Alignment _alignmentFromTextAlign(TextAlign textAlign) {
-    switch (textAlign) {
-      case TextAlign.center:
-        return Alignment.center;
-      case TextAlign.right:
-      case TextAlign.end:
-        return Alignment.centerRight;
-      case TextAlign.left:
-      case TextAlign.start:
-      case TextAlign.justify:
-        return Alignment.centerLeft;
-    }
   }
 
   Widget _buildItemWrapper({
