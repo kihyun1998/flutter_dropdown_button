@@ -64,6 +64,21 @@ class DropdownAmbientColors {
   final Color? hint;
 }
 
+/// The tooltip's appearance, with every slot the theme touches filled in.
+class ResolvedTooltipStyle {
+  /// Creates a resolved tooltip style.
+  const ResolvedTooltipStyle({this.decoration});
+
+  /// The tooltip's box, or null to leave it to Flutter.
+  ///
+  /// Null means the theme named no box property, so the ambient [TooltipTheme]
+  /// — or, failing that, [Tooltip]'s own default — keeps control. Handing
+  /// [Tooltip] a decoration *replaces* that default outright rather than
+  /// merging with it, so a partially-specified box would blank every slot it
+  /// did not restate. Non-null therefore always means complete.
+  final Decoration? decoration;
+}
+
 /// The search field's appearance, with every slot filled in.
 class ResolvedSearchFieldStyle {
   /// Creates a resolved search field style.

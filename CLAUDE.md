@@ -39,9 +39,13 @@ Single-open coordination lives in a registry keyed by `Overlay`, not in a proces
 
 `DropdownStyleTheme` composes four themes: `DropdownTheme`, `DropdownScrollTheme`, `DropdownTooltipTheme`, `SearchFieldTheme`.
 
-`DropdownTheme` **resolves itself**. `resolveButton()`, `resolveOverlay()` and `resolveItem()` return styles whose slots are all filled in; the widget reads the result rather than deciding. Resolution takes a `DropdownAmbientColors` — a plain palette lifted out of `ThemeData` — rather than a `BuildContext`, so it is a pure function.
+Each **resolves itself**. `DropdownTheme.resolveButton()`, `.resolveOverlay()` and `.resolveItem()`, `SearchFieldTheme.resolve()`, `DropdownScrollTheme.resolve()` and `DropdownTooltipTheme.resolve()` return styles whose slots are all filled in; the widget reads the result rather than deciding. There is no `??` chain and no `Theme.of(context)` left in `build()`.
 
-`SearchFieldTheme` and `DropdownScrollTheme` have **not** been converted yet; they still inline their fallbacks in `build()`. See issue #26.
+Resolution never takes a `BuildContext`. It takes whatever plain value it needs — a `DropdownAmbientColors` palette lifted out of `ThemeData`, a `Brightness`, or nothing at all — so every rule is a pure function.
+
+A resolved style is **complete**, and that is load-bearing rather than tidy. `SearchFieldTheme` reserves the height it also constrains its divider to, so the two cannot disagree. `DropdownTooltipTheme` fills the whole `BoxDecoration` once the caller names any part of it, because Flutter's `Tooltip` treats a decoration as a total replacement and would otherwise blank the slots the caller left alone. Both of those were shipped bugs.
+
+`DropdownTooltipTheme.resolve()` returns a **nullable** decoration on purpose: a theme that names no box property must leave the box to the ambient `TooltipTheme`.
 
 ### The recurring pattern
 
