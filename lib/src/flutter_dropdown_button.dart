@@ -330,11 +330,19 @@ class FlutterDropdownButton<T> extends StatefulWidget {
   ///
   /// Useful before navigation to ensure no orphaned overlays remain.
   ///
+  /// With [animate] true (the default) the menu plays its close animation, so
+  /// the trailing icon rotates back. Pass false to remove the overlay at once
+  /// — the widget may be disposed before an animation could finish.
+  ///
   /// ```dart
   /// FlutterDropdownButton.closeAll();
-  /// Navigator.pushReplacementNamed(context, '/home');
+  ///
+  /// // Right before navigating away:
+  /// FlutterDropdownButton.closeAll(animate: false);
+  /// Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
   /// ```
-  static void closeAll() => DropdownMixin.closeAll();
+  static void closeAll({bool animate = true}) =>
+      DropdownMixin.closeAll(animate: animate);
 
   @override
   State<FlutterDropdownButton<T>> createState() =>
