@@ -7,6 +7,7 @@ import 'overlay/dropdown_overlay_controller.dart';
 import 'theme/dropdown_scroll_theme.dart';
 import 'theme/dropdown_style_theme.dart';
 import 'theme/dropdown_theme.dart';
+import 'theme/resolved_dropdown_style.dart';
 import 'theme/search_field_theme.dart';
 import 'theme/tooltip_theme.dart';
 import 'widgets/smart_tooltip_text.dart';
@@ -377,6 +378,14 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
   DropdownTheme get effectiveTheme =>
       widget.theme?.dropdown ?? DropdownTheme.defaultTheme;
 
+  DropdownAmbientColors get _ambient => DropdownAmbientColors.of(context);
+
+  ResolvedButtonStyle get _buttonStyle =>
+      effectiveTheme.resolveButton(_ambient, enabled: isEnabled);
+
+  ResolvedOverlayStyle get _overlayStyle =>
+      effectiveTheme.resolveOverlay(_ambient);
+
   DropdownScrollTheme? get effectiveScrollTheme => widget.theme?.scroll;
 
   DropdownTooltipTheme get effectiveTooltipTheme =>
@@ -420,11 +429,7 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
     return widget.itemHeight + marginHeight;
   }
 
-  double get overlayBorderThickness {
-    final border = _buildOverlayDecoration()?.border;
-    if (border is Border) return border.top.width + border.bottom.width;
-    return 0.0;
-  }
+  double get overlayBorderThickness => _overlayStyle.borderThickness;
 
   /// Read afresh on every overlay build, so a menu open while its items or
   /// theme change re-measures against the new values.
@@ -603,27 +608,18 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
 
   void _toggleDropdown() => _menu.isOpen ? _menu.close() : _openDropdown();
 
-  BoxDecoration? _buildOverlayDecoration() {
-    return effectiveTheme.overlayDecoration ??
-        BoxDecoration(
-          color: effectiveTheme.backgroundColor ?? Theme.of(context).cardColor,
-          borderRadius: BorderRadius.circular(effectiveTheme.borderRadius),
-          border: effectiveTheme.border ??
-              Border.all(
-                color: Theme.of(context).dividerColor,
-                width: 1,
-              ),
-        );
-  }
+  BoxDecoration? _buildOverlayDecoration() => _overlayStyle.decoration;
 
   // ===== Build =====
 
   @override
   Widget build(BuildContext context) {
+    final style = _buttonStyle;
+
     Widget button = Container(
       key: _menu.buttonKey,
       width: widget.width,
-      decoration: _buildButtonDecoration(),
+      decoration: style.decoration,
       child: Material(
         color: Colors.transparent,
         child: InkWell(
@@ -631,16 +627,13 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
           mouseCursor: isEnabled
               ? SystemMouseCursors.click
               : SystemMouseCursors.forbidden,
-          borderRadius: BorderRadius.circular(effectiveTheme.borderRadius),
-          splashColor:
-              effectiveTheme.buttonSplashColor ?? Theme.of(context).splashColor,
-          highlightColor: effectiveTheme.buttonHighlightColor ??
-              Theme.of(context).highlightColor,
-          hoverColor:
-              effectiveTheme.buttonHoverColor ?? Theme.of(context).hoverColor,
+          borderRadius: BorderRadius.circular(style.borderRadius),
+          splashColor: style.splashColor,
+          highlightColor: style.highlightColor,
+          hoverColor: style.hoverColor,
           child: Padding(
-            padding: effectiveTheme.buttonPadding,
-            child: _buildButtonContent(),
+            padding: style.padding,
+            child: _buildButtonContent(style),
           ),
         ),
       ),
@@ -649,34 +642,9 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
     return _applyWidthConstraints(button);
   }
 
-  BoxDecoration _buildButtonDecoration() {
-    if (!isEnabled) {
-      if (effectiveTheme.disabledButtonDecoration != null) {
-        return effectiveTheme.disabledButtonDecoration!;
-      }
-      if (effectiveTheme.disabledBackgroundColor != null ||
-          effectiveTheme.disabledBorder != null) {
-        return BoxDecoration(
-          color: effectiveTheme.disabledBackgroundColor,
-          border: effectiveTheme.disabledBorder ??
-              effectiveTheme.border ??
-              Border.all(color: Theme.of(context).dividerColor),
-          borderRadius: BorderRadius.circular(effectiveTheme.borderRadius),
-        );
-      }
-    }
-    return effectiveTheme.buttonDecoration ??
-        BoxDecoration(
-          border: effectiveTheme.border ??
-              Border.all(color: Theme.of(context).dividerColor),
-          borderRadius: BorderRadius.circular(effectiveTheme.borderRadius),
-        );
-  }
-
-  Widget _buildButtonContent() {
-    final effectiveContentHeight =
-        effectiveTheme.buttonHeight ?? effectiveTheme.iconSize ?? 24.0;
-    final effectiveIconSize = effectiveTheme.iconSize ?? 24.0;
+  Widget _buildButtonContent(ResolvedButtonStyle style) {
+    final effectiveContentHeight = style.contentHeight;
+    final effectiveIconSize = style.iconSize;
     final rowHeight = effectiveContentHeight > effectiveIconSize
         ? effectiveContentHeight
         : effectiveIconSize;
@@ -713,8 +681,7 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
           ),
           if (_showTrailing)
             Padding(
-              padding: effectiveTheme.iconPadding ??
-                  const EdgeInsets.only(left: 8.0),
+              padding: style.iconPadding,
               child: SizedBox(
                 height: effectiveIconSize,
                 child: Center(
@@ -722,15 +689,9 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
                     turns: _iconRotation,
                     child: widget.trailing ??
                         Icon(
-                          effectiveTheme.icon ?? Icons.keyboard_arrow_down,
+                          style.icon,
                           size: effectiveIconSize,
-                          // `isEnabled`, not `widget.enabled`: a single-item
-                          // dropdown disabled by policy is disabled here too.
-                          color: isEnabled
-                              ? (effectiveTheme.iconColor ??
-                                  Theme.of(context).iconTheme.color)
-                              : (effectiveTheme.iconDisabledColor ??
-                                  Theme.of(context).disabledColor),
+                          color: style.iconColor,
                         ),
                   ),
                 ),
@@ -817,7 +778,7 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
         Padding(
           padding: widget.leadingPadding ?? const EdgeInsets.only(right: 8.0),
           child: SizedBox(
-            height: effectiveTheme.iconSize ?? 24.0,
+            height: _buttonStyle.iconSize,
             child: Center(child: leadingWidget),
           ),
         ),
@@ -860,7 +821,7 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
         Padding(
           padding: widget.leadingPadding ?? const EdgeInsets.only(right: 8.0),
           child: SizedBox(
-            height: effectiveTheme.iconSize ?? 24.0,
+            height: _buttonStyle.iconSize,
             child: Center(child: widget.leading!),
           ),
         ),
@@ -1087,42 +1048,32 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
     required Widget child,
     Alignment alignment = Alignment.centerLeft,
   }) {
+    final style = effectiveTheme.resolveItem(
+      _ambient,
+      selected: isSelected,
+      isFirst: isFirst,
+      isLast: isLast,
+    );
+
     return Material(
       color: Colors.transparent,
       child: Container(
-        margin: effectiveTheme.itemMargin,
+        margin: style.margin,
         child: InkWell(
           onTap: () {
             widget.onChanged(item);
             _onItemSelected();
           },
           mouseCursor: SystemMouseCursors.click,
-          splashColor:
-              effectiveTheme.itemSplashColor ?? Theme.of(context).splashColor,
-          highlightColor: effectiveTheme.itemHighlightColor ??
-              Theme.of(context).highlightColor,
-          hoverColor:
-              effectiveTheme.itemHoverColor ?? Theme.of(context).hoverColor,
-          borderRadius: BorderRadius.circular(
-            effectiveTheme.itemBorderRadius ??
-                (isFirst || isLast ? effectiveTheme.borderRadius : 0.0),
-          ),
+          splashColor: style.splashColor,
+          highlightColor: style.highlightColor,
+          hoverColor: style.hoverColor,
+          borderRadius: BorderRadius.circular(style.inkBorderRadius),
           child: Ink(
             height: widget.itemHeight,
             width: double.infinity,
-            padding: effectiveTheme.itemPadding,
-            decoration: BoxDecoration(
-              color: isSelected
-                  ? effectiveTheme.selectedItemColor ??
-                      Theme.of(context).primaryColor.withValues(alpha: 0.1)
-                  : Colors.transparent,
-              borderRadius: effectiveTheme.itemBorderRadius != null
-                  ? BorderRadius.circular(effectiveTheme.itemBorderRadius!)
-                  : null,
-              border: (isLast && effectiveTheme.excludeLastItemBorder)
-                  ? null
-                  : effectiveTheme.itemBorder,
-            ),
+            padding: style.padding,
+            decoration: style.decoration,
             child: Align(
               alignment: alignment,
               child: child,
@@ -1274,14 +1225,13 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
         scrollTheme.gradientColors!.isNotEmpty) {
       gradientColors = scrollTheme.gradientColors!;
     } else {
-      final baseColor =
-          effectiveTheme.backgroundColor ?? Theme.of(context).cardColor;
+      final baseColor = _overlayStyle.backgroundColor;
       gradientColors = [
         baseColor.withValues(alpha: 0.0),
         baseColor,
       ];
     }
-    final borderRadius = BorderRadius.circular(effectiveTheme.borderRadius);
+    final borderRadius = BorderRadius.circular(_overlayStyle.borderRadius);
 
     return ClipRRect(
       borderRadius: borderRadius,
