@@ -1,6 +1,7 @@
 library;
 
 export 'src/flutter_dropdown_button.dart';
+export 'src/flutter_multi_select_dropdown.dart';
 export 'src/buttons/menu_alignment.dart';
 export 'src/overlay/dropdown_overlay_controller.dart';
 export 'src/presentation/item_presentation.dart';

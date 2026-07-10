@@ -457,6 +457,7 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>> {
       // answer rather than the `value`.
       isChosen: (item) => widget.value == item,
       onItemTap: widget.onChanged,
+      closeOnTap: true,
       scrollToItem: widget.scrollToSelectedItem ? widget.value : null,
       scrollToItemDuration: widget.scrollToSelectedDuration,
       enabled: isEnabled,
