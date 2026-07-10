@@ -12,8 +12,9 @@ final theme = DropdownStyleTheme(
   ),
 );
 
-Widget host(Widget child) =>
-    MaterialApp(home: Scaffold(body: Center(child: child)));
+Widget host(Widget child) => MaterialApp(
+  home: Scaffold(body: Center(child: child)),
+);
 
 Color? arrowColour(WidgetTester tester) =>
     tester.widget<Icon>(find.byType(Icon)).color;

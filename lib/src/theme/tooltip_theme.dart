@@ -288,8 +288,8 @@ class DropdownTooltipTheme {
   /// Flutter's own tooltip background, which flips with the ambient brightness.
   static Color _defaultBackground(Brightness brightness) =>
       brightness == Brightness.dark
-          ? Colors.white.withValues(alpha: 0.9)
-          : Colors.grey.shade700.withValues(alpha: 0.9);
+      ? Colors.white.withValues(alpha: 0.9)
+      : Colors.grey.shade700.withValues(alpha: 0.9);
 
   Decoration? _resolveDecoration(Brightness brightness) {
     if (decoration != null) return decoration;

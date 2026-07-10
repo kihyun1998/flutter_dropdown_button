@@ -127,10 +127,9 @@ class TextItemPresentation<T> implements DropdownItemPresentation<T> {
     final text = SmartTooltipText(
       text: labelOf(item),
       tooltipTheme: tooltipTheme,
-      style:
-          isSelected
-              ? config.selectedTextStyle ?? config.textStyle
-              : config.textStyle,
+      style: isSelected
+          ? config.selectedTextStyle ?? config.textStyle
+          : config.textStyle,
       textAlign: config.textAlign,
       maxLines: config.maxLines,
       overflow: config.overflow,
@@ -155,11 +154,10 @@ class TextItemPresentation<T> implements DropdownItemPresentation<T> {
     final isHint = selectedText == null;
 
     final baseStyle = isHint ? config.hintStyle : config.textStyle;
-    final resolvedStyle =
-        !enabled && config.disabledTextStyle != null
-            ? (baseStyle?.merge(config.disabledTextStyle) ??
-                config.disabledTextStyle)
-            : baseStyle;
+    final resolvedStyle = !enabled && config.disabledTextStyle != null
+        ? (baseStyle?.merge(config.disabledTextStyle) ??
+              config.disabledTextStyle)
+        : baseStyle;
 
     final text = SmartTooltipText(
       text: displayText,

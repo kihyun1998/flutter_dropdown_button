@@ -41,12 +41,11 @@ class ResultPage extends StatelessWidget {
               ),
               const SizedBox(height: 48),
               ElevatedButton.icon(
-                onPressed:
-                    () => Navigator.pushNamedAndRemoveUntil(
-                      context,
-                      '/',
-                      (route) => false,
-                    ),
+                onPressed: () => Navigator.pushNamedAndRemoveUntil(
+                  context,
+                  '/',
+                  (route) => false,
+                ),
                 icon: const Icon(Icons.home),
                 label: const Text('Back to Home'),
                 style: ElevatedButton.styleFrom(

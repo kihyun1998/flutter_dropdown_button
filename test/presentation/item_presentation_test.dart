@@ -49,10 +49,9 @@ CustomItemPresentation<T> custom<T>({
 
 void main() {
   group('content alignment', () {
-    Alignment alignmentFor(TextAlign textAlign) =>
-        text<String>(
-          config: TextDropdownConfig(textAlign: textAlign),
-        ).contentAlignment;
+    Alignment alignmentFor(TextAlign textAlign) => text<String>(
+      config: TextDropdownConfig(textAlign: textAlign),
+    ).contentAlignment;
 
     test('text mode follows the configured textAlign', () {
       expect(alignmentFor(TextAlign.center), Alignment.center);

@@ -152,10 +152,8 @@ void main() {
                     itemBuilder: (fruit, _) => Text(fruit.name),
                     hintWidget: const Text('Pick a fruit'),
                     searchable: true,
-                    searchFilter:
-                        (fruit, query) => fruit.name.toLowerCase().contains(
-                          query.toLowerCase(),
-                        ),
+                    searchFilter: (fruit, query) =>
+                        fruit.name.toLowerCase().contains(query.toLowerCase()),
                     onChanged: (_) {},
                   );
                 },

@@ -55,8 +55,9 @@ void main() {
   testWidgets('a themed colour reaches the scrollbar', (tester) async {
     await openMenu(tester, const DropdownScrollTheme(thumbColor: Colors.red));
 
-    final data =
-        tester.widget<ScrollbarTheme>(find.byType(ScrollbarTheme)).data;
+    final data = tester
+        .widget<ScrollbarTheme>(find.byType(ScrollbarTheme))
+        .data;
     expect(data.thumbColor!.resolve({}), Colors.red);
     expect(tester.takeException(), isNull);
   });

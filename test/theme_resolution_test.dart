@@ -10,8 +10,9 @@ const red = Color(0xFFE53935);
 const green = Color(0xFF43A047);
 const blue = Color(0xFF1E88E5);
 
-Widget host(Widget child) =>
-    MaterialApp(home: Scaffold(body: Center(child: child)));
+Widget host(Widget child) => MaterialApp(
+  home: Scaffold(body: Center(child: child)),
+);
 
 Widget dropdown({
   DropdownStyleTheme? theme,

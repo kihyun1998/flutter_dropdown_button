@@ -172,12 +172,12 @@ abstract final class DropdownPlacement {
     return DropdownPlacementResult(
       height: height,
       openDown: openDown,
-      transformAlignment:
-          openDown ? Alignment.topCenter : Alignment.bottomCenter,
-      top:
-          openDown
-              ? input.buttonBottom + input.buttonGap
-              : input.buttonOffset.dy - input.buttonGap - height,
+      transformAlignment: openDown
+          ? Alignment.topCenter
+          : Alignment.bottomCenter,
+      top: openDown
+          ? input.buttonBottom + input.buttonGap
+          : input.buttonOffset.dy - input.buttonGap - height,
       width: width,
       left: _resolveLeft(input, width),
     );

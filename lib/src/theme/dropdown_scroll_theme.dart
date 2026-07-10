@@ -58,7 +58,7 @@ class DropdownScrollTheme {
   /// Wins over [thickness]; falls back to it, then to `8.0`.
   ///
   /// The track is drawn at this width too — Flutter's scrollbars have one
-  /// thickness, not two. See [trackWidth].
+  /// thickness, not two, which is why `trackWidth` is deprecated.
   final double? thumbWidth;
 
   /// Width of the scrollbar track (the background area).

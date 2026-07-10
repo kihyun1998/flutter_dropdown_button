@@ -171,8 +171,9 @@ void main() {
     test(
       'colours the caller left alone stay null in the ScrollbarThemeData',
       () {
-        final data =
-            const DropdownScrollTheme(thumbColor: red).resolve().scrollbarTheme;
+        final data = const DropdownScrollTheme(
+          thumbColor: red,
+        ).resolve().scrollbarTheme;
 
         expect(data.trackColor, isNull);
         expect(data.trackBorderColor, isNull);

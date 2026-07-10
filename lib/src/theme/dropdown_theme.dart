@@ -374,10 +374,9 @@ class DropdownTheme {
       iconSize: resolvedIconSize,
       icon: icon ?? Icons.keyboard_arrow_down,
       iconPadding: iconPadding ?? const EdgeInsets.only(left: 8.0),
-      iconColor:
-          enabled
-              ? (iconColor ?? ambient.icon)
-              : (iconDisabledColor ?? ambient.disabled),
+      iconColor: enabled
+          ? (iconColor ?? ambient.icon)
+          : (iconDisabledColor ?? ambient.disabled),
     );
   }
 
@@ -428,10 +427,9 @@ class DropdownTheme {
       elevation: elevation,
       shadowColor: shadowColor,
       padding: overlayPadding,
-      borderThickness:
-          decorationBorder is Border
-              ? decorationBorder.top.width + decorationBorder.bottom.width
-              : 0.0,
+      borderThickness: decorationBorder is Border
+          ? decorationBorder.top.width + decorationBorder.bottom.width
+          : 0.0,
     );
   }
 
@@ -448,14 +446,12 @@ class DropdownTheme {
   }) {
     return ResolvedItemStyle(
       decoration: BoxDecoration(
-        color:
-            selected
-                ? selectedItemColor ?? ambient.primary.withValues(alpha: 0.1)
-                : Colors.transparent,
-        borderRadius:
-            itemBorderRadius != null
-                ? BorderRadius.circular(itemBorderRadius!)
-                : null,
+        color: selected
+            ? selectedItemColor ?? ambient.primary.withValues(alpha: 0.1)
+            : Colors.transparent,
+        borderRadius: itemBorderRadius != null
+            ? BorderRadius.circular(itemBorderRadius!)
+            : null,
         border: (isLast && excludeLastItemBorder) ? null : itemBorder,
       ),
       padding: itemPadding,
