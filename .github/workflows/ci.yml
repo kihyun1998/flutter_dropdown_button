@@ -1,0 +1,70 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  # Two Flutter versions, on purpose.
+  #
+  # `stable` catches what breaks as Flutter moves. The pinned `minimum` is the
+  # floor `pubspec.yaml` promises, and it is the only job that can catch the
+  # package using an API newer than that promise. Without it, a pubspec that
+  # claims >=3.10 while calling a 3.27 API stays green forever — which is
+  # exactly what happened before this workflow existed.
+  test:
+    name: ${{ matrix.label }} (Flutter ${{ matrix.flutter }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - label: minimum
+            flutter: 3.27.0
+          - label: stable
+            flutter: stable
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ matrix.flutter }}
+          channel: stable
+          cache: true
+
+      - run: flutter pub get
+
+      - name: Analyze
+        run: flutter analyze
+
+      - name: Test
+        run: flutter test
+
+      - name: Analyze the example
+        working-directory: example
+        run: |
+          flutter pub get
+          flutter analyze
+
+  # Formatting and packaging are version-independent; one run is enough.
+  package:
+    name: format & publish check
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - run: flutter pub get
+
+      - name: Formatting
+        run: dart format --output=none --set-exit-if-changed .
+
+      - name: Publish dry run
+        run: flutter pub publish --dry-run
