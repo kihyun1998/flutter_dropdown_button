@@ -96,6 +96,45 @@ DropdownTheme(
 )
 ```
 
+### The checkbox in a multi-select row
+
+`DropdownTheme` does not style it. A `FlutterMultiSelectDropdown` row draws a
+plain `Checkbox`, which reads the ambient `CheckboxThemeData` and `ColorScheme`
+like any other:
+
+```dart
+Theme(
+  data: Theme.of(context).copyWith(
+    checkboxTheme: CheckboxThemeData(
+      fillColor: WidgetStateProperty.resolveWith(
+        (states) => states.contains(WidgetState.selected)
+            ? Colors.teal
+            : null,
+      ),
+    ),
+  ),
+  child: FlutterMultiSelectDropdown<String>(...),
+)
+```
+
+Everything around it — the row's hover, splash, margin, radius, and the
+selected row's background — is `DropdownTheme`'s, exactly as for a single-select
+menu.
+
+`itemHeight` must leave room for the box. A `Checkbox` measures **48×48** with
+Flutter's default `materialTapTargetSize`, and **40×40** under
+`MaterialTapTargetSize.shrinkWrap` — measured, not remembered. This package's
+default `itemHeight` is 48, so a shorter row needs the smaller tap target too:
+
+```dart
+Theme(
+  data: Theme.of(context).copyWith(
+    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+  ),
+  child: FlutterMultiSelectDropdown<String>(itemHeight: 40, ...),
+)
+```
+
 ## Advanced Theming
 
 ### Custom Decorations

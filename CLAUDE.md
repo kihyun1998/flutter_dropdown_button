@@ -141,16 +141,29 @@ package                    dart format --set-exit-if-changed  /  pub publish --d
 
 `flutter_dropdown_button` is a Flutter package providing a single, highly customizable dropdown widget rendered through an `OverlayEntry` rather than Flutter's built-in menu machinery.
 
-There is **one** widget — `FlutterDropdownButton<T>` — with two constructors:
+There are **two** widgets, and both are thin callers of `DropdownMenuShell`.
 
 - `FlutterDropdownButton<T>(...)` — custom mode. `itemBuilder` renders each item as an arbitrary widget.
 - `FlutterDropdownButton<T>.text(...)` — text mode. Items render as text through `SmartTooltipText`, gaining overflow handling, an automatic tooltip, and a default search filter. A `label` callback extracts the string, so `T` need not be `String`.
+- `FlutterMultiSelectDropdown<T>(...)` — a checklist. Emits a `Set<T>` per tick and does not close. **`StatelessWidget`**: the shell holds the state and `selected` belongs to the caller.
 
 `isTextMode` (`itemBuilder == null`) survives as a public informational getter. **Nothing inside the widget branches on it** — see `DropdownItemPresentation` below.
 
+**Cardinality is a type, not a flag.** `value`, `scrollToSelectedItem` and `disableWhenSingleItem` do not exist on the multi-select widget, so no assert has to forbid them. The rejected alternative — a `.multiSelect` named constructor — would have put four settable-but-dead fields on the public API, which is the exact shape 3.0.0 spent a major version deleting.
+
 ## Core Architecture
 
-The widget is a thin shell over five modules, each of which takes plain values rather than a `BuildContext`.
+Both widgets are thin callers of `DropdownMenuShell`, which is itself a thin shell over five modules, each of which takes plain values rather than a `BuildContext`.
+
+### `DropdownMenuShell` — `lib/src/shell/`
+
+The button, the overlay, and everything between. **It does not know what selection is.** No `value`, no `Set`, no `onChanged`. It takes `isChosen(T)`, `onItemTap(T)` and `closeOnTap`, and what a caller supplies for those is what makes a dropdown single- or multi-select.
+
+Internal — not exported. Its parameters are the public widgets' parameters, which is the price of the split: roughly seventeen pass-throughs declared twice. The alternative, a `.multiSelect` named constructor, would have cost four permanently-dead public fields instead. **A dead field is stepped on by users, who get no feedback at all; a missing pass-through is caught by review.**
+
+`scrollToItem: T?` is where a per-mode invariant became unrepresentable rather than asserted: single-select passes its `value`, multi-select passes null, and there is no "scrolling to the selected item in a multi-select" to forbid.
+
+When adding a parameter, add it here **and** to both widgets. Nothing enforces that.
 
 ### `DropdownPlacement` — `lib/src/placement/`
 
@@ -233,7 +246,11 @@ And when you pin a value to stop Flutter changing it, pin **the value it would h
 
 ## Deprecated
 
-**Nothing.** `lib/` contains zero `@Deprecated` annotations.
+**One.** `CustomItemPresentation.items`, since 3.1.0, removed in 4.0.0.
+
+It fed `buildSelected()`'s audit of `value` against `items` — the audit that made a custom-mode button show its hint when a list refresh dropped the chosen row. That rule is gone (`the widget draws what it was handed`), so the field is read by nothing.
+
+It was **deprecated rather than removed**, unlike the three dead fields below, because it did something until the day it stopped. A deprecation window buys a caller time to migrate, and here there is an argument to delete. `required` was dropped from it so callers can.
 
 3.0.0 removed the lot: `DropdownMixin`, `DropdownTheme.animationDuration`, `DropdownTooltipTheme.borderColor` / `.borderWidth`, `DropdownScrollTheme.trackWidth` and `.alwaysVisible`.
 
@@ -249,7 +266,7 @@ Beware the dartdoc link. `See [trackWidth].` inside another member's doc comment
 
 ```bash
 flutter pub get                                    # install dependencies
-flutter test                                       # 222 tests
+flutter test                                       # 256 tests
 flutter test --coverage                            # writes coverage/lcov.info
 dart run tool/check_coverage.dart --min 100 --report
 flutter analyze                                    # exits 1 on a single `info`
@@ -264,14 +281,14 @@ cd example && flutter run                          # the playground app
 
 ## Testing
 
-222 tests, **100% line coverage** (937 lines). 98 of them run without mounting a widget at all.
+256 tests, **100% line coverage** (1037 lines). 107 of them run without mounting a widget at all.
 
 | Suite | What it covers |
 | --- | --- |
 | `test/placement/` | The geometry module, exhaustively. No widgets. |
 | `test/theme/` | Every `resolve()`. No widgets. |
 | `test/overlay/` | The controller's lifecycle. No widgets. |
-| `test/presentation/` | Alignment, the default filter, label extraction. No widgets. |
+| `test/presentation/` | Alignment, the default filter, label extraction. Mostly without widgets — the checklist row's semantics needs one. |
 | `test/search/` | The query, filtering, reset, enable/disable. No widgets. |
 | `test/overlay_bounds_test.dart` | Menus near screen edges, and inside a nested `Overlay` |
 | `test/overlay_resize_test.dart` | An open menu growing, shrinking, and flipping |
@@ -294,6 +311,9 @@ cd example && flutter run                          # the playground app
 | `test/overlay_controller_widget_test.dart` | The controller driven bare, with its own chrome |
 | `test/last_four_lines_test.dart` | Unwrapped overflow; the gradient's controller swap |
 | `test/scrollbar_duplication_test.dart` | One scrollbar per menu, across four platforms |
+| `test/ghost_value_test.dart` | A `value` that `items` no longer offers, on the face and not in the menu |
+| `test/multi_select_test.dart` | Ticking, unticking, the caller's `Set`, the query surviving a tick |
+| `test/presentation/multi_select_presentation_test.dart` | A row announces *checked*, never *disabled* |
 
 **Conventions that matter here:**
 
@@ -307,12 +327,15 @@ cd example && flutter run                          # the playground app
 lib/
 ├── flutter_dropdown_button.dart          # public exports
 └── src/
-    ├── flutter_dropdown_button.dart      # the widget
+    ├── flutter_dropdown_button.dart      # single-select: 10 lines of selection, the rest delegated
+    ├── flutter_multi_select_dropdown.dart # multi-select: a StatelessWidget over the same shell
+    ├── shell/
+    │   └── dropdown_menu_shell.dart      # the button and the menu. Knows nothing of selection
     ├── placement/dropdown_placement.dart # pure geometry
     ├── overlay/
     │   └── dropdown_overlay_controller.dart  # overlay lifetime, animation, spec
     ├── presentation/
-    │   └── item_presentation.dart         # text vs custom rendering, behind one interface
+    │   └── item_presentation.dart         # text / custom / multi-select, behind one interface
     ├── search/
     │   └── dropdown_search_controller.dart  # the query, its field, its lifetime
     ├── theme/

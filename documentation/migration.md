@@ -1,5 +1,37 @@
 # Migration Guide
 
+## Upgrading to 3.1.0
+
+A new widget, one behaviour change, one deprecation. Nothing was removed.
+
+**`FlutterMultiSelectDropdown<T>` is new.** A checklist that stays open, emits a `Set<T>` the moment a box is ticked, and needs no confirm button. It shares every layout, theming and search parameter with `FlutterDropdownButton`. Nothing you already wrote changes.
+
+**Custom mode now draws a `value` that is not in `items`.** Previously `FlutterDropdownButton(itemBuilder: ...)` audited `value` against `items` and fell back to `hintWidget` when it was absent — silently, with no callback and no error. Text mode never did this, having no `items` to consult. The two now agree: **the widget draws what it was handed.**
+
+You see a difference only if a `value` outlives its row — the state a list refresh leaves behind. Where the button used to show the hint, it now shows the value. The menu is unchanged; it iterates `items` and never invented a row for it.
+
+If you were relying on the old fallback to detect a stale `value`, do it where the state lives:
+
+```dart
+// Before: the button told you, by showing the hint.
+// After:
+if (value != null && !items.contains(value)) {
+  // clear it, or offer the user a way to
+}
+```
+
+**`CustomItemPresentation.items` is deprecated.** It fed the audit above and is now read by nothing. It is no longer `required`; drop the argument. It will be removed in 4.0.0.
+
+```dart
+// Before
+CustomItemPresentation<T>(itemBuilder: ..., items: items, value: value)
+
+// After
+CustomItemPresentation<T>(itemBuilder: ..., value: value)
+```
+
+Only code that constructs a presentation by hand — a dropdown built on `DropdownOverlayController` — is affected. `FlutterDropdownButton` callers see nothing.
+
 ## Upgrading to 3.0.1
 
 No API changed. Three bugs did, and two of them are visible.
