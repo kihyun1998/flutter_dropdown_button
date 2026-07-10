@@ -12,6 +12,7 @@ Version 3.0.0 removes everything deprecated during the 2.x line. Nothing was ren
 | `DropdownTheme.animationDuration` | `FlutterDropdownButton.animationDuration` |
 | `DropdownTooltipTheme.borderColor` / `.borderWidth` | `DropdownTooltipTheme.border` |
 | `DropdownScrollTheme.alwaysVisible` | `DropdownScrollTheme.thumbVisibility` |
+| `DropdownScrollTheme.trackWidth` | `DropdownScrollTheme.thumbWidth` |
 
 **If you only ever used `FlutterDropdownButton`, nothing here affects you.** The removals are all on classes you had to reach for deliberately.
 
@@ -75,6 +76,18 @@ FlutterDropdownButton<String>.text(
 ```
 
 If you were setting it on the theme, your menus were animating at 200ms and still are. Move the value across only if you actually wanted the slower animation.
+
+### DropdownScrollTheme.trackWidth
+
+Never applied. Flutter's scrollbars have one thickness, not two, so the track has always been drawn at the thumb's width.
+
+```dart
+// Before — silently ignored
+DropdownScrollTheme(thumbWidth: 6, trackWidth: 20)
+
+// After
+DropdownScrollTheme(thumbWidth: 6)
+```
 
 ### DropdownScrollTheme.alwaysVisible
 

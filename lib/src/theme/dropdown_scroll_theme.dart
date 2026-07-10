@@ -22,11 +22,6 @@ class DropdownScrollTheme {
   const DropdownScrollTheme({
     this.thickness,
     this.thumbWidth,
-    @Deprecated(
-      'Never applied. Flutter draws the track at the thumb thickness; use '
-      'thumbWidth or thickness. This field will be removed in 4.0.0.',
-    )
-    this.trackWidth,
     this.radius,
     this.thumbColor,
     this.trackColor,
@@ -58,25 +53,8 @@ class DropdownScrollTheme {
   /// Wins over [thickness]; falls back to it, then to `8.0`.
   ///
   /// The track is drawn at this width too — Flutter's scrollbars have one
-  /// thickness, not two, which is why `trackWidth` is deprecated.
+  /// thickness, not two.
   final double? thumbWidth;
-
-  /// Width of the scrollbar track (the background area).
-  ///
-  /// **Deprecated, and it never worked.** Flutter's `Scrollbar` and
-  /// `RawScrollbar` draw the track at the thumb's thickness; neither exposes a
-  /// separate track width, so this value was never handed to anything. Setting
-  /// it changed nothing, and combining it with `trackVisibility: true` used to
-  /// crash the menu on open.
-  ///
-  /// Use [thumbWidth] — or [thickness] — to size the scrollbar.
-  ///
-  /// Removed in 4.0.0.
-  @Deprecated(
-    'Never applied. Flutter draws the track at the thumb thickness; use '
-    'thumbWidth or thickness. This field will be removed in 4.0.0.',
-  )
-  final double? trackWidth;
 
   /// Radius of the scrollbar thumb corners.
   ///
@@ -175,11 +153,6 @@ class DropdownScrollTheme {
   DropdownScrollTheme copyWith({
     double? thickness,
     double? thumbWidth,
-    @Deprecated(
-      'Never applied. Flutter draws the track at the thumb thickness; use '
-      'thumbWidth or thickness. This field will be removed in 4.0.0.',
-    )
-    double? trackWidth,
     Radius? radius,
     Color? thumbColor,
     Color? trackColor,
@@ -197,8 +170,6 @@ class DropdownScrollTheme {
     return DropdownScrollTheme(
       thickness: thickness ?? this.thickness,
       thumbWidth: thumbWidth ?? this.thumbWidth,
-      // ignore: deprecated_member_use_from_same_package
-      trackWidth: trackWidth ?? this.trackWidth,
       radius: radius ?? this.radius,
       thumbColor: thumbColor ?? this.thumbColor,
       trackColor: trackColor ?? this.trackColor,
@@ -223,8 +194,7 @@ class DropdownScrollTheme {
   /// [ScrollbarTheme] keeps its say. Only [overridesScrollbarTheme] slots that
   /// were actually asked for.
   ResolvedScrollStyle resolve() {
-    // ignore: deprecated_member_use_from_same_package
-    final custom = thumbWidth != null || trackWidth != null;
+    final custom = thumbWidth != null;
 
     return ResolvedScrollStyle(
       thumbWidth: thumbWidth ?? thickness ?? 8.0,
