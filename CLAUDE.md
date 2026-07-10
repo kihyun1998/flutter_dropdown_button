@@ -87,7 +87,7 @@ When you deprecate a member, annotate the **field, the constructor parameter and
 
 ```bash
 flutter pub get              # install dependencies
-flutter test                 # run the suite (140 tests)
+flutter test                 # run the suite (143 tests)
 flutter analyze              # static analysis; must be clean
 dart format .                # formatting; must produce no changes
 flutter pub publish --dry-run   # validate the package before release
@@ -97,7 +97,7 @@ cd example && flutter run    # run the playground app
 
 ## Testing
 
-140 tests. 81 of them run without mounting a widget at all.
+143 tests. 84 of them run without mounting a widget at all.
 
 | Suite | What it covers |
 | --- | --- |

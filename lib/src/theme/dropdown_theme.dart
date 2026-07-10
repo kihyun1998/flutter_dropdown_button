@@ -353,6 +353,17 @@ class DropdownTheme {
   // BuildContext — hand it a [DropdownAmbientColors] and it is a pure
   // function, testable without mounting a widget.
 
+  /// The size the trailing arrow takes when [iconSize] is left unset.
+  static const double defaultIconSize = 24.0;
+
+  /// The size the trailing arrow will actually be drawn at.
+  ///
+  /// This is the one part of [resolveButton]'s answer that owes nothing to the
+  /// ambient palette. It is exposed so that a caller who needs only this number
+  /// can read it without resolving a whole [ResolvedButtonStyle] — and so that
+  /// the fallback lives in exactly one place.
+  double get resolvedIconSize => iconSize ?? defaultIconSize;
+
   /// The button as it should be drawn.
   ///
   /// [enabled] must be the button's *effective* enabled state: a single-item
@@ -361,7 +372,7 @@ class DropdownTheme {
     DropdownAmbientColors ambient, {
     required bool enabled,
   }) {
-    final resolvedIconSize = iconSize ?? 24.0;
+    final resolvedIconSize = this.resolvedIconSize;
 
     return ResolvedButtonStyle(
       decoration: _buttonDecoration(ambient, enabled: enabled),

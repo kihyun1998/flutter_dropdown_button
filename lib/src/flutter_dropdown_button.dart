@@ -433,7 +433,10 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
       config: _textConfig,
       tooltipTheme: effectiveTooltipTheme,
       enabled: isEnabled,
-      leadingHeight: _buttonStyle.iconSize,
+      // Read off the theme, not off `_buttonStyle`. Resolving the whole button
+      // to reach one number would build a BoxDecoration and lift the ambient
+      // palette, on every access — and this getter is read on every keystroke.
+      leadingHeight: effectiveTheme.resolvedIconSize,
       leading: widget.leading,
       selectedLeading: widget.selectedLeading,
       leadingPadding: widget.leadingPadding,
@@ -493,10 +496,14 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
   ///
   /// The caller's `searchFilter` wins; failing that, the presentation supplies
   /// the default its mode can offer, and text mode is the only one that can.
-  List<T> get _visibleItems => _search.visibleItems(
-    widget.items,
-    widget.searchFilter ?? _presentation.defaultSearchFilter,
-  );
+  ///
+  /// Takes the [presentation] rather than reaching for `_presentation`, so the
+  /// one build that needs both does not construct two.
+  List<T> _visibleItems(DropdownItemPresentation<T> presentation) =>
+      _search.visibleItems(
+        widget.items,
+        widget.searchFilter ?? presentation.defaultSearchFilter,
+      );
 
   /// The height occupied by the search field including margin and divider.
   double get _searchFieldHeight =>
@@ -708,7 +715,8 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
   // ===== Overlay content =====
 
   Widget _buildOverlayContent(double height) {
-    final items = _visibleItems;
+    final presentation = _presentation;
+    final items = _visibleItems(presentation);
     final scrollTheme = effectiveScrollTheme;
     final padding = effectiveTheme.overlayPadding;
 
@@ -719,7 +727,6 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
         .clamp(0.0, double.infinity);
     final totalItemsHeight = items.length * actualItemHeight;
     final needsScroll = totalItemsHeight > availableContentHeight;
-    final presentation = _presentation;
     final itemAlignment = presentation.contentAlignment;
 
     Widget content;
