@@ -177,7 +177,7 @@ Beware the dartdoc link. `See [trackWidth].` inside another member's doc comment
 CI(`.github/workflows/ci.yml`)가 매 PR 에서 돈다. **로컬 게이트는 CI 를 대신하지 않는다.**
 
 ```
-minimum (Flutter 3.32.0)   flutter pub get / analyze / test / example analyze
+minimum (Flutter 3.32.0)   pub get / analyze / test --coverage / check_coverage / example analyze
 stable  (Flutter stable)   같음
 package                    dart format --set-exit-if-changed  /  pub publish --dry-run
 ```
@@ -185,6 +185,9 @@ package                    dart format --set-exit-if-changed  /  pub publish --d
 - **`minimum` 잡이 핵심이다.** `stable` 만 돌리면 pubspec 이 `>=3.10` 을 약속하고 3.32 API 를 쓰는 상태가 **영원히 초록**이다. 실증(#47): 이 잡이 첫 실행에서 서로 다른 두 사실을 잡았다 — `Tooltip.constraints` 가 3.27/3.29 에 없음, 그리고 **analyzer 규칙이 버전마다 다름**(3.32 는 dartdoc 링크를 deprecated 사용으로 셈). *"로컬에서 analyze 클린"* 은 *"선언한 바닥에서 클린"* 을 전혀 보장하지 않는다.
 - **`flutter analyze` 는 `info` 하나에도 exit 1 이다.**
 - **`pub publish --dry-run` 은 컴파일하지 않는다.** 파일 크기·라이선스·문서·git 청결도만 본다. 이 세션의 PR 47 개 내내 경고 0 이었고, 그동안 pubspec 은 거짓말을 하고 있었다.
+- **커버리지 바닥은 현재 수치에 여유 없이 붙인다**(`--min 93.3`). 여유를 두면 딱 그 여유만큼의 회귀를 허용하고, 실제 회귀는 임계값 바로 아래에 앉는다. 숫자가 오르면 바닥을 올린다. 빨간 빌드를 초록으로 만들려고 내리지 않는다.
+- **커버리지는 "무엇을 안 봤는지" 를 알려주지, "본 것이 옳은지" 는 말해주지 않는다.** 실증: 커버리지를 처음 켜자 `lib/` 80.6% 였고, 미커버의 대부분이 여섯 개 `copyWith` 였다. 그리고 **테스트 155 개 중 메뉴 항목을 탭하는 것이 하나도 없었다** — 이 위젯의 존재 이유인 상호작용이다. 배치·테마·오버레이·검색은 겹겹이 덮여 있었다.
+- **아카이브 내용을 ASCII 로 확인한다.** `pub publish --dry-run` 의 트리는 `├──` 를 쓴다. `|--` 로 grep 하면 무엇을 넣든 빈 결과가 나온다 — 어느 쪽이든 빈 결과가 나오는 검사는 검사가 아니다. 실증: `coverage/` 를 `.gitignore` 에 넣기 전 `lcov.info` 가 아카이브에 실려 있었고, `tool/` 도 그랬다. **둘 다 `dry-run` 경고 0 인 상태였다.** `tool/.pubignore` 와 `docs/.pubignore` 가 각각 막는다.
 - **`dart format` 은 패키지의 language version 을 따른다.** 실증: SDK 바닥을 Dart 3.8 로 올리자 3.7 의 tall style 이 켜지며 35 개 파일이 재포맷됐다. 제약 변경의 필연적 결과다.
 - 브랜치 → PR(`Closes #issue`) → **CI 그린 확인** → 머지. `main` 에 직접 커밋하지 않는다.
 - **`flutter pub publish` 는 되돌릴 수 없고 pub.dev 는 버전 삭제가 없다(retract 만). 에이전트가 실행하지 않는다 — 사용자가 직접.**
@@ -193,7 +196,9 @@ package                    dart format --set-exit-if-changed  /  pub publish --d
 
 ```bash
 flutter pub get                                    # install dependencies
-flutter test                                       # 143 tests
+flutter test                                       # 160 tests
+flutter test --coverage                            # writes coverage/lcov.info
+dart run tool/check_coverage.dart --min 93.3 --report
 flutter analyze                                    # exits 1 on a single `info`
 dart format --output=none --set-exit-if-changed .  # exits 1 if anything would change
 flutter pub publish --dry-run                      # metadata only; does not compile
@@ -206,7 +211,7 @@ cd example && flutter run                          # the playground app
 
 ## Testing
 
-143 tests. 84 of them run without mounting a widget at all.
+160 tests, 93.35% line coverage. 96 of them run without mounting a widget at all.
 
 | Suite | What it covers |
 | --- | --- |
@@ -227,6 +232,8 @@ cd example && flutter run                          # the playground app
 | `test/semantics_label_test.dart` | What a screen reader hears, at the semantics tree |
 | `test/scrollbar_theme_test.dart` | A visible track, and the ambient `ScrollbarTheme` surviving |
 | `test/disabled_state_test.dart` | The disabled state, including single-item auto-disable |
+| `test/selection_test.dart` | Tapping an item — the reason this widget exists |
+| `test/theme/copy_with_test.dart` | Every `copyWith`, preserving and replacing |
 
 **Conventions that matter here:**
 
