@@ -9,6 +9,20 @@ class Node {
   final String os;
 }
 
+/// An icon per value. This is why `itemLeadingBuilder` is a builder and not a
+/// single widget: every row wants a different one.
+const _osIcon = <String, IconData>{
+  'Windows Active Directory': Icons.window,
+  'Linux': Icons.terminal,
+  'macOS': Icons.laptop_mac,
+  'Solaris': Icons.wb_sunny_outlined,
+  'AIX': Icons.dns_outlined,
+  'FreeBSD': Icons.memory,
+  'OpenBSD': Icons.shield_outlined,
+  'Plan 9': Icons.science_outlined,
+  'Haiku': Icons.eco_outlined,
+};
+
 const _allNodes = <Node>[
   Node('web-01', 'Windows Active Directory'),
   Node('web-02', 'Windows Active Directory'),
@@ -100,6 +114,10 @@ class _MultiSelectPageState extends State<MultiSelectPage> {
                       1 => s.first,
                       _ => '${s.length} selected',
                     },
+                    // An icon between the box and the label; the count after
+                    // it. One slot could not have held both on the right sides.
+                    itemLeadingBuilder: (v) =>
+                        Icon(_osIcon[v] ?? Icons.help_outline, size: 18),
                     itemTrailingBuilder: (v) => Text(
                       '${counts[v]}',
                       style: TextStyle(color: Colors.grey.shade600),

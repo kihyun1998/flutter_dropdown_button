@@ -289,6 +289,7 @@ class MultiSelectPresentation<T> implements DropdownItemPresentation<T> {
     required this.config,
     required this.tooltipTheme,
     required this.enabled,
+    this.itemLeadingBuilder,
     this.itemTrailingBuilder,
   }) : assert(
          label != null || T == String,
@@ -313,6 +314,15 @@ class MultiSelectPresentation<T> implements DropdownItemPresentation<T> {
 
   /// Whether the button is interactive, which selects the disabled text style.
   final bool enabled;
+
+  /// Drawn between the checkbox and the label — an icon that varies by item.
+  ///
+  /// A builder rather than one widget, because the reason to want it is that
+  /// each value looks different.
+  ///
+  /// The row's `InkWell` merges its descendants' semantics, so a widget that
+  /// carries text is read aloud as part of the row. An `Icon` carries none.
+  final Widget Function(T item)? itemLeadingBuilder;
 
   /// Drawn at the end of each row. Its text is merged into the row's announced
   /// label by the row's `InkWell`, so a count reads as part of the item.
@@ -369,6 +379,7 @@ class MultiSelectPresentation<T> implements DropdownItemPresentation<T> {
   /// None of this is visible on screen. It was found with a semantics probe.
   @override
   Widget buildItem(T item, bool isSelected) {
+    final leading = itemLeadingBuilder?.call(item);
     final trailing = itemTrailingBuilder?.call(item);
 
     return Semantics(
@@ -376,6 +387,9 @@ class MultiSelectPresentation<T> implements DropdownItemPresentation<T> {
       child: Row(
         children: [
           ExcludeSemantics(child: Checkbox(value: isSelected, onChanged: null)),
+          if (leading != null)
+            Padding(padding: const EdgeInsets.only(right: 8.0), child: leading),
+          // Only the label gives way. A squeezed icon is never what was meant.
           Flexible(
             child: _text(
               labelOf(item),

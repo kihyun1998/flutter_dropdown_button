@@ -60,6 +60,7 @@ FlutterMultiSelectDropdown<T>({
   required ValueChanged<Set<T>> onChanged,
   required String Function(Set<T> selected) labelBuilder,
   String Function(T item)? label,          // required unless T is String
+  Widget Function(T item)? itemLeadingBuilder,
   Widget Function(T item)? itemTrailingBuilder,
   TextDropdownConfig? config,
   ...
@@ -77,7 +78,8 @@ Text mode only. An item that needs more than text — an avatar, two lines — i
 - **A chosen value absent from `items`** still counts towards `labelBuilder`, and draws no row. `'3 selected'` can appear beside two ticked boxes after a refresh drops the third. Offer a way to clear it.
 - **The query survives a tick.** Only opening and closing the menu reset it.
 - **Rows announce their checked state.** The box is drawn but excluded from the semantics tree; the row carries `checked` instead. A live `Checkbox` inside the row's ink well would announce every row as *disabled*.
-- **A trailing widget's text is merged into the row's announced label.** The ink well merges its descendants, so `itemTrailingBuilder: (v) => Text('42')` makes a screen reader read `"Apple\n42"`.
+- **A trailing widget's text is merged into the row's announced label.** The ink well merges its descendants, so `itemTrailingBuilder: (v) => Text('42')` makes a screen reader read `"Apple\n42"`. `itemLeadingBuilder` is the same; an `Icon` carries no label and stays silent.
+- **The row is `[checkbox] [leading] [label] [trailing]`.** Only the label gives way when space runs out, so it ellipsises and neither slot is squeezed. Material has no such arrangement — `CheckboxListTile`'s `secondary` sits on the *opposite* side of the box (`checkbox_list_tile.dart:590`), which is the layout `itemTrailingBuilder` alone gives you.
 
 ### Statics
 
@@ -319,6 +321,7 @@ final presentation = MultiSelectPresentation<String>(
   config: TextDropdownConfig.defaultConfig,
   tooltipTheme: DropdownTooltipTheme.defaultTheme,
   enabled: true,
+  itemLeadingBuilder: (item) => Icon(osIcon[item]),
   itemTrailingBuilder: (item) => Text('${counts[item]}'),
 );
 ```

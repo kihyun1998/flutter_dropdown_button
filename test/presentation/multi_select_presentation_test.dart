@@ -24,6 +24,7 @@ MultiSelectPresentation<T> multi<T>({
   required Set<T> selected,
   String Function(T)? label,
   String Function(Set<T>)? labelBuilder,
+  Widget Function(T)? itemLeadingBuilder,
   Widget Function(T)? itemTrailingBuilder,
   bool enabled = true,
   TextDropdownConfig config = TextDropdownConfig.defaultConfig,
@@ -35,6 +36,7 @@ MultiSelectPresentation<T> multi<T>({
     config: config,
     tooltipTheme: DropdownTooltipTheme.defaultTheme,
     enabled: enabled,
+    itemLeadingBuilder: itemLeadingBuilder,
     itemTrailingBuilder: itemTrailingBuilder,
   );
 }
@@ -179,6 +181,48 @@ void main() {
 
       expect(find.byType(Checkbox), findsOneWidget);
       expect(find.text('a'), findsOneWidget);
+    });
+
+    testWidgets('a leading widget sits between the box and the label', (
+      tester,
+    ) async {
+      // Asserted in screen coordinates rather than by walking the Row's
+      // children: where it lands is the contract, the tree is a detail.
+      final presentation = multi<String>(
+        selected: const {},
+        itemLeadingBuilder: (item) => const Icon(Icons.star),
+        itemTrailingBuilder: (item) => const Text('12'),
+      );
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: SizedBox(
+              width: 300,
+              child: presentation.buildItem('a', false),
+            ),
+          ),
+        ),
+      );
+
+      final box = tester.getTopLeft(find.byType(Checkbox)).dx;
+      final icon = tester.getTopLeft(find.byType(Icon)).dx;
+      final label = tester.getTopLeft(find.text('a')).dx;
+      final count = tester.getTopLeft(find.text('12')).dx;
+
+      expect(box, lessThan(icon));
+      expect(icon, lessThan(label));
+      expect(label, lessThan(count));
+    });
+
+    testWidgets('without an itemLeadingBuilder nothing leads', (tester) async {
+      final presentation = multi<String>(selected: const {});
+
+      await tester.pumpWidget(
+        MaterialApp(home: Scaffold(body: presentation.buildItem('a', false))),
+      );
+
+      expect(find.byType(Icon), findsNothing);
     });
   });
 
