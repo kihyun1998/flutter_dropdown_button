@@ -12,6 +12,7 @@ import 'theme/dropdown_theme.dart';
 import 'theme/resolved_dropdown_style.dart';
 import 'theme/search_field_theme.dart';
 import 'theme/tooltip_theme.dart';
+import 'widgets/scroll_gradient_overlay.dart';
 import 'widgets/smart_tooltip_text.dart';
 
 /// A highly customizable dropdown button widget with overlay-based rendering.
@@ -517,8 +518,6 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
   // ===== Lifecycle =====
 
   ScrollController? _scrollController;
-  final ValueNotifier<bool> _canScrollUp = ValueNotifier<bool>(false);
-  final ValueNotifier<bool> _canScrollDown = ValueNotifier<bool>(false);
 
   @override
   void initState() {
@@ -558,12 +557,11 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
 
   @override
   void dispose() {
-    _scrollController?.removeListener(_updateScrollGradients);
-    _scrollController?.dispose();
-    _canScrollUp.dispose();
-    _canScrollDown.dispose();
-    _search.dispose();
+    // The menu goes first: tearing it down unmounts the ScrollGradientOverlay,
+    // which listens to the controller disposed on the next line.
     _menu.dispose();
+    _scrollController?.dispose();
+    _search.dispose();
     super.dispose();
   }
 
@@ -740,12 +738,7 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
             ),
       );
     } else if (needsScroll) {
-      if (_scrollController == null) {
-        _scrollController = ScrollController();
-        _scrollController!.addListener(_updateScrollGradients);
-      }
-
-      _initializeScrollGradients();
+      _scrollController ??= ScrollController();
 
       if (widget.scrollToSelectedItem &&
           widget.value != null &&
@@ -780,7 +773,14 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
       }
 
       if (scrollTheme?.showScrollGradient == true) {
-        content = _buildScrollGradientOverlay(content, scrollTheme!);
+        content = ScrollGradientOverlay(
+          controller: _scrollController!,
+          fadeInto: _overlayStyle.backgroundColor,
+          height: scrollTheme!.resolve().gradientHeight,
+          borderRadius: _overlayStyle.borderRadius,
+          colors: scrollTheme.gradientColors,
+          child: content,
+        );
       }
     } else {
       final List<Widget> itemWidgets = [];
@@ -928,103 +928,6 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
   }
 
   // ===== Scroll gradients =====
-
-  void _updateScrollGradients() {
-    if (_scrollController == null || !_scrollController!.hasClients) return;
-    final position = _scrollController!.position;
-    _canScrollUp.value = position.pixels > 0;
-    _canScrollDown.value = position.pixels < position.maxScrollExtent;
-  }
-
-  void _initializeScrollGradients() {
-    SchedulerBinding.instance.addPostFrameCallback((_) {
-      if (_scrollController != null && _scrollController!.hasClients) {
-        _updateScrollGradients();
-      }
-    });
-  }
-
-  Widget _buildScrollGradientOverlay(
-    Widget child,
-    DropdownScrollTheme scrollTheme,
-  ) {
-    final gradientHeight = scrollTheme.resolve().gradientHeight;
-    final List<Color> gradientColors;
-    if (scrollTheme.gradientColors != null &&
-        scrollTheme.gradientColors!.isNotEmpty) {
-      gradientColors = scrollTheme.gradientColors!;
-    } else {
-      final baseColor = _overlayStyle.backgroundColor;
-      gradientColors = [
-        baseColor.withValues(alpha: 0.0),
-        baseColor,
-      ];
-    }
-    final borderRadius = BorderRadius.circular(_overlayStyle.borderRadius);
-
-    return ClipRRect(
-      borderRadius: borderRadius,
-      child: Stack(
-        children: [
-          child,
-          // Top gradient
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            child: ValueListenableBuilder<bool>(
-              valueListenable: _canScrollUp,
-              builder: (context, canScrollUp, _) {
-                return IgnorePointer(
-                  child: AnimatedOpacity(
-                    opacity: canScrollUp ? 1.0 : 0.0,
-                    duration: const Duration(milliseconds: 150),
-                    child: Container(
-                      height: gradientHeight,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: gradientColors,
-                        ),
-                      ),
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
-          // Bottom gradient
-          Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
-            child: ValueListenableBuilder<bool>(
-              valueListenable: _canScrollDown,
-              builder: (context, canScrollDown, _) {
-                return IgnorePointer(
-                  child: AnimatedOpacity(
-                    opacity: canScrollDown ? 1.0 : 0.0,
-                    duration: const Duration(milliseconds: 150),
-                    child: Container(
-                      height: gradientHeight,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: gradientColors.reversed.toList(),
-                        ),
-                      ),
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
   // ===== Scroll to selected =====
 

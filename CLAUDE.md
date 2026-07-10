@@ -87,7 +87,7 @@ When you deprecate a member, annotate the **field, the constructor parameter and
 
 ```bash
 flutter pub get              # install dependencies
-flutter test                 # run the suite (135 tests)
+flutter test                 # run the suite (140 tests)
 flutter analyze              # static analysis; must be clean
 dart format .                # formatting; must produce no changes
 flutter pub publish --dry-run   # validate the package before release
@@ -97,7 +97,7 @@ cd example && flutter run    # run the playground app
 
 ## Testing
 
-135 tests. 81 of them run without mounting a widget at all.
+140 tests. 81 of them run without mounting a widget at all.
 
 | Suite | What it covers |
 | --- | --- |
@@ -114,6 +114,7 @@ cd example && flutter run    # run the playground app
 | `test/text_label_test.dart` | `label` with a non-`String` `T` |
 | `test/theme_resolution_test.dart` | Resolution rules, observed at the rendered widget |
 | `test/tooltip_decoration_test.dart` | A partial tooltip theme keeping the box it did not name |
+| `test/scroll_gradient_test.dart` | Which edge each fade is opaque at |
 | `test/semantics_label_test.dart` | What a screen reader hears, at the semantics tree |
 | `test/scrollbar_theme_test.dart` | A visible track, and the ambient `ScrollbarTheme` surviving |
 | `test/disabled_state_test.dart` | The disabled state, including single-item auto-disable |
@@ -147,7 +148,9 @@ lib/
     │   └── tooltip_theme.dart
     ├── config/text_dropdown_config.dart  # text overflow, alignment, styles
     ├── buttons/menu_alignment.dart
-    └── widgets/smart_tooltip_text.dart   # tooltip on overflow
+    └── widgets/
+        ├── scroll_gradient_overlay.dart   # fades the menu's scroll edges
+        └── smart_tooltip_text.dart        # tooltip on overflow
 ```
 
 ## Documentation
