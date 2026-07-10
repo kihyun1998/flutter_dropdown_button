@@ -4,11 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 /// Wraps the dropdown in just enough app to give it an [Overlay].
 Widget host(Widget child) {
-  return MaterialApp(
-    home: Scaffold(
-      body: Center(child: child),
-    ),
-  );
+  return MaterialApp(home: Scaffold(body: Center(child: child)));
 }
 
 Future<void> openDropdown(WidgetTester tester) async {
@@ -22,8 +18,9 @@ void main() {
     // ListView when they do not. The presence of a ListView is therefore an
     // observable stand-in for "this dropdown scrolls".
 
-    testWidgets('a short list does not scroll just because search is on',
-        (tester) async {
+    testWidgets('a short list does not scroll just because search is on', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         host(
           FlutterDropdownButton<String>.text(

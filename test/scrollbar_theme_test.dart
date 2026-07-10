@@ -3,20 +3,22 @@ import 'package:flutter_dropdown_button/flutter_dropdown_button.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 Future<void> openMenu(WidgetTester tester, DropdownScrollTheme scroll) async {
-  await tester.pumpWidget(MaterialApp(
-    home: Scaffold(
-      body: Center(
-        child: FlutterDropdownButton<String>.text(
-          width: 200,
-          height: 100,
-          items: const ['a', 'b', 'c', 'd', 'e', 'f'],
-          hint: 'pick',
-          theme: DropdownStyleTheme(scroll: scroll),
-          onChanged: (_) {},
+  await tester.pumpWidget(
+    MaterialApp(
+      home: Scaffold(
+        body: Center(
+          child: FlutterDropdownButton<String>.text(
+            width: 200,
+            height: 100,
+            items: const ['a', 'b', 'c', 'd', 'e', 'f'],
+            hint: 'pick',
+            theme: DropdownStyleTheme(scroll: scroll),
+            onChanged: (_) {},
+          ),
         ),
       ),
     ),
-  ));
+  );
   await tester.tap(find.byType(FlutterDropdownButton<String>));
   await tester.pumpAndSettle();
 }
@@ -35,9 +37,9 @@ void main() {
     expect(find.text('a'), findsOneWidget, reason: 'the menu opened');
   });
 
-  testWidgets(
-      'an unstyled scroll theme leaves the ambient ScrollbarTheme alone',
-      (tester) async {
+  testWidgets('an unstyled scroll theme leaves the ambient ScrollbarTheme alone', (
+    tester,
+  ) async {
     // Guard, not a regression test: this passed before the rewrite too. It pins
     // the reason `overridesScrollbarTheme` exists — `ScrollbarTheme` replaces
     // the ambient one rather than merging with it, so wrapping unconditionally

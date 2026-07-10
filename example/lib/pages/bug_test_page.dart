@@ -198,8 +198,8 @@ class _DropdownBugTestPageState extends State<DropdownBugTestPage> {
                         ),
                       ),
                     ),
-                    onChanged: (value) =>
-                        setState(() => _selectedValue = value),
+                    onChanged:
+                        (value) => setState(() => _selectedValue = value),
                   ),
                 ),
                 const SizedBox(height: 32),
@@ -252,9 +252,10 @@ class _DropdownBugTestPageState extends State<DropdownBugTestPage> {
                       ),
                     ),
                     ElevatedButton.icon(
-                      onPressed: _countdown == null
-                          ? _startCountdownWithCloseAll
-                          : null,
+                      onPressed:
+                          _countdown == null
+                              ? _startCountdownWithCloseAll
+                              : null,
                       icon: const Icon(Icons.cleaning_services, size: 24),
                       label: const Text(
                         'Manual Fix\n(closeAll)',

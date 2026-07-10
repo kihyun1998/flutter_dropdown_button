@@ -9,11 +9,12 @@ DropdownOverlayController makeController({
 }) {
   return DropdownOverlayController(
     vsync: const TestVSync(),
-    spec: () => const DropdownOverlaySpec(
-      itemCount: 3,
-      actualItemHeight: 48,
-      maxDropdownHeight: 200,
-    ),
+    spec:
+        () => const DropdownOverlaySpec(
+          itemCount: 3,
+          actualItemHeight: 48,
+          maxDropdownHeight: 200,
+        ),
     contentBuilder: (_) => const SizedBox.shrink(),
     decorationBuilder: () => null,
     onOpenStateChanged: onOpenStateChanged,
@@ -30,8 +31,9 @@ void main() {
 
   test('closing a closed controller is a no-op', () {
     var notifications = 0;
-    final controller =
-        makeController(onOpenStateChanged: (_) => ++notifications);
+    final controller = makeController(
+      onOpenStateChanged: (_) => ++notifications,
+    );
     addTearDown(controller.dispose);
 
     controller.close();
@@ -60,8 +62,9 @@ void main() {
 
   test('disposing does not notify the owner', () {
     var notifications = 0;
-    final controller =
-        makeController(onOpenStateChanged: (_) => ++notifications);
+    final controller = makeController(
+      onOpenStateChanged: (_) => ++notifications,
+    );
 
     controller.dispose();
 

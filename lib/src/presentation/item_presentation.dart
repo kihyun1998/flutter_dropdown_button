@@ -56,12 +56,12 @@ class TextItemPresentation<T> implements DropdownItemPresentation<T> {
     this.selectedLeading,
     this.leadingPadding,
   }) : assert(
-          label != null || T == String,
-          'FlutterDropdownButton<$T>.text() needs a `label` callback.\n'
-          'Text mode renders items as text, so it must know how to turn a $T '
-          'into a String. Supply `label: (item) => item.someTextProperty`, or '
-          'use the default constructor with `itemBuilder` instead.',
-        );
+         label != null || T == String,
+         'FlutterDropdownButton<$T>.text() needs a `label` callback.\n'
+         'Text mode renders items as text, so it must know how to turn a $T '
+         'into a String. Supply `label: (item) => item.someTextProperty`, or '
+         'use the default constructor with `itemBuilder` instead.',
+       );
 
   /// Turns an item into the string that represents it.
   final String Function(T item)? label;
@@ -118,17 +118,19 @@ class TextItemPresentation<T> implements DropdownItemPresentation<T> {
 
   /// Case-insensitive `contains` over the item's label, whatever `T` is.
   @override
-  DropdownSearchFilter<T>? get defaultSearchFilter => (item, query) =>
-      labelOf(item).toLowerCase().contains(query.toLowerCase());
+  DropdownSearchFilter<T>? get defaultSearchFilter =>
+      (item, query) =>
+          labelOf(item).toLowerCase().contains(query.toLowerCase());
 
   @override
   Widget buildItem(T item, bool isSelected) {
     final text = SmartTooltipText(
       text: labelOf(item),
       tooltipTheme: tooltipTheme,
-      style: isSelected
-          ? config.selectedTextStyle ?? config.textStyle
-          : config.textStyle,
+      style:
+          isSelected
+              ? config.selectedTextStyle ?? config.textStyle
+              : config.textStyle,
       textAlign: config.textAlign,
       maxLines: config.maxLines,
       overflow: config.overflow,
@@ -153,10 +155,11 @@ class TextItemPresentation<T> implements DropdownItemPresentation<T> {
     final isHint = selectedText == null;
 
     final baseStyle = isHint ? config.hintStyle : config.textStyle;
-    final resolvedStyle = !enabled && config.disabledTextStyle != null
-        ? (baseStyle?.merge(config.disabledTextStyle) ??
-            config.disabledTextStyle)
-        : baseStyle;
+    final resolvedStyle =
+        !enabled && config.disabledTextStyle != null
+            ? (baseStyle?.merge(config.disabledTextStyle) ??
+                config.disabledTextStyle)
+            : baseStyle;
 
     final text = SmartTooltipText(
       text: displayText,

@@ -87,18 +87,18 @@ class FlutterDropdownButton<T> extends StatefulWidget {
     this.searchable = false,
     this.searchFilter,
     this.emptyBuilder,
-  })  : hintText = null,
-        label = null,
-        config = null,
-        leading = null,
-        selectedLeading = null,
-        leadingPadding = null,
-        assert(
-          minMenuWidth == null ||
-              maxMenuWidth == null ||
-              minMenuWidth <= maxMenuWidth,
-          'minMenuWidth must be less than or equal to maxMenuWidth',
-        );
+  }) : hintText = null,
+       label = null,
+       config = null,
+       leading = null,
+       selectedLeading = null,
+       leadingPadding = null,
+       assert(
+         minMenuWidth == null ||
+             maxMenuWidth == null ||
+             minMenuWidth <= maxMenuWidth,
+         'minMenuWidth must be less than or equal to maxMenuWidth',
+       );
 
   /// Creates a text-only dropdown button.
   ///
@@ -138,16 +138,16 @@ class FlutterDropdownButton<T> extends StatefulWidget {
     this.searchable = false,
     this.searchFilter,
     this.emptyBuilder,
-  })  : hintText = hint,
-        hintWidget = null,
-        itemBuilder = null,
-        selectedBuilder = null,
-        assert(
-          minMenuWidth == null ||
-              maxMenuWidth == null ||
-              minMenuWidth <= maxMenuWidth,
-          'minMenuWidth must be less than or equal to maxMenuWidth',
-        );
+  }) : hintText = hint,
+       hintWidget = null,
+       itemBuilder = null,
+       selectedBuilder = null,
+       assert(
+         minMenuWidth == null ||
+             maxMenuWidth == null ||
+             minMenuWidth <= maxMenuWidth,
+         'minMenuWidth must be less than or equal to maxMenuWidth',
+       );
 
   /// The list of items available in this dropdown.
   final List<T> items;
@@ -376,10 +376,10 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
   );
 
   /// The trailing icon turns half a revolution while the menu is open.
-  late final Animation<double> _iconRotation =
-      Tween<double>(begin: 0.0, end: 0.5).animate(
-    CurvedAnimation(parent: _menu.animation, curve: Curves.easeInOut),
-  );
+  late final Animation<double> _iconRotation = Tween<double>(
+    begin: 0.0,
+    end: 0.5,
+  ).animate(CurvedAnimation(parent: _menu.animation, curve: Curves.easeInOut));
 
   // ===== Theme =====
 
@@ -482,8 +482,9 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
 
   // ===== Search =====
 
-  late final DropdownSearchController<T> _search =
-      DropdownSearchController<T>(enabled: widget.searchable);
+  late final DropdownSearchController<T> _search = DropdownSearchController<T>(
+    enabled: widget.searchable,
+  );
 
   /// The items the menu should show right now.
   ///
@@ -495,9 +496,9 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
   /// The caller's `searchFilter` wins; failing that, the presentation supplies
   /// the default its mode can offer, and text mode is the only one that can.
   List<T> get _visibleItems => _search.visibleItems(
-        widget.items,
-        widget.searchFilter ?? _presentation.defaultSearchFilter,
-      );
+    widget.items,
+    widget.searchFilter ?? _presentation.defaultSearchFilter,
+  );
 
   /// The height occupied by the search field including margin and divider.
   double get _searchFieldHeight =>
@@ -609,9 +610,10 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
         color: Colors.transparent,
         child: InkWell(
           onTap: isEnabled ? _toggleDropdown : null,
-          mouseCursor: isEnabled
-              ? SystemMouseCursors.click
-              : SystemMouseCursors.forbidden,
+          mouseCursor:
+              isEnabled
+                  ? SystemMouseCursors.click
+                  : SystemMouseCursors.forbidden,
           borderRadius: BorderRadius.circular(style.borderRadius),
           splashColor: style.splashColor,
           highlightColor: style.highlightColor,
@@ -630,35 +632,39 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
   Widget _buildButtonContent(ResolvedButtonStyle style) {
     final effectiveContentHeight = style.contentHeight;
     final effectiveIconSize = style.iconSize;
-    final rowHeight = effectiveContentHeight > effectiveIconSize
-        ? effectiveContentHeight
-        : effectiveIconSize;
+    final rowHeight =
+        effectiveContentHeight > effectiveIconSize
+            ? effectiveContentHeight
+            : effectiveIconSize;
     final presentation = _presentation;
 
     return SizedBox(
       height: rowHeight,
       child: Row(
-        mainAxisAlignment: widget.width != null || widget.expand
-            ? MainAxisAlignment.spaceBetween
-            : MainAxisAlignment.start,
-        mainAxisSize: widget.width != null || widget.expand
-            ? MainAxisSize.max
-            : MainAxisSize.min,
+        mainAxisAlignment:
+            widget.width != null || widget.expand
+                ? MainAxisAlignment.spaceBetween
+                : MainAxisAlignment.start,
+        mainAxisSize:
+            widget.width != null || widget.expand
+                ? MainAxisSize.max
+                : MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Flexible(
             child: SizedBox(
               height: effectiveContentHeight,
-              child: widget.width != null || widget.expand
-                  ? Container(
-                      alignment: presentation.contentAlignment,
-                      child: presentation.buildSelected(),
-                    )
-                  : Align(
-                      alignment: presentation.contentAlignment,
-                      widthFactor: 1.0,
-                      child: presentation.buildSelected(),
-                    ),
+              child:
+                  widget.width != null || widget.expand
+                      ? Container(
+                        alignment: presentation.contentAlignment,
+                        child: presentation.buildSelected(),
+                      )
+                      : Align(
+                        alignment: presentation.contentAlignment,
+                        widthFactor: 1.0,
+                        child: presentation.buildSelected(),
+                      ),
             ),
           ),
           if (_showTrailing)
@@ -669,7 +675,8 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
                 child: Center(
                   child: RotationTransition(
                     turns: _iconRotation,
-                    child: widget.trailing ??
+                    child:
+                        widget.trailing ??
                         Icon(
                           style.icon,
                           size: effectiveIconSize,
@@ -713,8 +720,8 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
     // The same quantity `DropdownPlacement` grew the menu by, asked of the same
     // spec rather than re-added here. When these two disagreed, the item list
     // overflowed — twice, in 2.3.2 and again in 2.5.0.
-    final availableContentHeight =
-        (height - _buildSpec().totalChromeHeight).clamp(0.0, double.infinity);
+    final availableContentHeight = (height - _buildSpec().totalChromeHeight)
+        .clamp(0.0, double.infinity);
     final totalItemsHeight = items.length * actualItemHeight;
     final needsScroll = totalItemsHeight > availableContentHeight;
     final presentation = _presentation;
@@ -726,7 +733,8 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
       // Empty state for search with no results
       content = SizedBox(
         height: availableContentHeight,
-        child: widget.emptyBuilder?.call(_search.query) ??
+        child:
+            widget.emptyBuilder?.call(_search.query) ??
             Center(
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
@@ -799,10 +807,7 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
         );
       }
 
-      content = Column(
-        mainAxisSize: MainAxisSize.min,
-        children: itemWidgets,
-      );
+      content = Column(mainAxisSize: MainAxisSize.min, children: itemWidgets);
     }
 
     if (padding != null) {
@@ -812,10 +817,7 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
     if (widget.searchable) {
       content = Column(
         mainAxisSize: MainAxisSize.min,
-        children: [
-          _buildSearchField(),
-          Flexible(child: content),
-        ],
+        children: [_buildSearchField(), Flexible(child: content)],
       );
     }
 
@@ -896,10 +898,7 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
             width: double.infinity,
             padding: style.padding,
             decoration: style.decoration,
-            child: Align(
-              alignment: alignment,
-              child: child,
-            ),
+            child: Align(alignment: alignment, child: child),
           ),
         ),
       ),

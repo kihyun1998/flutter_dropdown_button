@@ -31,10 +31,7 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         home: Scaffold(
-          appBar: AppBar(
-            title: const Text('Title'),
-            actions: [dropdown()],
-          ),
+          appBar: AppBar(title: const Text('Title'), actions: [dropdown()]),
           body: const SizedBox.expand(),
         ),
       ),
@@ -81,10 +78,11 @@ void main() {
                 child: Overlay(
                   initialEntries: [
                     OverlayEntry(
-                      builder: (_) => Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [dropdown()],
-                      ),
+                      builder:
+                          (_) => Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [dropdown()],
+                          ),
                     ),
                   ],
                 ),
@@ -97,8 +95,11 @@ void main() {
 
     final menu = await openAndMeasureMenu(tester);
 
-    expect(menu.right, lessThanOrEqualTo(screenWidth),
-        reason: 'menu must not run off the right of the screen');
+    expect(
+      menu.right,
+      lessThanOrEqualTo(screenWidth),
+      reason: 'menu must not run off the right of the screen',
+    );
     expect(menu.left, greaterThanOrEqualTo(0));
   });
 }

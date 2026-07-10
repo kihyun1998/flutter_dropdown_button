@@ -115,18 +115,20 @@ class _ColourMenuButtonState extends State<_ColourMenuButton>
 
   late final DropdownOverlayController _menu = DropdownOverlayController(
     vsync: this,
-    spec: () => DropdownOverlaySpec(
-      itemCount: _colours.length,
-      actualItemHeight: 44,
-      maxDropdownHeight: 200,
-      borderThickness: 2,
-    ),
+    spec:
+        () => DropdownOverlaySpec(
+          itemCount: _colours.length,
+          actualItemHeight: 44,
+          maxDropdownHeight: 200,
+          borderThickness: 2,
+        ),
     contentBuilder: _buildMenu,
-    decorationBuilder: () => BoxDecoration(
-      color: Theme.of(context).cardColor,
-      borderRadius: BorderRadius.circular(8),
-      border: Border.all(color: Theme.of(context).dividerColor),
-    ),
+    decorationBuilder:
+        () => BoxDecoration(
+          color: Theme.of(context).cardColor,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: Theme.of(context).dividerColor),
+        ),
     onOpenStateChanged: (_) => setState(() {}),
   );
 

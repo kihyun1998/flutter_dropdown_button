@@ -42,8 +42,9 @@ void main() {
     expect(find.text('Cherry'), findsOneWidget);
   });
 
-  testWidgets('the selected item shows its label on the button',
-      (tester) async {
+  testWidgets('the selected item shows its label on the button', (
+    tester,
+  ) async {
     await tester.pumpWidget(
       host(
         FlutterDropdownButton<Fruit>.text(
@@ -60,8 +61,9 @@ void main() {
     expect(find.text('Pick a fruit'), findsNothing);
   });
 
-  testWidgets('search filters by label with no searchFilter supplied',
-      (tester) async {
+  testWidgets('search filters by label with no searchFilter supplied', (
+    tester,
+  ) async {
     await tester.pumpWidget(
       host(
         FlutterDropdownButton<Fruit>.text(
@@ -83,8 +85,9 @@ void main() {
     expect(find.text('Cherry'), findsNothing);
   });
 
-  testWidgets('omitting label for a non-String T fails immediately',
-      (tester) async {
+  testWidgets('omitting label for a non-String T fails immediately', (
+    tester,
+  ) async {
     await tester.pumpWidget(
       host(
         FlutterDropdownButton<int>.text(

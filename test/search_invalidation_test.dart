@@ -21,8 +21,9 @@ class Fruit {
 
 void main() {
   group('search survives a parent rebuild', () {
-    testWidgets('typed query is kept when items arrive as a fresh list',
-        (tester) async {
+    testWidgets('typed query is kept when items arrive as a fresh list', (
+      tester,
+    ) async {
       late StateSetter rebuildParent;
 
       await tester.pumpWidget(
@@ -60,8 +61,9 @@ void main() {
       expect(searchFieldText(tester), 'App');
     });
 
-    testWidgets('an item added in place shows up on the next open',
-        (tester) async {
+    testWidgets('an item added in place shows up on the next open', (
+      tester,
+    ) async {
       final items = <String>['Apple', 'Banana'];
       late StateSetter rebuildParent;
 
@@ -150,8 +152,10 @@ void main() {
                     itemBuilder: (fruit, _) => Text(fruit.name),
                     hintWidget: const Text('Pick a fruit'),
                     searchable: true,
-                    searchFilter: (fruit, query) =>
-                        fruit.name.toLowerCase().contains(query.toLowerCase()),
+                    searchFilter:
+                        (fruit, query) => fruit.name.toLowerCase().contains(
+                          query.toLowerCase(),
+                        ),
                     onChanged: (_) {},
                   );
                 },
@@ -174,8 +178,9 @@ void main() {
   });
 
   group('search is still cleared where it should be', () {
-    testWidgets('reopening the dropdown starts from an empty query',
-        (tester) async {
+    testWidgets('reopening the dropdown starts from an empty query', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(

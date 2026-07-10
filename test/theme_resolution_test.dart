@@ -79,28 +79,30 @@ void main() {
       expect(decoration.border, isNull, reason: 'the override replaces all');
     });
 
-    testWidgets('disabledBackgroundColor and disabledBorder build one together',
-        (tester) async {
-      await tester.pumpWidget(
-        host(
-          dropdown(
-            enabled: false,
-            theme: DropdownStyleTheme(
-              dropdown: DropdownTheme(
-                disabledBackgroundColor: green,
-                disabledBorder: Border.all(color: red),
-                borderRadius: 12,
+    testWidgets(
+      'disabledBackgroundColor and disabledBorder build one together',
+      (tester) async {
+        await tester.pumpWidget(
+          host(
+            dropdown(
+              enabled: false,
+              theme: DropdownStyleTheme(
+                dropdown: DropdownTheme(
+                  disabledBackgroundColor: green,
+                  disabledBorder: Border.all(color: red),
+                  borderRadius: 12,
+                ),
               ),
             ),
           ),
-        ),
-      );
+        );
 
-      final decoration = buttonDecoration(tester);
-      expect(decoration.color, green);
-      expect((decoration.border! as Border).top.color, red);
-      expect(decoration.borderRadius, BorderRadius.circular(12));
-    });
+        final decoration = buttonDecoration(tester);
+        expect(decoration.color, green);
+        expect((decoration.border! as Border).top.color, red);
+        expect(decoration.borderRadius, BorderRadius.circular(12));
+      },
+    );
 
     testWidgets('disabledBorder falls back to border', (tester) async {
       await tester.pumpWidget(
@@ -121,23 +123,24 @@ void main() {
     });
 
     testWidgets(
-        'with no disabled styling at all, the enabled decoration stands',
-        (tester) async {
-      await tester.pumpWidget(
-        host(
-          dropdown(
-            enabled: false,
-            theme: DropdownStyleTheme(
-              dropdown: DropdownTheme(border: Border.all(color: blue)),
+      'with no disabled styling at all, the enabled decoration stands',
+      (tester) async {
+        await tester.pumpWidget(
+          host(
+            dropdown(
+              enabled: false,
+              theme: DropdownStyleTheme(
+                dropdown: DropdownTheme(border: Border.all(color: blue)),
+              ),
             ),
           ),
-        ),
-      );
+        );
 
-      final decoration = buttonDecoration(tester);
-      expect(decoration.color, isNull);
-      expect((decoration.border! as Border).top.color, blue);
-    });
+        final decoration = buttonDecoration(tester);
+        expect(decoration.color, isNull);
+        expect((decoration.border! as Border).top.color, blue);
+      },
+    );
   });
 
   group('item decoration', () {
@@ -180,8 +183,9 @@ void main() {
       expect(decorations[2].border, isNull, reason: 'excludeLastItemBorder');
     });
 
-    testWidgets('excludeLastItemBorder false keeps the last border',
-        (tester) async {
+    testWidgets('excludeLastItemBorder false keeps the last border', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         host(
           dropdown(

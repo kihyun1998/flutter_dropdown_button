@@ -50,8 +50,9 @@ CustomItemPresentation<T> custom<T>({
 void main() {
   group('content alignment', () {
     Alignment alignmentFor(TextAlign textAlign) =>
-        text<String>(config: TextDropdownConfig(textAlign: textAlign))
-            .contentAlignment;
+        text<String>(
+          config: TextDropdownConfig(textAlign: textAlign),
+        ).contentAlignment;
 
     test('text mode follows the configured textAlign', () {
       expect(alignmentFor(TextAlign.center), Alignment.center);
@@ -63,8 +64,10 @@ void main() {
     });
 
     test('custom mode is always left, whatever the text config says', () {
-      expect(custom<String>(items: const ['a']).contentAlignment,
-          Alignment.centerLeft);
+      expect(
+        custom<String>(items: const ['a']).contentAlignment,
+        Alignment.centerLeft,
+      );
     });
   });
 
@@ -88,13 +91,18 @@ void main() {
     });
 
     test('any other T goes through the callback', () {
-      expect(text<Fruit>(label: (f) => f.name).labelOf(const Fruit('Kiwi')),
-          'Kiwi');
+      expect(
+        text<Fruit>(label: (f) => f.name).labelOf(const Fruit('Kiwi')),
+        'Kiwi',
+      );
     });
 
     test('a non-String T without a label fails at construction', () {
-      expect(() => text<Fruit>(), throwsAssertionError,
-          reason: 'the invariant .text() promises, checked where it lives');
+      expect(
+        () => text<Fruit>(),
+        throwsAssertionError,
+        reason: 'the invariant .text() promises, checked where it lives',
+      );
     });
   });
 
@@ -111,7 +119,9 @@ void main() {
 
     test('no value and no hint widget draws nothing', () {
       expect(
-          custom<String>(items: const ['a']).buildSelected(), isA<SizedBox>());
+        custom<String>(items: const ['a']).buildSelected(),
+        isA<SizedBox>(),
+      );
     });
 
     test('selectedBuilder wins over itemBuilder for the button face', () {

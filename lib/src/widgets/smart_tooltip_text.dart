@@ -107,10 +107,7 @@ class SmartTooltipText extends StatelessWidget {
           maxWidth: constraints.maxWidth,
         );
 
-        return _buildWithTooltip(
-          context: context,
-          showTooltip: isOverflowing,
-        );
+        return _buildWithTooltip(context: context, showTooltip: isOverflowing);
       },
     );
   }

@@ -41,11 +41,11 @@ class DropdownScrollTheme {
     this.gradientHeight,
     this.gradientColors,
   }) : assert(
-          !(trackVisibility == true && thumbVisibility == false),
-          'A scrollbar track cannot be drawn without a thumb.\n'
-          'Either drop `thumbVisibility: false`, in which case the thumb is '
-          'shown alongside the track, or drop `trackVisibility: true`.',
-        );
+         !(trackVisibility == true && thumbVisibility == false),
+         'A scrollbar track cannot be drawn without a thumb.\n'
+         'Either drop `thumbVisibility: false`, in which case the thumb is '
+         'shown alongside the track, or drop `trackVisibility: true`.',
+       );
 
   /// Thickness of the scrollbar — both its thumb and its track.
   ///
@@ -238,7 +238,8 @@ class DropdownScrollTheme {
           thumbVisibility ?? (trackVisibility == true ? true : null),
       trackVisibility: trackVisibility,
       interactive: interactive,
-      overridesScrollbarTheme: thumbColor != null ||
+      overridesScrollbarTheme:
+          thumbColor != null ||
           trackColor != null ||
           trackBorderColor != null ||
           crossAxisMargin != null ||
