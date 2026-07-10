@@ -292,7 +292,7 @@ Controls scrollbar appearance inside the dropdown overlay.
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
 | `thumbWidth` | `double?` | `null` | Width of the scrollbar thumb |
-| `trackWidth` | `double?` | `null` | Width of the scrollbar track |
+| `trackWidth` | `double?` | `null` | **Deprecated** — never applied; Flutter draws the track at the thumb thickness. Removed in 4.0.0 |
 | `radius` | `Radius?` | `null` | Corner radius of scrollbar thumb |
 | `thumbColor` | `Color?` | `null` | Color of the scrollbar thumb |
 | `trackColor` | `Color?` | `null` | Color of the scrollbar track |

@@ -927,111 +927,22 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
   // ===== Scrollbar =====
 
   Widget _applyScrollbarTheme(Widget content, DropdownScrollTheme scrollTheme) {
-    if (scrollTheme.resolve().hasCustomWidths) {
-      return _buildCustomScrollbar(content, scrollTheme);
-    }
+    final style = scrollTheme.resolve();
 
-    Widget scrollbarWidget = Scrollbar(
+    final scrollbar = Scrollbar(
       controller: _scrollController,
-      thickness: scrollTheme.thickness,
-      radius: scrollTheme.radius,
-      thumbVisibility: scrollTheme.thumbVisibility,
-      trackVisibility: scrollTheme.trackVisibility,
-      interactive: scrollTheme.interactive,
+      thickness:
+          style.hasCustomWidths ? style.thumbWidth : scrollTheme.thickness,
+      radius: style.radius,
+      thumbVisibility: style.thumbVisibility,
+      trackVisibility: style.trackVisibility,
+      interactive: style.interactive,
       child: content,
     );
 
-    if (scrollTheme.thumbColor != null ||
-        scrollTheme.trackColor != null ||
-        scrollTheme.trackBorderColor != null ||
-        scrollTheme.crossAxisMargin != null ||
-        scrollTheme.mainAxisMargin != null ||
-        scrollTheme.minThumbLength != null) {
-      return ScrollbarTheme(
-        data: ScrollbarThemeData(
-          thumbColor: scrollTheme.thumbColor != null
-              ? WidgetStateProperty.all(scrollTheme.thumbColor)
-              : null,
-          trackColor: scrollTheme.trackColor != null
-              ? WidgetStateProperty.all(scrollTheme.trackColor)
-              : null,
-          trackBorderColor: scrollTheme.trackBorderColor != null
-              ? WidgetStateProperty.all(scrollTheme.trackBorderColor)
-              : null,
-          crossAxisMargin: scrollTheme.crossAxisMargin,
-          mainAxisMargin: scrollTheme.mainAxisMargin,
-          minThumbLength: scrollTheme.minThumbLength,
-        ),
-        child: scrollbarWidget,
-      );
-    }
+    if (!style.overridesScrollbarTheme) return scrollbar;
 
-    return scrollbarWidget;
-  }
-
-  Widget _buildCustomScrollbar(
-    Widget child,
-    DropdownScrollTheme scrollTheme,
-  ) {
-    final resolved = scrollTheme.resolve();
-    final double effectiveThumbWidth = resolved.thumbWidth;
-    final double effectiveTrackWidth = resolved.trackWidth;
-
-    final scrollbarThemeData = ScrollbarThemeData(
-      thumbColor: scrollTheme.thumbColor != null
-          ? WidgetStateProperty.all(scrollTheme.thumbColor)
-          : null,
-      trackColor: scrollTheme.trackColor != null
-          ? WidgetStateProperty.all(scrollTheme.trackColor)
-          : null,
-      trackBorderColor: scrollTheme.trackBorderColor != null
-          ? WidgetStateProperty.all(scrollTheme.trackBorderColor)
-          : null,
-      thickness: WidgetStateProperty.all(effectiveThumbWidth),
-      radius: scrollTheme.radius,
-      crossAxisMargin: scrollTheme.crossAxisMargin,
-      mainAxisMargin: scrollTheme.mainAxisMargin,
-      minThumbLength: scrollTheme.minThumbLength,
-    );
-
-    if (effectiveTrackWidth != effectiveThumbWidth &&
-        scrollTheme.trackVisibility == true) {
-      return ScrollbarTheme(
-        data: scrollbarThemeData.copyWith(
-          trackColor: scrollTheme.trackColor != null
-              ? WidgetStateProperty.all(scrollTheme.trackColor)
-              : null,
-        ),
-        child: RawScrollbar(
-          controller: _scrollController,
-          thickness: effectiveThumbWidth,
-          radius: scrollTheme.radius,
-          thumbVisibility: resolved.thumbVisibility,
-          trackVisibility: resolved.trackVisibility,
-          interactive: resolved.interactive,
-          thumbColor: scrollTheme.thumbColor,
-          trackColor: scrollTheme.trackColor,
-          trackBorderColor: scrollTheme.trackBorderColor,
-          crossAxisMargin: resolved.crossAxisMargin,
-          mainAxisMargin: resolved.mainAxisMargin,
-          minThumbLength: resolved.minThumbLength,
-          child: child,
-        ),
-      );
-    }
-
-    return ScrollbarTheme(
-      data: scrollbarThemeData,
-      child: Scrollbar(
-        controller: _scrollController,
-        thickness: effectiveThumbWidth,
-        radius: scrollTheme.radius,
-        thumbVisibility: scrollTheme.thumbVisibility,
-        trackVisibility: scrollTheme.trackVisibility,
-        interactive: scrollTheme.interactive,
-        child: child,
-      ),
-    );
+    return ScrollbarTheme(data: style.scrollbarTheme, child: scrollbar);
   }
 
   // ===== Scroll gradients =====

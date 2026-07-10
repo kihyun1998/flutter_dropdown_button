@@ -154,7 +154,6 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
   // ── DropdownScrollTheme ─────────────────────────────────────────────────
   bool _dstEnabled = false;
   double? _dstThumbWidth;
-  double? _dstTrackWidth;
   double? _dstRadius;
   Color? _dstThumbColor;
   Color? _dstTrackColor;
@@ -302,7 +301,6 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
       scroll: _dstEnabled
           ? DropdownScrollTheme(
               thumbWidth: _dstThumbWidth,
-              trackWidth: _dstTrackWidth,
               radius: _dstRadius != null ? Radius.circular(_dstRadius!) : null,
               thumbColor: _dstThumbColor,
               trackColor: _dstTrackColor,
@@ -1518,14 +1516,6 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
             2,
             20,
             (v) => setState(() => _dstThumbWidth = v),
-            enableDefault: 8,
-          ),
-          _optionalSliderRow(
-            'trackWidth',
-            _dstTrackWidth,
-            2,
-            20,
-            (v) => setState(() => _dstTrackWidth = v),
             enableDefault: 8,
           ),
           _optionalSliderRow(
