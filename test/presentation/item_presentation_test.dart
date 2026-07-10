@@ -39,7 +39,8 @@ CustomItemPresentation<T> custom<T>({
   Widget? hintWidget,
 }) {
   return CustomItemPresentation<T>(
-    itemBuilder: (item, isSelected) => Text('$item'),
+    // The flag is in the text so a caller can see which one it was handed.
+    itemBuilder: (item, isSelected) => Text('$item/$isSelected'),
     items: items,
     value: value,
     selectedBuilder: selectedBuilder,
@@ -131,6 +132,23 @@ void main() {
       );
 
       expect((presentation.buildSelected() as Text).data, 'face:a');
+    });
+
+    test('without selectedBuilder, itemBuilder draws the face as selected', () {
+      final presentation = custom<String>(items: const ['a'], value: 'a');
+
+      expect(
+        (presentation.buildSelected() as Text).data,
+        'a/true',
+        reason: 'the button face is the item, and the item is the chosen one',
+      );
+    });
+
+    test('an item row is drawn unselected unless it is the value', () {
+      final presentation = custom<String>(items: const ['a', 'b'], value: 'a');
+
+      expect((presentation.buildItem('a', true) as Text).data, 'a/true');
+      expect((presentation.buildItem('b', false) as Text).data, 'b/false');
     });
   });
 }
