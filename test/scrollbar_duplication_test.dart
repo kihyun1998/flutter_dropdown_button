@@ -200,4 +200,36 @@ void main() {
       expect(controller.offset, 0, reason: 'nobody may drag this thumb');
     });
   });
+
+  // Guard, not a regression test: this passed before the docs were corrected.
+  //
+  // It pins the claim `interactive`'s dartdoc now makes. `Scrollbar` resolves a
+  // null `interactive` to `!_useAndroidScrollbar` (material/scrollbar.dart:218),
+  // so on desktop the thumb is draggable — the opposite of what the doc used to
+  // say. One gesture per test: an earlier drag wakes the thumb and the next one
+  // lands on it.
+  testWidgets('interactive: null leaves the thumb draggable on desktop', (
+    tester,
+  ) async {
+    await on(TargetPlatform.windows, () async {
+      await openMenu(tester, const DropdownScrollTheme(thumbVisibility: true));
+
+      final controller = tester
+          .widget<ListView>(find.byType(ListView))
+          .controller!;
+      final box = tester.getRect(find.byType(ListView));
+
+      await tester.dragFrom(
+        Offset(box.right - 2, box.top + 5),
+        const Offset(0, 40),
+      );
+      await tester.pumpAndSettle();
+
+      expect(
+        controller.offset,
+        greaterThan(0),
+        reason: 'null means "ask the ambient theme", and it says draggable',
+      );
+    });
+  });
 }

@@ -69,4 +69,31 @@ void main() {
     expect(tester.widget<Scrollbar>(find.byType(Scrollbar)).thickness, 6);
     expect(tester.takeException(), isNull);
   });
+
+  // Guard, not a regression test: this passed before the docs were corrected.
+  //
+  // A track colour is a colour, not a request for a track. `Scrollbar` paints
+  // the track only when `showScrollbar && trackVisibility` — the colour is
+  // resolved to transparent otherwise (material/scrollbar.dart:274).
+  //
+  // Pinned because "you named a track colour, so you want a track" is the
+  // tempting fix, and it would grow a track — and an always-visible thumb —
+  // under every app that names one. Implementing it must break this test.
+  testWidgets('a track colour alone does not ask for a track', (tester) async {
+    await openMenu(tester, const DropdownScrollTheme(trackColor: Colors.red));
+
+    final scrollbar = tester.widget<Scrollbar>(find.byType(Scrollbar));
+    expect(scrollbar.trackVisibility, isNull);
+    expect(scrollbar.thumbVisibility, isNull);
+
+    final data = tester
+        .widget<ScrollbarTheme>(find.byType(ScrollbarTheme))
+        .data;
+    expect(
+      data.trackColor!.resolve({}),
+      Colors.red,
+      reason:
+          'the colour is forwarded; it is Flutter that declines to paint it',
+    );
+  });
 }
