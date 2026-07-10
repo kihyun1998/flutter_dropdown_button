@@ -1,5 +1,14 @@
 # Changelog
 
+## 3.0.1
+
+* **FIX**: The menu drew **two scrollbars** on desktop. `MaterialScrollBehavior` wraps every scroll view in a `Scrollbar` of its own, and this package added a second on top without suppressing it. The one underneath answered to nothing `DropdownScrollTheme` says. The list is now wrapped in `ScrollConfiguration(scrollbars: false)`
+* **FIX**: The scrollbar swelled from 8 to 12 logical pixels while a pointer hovered a visible track. Flutter does that to any `Scrollbar` handed no `thickness` (`material/scrollbar.dart:303`), and this package handed it `null` whenever the caller named neither `thickness` nor `thumbWidth` — `trackVisibility: true` alone was enough. The menu now passes the thickness the bar would have rested at anyway, so it looks the same at rest and no longer swells
+* **FIX**: A dropdown given **no `DropdownScrollTheme` at all** never applied a scrollbar of its own; the menu fell through entirely to Flutter's automatic one, unstyleable and swelling. `scroll` now falls back to `DropdownScrollTheme.defaultTheme`, the way `dropdown`, `tooltip` and `search` always have
+* **CHANGE**: `DropdownScrollTheme.thickness`'s dartdoc promised a flat `8.0` fallback. Flutter's default is **8 on desktop and 4 on Android**; honouring that doc would have doubled the bar on every Android build. The resting thickness now comes from the ambient `ScrollbarTheme` first, then from Flutter's own platform default. The doc now says what the code does
+* **CHANGE**: `ResolvedScrollStyle.hasCustomWidths` is informational. `thickness` carries the answer it used to gate, and nothing in the package branches on it
+* **TEST**: 222 tests, up from 207, still at 100% line coverage. Fifteen new ones drive the scrollbar across `windows`, `macOS`, `linux` and `android`
+
 ## 3.0.0
 
 Removes everything deprecated during the 2.x line, plus one field that was never deprecated because nobody noticed it did nothing. Nothing was renamed — every removed member already had a replacement that was doing the work. **If you only ever used `FlutterDropdownButton`, what changes for you is that `semanticsLabel` starts working, a visible scrollbar track stops crashing, and the scroll fades point the right way.**
