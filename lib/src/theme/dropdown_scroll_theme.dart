@@ -13,10 +13,20 @@ import 'resolved_dropdown_style.dart';
 ///   thickness: 8.0,
 ///   radius: Radius.circular(4.0),
 ///   thumbColor: Colors.grey,
-///   trackColor: Colors.grey.withOpacity(0.2),
+///   trackColor: Colors.grey.withValues(alpha: 0.2),
 ///   thumbVisibility: true,
+///   trackVisibility: true,
 /// )
 /// ```
+///
+/// **A colour is not a request.** [trackColor] and [trackBorderColor] say what
+/// the track looks like once it is drawn; [trackVisibility] is what draws it.
+/// Naming a track colour and leaving [trackVisibility] null paints nothing.
+///
+/// **Null is not "off".** Every `bool?` here defaults to null, which means *let
+/// the ambient `ScrollbarTheme` decide, and failing that Flutter*. For
+/// [interactive] that resolves to **draggable** on desktop, not to "display
+/// only". Pass `false` when you mean off.
 class DropdownScrollTheme {
   /// Creates a dropdown scroll theme configuration.
   const DropdownScrollTheme({
@@ -65,44 +75,65 @@ class DropdownScrollTheme {
 
   /// Radius of the scrollbar thumb corners.
   ///
-  /// If null, uses the default scrollbar radius.
-  /// Makes the scrollbar thumb rounded at the corners.
+  /// If null, the ambient `ScrollbarTheme` decides, and failing that Flutter's
+  /// own default: **`Radius.circular(8)` on desktop, square on Android.**
   final Radius? radius;
 
-  /// Color of the scrollbar thumb.
+  /// Color of the scrollbar thumb — the draggable part.
   ///
-  /// If null, uses the theme's default scrollbar color.
-  /// The thumb is the draggable part of the scrollbar.
+  /// If null, the ambient `ScrollbarTheme` decides, and failing that Flutter's
+  /// own default, which fades between an idle and a hovered shade.
   final Color? thumbColor;
 
-  /// Color of the scrollbar track.
+  /// Color of the scrollbar track — the channel the thumb slides along.
   ///
-  /// If null, no track is displayed.
-  /// The track is the background area behind the thumb.
+  /// **Only drawn when [trackVisibility] is true.** A colour on its own paints
+  /// nothing: Flutter resolves the track's colour to transparent whenever the
+  /// track is hidden, and the track is hidden by default.
+  ///
+  /// If null while the track *is* visible, the ambient `ScrollbarTheme`
+  /// decides, and failing that Flutter tints it from `ColorScheme.onSurface`.
   final Color? trackColor;
 
-  /// Color of the scrollbar track border.
+  /// Color of the outline around the scrollbar track.
   ///
-  /// If null, no track border is displayed.
-  /// Creates an outline around the scrollbar track.
+  /// **Only drawn when [trackVisibility] is true**, on the same terms as
+  /// [trackColor].
   final Color? trackBorderColor;
 
-  /// Whether the scrollbar thumb should be visible.
+  /// Whether the thumb stays visible once scrolling stops.
   ///
-  /// If false, hides the scrollbar thumb.
-  /// If true or null, shows the thumb when appropriate.
+  /// If **true**, the thumb is pinned on screen.
+  ///
+  /// If **false or null** — these behave identically — the thumb fades in while
+  /// the list scrolls and fades out shortly after it stops. Neither value hides
+  /// it outright.
+  ///
+  /// Setting [trackVisibility] to true raises this to true, because Flutter
+  /// cannot draw a track without a thumb.
   final bool? thumbVisibility;
 
-  /// Whether the scrollbar track should be visible.
+  /// Whether the track is drawn behind the thumb.
   ///
-  /// If false, hides the scrollbar track.
-  /// If true or null, shows the track when scrollbar is visible.
+  /// If **null**, the ambient `ScrollbarTheme` decides, and failing that
+  /// Flutter's own default: **false**. There is no track, and [trackColor] and
+  /// [trackBorderColor] paint nothing.
+  ///
+  /// If **true**, the track is drawn and [thumbVisibility] is raised to true
+  /// along with it, because Flutter cannot draw a track without a thumb.
+  ///
+  /// Flutter widens a thickness-less scrollbar from 8 to 12 while a pointer
+  /// hovers a visible track. The menu hands `Scrollbar` a concrete [thickness]
+  /// whatever this theme says, so the bar keeps its width. Nothing to do here.
   final bool? trackVisibility;
 
-  /// Whether the scrollbar can be interacted with.
+  /// Whether the user may drag the thumb.
   ///
-  /// If true, users can drag the scrollbar thumb to scroll.
-  /// If false or null, the scrollbar is for display only.
+  /// If **null**, the ambient `ScrollbarTheme` decides, and failing that
+  /// Flutter's own default, which is **draggable on desktop** and not on
+  /// Android. Null does not mean "display only".
+  ///
+  /// Pass **false** for a scrollbar that is drawn but cannot be grabbed.
   final bool? interactive;
 
   /// The margin around the scrollbar's cross axis.
@@ -148,8 +179,8 @@ class DropdownScrollTheme {
   /// ```dart
   /// gradientColors: [
   ///   Colors.white,
-  ///   Colors.white.withOpacity(0.5),
-  ///   Colors.white.withOpacity(0.0),
+  ///   Colors.white.withValues(alpha: 0.5),
+  ///   Colors.white.withValues(alpha: 0.0),
   /// ]
   /// ```
   ///

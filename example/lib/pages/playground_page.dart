@@ -160,7 +160,10 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
   Color? _dstTrackBorderColor;
   bool _dstThumbVisibility = false;
   bool _dstTrackVisibility = false;
-  bool _dstInteractive = false;
+
+  // Matches what a null `interactive` resolves to on desktop. Starting at
+  // `false` shipped a demo whose scrollbar could not be dragged.
+  bool _dstInteractive = true;
   bool _dstShowScrollGradient = false;
   double _dstGradientHeight = 24.0;
 

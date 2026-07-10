@@ -293,19 +293,23 @@ Controls scrollbar appearance inside the dropdown overlay.
 |-----------|------|---------|-------------|
 | `thumbWidth` | `double?` | `null` | Width of the scrollbar. Wins over `thickness` |
 | `thickness` | `double?` | `null` | Thickness of the scrollbar. Unset, the ambient `ScrollbarTheme` decides, then Flutter's own default — **8 on desktop, 4 on Android** |
-| `radius` | `Radius?` | `null` | Corner radius of scrollbar thumb |
+| `radius` | `Radius?` | `null` | Corner radius of scrollbar thumb. Unset, `Radius.circular(8)` on desktop and square on Android |
 | `thumbColor` | `Color?` | `null` | Color of the scrollbar thumb |
-| `trackColor` | `Color?` | `null` | Color of the scrollbar track |
-| `trackBorderColor` | `Color?` | `null` | Border color of the scrollbar track |
-| `thumbVisibility` | `bool?` | `null` | Show/hide scrollbar thumb |
-| `trackVisibility` | `bool?` | `null` | Show/hide scrollbar track |
-| `interactive` | `bool?` | `null` | Allow dragging the scrollbar thumb |
+| `trackColor` | `Color?` | `null` | Color of the scrollbar track. **Paints nothing unless `trackVisibility` is `true`** |
+| `trackBorderColor` | `Color?` | `null` | Border color of the scrollbar track, on the same terms as `trackColor` |
+| `thumbVisibility` | `bool?` | `null` | `true` pins the thumb on screen. `false` and `null` behave alike: it fades in while scrolling and fades out |
+| `trackVisibility` | `bool?` | `null` | `true` draws the track and pins the thumb with it. Unset, there is **no track** |
+| `interactive` | `bool?` | `null` | `false` makes the thumb undraggable. Unset, Flutter decides — **draggable on desktop**, not on Android |
 | `crossAxisMargin` | `double?` | `null` | Margin from edge of scroll view |
 | `mainAxisMargin` | `double?` | `null` | Margin at top/bottom of scrollbar |
 | `minThumbLength` | `double?` | `null` | Minimum length of scrollbar thumb |
 | `showScrollGradient` | `bool?` | `false` | Show fade gradient when scrollable |
 | `gradientHeight` | `double?` | `24.0` | Height of gradient effect |
 | `gradientColors` | `List<Color>?` | `null` | Custom gradient colors (auto-detects from background if `null`) |
+
+> A colour is not a request. `trackColor` describes the track; `trackVisibility`
+> is what draws it. A `null` `bool?` means *let the ambient `ScrollbarTheme`
+> decide* — not *off*.
 
 ### DropdownTooltipTheme
 
