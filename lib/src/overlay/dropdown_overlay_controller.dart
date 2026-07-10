@@ -75,11 +75,7 @@ class DropdownOverlaySpec {
 
   /// Everything in the overlay that is not an item.
   double get totalChromeHeight =>
-      chromeHeight +
-      borderThickness +
-      (overlayPadding == null
-          ? 0.0
-          : overlayPadding!.top + overlayPadding!.bottom);
+      chromeHeight + borderThickness + (overlayPadding?.vertical ?? 0.0);
 }
 
 /// Supplies a fresh [DropdownOverlaySpec] each time the overlay builds.

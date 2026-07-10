@@ -122,14 +122,17 @@ class TextItemPresentation<T> implements DropdownItemPresentation<T> {
       (item, query) =>
           labelOf(item).toLowerCase().contains(query.toLowerCase());
 
-  @override
-  Widget buildItem(T item, bool isSelected) {
-    final text = SmartTooltipText(
-      text: labelOf(item),
+  /// One run of text under this theme's rules.
+  ///
+  /// Every caller shares the same eight `config` pass-throughs; only the string
+  /// and its style differ. Writing them out twice is how `semanticsLabel` came
+  /// to reach the items and not the button. [style] is passed through verbatim:
+  /// a null style is a decision, not a gap.
+  SmartTooltipText _text(String text, TextStyle? style) {
+    return SmartTooltipText(
+      text: text,
       tooltipTheme: tooltipTheme,
-      style: isSelected
-          ? config.selectedTextStyle ?? config.textStyle
-          : config.textStyle,
+      style: style,
       textAlign: config.textAlign,
       maxLines: config.maxLines,
       overflow: config.overflow,
@@ -137,6 +140,16 @@ class TextItemPresentation<T> implements DropdownItemPresentation<T> {
       textDirection: config.textDirection,
       locale: config.locale,
       textScaler: config.textScaler,
+    );
+  }
+
+  @override
+  Widget buildItem(T item, bool isSelected) {
+    final text = _text(
+      labelOf(item),
+      isSelected
+          ? config.selectedTextStyle ?? config.textStyle
+          : config.textStyle,
     );
 
     // `config.semanticsLabel` deliberately does not reach here. `Text`'s
@@ -159,18 +172,7 @@ class TextItemPresentation<T> implements DropdownItemPresentation<T> {
               config.disabledTextStyle)
         : baseStyle;
 
-    final text = SmartTooltipText(
-      text: displayText,
-      tooltipTheme: tooltipTheme,
-      style: resolvedStyle,
-      textAlign: config.textAlign,
-      maxLines: config.maxLines,
-      overflow: config.overflow,
-      softWrap: config.softWrap,
-      textDirection: config.textDirection,
-      locale: config.locale,
-      textScaler: config.textScaler,
-    );
+    final text = _text(displayText, resolvedStyle);
 
     // The hint never takes a leading widget; only a chosen item does.
     final face = _withLeading(
