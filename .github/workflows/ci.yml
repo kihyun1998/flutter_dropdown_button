@@ -52,7 +52,7 @@ jobs:
       # under a threshold. Raise it when the number rises; never lower it to
       # make a red build green.
       - name: Coverage floor
-        run: dart run tool/check_coverage.dart --min 93.3 --report
+        run: dart run tool/check_coverage.dart --min 100 --report
 
       - name: Analyze the example
         working-directory: example

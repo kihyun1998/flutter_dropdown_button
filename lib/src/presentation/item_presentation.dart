@@ -96,11 +96,19 @@ class TextItemPresentation<T> implements DropdownItemPresentation<T> {
   /// The text [item] displays.
   ///
   /// Uses [label] when given. Without it, `T` must be [String].
+  ///
+  /// The throw below is a **release-mode guard**, and is unreachable in debug.
+  /// It fires when `label == null && item is! String`, which is exactly the
+  /// condition this class's constructor asserts against — and asserts are
+  /// compiled out of release builds. Coverage for it is therefore always zero,
+  /// and that is not a reason to delete it: without it a release build would
+  /// carry on with no label and fail somewhere less legible.
   String labelOf(T item) {
     final extract = label;
     if (extract != null) return extract(item);
     if (item is String) return item;
 
+    // coverage:ignore-start
     throw FlutterError(
       'FlutterDropdownButton<$T>.text() needs a `label` callback.\n'
       'Text mode renders items as text, so it must know how to turn a $T '
@@ -111,6 +119,7 @@ class TextItemPresentation<T> implements DropdownItemPresentation<T> {
       '  )\n\n'
       '`label` may only be omitted when T is String.',
     );
+    // coverage:ignore-end
   }
 
   @override
