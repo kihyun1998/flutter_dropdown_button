@@ -29,3 +29,7 @@ migrate_working_dir/
 .flutter-plugins
 .flutter-plugins-dependencies
 build/
+
+# Coverage output. Must stay ignored: pub uses .gitignore to build the
+# archive (there is no root .pubignore), and a shipped archive cannot be undone.
+coverage/
