@@ -189,6 +189,41 @@ void main() {
     );
   });
 
+  testWidgets('a leading icon reaches the menu rows, before the label', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: Center(
+            child: FlutterMultiSelectDropdown<String>(
+              width: 260,
+              items: const ['Apple', 'Banana'],
+              selected: const {},
+              labelBuilder: (s) => 'pick',
+              itemLeadingBuilder: (item) => const Icon(Icons.star),
+              itemTrailingBuilder: (item) => const Text('12'),
+              onChanged: (_) {},
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.tap(find.byType(FlutterMultiSelectDropdown<String>));
+    await tester.pumpAndSettle();
+
+    expect(find.byIcon(Icons.star), findsNWidgets(2), reason: 'one per row');
+
+    final box = tester.getTopLeft(find.byType(Checkbox).first).dx;
+    final icon = tester.getTopLeft(find.byIcon(Icons.star).first).dx;
+    final label = tester.getTopLeft(find.text('Apple')).dx;
+    final count = tester.getTopLeft(find.text('12').first).dx;
+
+    expect(box, lessThan(icon));
+    expect(icon, lessThan(label));
+    expect(label, lessThan(count));
+  });
+
   testWidgets('closeAll shuts a checklist too', (tester) async {
     await tester.pumpWidget(const Harness());
     await openMenu(tester);

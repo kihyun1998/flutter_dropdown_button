@@ -50,6 +50,7 @@ class FlutterMultiSelectDropdown<T> extends StatelessWidget {
     required this.onChanged,
     required this.labelBuilder,
     this.label,
+    this.itemLeadingBuilder,
     this.itemTrailingBuilder,
     this.config,
     this.theme,
@@ -87,6 +88,16 @@ class FlutterMultiSelectDropdown<T> extends StatelessWidget {
   /// Turns an item into the string its row shows. Required unless `T` is
   /// [String].
   final String Function(T item)? label;
+
+  /// Drawn between the checkbox and the label — an icon that varies by item.
+  ///
+  /// A builder rather than one widget: the reason to want it is that each value
+  /// looks different. Only the label gives way when the row runs out of room,
+  /// so a long label ellipsises and the icon does not shrink.
+  ///
+  /// The row's ink well merges its descendants' semantics, so a widget that
+  /// carries text is announced as part of the row. An `Icon` carries none.
+  final Widget Function(T item)? itemLeadingBuilder;
 
   /// Drawn at the end of each row — a count, a badge.
   ///
@@ -175,6 +186,7 @@ class FlutterMultiSelectDropdown<T> extends StatelessWidget {
         config: config ?? TextDropdownConfig.defaultConfig,
         tooltipTheme: theme?.tooltip ?? DropdownTooltipTheme.defaultTheme,
         enabled: enabled,
+        itemLeadingBuilder: itemLeadingBuilder,
         itemTrailingBuilder: itemTrailingBuilder,
       ),
       // What multi-selection means, said once.

@@ -156,6 +156,7 @@ FlutterMultiSelectDropdown<String>(
     _ => '${s.length} selected',
   },
   searchable: true,                        // when the list runs long
+  itemLeadingBuilder: (v) => Icon(osIcon[v]),
   itemTrailingBuilder: (v) => Text('${counts[v]}'),
   onChanged: (next) => setState(() => chosen = next),
 )
@@ -250,6 +251,7 @@ both, where single-select's `value == item` needed only the first.
 | **`onChanged`** | `ValueChanged<Set<T>>` | **required** | Called with a **new** `Set` the moment a row is tapped |
 | **`labelBuilder`** | `String Function(Set<T>)` | **required** | Turns `selected` into the button's face |
 | `label` | `String Function(T)?` | `null` | The text a row shows. Required unless `T` is `String` |
+| `itemLeadingBuilder` | `Widget Function(T)?` | `null` | Drawn between the checkbox and the label — an icon that varies by item |
 | `itemTrailingBuilder` | `Widget Function(T)?` | `null` | Drawn at the end of each row — a count, a badge |
 | `config` | `TextDropdownConfig?` | `null` | Text rendering configuration |
 
