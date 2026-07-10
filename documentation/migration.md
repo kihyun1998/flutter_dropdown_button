@@ -11,6 +11,7 @@ Version 3.0.0 removes everything deprecated during the 2.x line. Nothing was ren
 | `DropdownMixin.calculateDropdownPosition()` / `DropdownPositionResult` | `DropdownOverlayController.measurePlacement()` → `DropdownPlacementResult` |
 | `DropdownTheme.animationDuration` | `FlutterDropdownButton.animationDuration` |
 | `DropdownTooltipTheme.borderColor` / `.borderWidth` | `DropdownTooltipTheme.border` |
+| `DropdownScrollTheme.alwaysVisible` | `DropdownScrollTheme.thumbVisibility` |
 
 **If you only ever used `FlutterDropdownButton`, nothing here affects you.** The removals are all on classes you had to reach for deliberately.
 
@@ -74,6 +75,20 @@ FlutterDropdownButton<String>.text(
 ```
 
 If you were setting it on the theme, your menus were animating at 200ms and still are. Move the value across only if you actually wanted the slower animation.
+
+### DropdownScrollTheme.alwaysVisible
+
+This field was never read. Setting it did nothing; the scrollbar auto-hid regardless.
+
+```dart
+// Before — silently ignored
+DropdownScrollTheme(alwaysVisible: true)
+
+// After
+DropdownScrollTheme(thumbVisibility: true)
+```
+
+If you were setting it, your scrollbar has been auto-hiding all along. Move the value across only if you actually want it pinned open.
 
 ### DropdownTooltipTheme.borderColor / borderWidth
 

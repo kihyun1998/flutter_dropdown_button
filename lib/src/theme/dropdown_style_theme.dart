@@ -20,7 +20,7 @@ import 'tooltip_theme.dart';
 ///   scroll: DropdownScrollTheme(
 ///     thickness: 8.0,
 ///     thumbColor: Colors.grey,
-///     alwaysVisible: true,
+///     thumbVisibility: true,
 ///   ),
 ///   tooltip: DropdownTooltipTheme(
 ///     backgroundColor: Colors.black87,

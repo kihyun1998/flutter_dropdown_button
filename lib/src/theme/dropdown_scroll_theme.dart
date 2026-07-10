@@ -14,7 +14,7 @@ import 'resolved_dropdown_style.dart';
 ///   radius: Radius.circular(4.0),
 ///   thumbColor: Colors.grey,
 ///   trackColor: Colors.grey.withOpacity(0.2),
-///   alwaysVisible: true,
+///   thumbVisibility: true,
 /// )
 /// ```
 class DropdownScrollTheme {
@@ -31,7 +31,6 @@ class DropdownScrollTheme {
     this.thumbColor,
     this.trackColor,
     this.trackBorderColor,
-    this.alwaysVisible,
     this.thumbVisibility,
     this.trackVisibility,
     this.interactive,
@@ -102,12 +101,6 @@ class DropdownScrollTheme {
   /// If null, no track border is displayed.
   /// Creates an outline around the scrollbar track.
   final Color? trackBorderColor;
-
-  /// Whether the scrollbar should always be visible.
-  ///
-  /// If true, the scrollbar is always shown even when not scrolling.
-  /// If false or null, the scrollbar appears only during scroll interaction.
-  final bool? alwaysVisible;
 
   /// Whether the scrollbar thumb should be visible.
   ///
@@ -191,7 +184,6 @@ class DropdownScrollTheme {
     Color? thumbColor,
     Color? trackColor,
     Color? trackBorderColor,
-    bool? alwaysVisible,
     bool? thumbVisibility,
     bool? trackVisibility,
     bool? interactive,
@@ -211,7 +203,6 @@ class DropdownScrollTheme {
       thumbColor: thumbColor ?? this.thumbColor,
       trackColor: trackColor ?? this.trackColor,
       trackBorderColor: trackBorderColor ?? this.trackBorderColor,
-      alwaysVisible: alwaysVisible ?? this.alwaysVisible,
       thumbVisibility: thumbVisibility ?? this.thumbVisibility,
       trackVisibility: trackVisibility ?? this.trackVisibility,
       interactive: interactive ?? this.interactive,
