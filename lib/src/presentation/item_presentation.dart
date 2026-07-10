@@ -220,8 +220,13 @@ class CustomItemPresentation<T> implements DropdownItemPresentation<T> {
   /// Creates the custom-widget presentation.
   const CustomItemPresentation({
     required this.itemBuilder,
-    required this.items,
     required this.value,
+    @Deprecated(
+      'Read by nothing since 3.1.0. The button draws `value` whether or not it '
+      'appears in `items`, the way text mode always has. Drop the argument. '
+      'This parameter will be removed in 4.0.0.',
+    )
+    this.items = const [],
     this.selectedBuilder,
     this.hintWidget,
   });
@@ -229,7 +234,16 @@ class CustomItemPresentation<T> implements DropdownItemPresentation<T> {
   /// Builds one item row.
   final Widget Function(T item, bool isSelected) itemBuilder;
 
-  /// The items on offer, consulted to decide whether [value] is still one.
+  /// The items on offer.
+  ///
+  /// Read by nothing. [buildSelected] once consulted it to decide whether
+  /// [value] was still on offer, and drew [hintWidget] when it was not. It no
+  /// longer does: the widget draws what it was handed.
+  @Deprecated(
+    'Read by nothing since 3.1.0. The button draws `value` whether or not it '
+    'appears in `items`, the way text mode always has. Drop the argument. '
+    'This field will be removed in 4.0.0.',
+  )
   final List<T> items;
 
   /// The chosen item, if any.
@@ -255,7 +269,7 @@ class CustomItemPresentation<T> implements DropdownItemPresentation<T> {
   @override
   Widget buildSelected() {
     final selected = value;
-    if (selected != null && items.contains(selected)) {
+    if (selected != null) {
       final build = selectedBuilder;
       if (build != null) return build(selected);
       return itemBuilder(selected, true);

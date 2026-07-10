@@ -255,7 +255,13 @@ presentation.defaultSearchFilter!(user, 'ann');
 
 Renders each item as whatever `itemBuilder` returns. `defaultSearchFilter` is null: it cannot match an arbitrary widget against a query, so a caller who wants search must supply `searchFilter`.
 
-`buildSelected()` falls back to `hintWidget` when `value` is null **or is not among `items`**.
+`buildSelected()` falls back to `hintWidget` only when `value` is **null**.
+
+A `value` that is not among `items` — the state a list refresh leaves behind when the chosen row's data disappears — is still drawn. **The widget draws what it was handed**: `value` belongs to the caller, and auditing it against `items` would make the button disagree with the state its owner holds. Text mode never audited it, having no `items` to consult; since 3.1.0 custom mode does not either.
+
+The menu is a separate matter. It iterates `items`, so an absent value is never a row.
+
+`items` is therefore read by nothing and is **deprecated**; it will be removed in 4.0.0.
 
 ## DropdownSearchController\<T\>
 
