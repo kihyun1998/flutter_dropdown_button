@@ -121,6 +121,16 @@ Everything around it — the row's hover, splash, margin, radius, and the
 selected row's background — is `DropdownTheme`'s, exactly as for a single-select
 menu.
 
+The widgets `itemLeadingBuilder` and `itemTrailingBuilder` return are **yours**.
+The package places them and styles nothing about them; colour and size are
+whatever you build:
+
+```dart
+itemLeadingBuilder: (v) => Icon(osIcon[v], size: 18, color: theme.iconColor),
+itemTrailingBuilder: (v) => Text('${counts[v]}',
+    style: TextStyle(color: Colors.grey.shade600)),
+```
+
 `itemHeight` must leave room for the box. A `Checkbox` measures **48×48** with
 Flutter's default `materialTapTargetSize`, and **40×40** under
 `MaterialTapTargetSize.shrinkWrap` — measured, not remembered. This package's
