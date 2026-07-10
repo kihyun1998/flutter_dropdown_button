@@ -16,9 +16,9 @@ import '../widgets/scroll_gradient_overlay.dart';
 ///
 /// **This file does not know what selection is.** It never sees a `value`, a
 /// `Set`, or an `onChanged`. It is handed a predicate that says whether a row
-/// is chosen and a callback for when one is tapped. What a caller does with
-/// those is what makes a dropdown single- or multi-select; nothing in here
-/// changes.
+/// is chosen, a callback for when one is tapped, and whether a tap closes the
+/// menu. What a caller does with those is what makes a dropdown single- or
+/// multi-select; nothing in here changes.
 ///
 /// Not exported. It is an implementation detail shared by the public widgets,
 /// and every parameter it takes is one of theirs.
@@ -30,6 +30,7 @@ class DropdownMenuShell<T> extends StatefulWidget {
     required this.presentation,
     required this.isChosen,
     required this.onItemTap,
+    required this.closeOnTap,
     required this.enabled,
     required this.showTrailing,
     required this.height,
@@ -60,12 +61,15 @@ class DropdownMenuShell<T> extends StatefulWidget {
   /// Whether [item] is currently chosen. Drives the row's selected styling.
   final bool Function(T item) isChosen;
 
-  /// Called when a row is tapped. The menu closes afterwards.
-  ///
-  /// A checklist will want to stay open instead. That is a `closeOnTap` flag,
-  /// and it arrives with the caller that needs it — a parameter no caller sets
-  /// is a branch no test can reach.
+  /// Called when a row is tapped.
   final void Function(T item) onItemTap;
+
+  /// Whether tapping a row closes the menu.
+  ///
+  /// False repaints it instead, so the next box can be ticked. The query
+  /// survives either way — it is reset by the menu opening and closing, never
+  /// by a tap.
+  final bool closeOnTap;
 
   /// Whether the button responds to a tap.
   final bool enabled;
@@ -592,7 +596,13 @@ class _DropdownMenuShellState<T> extends State<DropdownMenuShell<T>>
         child: InkWell(
           onTap: () {
             widget.onItemTap(item);
-            _menu.close();
+            if (widget.closeOnTap) {
+              _menu.close();
+            } else {
+              // The owner will rebuild us with a new selection; the overlay is
+              // in another element subtree and would not hear about it.
+              _menu.rebuild();
+            }
           },
           mouseCursor: SystemMouseCursors.click,
           splashColor: style.splashColor,
