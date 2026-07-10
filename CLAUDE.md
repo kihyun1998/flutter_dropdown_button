@@ -15,7 +15,7 @@ The two are distinguished internally by `isTextMode`, which is `itemBuilder == n
 
 ## Core Architecture
 
-The widget is a thin shell over four modules, each of which takes plain values rather than a `BuildContext`.
+The widget is a thin shell over five modules, each of which takes plain values rather than a `BuildContext`.
 
 ### `DropdownPlacement` — `lib/src/placement/`
 
@@ -34,6 +34,16 @@ Owns the overlay's lifetime, the open/close animation, the widget tree the menu 
 It takes a `DropdownOverlaySpec` **callback**, not a value — the item count, the theme and the search field's height change while the menu is open, and `measurePlacement()` re-reads them on every overlay build. That is why an open menu re-sizes when its items change, and flips above the button when the taller menu no longer fits below.
 
 Single-open coordination lives in a registry keyed by `Overlay`, not in a process-wide static.
+
+### `DropdownSearchController` — `lib/src/search/`
+
+Owns the query: its `TextEditingController`, its `FocusNode`, and their lifetime.
+
+It does **not** know about the menu or the scroll position. A query change that also scrolled and rebuilt an overlay would make this class a second copy of the widget; the owner does those.
+
+`visibleItems(items, filter)` derives the list on every call. A cache here needs invalidating from the search callback, from `didUpdateWidget`, and from open/close/select — and every past defect in this area was a missed invalidation.
+
+`enabled` is not the same as "the controllers exist". Turning search off stops filtering but keeps the field, so turning it back on does not lose the caret.
 
 ### `DropdownItemPresentation` — `lib/src/presentation/`
 
@@ -77,7 +87,7 @@ When you deprecate a member, annotate the **field, the constructor parameter and
 
 ```bash
 flutter pub get              # install dependencies
-flutter test                 # run the suite (123 tests)
+flutter test                 # run the suite (135 tests)
 flutter analyze              # static analysis; must be clean
 dart format .                # formatting; must produce no changes
 flutter pub publish --dry-run   # validate the package before release
@@ -87,7 +97,7 @@ cd example && flutter run    # run the playground app
 
 ## Testing
 
-123 tests. 69 of them run without mounting a widget at all.
+135 tests. 81 of them run without mounting a widget at all.
 
 | Suite | What it covers |
 | --- | --- |
@@ -95,6 +105,7 @@ cd example && flutter run    # run the playground app
 | `test/theme/` | Every `resolve()`. No widgets. |
 | `test/overlay/` | The controller's lifecycle. No widgets. |
 | `test/presentation/` | Alignment, the default filter, label extraction. No widgets. |
+| `test/search/` | The query, filtering, reset, enable/disable. No widgets. |
 | `test/overlay_bounds_test.dart` | Menus near screen edges, and inside a nested `Overlay` |
 | `test/overlay_resize_test.dart` | An open menu growing, shrinking, and flipping |
 | `test/overlay_lifecycle_test.dart` | Single-open, `closeAll`, dispose |
@@ -125,6 +136,8 @@ lib/
     │   └── dropdown_overlay_controller.dart  # overlay lifetime, animation, spec
     ├── presentation/
     │   └── item_presentation.dart         # text vs custom rendering, behind one interface
+    ├── search/
+    │   └── dropdown_search_controller.dart  # the query, its field, its lifetime
     ├── theme/
     │   ├── dropdown_style_theme.dart     # composes the four below
     │   ├── dropdown_theme.dart           # + resolveButton/Overlay/Item

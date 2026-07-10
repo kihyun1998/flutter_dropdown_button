@@ -255,6 +255,28 @@ Renders each item as whatever `itemBuilder` returns. `defaultSearchFilter` is nu
 
 `buildSelected()` falls back to `hintWidget` when `value` is null **or is not among `items`**.
 
+## DropdownSearchController\<T\>
+
+Owns a dropdown's search query: its text field, its focus, and their lifetime. Hold one; `FlutterDropdownButton` does.
+
+It knows nothing about the menu or the scroll position — a query change that also scrolled and rebuilt an overlay would make it a second copy of the widget. The owner does those.
+
+### Members
+
+| Member | Description |
+|--------|-------------|
+| `DropdownSearchController({required bool enabled})` | Allocates the field's controllers only when `enabled` |
+| `enabled` | Whether search filters. Settable; turning it off keeps the field, so turning it back on does not lose the caret |
+| `query` | What the user has typed |
+| `textController` / `focusNode` | Attach to your search field. Null until search is first enabled |
+| `onQueryChanged(String)` | Records the query. You decide what to redraw |
+| `visibleItems(items, filter)` | The items the query leaves visible. A null `filter` hides nothing |
+| `reset()` | Clears the query and the field |
+| `requestFocus()` | Puts the caret in the field |
+| `dispose()` | Call from the owner's `dispose` |
+
+`visibleItems` derives the list on every call rather than caching it. Pass `TextItemPresentation.defaultSearchFilter`, or your own predicate.
+
 ## Manual Dropdown Cleanup
 
 `FlutterDropdownButton.closeAll()` closes every open menu without needing a reference to the widget that opened it. Use it before navigating away, or before showing a dialog, when a menu may still be on screen.
