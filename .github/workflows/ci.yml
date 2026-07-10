@@ -22,8 +22,10 @@ jobs:
         include:
           - label: minimum
             flutter: 3.27.0
+          # An empty version means "the latest on the channel". The action
+          # takes a semver here, not a channel name.
           - label: stable
-            flutter: stable
+            flutter: ''
 
     steps:
       - uses: actions/checkout@v4
