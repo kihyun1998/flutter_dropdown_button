@@ -446,8 +446,9 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
 
   double get actualItemHeight {
     final itemMargin = effectiveTheme.itemMargin;
-    final marginHeight =
-        itemMargin != null ? (itemMargin.top + itemMargin.bottom) : 0.0;
+    final marginHeight = itemMargin != null
+        ? (itemMargin.top + itemMargin.bottom)
+        : 0.0;
     return widget.itemHeight + marginHeight;
   }
 
@@ -610,10 +611,9 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
         color: Colors.transparent,
         child: InkWell(
           onTap: isEnabled ? _toggleDropdown : null,
-          mouseCursor:
-              isEnabled
-                  ? SystemMouseCursors.click
-                  : SystemMouseCursors.forbidden,
+          mouseCursor: isEnabled
+              ? SystemMouseCursors.click
+              : SystemMouseCursors.forbidden,
           borderRadius: BorderRadius.circular(style.borderRadius),
           splashColor: style.splashColor,
           highlightColor: style.highlightColor,
@@ -632,39 +632,35 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
   Widget _buildButtonContent(ResolvedButtonStyle style) {
     final effectiveContentHeight = style.contentHeight;
     final effectiveIconSize = style.iconSize;
-    final rowHeight =
-        effectiveContentHeight > effectiveIconSize
-            ? effectiveContentHeight
-            : effectiveIconSize;
+    final rowHeight = effectiveContentHeight > effectiveIconSize
+        ? effectiveContentHeight
+        : effectiveIconSize;
     final presentation = _presentation;
 
     return SizedBox(
       height: rowHeight,
       child: Row(
-        mainAxisAlignment:
-            widget.width != null || widget.expand
-                ? MainAxisAlignment.spaceBetween
-                : MainAxisAlignment.start,
-        mainAxisSize:
-            widget.width != null || widget.expand
-                ? MainAxisSize.max
-                : MainAxisSize.min,
+        mainAxisAlignment: widget.width != null || widget.expand
+            ? MainAxisAlignment.spaceBetween
+            : MainAxisAlignment.start,
+        mainAxisSize: widget.width != null || widget.expand
+            ? MainAxisSize.max
+            : MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Flexible(
             child: SizedBox(
               height: effectiveContentHeight,
-              child:
-                  widget.width != null || widget.expand
-                      ? Container(
-                        alignment: presentation.contentAlignment,
-                        child: presentation.buildSelected(),
-                      )
-                      : Align(
-                        alignment: presentation.contentAlignment,
-                        widthFactor: 1.0,
-                        child: presentation.buildSelected(),
-                      ),
+              child: widget.width != null || widget.expand
+                  ? Container(
+                      alignment: presentation.contentAlignment,
+                      child: presentation.buildSelected(),
+                    )
+                  : Align(
+                      alignment: presentation.contentAlignment,
+                      widthFactor: 1.0,
+                      child: presentation.buildSelected(),
+                    ),
             ),
           ),
           if (_showTrailing)
@@ -817,7 +813,10 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
     if (widget.searchable) {
       content = Column(
         mainAxisSize: MainAxisSize.min,
-        children: [_buildSearchField(), Flexible(child: content)],
+        children: [
+          _buildSearchField(),
+          Flexible(child: content),
+        ],
       );
     }
 
@@ -912,8 +911,9 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
 
     final scrollbar = Scrollbar(
       controller: _scrollController,
-      thickness:
-          style.hasCustomWidths ? style.thumbWidth : scrollTheme.thickness,
+      thickness: style.hasCustomWidths
+          ? style.thumbWidth
+          : scrollTheme.thickness,
       radius: style.radius,
       thumbVisibility: style.thumbVisibility,
       trackVisibility: style.trackVisibility,

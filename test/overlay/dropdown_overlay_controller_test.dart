@@ -9,12 +9,11 @@ DropdownOverlayController makeController({
 }) {
   return DropdownOverlayController(
     vsync: const TestVSync(),
-    spec:
-        () => const DropdownOverlaySpec(
-          itemCount: 3,
-          actualItemHeight: 48,
-          maxDropdownHeight: 200,
-        ),
+    spec: () => const DropdownOverlaySpec(
+      itemCount: 3,
+      actualItemHeight: 48,
+      maxDropdownHeight: 200,
+    ),
     contentBuilder: (_) => const SizedBox.shrink(),
     decorationBuilder: () => null,
     onOpenStateChanged: onOpenStateChanged,

@@ -245,10 +245,9 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
         borderRadius: _dtBorderRadius,
         elevation: _dtElevation,
         backgroundColor: _dtBackgroundColor,
-        border:
-            _dtBorderEnabled
-                ? Border.all(color: _dtBorderColor, width: _dtBorderWidth)
-                : null,
+        border: _dtBorderEnabled
+            ? Border.all(color: _dtBorderColor, width: _dtBorderWidth)
+            : null,
         selectedItemColor: _dtSelectedItemColor,
         itemHoverColor: _dtItemHoverColor,
         itemSplashColor: _dtItemSplashColor,
@@ -261,65 +260,58 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
           horizontal: _dtButtonPaddingH,
           vertical: _dtButtonPaddingV,
         ),
-        itemMargin:
-            _dtItemMarginEnabled
-                ? EdgeInsets.symmetric(
-                  horizontal: _dtItemMarginH,
-                  vertical: _dtItemMarginV,
-                )
-                : null,
+        itemMargin: _dtItemMarginEnabled
+            ? EdgeInsets.symmetric(
+                horizontal: _dtItemMarginH,
+                vertical: _dtItemMarginV,
+              )
+            : null,
         itemBorderRadius: _dtItemBorderRadius,
         iconColor: _dtIconColor,
         iconDisabledColor: _dtIconDisabledColor,
         icon: _dtIcon,
         iconSize: _dtIconSize,
         buttonHeight: _dtButtonHeight,
-        iconPadding:
-            _dtIconPaddingLeft != null
-                ? EdgeInsets.only(left: _dtIconPaddingLeft!)
-                : null,
-        overlayPadding:
-            _dtOverlayPaddingEnabled
-                ? EdgeInsets.symmetric(
-                  horizontal: _dtOverlayPaddingH,
-                  vertical: _dtOverlayPaddingV,
-                )
-                : null,
-        itemBorder:
-            _dtItemBorderEnabled
-                ? Border(
-                  bottom: BorderSide(
-                    color: _dtItemBorderColor,
-                    width: _dtItemBorderWidth,
-                  ),
-                )
-                : null,
+        iconPadding: _dtIconPaddingLeft != null
+            ? EdgeInsets.only(left: _dtIconPaddingLeft!)
+            : null,
+        overlayPadding: _dtOverlayPaddingEnabled
+            ? EdgeInsets.symmetric(
+                horizontal: _dtOverlayPaddingH,
+                vertical: _dtOverlayPaddingV,
+              )
+            : null,
+        itemBorder: _dtItemBorderEnabled
+            ? Border(
+                bottom: BorderSide(
+                  color: _dtItemBorderColor,
+                  width: _dtItemBorderWidth,
+                ),
+              )
+            : null,
         excludeLastItemBorder: _dtExcludeLastItemBorder,
         disabledBackgroundColor: _dtDisabledBackgroundColor,
-        disabledBorder:
-            _dtDisabledBorderEnabled
-                ? Border.all(
-                  color: _dtDisabledBorderColor,
-                  width: _dtDisabledBorderWidth,
-                )
-                : null,
-      ),
-      scroll:
-          _dstEnabled
-              ? DropdownScrollTheme(
-                thumbWidth: _dstThumbWidth,
-                radius:
-                    _dstRadius != null ? Radius.circular(_dstRadius!) : null,
-                thumbColor: _dstThumbColor,
-                trackColor: _dstTrackColor,
-                trackBorderColor: _dstTrackBorderColor,
-                thumbVisibility: _dstThumbVisibility,
-                trackVisibility: _dstTrackVisibility,
-                interactive: _dstInteractive,
-                showScrollGradient: _dstShowScrollGradient,
-                gradientHeight: _dstGradientHeight,
+        disabledBorder: _dtDisabledBorderEnabled
+            ? Border.all(
+                color: _dtDisabledBorderColor,
+                width: _dtDisabledBorderWidth,
               )
-              : const DropdownScrollTheme(),
+            : null,
+      ),
+      scroll: _dstEnabled
+          ? DropdownScrollTheme(
+              thumbWidth: _dstThumbWidth,
+              radius: _dstRadius != null ? Radius.circular(_dstRadius!) : null,
+              thumbColor: _dstThumbColor,
+              trackColor: _dstTrackColor,
+              trackBorderColor: _dstTrackBorderColor,
+              thumbVisibility: _dstThumbVisibility,
+              trackVisibility: _dstTrackVisibility,
+              interactive: _dstInteractive,
+              showScrollGradient: _dstShowScrollGradient,
+              gradientHeight: _dstGradientHeight,
+            )
+          : const DropdownScrollTheme(),
       tooltip: DropdownTooltipTheme(
         enabled: _dttEnabled,
         mode: _dttMode,
@@ -342,34 +334,30 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
           horizontal: _sftContentPaddingH,
           vertical: _sftContentPaddingV,
         ),
-        padding:
-            (_sftPaddingH > 0 || _sftPaddingV > 0)
-                ? EdgeInsets.symmetric(
-                  horizontal: _sftPaddingH,
-                  vertical: _sftPaddingV,
-                )
-                : null,
+        padding: (_sftPaddingH > 0 || _sftPaddingV > 0)
+            ? EdgeInsets.symmetric(
+                horizontal: _sftPaddingH,
+                vertical: _sftPaddingV,
+              )
+            : null,
         autofocus: _sftAutofocus,
         cursorColor: _sftCursorColor,
         cursorWidth: _sftCursorWidth,
         cursorHeight: _sftCursorHeight,
-        cursorRadius:
-            _sftCursorRadius != null
-                ? Radius.circular(_sftCursorRadius!)
-                : null,
+        cursorRadius: _sftCursorRadius != null
+            ? Radius.circular(_sftCursorRadius!)
+            : null,
         textStyle: TextStyle(fontSize: _sftTextFontSize, color: _sftTextColor),
         textAlign: _sftTextAlign,
-        border:
-            _sftBorderEnabled
-                ? Border.all(color: _sftBorderColor, width: _sftBorderWidth)
-                : null,
-        focusedBorder:
-            _sftFocusedBorderEnabled
-                ? Border.all(
-                  color: _sftFocusedBorderColor,
-                  width: _sftFocusedBorderWidth,
-                )
-                : null,
+        border: _sftBorderEnabled
+            ? Border.all(color: _sftBorderColor, width: _sftBorderWidth)
+            : null,
+        focusedBorder: _sftFocusedBorderEnabled
+            ? Border.all(
+                color: _sftFocusedBorderColor,
+                width: _sftFocusedBorderWidth,
+              )
+            : null,
         keyboardType: _sftKeyboardType,
         textInputAction: _sftTextInputAction,
         divider: _sftShowDivider ? const Divider(height: 1) : null,
@@ -383,13 +371,12 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
       maxLines: _cfgMaxLines,
       textAlign: _textAlign,
       softWrap: _softWrap,
-      disabledTextStyle:
-          _cfgDisabledTextStyleEnabled
-              ? TextStyle(
-                color: _cfgDisabledTextColor,
-                fontSize: _cfgDisabledTextFontSize,
-              )
-              : null,
+      disabledTextStyle: _cfgDisabledTextStyleEnabled
+          ? TextStyle(
+              color: _cfgDisabledTextColor,
+              fontSize: _cfgDisabledTextFontSize,
+            )
+          : null,
     );
   }
 
@@ -415,25 +402,24 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
           ),
         ],
       ),
-      body:
-          isWide
-              ? Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
+      body: isWide
+          ? Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(width: 420, child: _buildSettingsPanel()),
+                const VerticalDivider(width: 1),
+                Expanded(child: _buildPreview()),
+              ],
+            )
+          : SingleChildScrollView(
+              child: Column(
                 children: [
-                  SizedBox(width: 420, child: _buildSettingsPanel()),
-                  const VerticalDivider(width: 1),
-                  Expanded(child: _buildPreview()),
+                  _buildSettingsPanel(),
+                  const Divider(height: 1),
+                  SizedBox(height: 400, child: _buildPreview()),
                 ],
-              )
-              : SingleChildScrollView(
-                child: Column(
-                  children: [
-                    _buildSettingsPanel(),
-                    const Divider(height: 1),
-                    SizedBox(height: 400, child: _buildPreview()),
-                  ],
-                ),
               ),
+            ),
     );
   }
 
@@ -470,18 +456,16 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
         Wrap(
           spacing: 6,
           runSpacing: 6,
-          children:
-              _presets.entries.map((e) {
-                return ActionChip(
-                  label: Text(e.key, style: const TextStyle(fontSize: 11)),
-                  onPressed:
-                      () => setState(() {
-                        _items = List.from(e.value);
-                        _selectedValue = null;
-                        _itemCounter = _items.length;
-                      }),
-                );
-              }).toList(),
+          children: _presets.entries.map((e) {
+            return ActionChip(
+              label: Text(e.key, style: const TextStyle(fontSize: 11)),
+              onPressed: () => setState(() {
+                _items = List.from(e.value);
+                _selectedValue = null;
+                _itemCounter = _items.length;
+              }),
+            );
+          }).toList(),
         ),
         const SizedBox(height: 8),
         Row(
@@ -519,27 +503,24 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
         Wrap(
           spacing: 4,
           runSpacing: 4,
-          children:
-              _items.map((item) {
-                final isSelected = item == _selectedValue;
-                return Chip(
-                  label: Text(
-                    item.length > 20 ? '${item.substring(0, 20)}…' : item,
-                    style: TextStyle(
-                      fontSize: 10,
-                      fontWeight:
-                          isSelected ? FontWeight.bold : FontWeight.normal,
-                    ),
-                  ),
-                  backgroundColor: isSelected ? Colors.blue.shade100 : null,
-                  deleteIcon: const Icon(Icons.close, size: 14),
-                  onDeleted:
-                      () => setState(() {
-                        _items.remove(item);
-                        if (_selectedValue == item) _selectedValue = null;
-                      }),
-                );
-              }).toList(),
+          children: _items.map((item) {
+            final isSelected = item == _selectedValue;
+            return Chip(
+              label: Text(
+                item.length > 20 ? '${item.substring(0, 20)}…' : item,
+                style: TextStyle(
+                  fontSize: 10,
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                ),
+              ),
+              backgroundColor: isSelected ? Colors.blue.shade100 : null,
+              deleteIcon: const Icon(Icons.close, size: 14),
+              onDeleted: () => setState(() {
+                _items.remove(item);
+                if (_selectedValue == item) _selectedValue = null;
+              }),
+            );
+          }).toList(),
         ),
       ],
     );
@@ -576,11 +557,10 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
                     ),
                   ],
                   selected: {_type},
-                  onSelectionChanged:
-                      (v) => setState(() {
-                        _type = v.first;
-                        _selectedValue = null;
-                      }),
+                  onSelectionChanged: (v) => setState(() {
+                    _type = v.first;
+                    _selectedValue = null;
+                  }),
                 ),
               ),
             ],
@@ -638,8 +618,8 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
                     ButtonSegment(value: MenuAlignment.right, label: Text('R')),
                   ],
                   selected: {_menuAlignment},
-                  onSelectionChanged:
-                      (v) => setState(() => _menuAlignment = v.first),
+                  onSelectionChanged: (v) =>
+                      setState(() => _menuAlignment = v.first),
                 ),
               ),
             ],
@@ -806,8 +786,8 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
                     ),
                   ],
                   selected: {_overflow},
-                  onSelectionChanged:
-                      (v) => setState(() => _overflow = v.first),
+                  onSelectionChanged: (v) =>
+                      setState(() => _overflow = v.first),
                 ),
               ),
             ],
@@ -840,8 +820,8 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
                     ButtonSegment(value: TextAlign.end, label: Text('end')),
                   ],
                   selected: {_textAlign},
-                  onSelectionChanged:
-                      (v) => setState(() => _textAlign = v.first),
+                  onSelectionChanged: (v) =>
+                      setState(() => _textAlign = v.first),
                 ),
               ),
             ],
@@ -1299,8 +1279,8 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
                     ButtonSegment(value: TextAlign.end, label: Text('end')),
                   ],
                   selected: {_sftTextAlign},
-                  onSelectionChanged:
-                      (v) => setState(() => _sftTextAlign = v.first),
+                  onSelectionChanged: (v) =>
+                      setState(() => _sftTextAlign = v.first),
                 ),
               ),
             ],
@@ -1435,10 +1415,9 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
                       child: Text('url'),
                     ),
                   ],
-                  onChanged:
-                      (v) => setState(
-                        () => _sftKeyboardType = v ?? TextInputType.text,
-                      ),
+                  onChanged: (v) => setState(
+                    () => _sftKeyboardType = v ?? TextInputType.text,
+                  ),
                 ),
               ),
             ],
@@ -1480,10 +1459,9 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
                       child: Text('none'),
                     ),
                   ],
-                  onChanged:
-                      (v) => setState(
-                        () => _sftTextInputAction = v ?? TextInputAction.search,
-                      ),
+                  onChanged: (v) => setState(
+                    () => _sftTextInputAction = v ?? TextInputAction.search,
+                  ),
                 ),
               ),
             ],
@@ -1730,21 +1708,20 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
   Widget _buildDropdown() {
     final theme = _buildStyleTheme();
     final config = _buildTextConfig();
-    final trailing =
-        _useCustomTrailing
-            ? Container(
-              padding: const EdgeInsets.all(4),
-              decoration: BoxDecoration(
-                color: Colors.blue.shade100,
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                Icons.arrow_drop_down,
-                size: _trailingSize,
-                color: Colors.blue.shade700,
-              ),
-            )
-            : null;
+    final trailing = _useCustomTrailing
+        ? Container(
+            padding: const EdgeInsets.all(4),
+            decoration: BoxDecoration(
+              color: Colors.blue.shade100,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.arrow_drop_down,
+              size: _trailingSize,
+              color: Colors.blue.shade700,
+            ),
+          )
+        : null;
 
     switch (_type) {
       case DropdownType.text:
@@ -1766,14 +1743,12 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
           disableWhenSingleItem: _disableWhenSingleItem,
           hideIconWhenSingleItem: _hideIconWhenSingleItem,
           expand: _expand,
-          leading:
-              _showLeading
-                  ? Icon(Icons.circle, size: _leadingSize, color: Colors.grey)
-                  : null,
-          selectedLeading:
-              _showLeading
-                  ? Icon(Icons.circle, size: _leadingSize, color: Colors.blue)
-                  : null,
+          leading: _showLeading
+              ? Icon(Icons.circle, size: _leadingSize, color: Colors.grey)
+              : null,
+          selectedLeading: _showLeading
+              ? Icon(Icons.circle, size: _leadingSize, color: Colors.blue)
+              : null,
           minMenuWidth: _minMenuWidth,
           maxMenuWidth: _maxMenuWidth,
           menuAlignment: _menuAlignment,
@@ -1797,8 +1772,8 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
           maxMenuWidth: _maxMenuWidth,
           menuAlignment: _menuAlignment,
           searchable: _searchable,
-          searchFilter:
-              (item, query) => item.toLowerCase().contains(query.toLowerCase()),
+          searchFilter: (item, query) =>
+              item.toLowerCase().contains(query.toLowerCase()),
           itemBuilder: (item, isSelected) => Text(item),
           onChanged: (v) => setState(() => _selectedValue = v),
         );
@@ -1918,8 +1893,8 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
             child: Text(label, style: const TextStyle(fontSize: 12)),
           ),
           GestureDetector(
-            onTap:
-                () => _showColorPicker(value, onChange, solidOnly: solidOnly),
+            onTap: () =>
+                _showColorPicker(value, onChange, solidOnly: solidOnly),
             child: Container(
               width: 32,
               height: 22,
@@ -1928,15 +1903,14 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
                 border: Border.all(color: Colors.grey.shade400),
                 borderRadius: BorderRadius.circular(3),
               ),
-              child:
-                  value == null
-                      ? const Center(
-                        child: Text(
-                          '∅',
-                          style: TextStyle(fontSize: 13, color: Colors.grey),
-                        ),
-                      )
-                      : null,
+              child: value == null
+                  ? const Center(
+                      child: Text(
+                        '∅',
+                        style: TextStyle(fontSize: 13, color: Colors.grey),
+                      ),
+                    )
+                  : null,
             ),
           ),
         ],
@@ -1951,64 +1925,61 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
   }) {
     showDialog<void>(
       context: context,
-      builder:
-          (ctx) => AlertDialog(
-            title: const Text('Select Color', style: TextStyle(fontSize: 15)),
-            contentPadding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-            content: SizedBox(
-              width: 300,
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    if (!solidOnly) ...[
-                      const Text(
-                        'Solid',
-                        style: TextStyle(fontSize: 11, color: Colors.grey),
-                      ),
-                      const SizedBox(height: 6),
-                    ],
-                    Wrap(
-                      spacing: 6,
-                      runSpacing: 6,
-                      children:
-                          _solidColors.map((c) {
-                            return _colorSwatch(c, c == current, () {
-                              onChange(c);
-                              Navigator.pop(ctx);
-                            });
-                          }).toList(),
-                    ),
-                    if (!solidOnly) ...[
-                      const SizedBox(height: 12),
-                      const Text(
-                        'Overlay (semi-transparent)',
-                        style: TextStyle(fontSize: 11, color: Colors.grey),
-                      ),
-                      const SizedBox(height: 6),
-                      Wrap(
-                        spacing: 6,
-                        runSpacing: 6,
-                        children:
-                            _overlayColors.map((c) {
-                              return _colorSwatch(c, c == current, () {
-                                onChange(c);
-                                Navigator.pop(ctx);
-                              });
-                            }).toList(),
-                      ),
-                    ],
-                  ],
+      builder: (ctx) => AlertDialog(
+        title: const Text('Select Color', style: TextStyle(fontSize: 15)),
+        contentPadding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+        content: SizedBox(
+          width: 300,
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (!solidOnly) ...[
+                  const Text(
+                    'Solid',
+                    style: TextStyle(fontSize: 11, color: Colors.grey),
+                  ),
+                  const SizedBox(height: 6),
+                ],
+                Wrap(
+                  spacing: 6,
+                  runSpacing: 6,
+                  children: _solidColors.map((c) {
+                    return _colorSwatch(c, c == current, () {
+                      onChange(c);
+                      Navigator.pop(ctx);
+                    });
+                  }).toList(),
                 ),
-              ),
+                if (!solidOnly) ...[
+                  const SizedBox(height: 12),
+                  const Text(
+                    'Overlay (semi-transparent)',
+                    style: TextStyle(fontSize: 11, color: Colors.grey),
+                  ),
+                  const SizedBox(height: 6),
+                  Wrap(
+                    spacing: 6,
+                    runSpacing: 6,
+                    children: _overlayColors.map((c) {
+                      return _colorSwatch(c, c == current, () {
+                        onChange(c);
+                        Navigator.pop(ctx);
+                      });
+                    }).toList(),
+                  ),
+                ],
+              ],
             ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(ctx),
-                child: const Text('Cancel'),
-              ),
-            ],
           ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancel'),
+          ),
+        ],
+      ),
     );
   }
 
@@ -2026,15 +1997,14 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
           ),
           borderRadius: BorderRadius.circular(4),
         ),
-        child:
-            color == null
-                ? const Center(
-                  child: Text(
-                    '∅',
-                    style: TextStyle(fontSize: 16, color: Colors.grey),
-                  ),
-                )
-                : null,
+        child: color == null
+            ? const Center(
+                child: Text(
+                  '∅',
+                  style: TextStyle(fontSize: 16, color: Colors.grey),
+                ),
+              )
+            : null,
       ),
     );
   }
@@ -2056,40 +2026,34 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
             child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
-                children:
-                    _iconOptions.map((icon) {
-                      final isSelected = icon == value;
-                      return Padding(
-                        padding: const EdgeInsets.only(right: 4),
-                        child: GestureDetector(
-                          onTap: () => onChange(icon),
-                          child: Container(
-                            width: 36,
-                            height: 36,
-                            decoration: BoxDecoration(
-                              color: isSelected ? Colors.blue.shade50 : null,
-                              border: Border.all(
-                                color:
-                                    isSelected
-                                        ? Colors.blue
-                                        : Colors.grey.shade300,
-                                width: isSelected ? 2 : 1,
-                              ),
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                            child: Center(
-                              child:
-                                  icon == null
-                                      ? const Text(
-                                        'def',
-                                        style: TextStyle(fontSize: 9),
-                                      )
-                                      : Icon(icon, size: 18),
-                            ),
+                children: _iconOptions.map((icon) {
+                  final isSelected = icon == value;
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 4),
+                    child: GestureDetector(
+                      onTap: () => onChange(icon),
+                      child: Container(
+                        width: 36,
+                        height: 36,
+                        decoration: BoxDecoration(
+                          color: isSelected ? Colors.blue.shade50 : null,
+                          border: Border.all(
+                            color: isSelected
+                                ? Colors.blue
+                                : Colors.grey.shade300,
+                            width: isSelected ? 2 : 1,
                           ),
+                          borderRadius: BorderRadius.circular(4),
                         ),
-                      );
-                    }).toList(),
+                        child: Center(
+                          child: icon == null
+                              ? const Text('def', style: TextStyle(fontSize: 9))
+                              : Icon(icon, size: 18),
+                        ),
+                      ),
+                    ),
+                  );
+                }).toList(),
               ),
             ),
           ),

@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dropdown_button/flutter_dropdown_button.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-Widget host(Widget child) =>
-    MaterialApp(home: Scaffold(body: Center(child: child)));
+Widget host(Widget child) => MaterialApp(
+  home: Scaffold(body: Center(child: child)),
+);
 
 /// The opacity the menu is drawn at, straight off the widget that applies it.
 double menuOpacity(WidgetTester tester) {

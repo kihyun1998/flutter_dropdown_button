@@ -12,8 +12,9 @@ const apple = Fruit('Apple');
 const banana = Fruit('Banana');
 const cherry = Fruit('Cherry');
 
-Widget host(Widget child) =>
-    MaterialApp(home: Scaffold(body: Center(child: child)));
+Widget host(Widget child) => MaterialApp(
+  home: Scaffold(body: Center(child: child)),
+);
 
 Future<void> openDropdown(WidgetTester tester) async {
   await tester.tap(find.byType(FlutterDropdownButton<Fruit>));

@@ -4,7 +4,9 @@ import 'package:flutter_test/flutter_test.dart';
 
 /// Wraps the dropdown in just enough app to give it an [Overlay].
 Widget host(Widget child) {
-  return MaterialApp(home: Scaffold(body: Center(child: child)));
+  return MaterialApp(
+    home: Scaffold(body: Center(child: child)),
+  );
 }
 
 Future<void> openDropdown(WidgetTester tester) async {

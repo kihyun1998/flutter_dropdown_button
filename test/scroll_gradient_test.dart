@@ -48,14 +48,13 @@ List<LinearGradient> fades(WidgetTester tester) {
     matching: find.byType(Container),
   );
 
-  final gradients =
-      tester
-          .widgetList<Container>(painted)
-          .map((c) => c.decoration)
-          .whereType<BoxDecoration>()
-          .map((d) => d.gradient)
-          .whereType<LinearGradient>()
-          .toList();
+  final gradients = tester
+      .widgetList<Container>(painted)
+      .map((c) => c.decoration)
+      .whereType<BoxDecoration>()
+      .map((d) => d.gradient)
+      .whereType<LinearGradient>()
+      .toList();
 
   expect(gradients, hasLength(2), reason: 'a fade at each edge');
   return gradients;
@@ -107,11 +106,10 @@ void main() {
     await openScrollableMenu(tester);
     await tester.pumpAndSettle();
 
-    final opacities =
-        tester
-            .widgetList<AnimatedOpacity>(find.byType(AnimatedOpacity))
-            .map((o) => o.opacity)
-            .toList();
+    final opacities = tester
+        .widgetList<AnimatedOpacity>(find.byType(AnimatedOpacity))
+        .map((o) => o.opacity)
+        .toList();
 
     expect(opacities, [
       0.0,

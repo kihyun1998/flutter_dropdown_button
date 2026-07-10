@@ -67,8 +67,9 @@ void main() {
         border: Border.all(color: green),
       );
 
-      final decoration =
-          theme.resolveButton(ambient, enabled: false).decoration;
+      final decoration = theme
+          .resolveButton(ambient, enabled: false)
+          .decoration;
       expect(decoration.color, red);
       expect(decoration.border, isNull);
     });
@@ -152,8 +153,10 @@ void main() {
     });
 
     test('an untinted selection falls back to the ambient primary at 10%', () {
-      final colour =
-          resolve(const DropdownTheme(), selected: true).decoration.color!;
+      final colour = resolve(
+        const DropdownTheme(),
+        selected: true,
+      ).decoration.color!;
 
       expect(colour.a, closeTo(0.1, 0.001));
     });

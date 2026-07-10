@@ -78,11 +78,10 @@ void main() {
                 child: Overlay(
                   initialEntries: [
                     OverlayEntry(
-                      builder:
-                          (_) => Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [dropdown()],
-                          ),
+                      builder: (_) => Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [dropdown()],
+                      ),
                     ),
                   ],
                 ),

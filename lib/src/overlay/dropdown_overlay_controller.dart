@@ -321,12 +321,11 @@ class DropdownOverlayController {
                         child: contentBuilder(position.height),
                       ),
                     ),
-                    builder:
-                        (context, child) => Transform.scale(
-                          scale: _scale.value,
-                          alignment: position.transformAlignment,
-                          child: Opacity(opacity: _opacity.value, child: child),
-                        ),
+                    builder: (context, child) => Transform.scale(
+                      scale: _scale.value,
+                      alignment: position.transformAlignment,
+                      child: Opacity(opacity: _opacity.value, child: child),
+                    ),
                   ),
                 ),
               ],
