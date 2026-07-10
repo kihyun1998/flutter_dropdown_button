@@ -98,6 +98,8 @@ final style = theme.resolveButton(ambient, enabled: isEnabled);
 Container(decoration: style.decoration, ...);
 ```
 
+Not everything a theme knows needs a palette. `DropdownTheme.resolvedIconSize` — the arrow's size, or `DropdownTheme.defaultIconSize` when unset — is a pure read, and reading it is how a caller avoids building a whole `ResolvedButtonStyle` for one number.
+
 ### Methods on DropdownTheme
 
 | Method | Returns | Description |

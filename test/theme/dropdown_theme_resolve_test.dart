@@ -20,6 +20,36 @@ const red = Color(0xFFE53935);
 const green = Color(0xFF43A047);
 
 void main() {
+  group('icon size', () {
+    test('resolvedIconSize falls back to the named default', () {
+      expect(
+        const DropdownTheme().resolvedIconSize,
+        DropdownTheme.defaultIconSize,
+      );
+      expect(const DropdownTheme(iconSize: 18).resolvedIconSize, 18);
+    });
+
+    test('it agrees with the size resolveButton hands out', () {
+      // Two readers, one fallback. A second copy of `24.0` is how a divider
+      // came to be reserved at one height and drawn at another.
+      for (final theme in const [
+        DropdownTheme(),
+        DropdownTheme(iconSize: 18),
+      ]) {
+        expect(
+          theme.resolveButton(ambient, enabled: true).iconSize,
+          theme.resolvedIconSize,
+        );
+      }
+    });
+
+    test('it needs no ambient palette', () {
+      // Which is the whole point: a caller wanting only this number should not
+      // have to resolve a BoxDecoration to get it.
+      expect(const DropdownTheme(iconSize: 30).resolvedIconSize, 30);
+    });
+  });
+
   group('button', () {
     test('falls back to the ambient palette', () {
       final style = const DropdownTheme().resolveButton(ambient, enabled: true);
