@@ -10,6 +10,20 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Domain docs.** Single-context. `CONTEXT.md` and `docs/adr/` do not exist yet and their absence is expected — they are created lazily, when a term or a decision actually needs resolving. See `docs/agents/domain.md`.
 
+## 우회 금지 (근본 층에서 고쳐라)
+
+**증상이 보이는 층과 원인이 사는 층은 다르다.** 증상이 난 자리에서 덮지 마라. 우회는 ① 진짜 결함을 가려 고칠 압력을 없애고, ② 같은 지식을 두 층에 복제해 divergence 씨앗이 되고, ③ 잘못된 기본값을 영원히 기본값으로 남긴다. **우회하고 싶은 충동 = 멈추고 사용자에게 온다** — 무슨 상황인지 설명하고 근본 수정 여부를 *묻는다*. 혼자 우회하지도, 혼자 이슈만 파고 넘어가지도 마라.
+
+**이 패키지는 상류다.** `just_make_logo`(`^1.6.1`)와 `penterm-2`(`^1.4.6`)가 이걸 의존한다 — 둘 다 **두 메이저 뒤에** 묶여 있다. 여기서 내린 결정은 저 둘이 언젠가 치른다. 소비처 목록은 추정하지 말고 도출한다: `for d in ../*/; do grep -l 'flutter_dropdown_button:' $d/pubspec.yaml; done`.
+
+**그러나 "근본 층에서 고쳐라" 는 "전부 상류로 밀어라" 가 아니다.** 물을 것은 *어느 층이 상류인가* 가 아니라 **누구의 불변식이 깨졌는가** 다. 하류가 결함을 들고 와도, 상류의 동작이 *의도한 계약*이라면 근본 층은 다른 곳이다. 실증(#59): 하류 앱(`acra_client`)이 `trackColor` 를 넣었는데 트랙이 안 나왔다. Flutter 의 결함처럼도, 우리 코드의 결함처럼도 보였지만 **둘 다 아니었다** — `material/scrollbar.dart:274` 는 `trackVisibility: true` 없이는 투명을 반환하는 게 맞고, 우리 코드도 맞았다. 깨진 불변식은 **우리 dartdoc** 이었다. 클래스 예제가 하류에게 정확히 그 틀린 조합을 가르치고 있었다. `lib/` 에서 주석 말고는 아무것도 바뀌지 않았다. **계약을 결함으로 오진하면 우회를 없애는 대신 계약을 없앤다.**
+
+**의존성은 벽이 아니라 양방향으로 새는 막이다.** 변경은 아래로만 흐르지 않는다. 실증(#47): `environment` 는 `flutter: ">=3.10.0"` 을 선언했으나 `Color.withValues`(3.27)·`WidgetStateProperty`(3.22)를 쓰고 있었고, CI 가 두 번 반박한 끝에 진짜 바닥은 **3.32** 였다. 상류(Flutter)의 요구가 이쪽 하한을 밀어 올리고, 그 하한은 캐럿 범위를 타고 **하류로 그대로 전파된다** — `pub get` 성공은 제약이 정직하다는 증거가 아니다.
+
+**역방향도 신호다: 둘 이상의 소비처가 *독립적으로 같은 우회*에 도달했다면, 그건 이 API 의 기본값이 함정이라는 증거다.** 사람들이 올바른 옵션을 발견한 게 아니라 결함을 발견하고 돌아간 것이다. 옵션을 하나 더 얹어 도망치지 말고 기본값을 의심하라.
+
+**크로스 repo 인용에는 repo 접두사를 붙인다.** 맨 `#88` 은 GitHub 에서 *이* repo 의 88 번으로 링크된다. 남의 트래커를 가리킬 땐 `table_plus#88` 로 쓴다.
+
 ## 작업 flow
 
 *Substantive 변경*(버그 수정·기능 추가·동작 변경)이면 이 순서로 짠다. 단계를 *생략*하려면 (건너뛰는 게 아니라) *왜 이 변경엔 해당 없는지를 명시*한다 — 조용한 스킵 금지.
