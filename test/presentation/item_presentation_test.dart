@@ -33,7 +33,6 @@ TextItemPresentation<T> text<T>({
 }
 
 CustomItemPresentation<T> custom<T>({
-  required List<T> items,
   T? value,
   Widget Function(T)? selectedBuilder,
   Widget? hintWidget,
@@ -41,7 +40,6 @@ CustomItemPresentation<T> custom<T>({
   return CustomItemPresentation<T>(
     // The flag is in the text so a caller can see which one it was handed.
     itemBuilder: (item, isSelected) => Text('$item/$isSelected'),
-    items: items,
     value: value,
     selectedBuilder: selectedBuilder,
     hintWidget: hintWidget,
@@ -64,10 +62,7 @@ void main() {
     });
 
     test('custom mode is always left, whatever the text config says', () {
-      expect(
-        custom<String>(items: const ['a']).contentAlignment,
-        Alignment.centerLeft,
-      );
+      expect(custom<String>().contentAlignment, Alignment.centerLeft);
     });
   });
 
@@ -81,7 +76,7 @@ void main() {
     });
 
     test('custom mode has none — it cannot read a widget', () {
-      expect(custom<String>(items: const ['a']).defaultSearchFilter, isNull);
+      expect(custom<String>().defaultSearchFilter, isNull);
     });
   });
 
@@ -107,26 +102,28 @@ void main() {
   });
 
   group('custom selected widget', () {
-    test('a value absent from items falls back to the hint', () {
-      final presentation = custom<String>(
-        items: const ['a', 'b'],
-        value: 'gone',
-        hintWidget: const Text('pick one'),
-      );
+    // The contract changed. This test used to assert the opposite — that a
+    // value absent from `items` fell back to the hint — and that is what text
+    // mode never did, because `TextItemPresentation` has no `items` to consult.
+    // The widget draws what it was handed; `value` is the caller's.
+    test(
+      'a value absent from items is still drawn, not swapped for the hint',
+      () {
+        final presentation = custom<String>(
+          value: 'gone',
+          hintWidget: const Text('pick one'),
+        );
 
-      expect((presentation.buildSelected() as Text).data, 'pick one');
-    });
+        expect((presentation.buildSelected() as Text).data, 'gone/true');
+      },
+    );
 
     test('no value and no hint widget draws nothing', () {
-      expect(
-        custom<String>(items: const ['a']).buildSelected(),
-        isA<SizedBox>(),
-      );
+      expect(custom<String>().buildSelected(), isA<SizedBox>());
     });
 
     test('selectedBuilder wins over itemBuilder for the button face', () {
       final presentation = custom<String>(
-        items: const ['a'],
         value: 'a',
         selectedBuilder: (item) => Text('face:$item'),
       );
@@ -135,7 +132,7 @@ void main() {
     });
 
     test('without selectedBuilder, itemBuilder draws the face as selected', () {
-      final presentation = custom<String>(items: const ['a'], value: 'a');
+      final presentation = custom<String>(value: 'a');
 
       expect(
         (presentation.buildSelected() as Text).data,
@@ -145,7 +142,7 @@ void main() {
     });
 
     test('an item row is drawn unselected unless it is the value', () {
-      final presentation = custom<String>(items: const ['a', 'b'], value: 'a');
+      final presentation = custom<String>(value: 'a');
 
       expect((presentation.buildItem('a', true) as Text).data, 'a/true');
       expect((presentation.buildItem('b', false) as Text).data, 'b/false');

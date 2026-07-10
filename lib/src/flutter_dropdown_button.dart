@@ -156,6 +156,12 @@ class FlutterDropdownButton<T> extends StatefulWidget {
   final ValueChanged<T?> onChanged;
 
   /// The currently selected value.
+  ///
+  /// Drawn on the button whether or not it appears in [items]. A list that
+  /// refreshes can drop the chosen row while this still names it; the button
+  /// keeps showing it rather than quietly reverting to the hint, because this
+  /// value belongs to the caller. The menu is a separate matter — it iterates
+  /// [items], so an absent value is never a row.
   final T? value;
 
   // --- Custom mode fields ---
@@ -423,7 +429,6 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
     if (itemBuilder != null) {
       return CustomItemPresentation<T>(
         itemBuilder: itemBuilder,
-        items: widget.items,
         value: widget.value,
         selectedBuilder: widget.selectedBuilder,
         hintWidget: widget.hintWidget,
