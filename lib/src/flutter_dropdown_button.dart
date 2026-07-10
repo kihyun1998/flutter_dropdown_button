@@ -446,10 +446,7 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
 
   double get actualItemHeight {
     final itemMargin = effectiveTheme.itemMargin;
-    final marginHeight = itemMargin != null
-        ? (itemMargin.top + itemMargin.bottom)
-        : 0.0;
-    return widget.itemHeight + marginHeight;
+    return widget.itemHeight + (itemMargin?.vertical ?? 0.0);
   }
 
   double get overlayBorderThickness => _overlayStyle.borderThickness;
@@ -637,21 +634,23 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
         : effectiveIconSize;
     final presentation = _presentation;
 
+    // A button given a width, or told to expand, fills it; one sized to its
+    // content hugs it. Three layout decisions turn on the same question.
+    final fillsWidth = widget.width != null || widget.expand;
+
     return SizedBox(
       height: rowHeight,
       child: Row(
-        mainAxisAlignment: widget.width != null || widget.expand
+        mainAxisAlignment: fillsWidth
             ? MainAxisAlignment.spaceBetween
             : MainAxisAlignment.start,
-        mainAxisSize: widget.width != null || widget.expand
-            ? MainAxisSize.max
-            : MainAxisSize.min,
+        mainAxisSize: fillsWidth ? MainAxisSize.max : MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Flexible(
             child: SizedBox(
               height: effectiveContentHeight,
-              child: widget.width != null || widget.expand
+              child: fillsWidth
                   ? Container(
                       alignment: presentation.contentAlignment,
                       child: presentation.buildSelected(),
