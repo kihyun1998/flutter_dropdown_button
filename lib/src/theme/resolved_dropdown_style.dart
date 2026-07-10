@@ -180,7 +180,10 @@ class ResolvedScrollStyle {
   /// Height of the fade shown when the list can scroll.
   final double gradientHeight;
 
-  /// Whether the caller named a thumb or track width of their own.
+  /// Whether the caller named a thumb width of their own.
+  ///
+  /// Informational. [thickness] already carries the answer this used to gate,
+  /// so nothing inside the package branches on it any more.
   final bool hasCustomWidths;
 
   /// Colours, margins and thumb length, in the shape `ScrollbarTheme` takes.

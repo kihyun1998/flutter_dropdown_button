@@ -44,13 +44,20 @@ class DropdownScrollTheme {
 
   /// Thickness of the scrollbar — both its thumb and its track.
   ///
-  /// If null, the ambient `ScrollbarTheme` decides, then Flutter's own
-  /// platform-dependent default. [thumbWidth] wins over this.
+  /// If null, the ambient `ScrollbarTheme` decides, and failing that Flutter's
+  /// own default: **8 logical pixels, halved to 4 on Android.**
+  ///
+  /// Whatever the source, the menu hands `Scrollbar` a concrete number rather
+  /// than null. Flutter swells a thickness-less scrollbar from 8 to 12 while a
+  /// pointer hovers a visible track; pinning the resting value stops that
+  /// without changing how the bar looks at rest.
+  ///
+  /// [thumbWidth] wins over this.
   final double? thickness;
 
   /// Width of the scrollbar, named from the thumb's point of view.
   ///
-  /// Wins over [thickness]; falls back to it, then to `8.0`.
+  /// Wins over [thickness]; failing both, `8.0`.
   ///
   /// The track is drawn at this width too — Flutter's scrollbars have one
   /// thickness, not two.

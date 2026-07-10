@@ -397,7 +397,11 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
   ResolvedSearchFieldStyle get _searchStyle =>
       effectiveSearchTheme.resolve(_ambient);
 
-  DropdownScrollTheme? get effectiveScrollTheme => widget.theme?.scroll;
+  /// Never null. Without one the menu used to fall through to the scrollbar
+  /// Flutter's `MaterialScrollBehavior` inserts on desktop, which answers to
+  /// nothing this package exposes and swells on hover.
+  DropdownScrollTheme get effectiveScrollTheme =>
+      widget.theme?.scroll ?? DropdownScrollTheme.defaultTheme;
 
   DropdownTooltipTheme get effectiveTooltipTheme =>
       widget.theme?.tooltip ?? DropdownTooltipTheme.defaultTheme;
@@ -778,15 +782,13 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
         ),
       );
 
-      if (scrollTheme != null) {
-        content = _applyScrollbarTheme(content, scrollTheme);
-      }
+      content = _applyScrollbarTheme(content, scrollTheme);
 
-      if (scrollTheme?.showScrollGradient == true) {
+      if (scrollTheme.showScrollGradient == true) {
         content = ScrollGradientOverlay(
           controller: _scrollController!,
           fadeInto: _overlayStyle.backgroundColor,
-          height: scrollTheme!.resolve().gradientHeight,
+          height: scrollTheme.resolve().gradientHeight,
           borderRadius: _overlayStyle.borderRadius,
           colors: scrollTheme.gradientColors,
           child: content,
@@ -912,14 +914,35 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
 
   // ===== Scrollbar =====
 
+  /// The thickness this scrollbar would rest at if we named none.
+  ///
+  /// Naming it is what stops Flutter swelling a track-showing scrollbar from 8
+  /// to 12 while a pointer hovers (`material/scrollbar.dart:303`). But the value
+  /// must be the one the caller would otherwise have got, or pinning it becomes
+  /// a silent restyle:
+  ///
+  /// * an app-wide [ScrollbarTheme] is asked first, at rest;
+  /// * failing that, Flutter's own default — **halved on Android**, so a flat
+  ///   `8.0` would double the bar on every Android build.
+  double get _restingScrollbarThickness {
+    final ambient = ScrollbarTheme.of(
+      context,
+    ).thickness?.resolve(<WidgetState>{});
+    if (ambient != null) return ambient;
+
+    return Theme.of(context).platform == TargetPlatform.android ? 4.0 : 8.0;
+  }
+
   Widget _applyScrollbarTheme(Widget content, DropdownScrollTheme scrollTheme) {
     final style = scrollTheme.resolve();
 
     final scrollbar = Scrollbar(
       controller: _scrollController,
-      thickness: style.hasCustomWidths
-          ? style.thumbWidth
-          : scrollTheme.thickness,
+      // Never null. Flutter swells a thickness-less scrollbar from 8 to 12
+      // while a pointer hovers a visible track (`material/scrollbar.dart:303`);
+      // naming the thickness it would have used anyway pins it without changing
+      // how the bar looks at rest.
+      thickness: style.thickness ?? _restingScrollbarThickness,
       radius: style.radius,
       thumbVisibility: style.thumbVisibility,
       trackVisibility: style.trackVisibility,
@@ -927,9 +950,17 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
       child: content,
     );
 
-    if (!style.overridesScrollbarTheme) return scrollbar;
+    // Desktop's `MaterialScrollBehavior` wraps every scroll view in a
+    // `Scrollbar` of its own. Ours would sit on top of it, two bars deep, and
+    // the one underneath answers to nothing this theme says.
+    final only = ScrollConfiguration(
+      behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
+      child: scrollbar,
+    );
 
-    return ScrollbarTheme(data: style.scrollbarTheme, child: scrollbar);
+    if (!style.overridesScrollbarTheme) return only;
+
+    return ScrollbarTheme(data: style.scrollbarTheme, child: only);
   }
 
   // ===== Scroll gradients =====
