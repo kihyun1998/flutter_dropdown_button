@@ -2,7 +2,7 @@
 
 ## 3.0.0
 
-Removes everything deprecated during the 2.x line. Nothing was renamed and no behaviour changed — every removed member already had a replacement that was doing the work. **If you only ever used `FlutterDropdownButton`, nothing here affects you.**
+Removes everything deprecated during the 2.x line. Nothing was renamed — every removed member already had a replacement that was doing the work. **If you only ever used `FlutterDropdownButton`, the only thing that changes for you is that `semanticsLabel` starts working.**
 
 The deprecations landed across 2.3.2, 2.4.0, 2.4.1 and 2.5.0. Upgrading straight from an earlier 2.x skips the versions that warned, so the list below is the warning.
 
@@ -11,13 +11,14 @@ The deprecations landed across 2.3.2, 2.4.0, 2.4.1 and 2.5.0. Upgrading straight
 * **BREAKING**: Removed `DropdownPositionResult` and `DropdownMixin.calculateDropdownPosition()`. Use `DropdownOverlayController.measurePlacement()`, which returns a `DropdownPlacementResult`
 * **BREAKING**: Removed `DropdownTheme.animationDuration`. Nothing ever read it; setting it did nothing. Pass `animationDuration` to `FlutterDropdownButton`. If you were setting it on the theme your menus animated at 200ms and still do — move the value across only if you actually wanted the slower animation. Deprecated in 2.4.1
 * **BREAKING**: Removed `DropdownTooltipTheme.borderColor` and `DropdownTooltipTheme.borderWidth`. Use `border`, which takes any `BoxBorder`: `DropdownTooltipTheme(border: Border.all(color: Colors.red, width: 2))`. Deprecated in 2.5.0
+* **FIX**: `TextDropdownConfig.semanticsLabel` now labels the dropdown, as it always claimed to. It was applied to **every menu item** and to nothing else — and `Text`'s semantics label *replaces* the announced string, so a screen reader read `"Fruit picker"` for the Apple row, the Banana row and the Cherry row alike, suppressing every item's name and leaving the menu unnavigable by voice. It now sits on the button, announced alongside the selected value (`"Fruit picker, Banana"`), and items announce their own text
 * **CHANGE**: `lib/src/buttons/dropdown_mixin.dart` is gone, and with it the last `@Deprecated` annotation in the package
 * **FEAT**: Added `DropdownItemPresentation<T>`, with `TextItemPresentation` and `CustomItemPresentation` behind it. Anyone building a dropdown on `DropdownOverlayController` can reuse `TextItemPresentation` and get overflow handling, the tooltip and the default search filter for free, rather than reimplementing them
 * **REFACTOR**: The widget no longer branches on `isTextMode`. Rendering is chosen once, in one factory; eight consult sites became zero, and four private render methods left `flutter_dropdown_button.dart` (1291 → 1166 lines). A third rendering mode is now a third implementation and a third branch in that factory, not another conditional at every render site
 * **REFACTOR**: The overlay's content area is now sized by `DropdownOverlaySpec.totalChromeHeight` rather than by re-adding the border, padding and search-field heights by hand. `DropdownPlacement` grows the menu by that same getter, so the grow and the shrink can no longer disagree — which is what they did in 2.3.2 and again in 2.5.0
 * **CHANGE**: `isTextMode` remains public but is informational — nothing inside the widget reads it
 * **CHANGE**: The `label`-or-`String` invariant is now asserted by `TextItemPresentation` rather than in `initState`, so it fires on the first build. Still before anything paints, still an `AssertionError` in debug builds
-* **TEST**: 113 tests, up from 107. Four guarded members that no longer exist and were deleted; ten new ones exercise the presentation seam with no widget tree. One deletion is worth naming: "a tooltip `borderWidth` with no `borderColor` draws nothing" is now unrepresentable rather than untested, because a `BoxBorder` cannot carry a width without a colour
+* **TEST**: 116 tests, up from 107. Four guarded members that no longer exist and were deleted; ten new ones exercise the presentation seam with no widget tree. One deletion is worth naming: "a tooltip `borderWidth` with no `borderColor` draws nothing" is now unrepresentable rather than untested, because a `BoxBorder` cannot carry a width without a colour
 * **DOCS**: `documentation/migration.md` gains a 2.x → 3.0.0 section. `api_reference.md` no longer documents `DropdownMixin`, and its `closeAll()` section no longer claims the call is unanimated or that only one menu can be open process-wide — both stopped being true in 2.4.0
 
 ## 2.5.0

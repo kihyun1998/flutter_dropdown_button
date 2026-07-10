@@ -136,9 +136,12 @@ class TextItemPresentation<T> implements DropdownItemPresentation<T> {
       textDirection: config.textDirection,
       locale: config.locale,
       textScaler: config.textScaler,
-      semanticsLabel: config.semanticsLabel,
     );
 
+    // `config.semanticsLabel` deliberately does not reach here. `Text`'s
+    // semantics label *replaces* the announced string, so applying one label to
+    // every row made a screen reader read the same phrase for all of them.
+    // It describes the dropdown, and it is applied in [buildSelected].
     return _withLeading(text, leading);
   }
 
@@ -169,10 +172,16 @@ class TextItemPresentation<T> implements DropdownItemPresentation<T> {
     );
 
     // The hint never takes a leading widget; only a chosen item does.
-    return _withLeading(
+    final face = _withLeading(
       text,
       selectedText != null ? (selectedLeading ?? leading) : null,
     );
+
+    // The label describes the control, so it goes on the control. Wrapping
+    // rather than passing it to `Text` keeps the selected value announced too.
+    final describe = config.semanticsLabel;
+    if (describe == null) return face;
+    return Semantics(label: describe, child: face);
   }
 
   Widget _withLeading(Widget text, Widget? leadingWidget) {

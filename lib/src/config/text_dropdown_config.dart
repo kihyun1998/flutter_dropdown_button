@@ -129,8 +129,11 @@ class TextDropdownConfig {
 
   /// A semantic description of the dropdown for accessibility.
   ///
-  /// Used by screen readers and other assistive technologies.
-  /// If null, no semantic label is provided.
+  /// Applied to the **button**, alongside the selected value rather than in
+  /// place of it: a screen reader announces `"Fruit picker, Banana"`.
+  ///
+  /// It does **not** label the items — each of those announces its own text.
+  /// If null, the button announces only its value.
   final String? semanticsLabel;
 
   /// Creates a copy of this config with the given fields replaced.

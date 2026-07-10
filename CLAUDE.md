@@ -75,7 +75,7 @@ When you deprecate a member, annotate the **field, the constructor parameter and
 
 ```bash
 flutter pub get              # install dependencies
-flutter test                 # run the suite (113 tests)
+flutter test                 # run the suite (116 tests)
 flutter analyze              # static analysis; must be clean
 dart format .                # formatting; must produce no changes
 flutter pub publish --dry-run   # validate the package before release
@@ -85,7 +85,7 @@ cd example && flutter run    # run the playground app
 
 ## Testing
 
-113 tests. 66 of them run without mounting a widget at all.
+116 tests. 66 of them run without mounting a widget at all.
 
 | Suite | What it covers |
 | --- | --- |
@@ -101,6 +101,7 @@ cd example && flutter run    # run the playground app
 | `test/text_label_test.dart` | `label` with a non-`String` `T` |
 | `test/theme_resolution_test.dart` | Resolution rules, observed at the rendered widget |
 | `test/tooltip_decoration_test.dart` | A partial tooltip theme keeping the box it did not name |
+| `test/semantics_label_test.dart` | What a screen reader hears, at the semantics tree |
 | `test/disabled_state_test.dart` | The disabled state, including single-item auto-disable |
 
 **Conventions that matter here:**

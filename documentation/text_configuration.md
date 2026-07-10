@@ -279,6 +279,10 @@ TextDropdownConfig(
 )
 ```
 
+`semanticsLabel` describes the **button**. A screen reader announces it alongside
+the selected value — `"Fruit selection dropdown, Banana"` — not in place of it.
+Menu items are unaffected: each announces its own text.
+
 ### Locale-specific Rendering
 
 ```dart

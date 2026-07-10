@@ -341,7 +341,7 @@ TextDropdownConfig({
 | `textDirection` | `TextDirection?` | null | Text direction |
 | `locale` | `Locale?` | null | Locale for text rendering |
 | `textScaler` | `TextScaler?` | null | Text scaler for accessibility |
-| `semanticsLabel` | `String?` | null | Semantic label for accessibility |
+| `semanticsLabel` | `String?` | null | Accessibility label for the **button**, announced alongside the selected value. Items announce their own text |
 
 ### Predefined Configurations
 
