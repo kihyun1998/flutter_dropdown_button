@@ -6,7 +6,7 @@ Complete reference for all classes and widgets in the flutter_dropdown_button pa
 
 ## FlutterDropdownButton<T>
 
-The one dropdown widget. Two constructors.
+Chooses one item. Two constructors.
 
 ```dart
 // Custom mode — render each item as any widget
@@ -40,6 +40,50 @@ Full parameter tables live in `README.md`. The two constructors share every layo
 | Member | Description |
 |--------|-------------|
 | `closeAll({bool animate = true})` | Closes every open menu. Pass `animate: false` right before navigation, when the widget may be disposed before an animation could finish |
+
+### A value that is not in `items`
+
+The button draws `value` whether or not `items` still offers it. A list refresh can drop the chosen row's data while `value` still names it; the button keeps showing it, the menu draws no row for it, and nothing throws.
+
+**The widget draws what it was handed.** `value` belongs to the caller, and a button that silently reverted to its hint would disagree with the state its owner holds — with no callback and no error to explain why.
+
+Before 3.1.0, custom mode audited `value` against `items` and fell back to `hintWidget`; text mode never did, having no `items` to consult. The two now agree.
+
+## FlutterMultiSelectDropdown\<T\>
+
+A checklist. Several items may be chosen, the menu stays open while they are, and `onChanged` fires the moment a box is ticked — no confirm button. Anchored rather than modal: no scrim, dismissed by an outside tap.
+
+```dart
+FlutterMultiSelectDropdown<T>({
+  required List<T> items,
+  required Set<T> selected,
+  required ValueChanged<Set<T>> onChanged,
+  required String Function(Set<T> selected) labelBuilder,
+  String Function(T item)? label,          // required unless T is String
+  Widget Function(T item)? itemTrailingBuilder,
+  TextDropdownConfig? config,
+  ...
+})
+```
+
+It shares every layout, theming and search parameter with `FlutterDropdownButton`. It does **not** have `value`, `scrollToSelectedItem`, `scrollToSelectedDuration`, `disableWhenSingleItem` or `hideIconWhenSingleItem`: those mean nothing to a checklist, so they are absent from the type rather than asserted against at runtime.
+
+Text mode only. An item that needs more than text — an avatar, two lines — is a fourth `DropdownItemPresentation` and does not exist yet.
+
+### Contracts
+
+- **`selected` is yours.** `onChanged` receives a fresh `Set`; the one you pass in is never mutated and may be unmodifiable.
+- **`T` needs `==` and `hashCode`.** `selected.contains(item)` uses both, where single-select's `value == item` used only the first. A `T` with a hand-written `==` and the default `hashCode` will let a `Set` hold duplicates that look identical.
+- **A chosen value absent from `items`** still counts towards `labelBuilder`, and draws no row. `'3 selected'` can appear beside two ticked boxes after a refresh drops the third. Offer a way to clear it.
+- **The query survives a tick.** Only opening and closing the menu reset it.
+- **Rows announce their checked state.** The box is drawn but excluded from the semantics tree; the row carries `checked` instead. A live `Checkbox` inside the row's ink well would announce every row as *disabled*.
+- **A trailing widget's text is merged into the row's announced label.** The ink well merges its descendants, so `itemTrailingBuilder: (v) => Text('42')` makes a screen reader read `"Apple\n42"`.
+
+### Statics
+
+| Member | Description |
+|--------|-------------|
+| `closeAll({bool animate = true})` | The same registry as `FlutterDropdownButton.closeAll`. Either closes both kinds |
 
 ## DropdownTheme
 
@@ -262,6 +306,29 @@ A `value` that is not among `items` — the state a list refresh leaves behind w
 The menu is a separate matter. It iterates `items`, so an absent value is never a row.
 
 `items` is therefore read by nothing and is **deprecated**; it will be removed in 4.0.0.
+
+### MultiSelectPresentation\<T\>
+
+Renders items as a checklist: a box, a label, and an optional trailing widget. The button's face is whatever `labelBuilder` makes of the chosen set. `FlutterMultiSelectDropdown` uses it; nothing stops you from driving it yourself.
+
+```dart
+final presentation = MultiSelectPresentation<String>(
+  selected: chosen,
+  labelBuilder: (s) => '${s.length} selected',
+  label: null,                                 // required unless T is String
+  config: TextDropdownConfig.defaultConfig,
+  tooltipTheme: DropdownTooltipTheme.defaultTheme,
+  enabled: true,
+  itemTrailingBuilder: (item) => Text('${counts[item]}'),
+);
+```
+
+The interface is unchanged. `buildSelected()` still takes no argument: `TextItemPresentation` swallows a `value` as a field, and this one swallows a `Set` and a `labelBuilder` the same way.
+
+Two things it does that are not visible on screen:
+
+- The `Checkbox` is **presentational** and **excluded from the semantics tree**, and the row carries `Semantics(checked:)` instead. `onChanged: null` gives the box no gesture recognizer — a tap on it falls through to the row — but it *does* put `isEnabled: false` on the merged row, which makes a screen reader call every row of a working checklist *dimmed*. `IgnorePointer` does not help; it suppresses hit-testing, not semantics.
+- The row's ink well **merges** its descendants' semantics, so `itemTrailingBuilder`'s text becomes part of the announced label: `"Apple\n42"`.
 
 ## DropdownSearchController\<T\>
 

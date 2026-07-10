@@ -1,14 +1,15 @@
 # Flutter Dropdown Button
 
-A highly customizable dropdown package for Flutter with overlay-based rendering, smooth animations, and full control over appearance and behavior — all in a single widget.
+A highly customizable dropdown package for Flutter with overlay-based rendering, smooth animations, and full control over appearance and behavior.
 
 [![pub package](https://img.shields.io/pub/v/flutter_dropdown_button.svg)](https://pub.dev/packages/flutter_dropdown_button)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## Features
 
-- **Single Unified Widget**: One `FlutterDropdownButton<T>` for all use cases
+- **Two Widgets**: `FlutterDropdownButton<T>` chooses one item; `FlutterMultiSelectDropdown<T>` is a checklist that stays open
 - **Two Modes**: Custom widget rendering (default) or text-only (`.text()`)
+- **Multi-Select**: Tick boxes, get a `Set<T>` at once — anchored, not modal, and no confirm button
 - **Any Type in Text Mode**: Supply a `label` callback and keep tooltips, overflow handling and search
 - **Overlay-based Rendering**: Better positioning and visual effects than Flutter's built-in DropdownButton
 - **Smart Positioning**: Automatically opens up/down based on available space
@@ -43,7 +44,7 @@ Add to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  flutter_dropdown_button: ^3.0.2
+  flutter_dropdown_button: ^3.1.0
 ```
 
 Import the package:
@@ -140,6 +141,29 @@ FlutterDropdownButton<String>(
 )
 ```
 
+### Multi-Select Checklist
+
+Ticking a box calls `onChanged` immediately with a **new** `Set`. The menu stays
+open, so the next box can be ticked. There is no confirm button and no scrim.
+
+```dart
+FlutterMultiSelectDropdown<String>(
+  items: ['Windows', 'Linux', 'macOS'],
+  selected: chosen,
+  labelBuilder: (s) => switch (s.length) {
+    0 => 'All',
+    1 => s.first,
+    _ => '${s.length} selected',
+  },
+  searchable: true,                        // when the list runs long
+  itemTrailingBuilder: (v) => Text('${counts[v]}'),
+  onChanged: (next) => setState(() => chosen = next),
+)
+```
+
+`selected` is yours. The widget copies it before emitting, never edits it, and
+draws whatever you hand it — see [A value that is not in `items`](#a-value-that-is-not-in-items).
+
 ---
 
 ## API Reference
@@ -175,7 +199,7 @@ The unified dropdown widget. Use the default constructor for custom widget rende
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
-| `value` | `T?` | `null` | Currently selected value |
+| `value` | `T?` | `null` | Currently selected value. Drawn on the button whether or not it is in `items` — see below |
 | `width` | `double?` | `null` | Fixed width (`null` = content-based) |
 | `minWidth` | `double?` | `null` | Minimum width constraint |
 | `maxWidth` | `double?` | `null` | Maximum width constraint |
@@ -196,6 +220,48 @@ The unified dropdown widget. Use the default constructor for custom widget rende
 | `searchable` | `bool` | `false` | Enable search/filter field in dropdown |
 | `searchFilter` | `bool Function(T, String)?` | `null` | Custom filter function (required for custom mode) |
 | `emptyBuilder` | `Widget Function(String)?` | `null` | Widget builder for empty search results |
+
+#### A value that is not in `items`
+
+A list refresh can drop the row a `value` names while `value` still names it.
+The button keeps drawing that value; the menu, which iterates `items`, draws no
+row for it. **The widget draws what it was handed** — `value` is yours, and a
+button that silently reverted to its hint would disagree with the state you
+hold. Nothing throws.
+
+`FlutterMultiSelectDropdown` follows the same rule: such a value still counts
+towards `labelBuilder`, so `'3 selected'` can appear beside two ticked rows.
+Give the user a way to clear it.
+
+### FlutterMultiSelectDropdown\<T\>
+
+A checklist. Several items may be chosen, the menu stays open while they are,
+and `onChanged` fires the moment a box is ticked. Anchored rather than modal:
+no scrim, dismissed by an outside tap.
+
+Rows render as text, so `T` must be a `String` or `label` must say how to make
+one. `T` must implement `==` **and** `hashCode` consistently — a `Set` needs
+both, where single-select's `value == item` needed only the first.
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| **`items`** | `List<T>` | **required** | List of item values |
+| **`selected`** | `Set<T>` | **required** | The chosen items. Yours; never mutated |
+| **`onChanged`** | `ValueChanged<Set<T>>` | **required** | Called with a **new** `Set` the moment a row is tapped |
+| **`labelBuilder`** | `String Function(Set<T>)` | **required** | Turns `selected` into the button's face |
+| `label` | `String Function(T)?` | `null` | The text a row shows. Required unless `T` is `String` |
+| `itemTrailingBuilder` | `Widget Function(T)?` | `null` | Drawn at the end of each row — a count, a badge |
+| `config` | `TextDropdownConfig?` | `null` | Text rendering configuration |
+
+Everything under **Common Parameters** above applies too, except the five that
+mean nothing to a checklist and therefore do not exist on it: `value`,
+`scrollToSelectedItem`, `scrollToSelectedDuration`, `disableWhenSingleItem` and
+`hideIconWhenSingleItem`. They are absent from the type rather than asserted
+against at runtime.
+
+```dart
+FlutterMultiSelectDropdown.closeAll();   // the same registry as the other widget
+```
 
 ### MenuAlignment
 

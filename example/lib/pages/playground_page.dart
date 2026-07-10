@@ -394,6 +394,11 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
         title: const Text('Dropdown Playground'),
         actions: [
           IconButton(
+            icon: const Icon(Icons.checklist),
+            tooltip: 'Multi-Select Filter',
+            onPressed: () => Navigator.pushNamed(context, '/multi-select'),
+          ),
+          IconButton(
             icon: const Icon(Icons.travel_explore),
             tooltip: 'Domain Types & Controller',
             onPressed: () => Navigator.pushNamed(context, '/domain-type'),

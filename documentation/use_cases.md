@@ -380,3 +380,85 @@ FlutterDropdownButton<String>.text(
 | `minWidth: 100, maxWidth: 300` | Content-driven, clamped to 100~300px |
 | `expand: true` | Fills available flex space |
 | None | Shrinks to content, no limit |
+
+---
+
+## Filter Panel — Multi-Select
+
+The case this widget was built for. A side panel, 350px wide, filters a list of
+server nodes by fields whose values are finite and discovered at runtime: OS
+family, protocol, status. The user wants several values ORed together, applied
+the moment they are ticked, beside chip filters that already behave that way.
+
+A `showDialog` + `CheckboxListTile` gets you there, but it dims the page, it
+forces an *Apply* button, and it breaks gesture parity with the chips.
+
+```dart
+class OsFilter extends StatefulWidget {
+  const OsFilter({super.key, required this.nodes, required this.onFilter});
+
+  final List<Node> nodes;
+  final ValueChanged<Set<String>> onFilter;
+
+  @override
+  State<OsFilter> createState() => _OsFilterState();
+}
+
+class _OsFilterState extends State<OsFilter> {
+  Set<String> chosen = {};
+
+  @override
+  Widget build(BuildContext context) {
+    // The values, and how many nodes carry each, come from the data.
+    final counts = <String, int>{};
+    for (final node in widget.nodes) {
+      counts[node.os] = (counts[node.os] ?? 0) + 1;
+    }
+    final values = counts.keys.toList()..sort();
+
+    return FlutterMultiSelectDropdown<String>(
+      width: 320,
+      items: values,
+      selected: chosen,
+      labelBuilder: (s) => switch (s.length) {
+        0 => 'All operating systems',
+        1 => s.first,
+        _ => '${s.length} selected',
+      },
+      // Ten values is where scanning stops working.
+      searchable: values.length > 10,
+      itemTrailingBuilder: (v) => Text('${counts[v]}'),
+      onChanged: (next) {
+        setState(() => chosen = next);
+        widget.onFilter(next);   // OR semantics are yours; the widget has none
+      },
+    );
+  }
+}
+```
+
+### Why a list rather than chips
+
+`Windows Active Directory` is a real value. As a chip in a `Wrap` it eats a whole
+row of a 350px panel. A list row uses the full width and ellipsises what does not
+fit, with the full string in a tooltip — so the layout is immune to how long the
+values turn out to be.
+
+### The value that disappears
+
+Refresh the node list and every machine running `Solaris` may be gone. `chosen`
+still holds `'Solaris'`; `items` no longer offers it.
+
+Nothing breaks. The widget draws what it was handed: no row is invented for the
+missing value, no exception is thrown, and the choice is not silently discarded.
+What it *does* do is count it — `labelBuilder` sees a set of three beside two
+ticked boxes.
+
+That is deliberate: `chosen` is your state, and a widget that edited it behind
+your back would be the harder bug. Show the chosen values as removable chips
+beside the button, and the stale one has an exit.
+
+### What the widget does not do
+
+Filter semantics. OR versus AND, `contains` versus `∈`, how an empty set reads —
+all yours. The widget takes a `Set<T>` and gives back a `Set<T>`.
