@@ -41,8 +41,9 @@ Future<void Function(List<String>)> pumpWithMutableItems(
 }
 
 void main() {
-  testWidgets('an open menu reflects items that change underneath it',
-      (tester) async {
+  testWidgets('an open menu reflects items that change underneath it', (
+    tester,
+  ) async {
     // The item count is held constant so this measures only whether the open
     // overlay picks up new items — not whether it can grow. The overlay's
     // height is fixed when it opens, so a longer list would scroll the new
@@ -63,8 +64,9 @@ void main() {
     expect(find.text('Banana'), findsNothing);
   });
 
-  testWidgets('items arriving while searching are filtered by the query',
-      (tester) async {
+  testWidgets('items arriving while searching are filtered by the query', (
+    tester,
+  ) async {
     final setItems = await pumpWithMutableItems(
       tester,
       initial: ['Apple', 'Banana'],

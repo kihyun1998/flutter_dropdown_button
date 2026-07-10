@@ -57,10 +57,8 @@ Rect menuRect(WidgetTester tester) {
 Rect buttonRect(WidgetTester tester) =>
     tester.getRect(find.byType(FlutterDropdownButton<String>));
 
-List<String> manyItems(int n) => List<String>.generate(
-      n,
-      (i) => i == 0 ? 'Apple' : 'Item $i',
-    );
+List<String> manyItems(int n) =>
+    List<String>.generate(n, (i) => i == 0 ? 'Apple' : 'Item $i');
 
 void main() {
   testWidgets('an open menu grows when an item is added', (tester) async {
@@ -93,8 +91,9 @@ void main() {
     expect(menuRect(tester).height, lessThan(before));
   });
 
-  testWidgets('an open menu flips above the button when it no longer fits',
-      (tester) async {
+  testWidgets('an open menu flips above the button when it no longer fits', (
+    tester,
+  ) async {
     // Button occupies y 402..450 on a 600px screen. One item (50px) fits in
     // the 138px below it; eight items (202px) do not, and 390px sit above.
     final setItems = await pumpDropdown(
@@ -105,13 +104,19 @@ void main() {
 
     await openDropdown(tester);
     final button = buttonRect(tester);
-    expect(menuRect(tester).top, greaterThan(button.bottom),
-        reason: 'one item opens downward');
+    expect(
+      menuRect(tester).top,
+      greaterThan(button.bottom),
+      reason: 'one item opens downward',
+    );
 
     setItems(manyItems(8));
     await tester.pumpAndSettle();
 
-    expect(menuRect(tester).bottom, lessThan(button.top),
-        reason: 'eight items no longer fit below, so the menu flips above');
+    expect(
+      menuRect(tester).bottom,
+      lessThan(button.top),
+      reason: 'eight items no longer fit below, so the menu flips above',
+    );
   });
 }

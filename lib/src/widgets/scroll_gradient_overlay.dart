@@ -127,22 +127,23 @@ class _ScrollGradientOverlayState extends State<ScrollGradientOverlay> {
   Widget _fade(ValueListenable<bool> visible, List<Color> colors) {
     return ValueListenableBuilder<bool>(
       valueListenable: visible,
-      builder: (context, show, _) => IgnorePointer(
-        child: AnimatedOpacity(
-          opacity: show ? 1.0 : 0.0,
-          duration: ScrollGradientOverlay.fadeDuration,
-          child: Container(
-            height: widget.height,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: colors,
+      builder:
+          (context, show, _) => IgnorePointer(
+            child: AnimatedOpacity(
+              opacity: show ? 1.0 : 0.0,
+              duration: ScrollGradientOverlay.fadeDuration,
+              child: Container(
+                height: widget.height,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: colors,
+                  ),
+                ),
               ),
             ),
           ),
-        ),
-      ),
     );
   }
 }

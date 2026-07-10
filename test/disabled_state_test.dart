@@ -20,8 +20,9 @@ Color? arrowColour(WidgetTester tester) =>
 
 void main() {
   group('the arrow icon agrees with the rest of the button', () {
-    testWidgets('enabled dropdown draws the enabled icon colour',
-        (tester) async {
+    testWidgets('enabled dropdown draws the enabled icon colour', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         host(
           FlutterDropdownButton<String>.text(
@@ -36,8 +37,9 @@ void main() {
       expect(arrowColour(tester), enabledIcon);
     });
 
-    testWidgets('disabled dropdown draws the disabled icon colour',
-        (tester) async {
+    testWidgets('disabled dropdown draws the disabled icon colour', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         host(
           FlutterDropdownButton<String>.text(
@@ -53,8 +55,7 @@ void main() {
       expect(arrowColour(tester), disabledIcon);
     });
 
-    testWidgets(
-        'a single-item dropdown disabled by policy draws the '
+    testWidgets('a single-item dropdown disabled by policy draws the '
         'disabled icon colour too', (tester) async {
       // `disableWhenSingleItem` makes the button non-interactive: the tap is
       // blocked, the decoration switches to its disabled form, and the text

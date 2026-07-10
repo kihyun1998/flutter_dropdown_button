@@ -34,8 +34,11 @@ void main() {
     await tester.pump(); // insert the overlay
     await tester.pump(const Duration(milliseconds: 200));
 
-    expect(menuOpacity(tester), lessThan(1.0),
-        reason: 'a 1000ms animation is only a fifth of the way through');
+    expect(
+      menuOpacity(tester),
+      lessThan(1.0),
+      reason: 'a 1000ms animation is only a fifth of the way through',
+    );
 
     await tester.pumpAndSettle();
     expect(menuOpacity(tester), 1.0);

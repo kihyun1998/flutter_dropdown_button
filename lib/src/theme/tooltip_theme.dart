@@ -281,8 +281,9 @@ class DropdownTooltipTheme {
   }
 
   /// Flutter's own tooltip corner radius.
-  static const BorderRadius _defaultRadius =
-      BorderRadius.all(Radius.circular(4));
+  static const BorderRadius _defaultRadius = BorderRadius.all(
+    Radius.circular(4),
+  );
 
   /// Flutter's own tooltip background, which flips with the ambient brightness.
   static Color _defaultBackground(Brightness brightness) =>
@@ -293,7 +294,8 @@ class DropdownTooltipTheme {
   Decoration? _resolveDecoration(Brightness brightness) {
     if (decoration != null) return decoration;
 
-    final touchesTheBox = backgroundColor != null ||
+    final touchesTheBox =
+        backgroundColor != null ||
         borderRadius != null ||
         border != null ||
         shadow != null;

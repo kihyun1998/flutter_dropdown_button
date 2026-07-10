@@ -15,21 +15,23 @@ Future<Tooltip> pumpTooltip(
   DropdownTooltipTheme tooltip, {
   Brightness brightness = Brightness.light,
 }) async {
-  await tester.pumpWidget(MaterialApp(
-    theme: ThemeData(brightness: brightness),
-    home: Scaffold(
-      body: Center(
-        child: FlutterDropdownButton<String>.text(
-          width: 140,
-          items: const [_long],
-          value: _long,
-          disableWhenSingleItem: false,
-          theme: DropdownStyleTheme(tooltip: tooltip),
-          onChanged: (_) {},
+  await tester.pumpWidget(
+    MaterialApp(
+      theme: ThemeData(brightness: brightness),
+      home: Scaffold(
+        body: Center(
+          child: FlutterDropdownButton<String>.text(
+            width: 140,
+            items: const [_long],
+            value: _long,
+            disableWhenSingleItem: false,
+            theme: DropdownStyleTheme(tooltip: tooltip),
+            onChanged: (_) {},
+          ),
         ),
       ),
     ),
-  ));
+  );
   await tester.pumpAndSettle();
   return tester.widget<Tooltip>(find.byType(Tooltip).first);
 }
@@ -67,8 +69,10 @@ void main() {
 
   testWidgets('a shadow does not blank the box', (tester) async {
     const shadow = [BoxShadow(color: Colors.black26, blurRadius: 8)];
-    final tooltip =
-        await pumpTooltip(tester, const DropdownTooltipTheme(shadow: shadow));
+    final tooltip = await pumpTooltip(
+      tester,
+      const DropdownTooltipTheme(shadow: shadow),
+    );
 
     expect(boxOf(tooltip).boxShadow, shadow);
     expect(boxOf(tooltip).color, isNotNull);
@@ -87,8 +91,9 @@ void main() {
     expect(boxOf(tooltip).color, isNotNull);
   });
 
-  testWidgets('the default background flips with the ambient brightness',
-      (tester) async {
+  testWidgets('the default background flips with the ambient brightness', (
+    tester,
+  ) async {
     final light = await pumpTooltip(
       tester,
       DropdownTooltipTheme(borderRadius: BorderRadius.circular(8)),

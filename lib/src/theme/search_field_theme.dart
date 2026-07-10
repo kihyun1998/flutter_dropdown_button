@@ -237,7 +237,8 @@ class SearchFieldTheme {
       textAlign: textAlign,
       autofocus: autofocus,
       dividerHeight: resolvedDividerHeight,
-      totalHeight: resolvedHeight +
+      totalHeight:
+          resolvedHeight +
           resolvedMargin.top +
           resolvedMargin.bottom +
           resolvedDividerHeight,
@@ -261,7 +262,8 @@ class SearchFieldTheme {
       hintText: 'Search...',
       prefixIcon: const Icon(Icons.search, size: 20),
       prefixIconConstraints: const BoxConstraints(minWidth: 36, minHeight: 0),
-      contentPadding: contentPadding ??
+      contentPadding:
+          contentPadding ??
           const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       isDense: true,
       border: OutlineInputBorder(

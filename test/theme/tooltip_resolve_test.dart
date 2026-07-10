@@ -4,17 +4,20 @@ import 'package:flutter_test/flutter_test.dart';
 
 /// No widget tree, no `pumpWidget`, no `BuildContext`.
 
-BoxDecoration boxOf(DropdownTooltipTheme theme,
-        [Brightness brightness = Brightness.light]) =>
-    theme.resolve(brightness).decoration! as BoxDecoration;
+BoxDecoration boxOf(
+  DropdownTooltipTheme theme, [
+  Brightness brightness = Brightness.light,
+]) => theme.resolve(brightness).decoration! as BoxDecoration;
 
 final grey700 = Colors.grey.shade700.withValues(alpha: 0.9);
 const radius4 = BorderRadius.all(Radius.circular(4));
 
 void main() {
   test('a theme that names no box property leaves the decoration null', () {
-    expect(const DropdownTooltipTheme().resolve(Brightness.light).decoration,
-        isNull);
+    expect(
+      const DropdownTooltipTheme().resolve(Brightness.light).decoration,
+      isNull,
+    );
   });
 
   test('any one box property fills all the others', () {
@@ -37,8 +40,10 @@ void main() {
     final theme = DropdownTooltipTheme(borderRadius: BorderRadius.circular(8));
 
     expect(boxOf(theme, Brightness.light).color, grey700);
-    expect(boxOf(theme, Brightness.dark).color,
-        Colors.white.withValues(alpha: 0.9));
+    expect(
+      boxOf(theme, Brightness.dark).color,
+      Colors.white.withValues(alpha: 0.9),
+    );
   });
 
   test('an explicit background overrides the brightness default', () {

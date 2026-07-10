@@ -111,8 +111,10 @@ class DropdownOverlayController {
     required this.decorationBuilder,
     Duration animationDuration = const Duration(milliseconds: 200),
     this.onOpenStateChanged,
-  }) : _animation =
-            AnimationController(duration: animationDuration, vsync: vsync);
+  }) : _animation = AnimationController(
+         duration: animationDuration,
+         vsync: vsync,
+       );
 
   /// Attach this to the button so the controller can measure it.
   final GlobalKey buttonKey = GlobalKey();
@@ -150,11 +152,15 @@ class DropdownOverlayController {
   /// while the menu is open, say. The menu's own scale and fade are internal.
   AnimationController get animation => _animation;
 
-  late final Animation<double> _scale = Tween<double>(begin: 0.8, end: 1.0)
-      .animate(CurvedAnimation(parent: _animation, curve: Curves.easeOutBack));
+  late final Animation<double> _scale = Tween<double>(
+    begin: 0.8,
+    end: 1.0,
+  ).animate(CurvedAnimation(parent: _animation, curve: Curves.easeOutBack));
 
-  late final Animation<double> _opacity = Tween<double>(begin: 0.0, end: 1.0)
-      .animate(CurvedAnimation(parent: _animation, curve: Curves.easeOut));
+  late final Animation<double> _opacity = Tween<double>(
+    begin: 0.0,
+    end: 1.0,
+  ).animate(CurvedAnimation(parent: _animation, curve: Curves.easeOut));
 
   /// Shows the menu, closing whichever menu is open in the same [Overlay].
   void open(BuildContext context) {
@@ -224,8 +230,9 @@ class DropdownOverlayController {
       // The overlay may already be gone — during a route transition, say.
     } finally {
       _entry = null;
-      _openPerOverlay
-          .removeWhere((_, controller) => identical(controller, this));
+      _openPerOverlay.removeWhere(
+        (_, controller) => identical(controller, this),
+      );
       if (notify) onOpenStateChanged?.call(false);
     }
   }
@@ -299,11 +306,13 @@ class DropdownOverlayController {
                       borderRadius: BorderRadius.circular(current.borderRadius),
                       child: Container(
                         constraints: BoxConstraints(maxHeight: position.height),
-                        decoration: decorationBuilder() ??
+                        decoration:
+                            decorationBuilder() ??
                             BoxDecoration(
                               color: Theme.of(context).cardColor,
-                              borderRadius:
-                                  BorderRadius.circular(current.borderRadius),
+                              borderRadius: BorderRadius.circular(
+                                current.borderRadius,
+                              ),
                               border: Border.all(
                                 color: Theme.of(context).dividerColor,
                                 width: 1,
@@ -312,11 +321,12 @@ class DropdownOverlayController {
                         child: contentBuilder(position.height),
                       ),
                     ),
-                    builder: (context, child) => Transform.scale(
-                      scale: _scale.value,
-                      alignment: position.transformAlignment,
-                      child: Opacity(opacity: _opacity.value, child: child),
-                    ),
+                    builder:
+                        (context, child) => Transform.scale(
+                          scale: _scale.value,
+                          alignment: position.transformAlignment,
+                          child: Opacity(opacity: _opacity.value, child: child),
+                        ),
                   ),
                 ),
               ],

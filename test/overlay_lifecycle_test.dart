@@ -85,8 +85,9 @@ void main() {
     expect(alphaMenuOpen(), isFalse);
   });
 
-  testWidgets('closeAll(animate: false) removes the menu at once',
-      (tester) async {
+  testWidgets('closeAll(animate: false) removes the menu at once', (
+    tester,
+  ) async {
     await tester.pumpWidget(twoDropdowns());
 
     await tester.tap(alphaButton());
@@ -112,8 +113,9 @@ void main() {
     expect(alphaMenuOpen(), isTrue);
   });
 
-  testWidgets('disposing the widget while open tears the overlay down',
-      (tester) async {
+  testWidgets('disposing the widget while open tears the overlay down', (
+    tester,
+  ) async {
     await tester.pumpWidget(twoDropdowns());
 
     await tester.tap(alphaButton());

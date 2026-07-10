@@ -128,7 +128,8 @@ abstract final class DropdownPlacement {
   /// Calculates the menu's placement.
   static DropdownPlacementResult resolve(DropdownPlacementInput input) {
     final width = _resolveWidth(input);
-    final preferredHeight = math.min(
+    final preferredHeight =
+        math.min(
           input.itemCount * input.actualItemHeight,
           input.maxDropdownHeight,
         ) +
@@ -136,12 +137,14 @@ abstract final class DropdownPlacement {
 
     // Both spans already exclude the screen margin and the button gap, so a
     // menu that fits within one of them satisfies the invariant by itself.
-    final spaceBelow = input.screenSize.height -
+    final spaceBelow =
+        input.screenSize.height -
         input.safeInsetBottom -
         input.screenMargin -
         input.buttonBottom -
         input.buttonGap;
-    final spaceAbove = input.buttonOffset.dy -
+    final spaceAbove =
+        input.buttonOffset.dy -
         input.safeInsetTop -
         input.screenMargin -
         input.buttonGap;
@@ -171,9 +174,10 @@ abstract final class DropdownPlacement {
       openDown: openDown,
       transformAlignment:
           openDown ? Alignment.topCenter : Alignment.bottomCenter,
-      top: openDown
-          ? input.buttonBottom + input.buttonGap
-          : input.buttonOffset.dy - input.buttonGap - height,
+      top:
+          openDown
+              ? input.buttonBottom + input.buttonGap
+              : input.buttonOffset.dy - input.buttonGap - height,
       width: width,
       left: _resolveLeft(input, width),
     );

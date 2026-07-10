@@ -29,8 +29,11 @@ void main() {
     expect(search.enabled, isFalse);
     expect(search.textController, isNull);
     expect(search.focusNode, isNull);
-    expect(search.visibleItems(fruits, contains), same(fruits),
-        reason: 'the caller\'s own list, not a copy');
+    expect(
+      search.visibleItems(fruits, contains),
+      same(fruits),
+      reason: 'the caller\'s own list, not a copy',
+    );
   });
 
   test('an enabled controller has a field to type into', () {
@@ -66,8 +69,11 @@ void main() {
     final search = searching()..onQueryChanged('a');
 
     expect(search.visibleItems(fruits, contains), ['Apple', 'Banana']);
-    expect(search.visibleItems(const ['Avocado'], contains), ['Avocado'],
-        reason: 'a different list, filtered by the same live query');
+    expect(
+      search.visibleItems(const ['Avocado'], contains),
+      ['Avocado'],
+      reason: 'a different list, filtered by the same live query',
+    );
   });
 
   test('reset clears the query and the field', () {
@@ -97,8 +103,11 @@ void main() {
     search.enabled = false;
 
     expect(search.visibleItems(fruits, contains), same(fruits));
-    expect(search.textController, same(field),
-        reason: 'turning search back on must not lose the caret');
+    expect(
+      search.textController,
+      same(field),
+      reason: 'turning search back on must not lose the caret',
+    );
   });
 
   test('re-enabling keeps the query that was already typed', () {

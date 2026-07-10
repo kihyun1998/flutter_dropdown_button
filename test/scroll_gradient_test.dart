@@ -15,26 +15,28 @@ Future<void> openScrollableMenu(
   WidgetTester tester, {
   List<Color>? gradientColors,
 }) async {
-  await tester.pumpWidget(MaterialApp(
-    home: Scaffold(
-      body: Center(
-        child: FlutterDropdownButton<String>.text(
-          width: 200,
-          height: 100,
-          items: const ['a', 'b', 'c', 'd', 'e', 'f'],
-          hint: 'pick',
-          theme: DropdownStyleTheme(
-            dropdown: const DropdownTheme(backgroundColor: menuBackground),
-            scroll: DropdownScrollTheme(
-              showScrollGradient: true,
-              gradientColors: gradientColors,
+  await tester.pumpWidget(
+    MaterialApp(
+      home: Scaffold(
+        body: Center(
+          child: FlutterDropdownButton<String>.text(
+            width: 200,
+            height: 100,
+            items: const ['a', 'b', 'c', 'd', 'e', 'f'],
+            hint: 'pick',
+            theme: DropdownStyleTheme(
+              dropdown: const DropdownTheme(backgroundColor: menuBackground),
+              scroll: DropdownScrollTheme(
+                showScrollGradient: true,
+                gradientColors: gradientColors,
+              ),
             ),
+            onChanged: (_) {},
           ),
-          onChanged: (_) {},
         ),
       ),
     ),
-  ));
+  );
   await tester.tap(find.byType(FlutterDropdownButton<String>));
   await tester.pumpAndSettle();
 }
@@ -46,13 +48,14 @@ List<LinearGradient> fades(WidgetTester tester) {
     matching: find.byType(Container),
   );
 
-  final gradients = tester
-      .widgetList<Container>(painted)
-      .map((c) => c.decoration)
-      .whereType<BoxDecoration>()
-      .map((d) => d.gradient)
-      .whereType<LinearGradient>()
-      .toList();
+  final gradients =
+      tester
+          .widgetList<Container>(painted)
+          .map((c) => c.decoration)
+          .whereType<BoxDecoration>()
+          .map((d) => d.gradient)
+          .whereType<LinearGradient>()
+          .toList();
 
   expect(gradients, hasLength(2), reason: 'a fade at each edge');
   return gradients;
@@ -64,8 +67,11 @@ void main() {
 
     final top = fades(tester).first;
     expect(top.begin, Alignment.topCenter);
-    expect(top.colors.first, menuBackground,
-        reason: 'the edge the content disappears under');
+    expect(
+      top.colors.first,
+      menuBackground,
+      reason: 'the edge the content disappears under',
+    );
     expect(top.colors.last.a, 0.0, reason: 'clear over the content');
   });
 
@@ -81,39 +87,47 @@ void main() {
   // Guard, not a regression test: this passed before the fix too, and that is
   // the diagnosis — colours the caller supplied were always drawn correctly.
   // Only the default list was built in the wrong order.
-  testWidgets('themed colours are taken edge-first, and reversed at the bottom',
-      (tester) async {
-    const edge = Color(0xFF112233);
-    const clear = Color(0x00112233);
-    await openScrollableMenu(tester, gradientColors: const [edge, clear]);
+  testWidgets(
+    'themed colours are taken edge-first, and reversed at the bottom',
+    (tester) async {
+      const edge = Color(0xFF112233);
+      const clear = Color(0x00112233);
+      await openScrollableMenu(tester, gradientColors: const [edge, clear]);
 
-    expect(fades(tester).first.colors, const [edge, clear]);
-    expect(fades(tester).last.colors, const [clear, edge]);
-  });
+      expect(fades(tester).first.colors, const [edge, clear]);
+      expect(fades(tester).last.colors, const [clear, edge]);
+    },
+  );
 
   // Guard. The notifiers moved into ScrollGradientOverlay; this pins that they
   // still start from the scroll position rather than from `false`.
-  testWidgets('only the bottom fade shows before the user scrolls',
-      (tester) async {
+  testWidgets('only the bottom fade shows before the user scrolls', (
+    tester,
+  ) async {
     await openScrollableMenu(tester);
     await tester.pumpAndSettle();
 
-    final opacities = tester
-        .widgetList<AnimatedOpacity>(find.byType(AnimatedOpacity))
-        .map((o) => o.opacity)
-        .toList();
+    final opacities =
+        tester
+            .widgetList<AnimatedOpacity>(find.byType(AnimatedOpacity))
+            .map((o) => o.opacity)
+            .toList();
 
-    expect(opacities, [0.0, 1.0],
-        reason: 'nothing is hidden above yet; six items are hidden below');
+    expect(opacities, [
+      0.0,
+      1.0,
+    ], reason: 'nothing is hidden above yet; six items are hidden below');
   });
 
-  testWidgets('disposing the dropdown while the menu is open does not throw',
-      (tester) async {
+  testWidgets('disposing the dropdown while the menu is open does not throw', (
+    tester,
+  ) async {
     // The overlay listens to a ScrollController the State owns. Tearing the
     // menu down must happen before that controller is disposed.
     await openScrollableMenu(tester);
-    await tester
-        .pumpWidget(const MaterialApp(home: Scaffold(body: SizedBox())));
+    await tester.pumpWidget(
+      const MaterialApp(home: Scaffold(body: SizedBox())),
+    );
     await tester.pumpAndSettle();
 
     expect(tester.takeException(), isNull);
