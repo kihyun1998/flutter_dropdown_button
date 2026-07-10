@@ -20,8 +20,12 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - label: minimum
-            flutter: 3.29.0
+          # TEMPORARY: bisecting the real floor. `Tooltip.constraints` is not in
+          # 3.27 or 3.29. Keep the lowest that passes; delete the rest.
+          - label: probe-3.32
+            flutter: 3.32.0
+          - label: probe-3.35
+            flutter: 3.35.0
           # An empty version means "the latest on the channel". The action
           # takes a semver here, not a channel name.
           - label: stable
