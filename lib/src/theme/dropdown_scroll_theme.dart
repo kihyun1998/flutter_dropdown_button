@@ -22,6 +22,10 @@ class DropdownScrollTheme {
   const DropdownScrollTheme({
     this.thickness,
     this.thumbWidth,
+    @Deprecated(
+      'Never applied. Flutter draws the track at the thumb thickness; use '
+      'thumbWidth or thickness. This field will be removed in 4.0.0.',
+    )
     this.trackWidth,
     this.radius,
     this.thumbColor,
@@ -37,27 +41,42 @@ class DropdownScrollTheme {
     this.showScrollGradient,
     this.gradientHeight,
     this.gradientColors,
-  });
+  }) : assert(
+          !(trackVisibility == true && thumbVisibility == false),
+          'A scrollbar track cannot be drawn without a thumb.\n'
+          'Either drop `thumbVisibility: false`, in which case the thumb is '
+          'shown alongside the track, or drop `trackVisibility: true`.',
+        );
 
-  /// Thickness of the scrollbar track.
+  /// Thickness of the scrollbar — both its thumb and its track.
   ///
-  /// If null, uses the default scrollbar thickness (platform-dependent).
-  /// Controls the width of the scrollbar when visible.
-  ///
-  /// **Deprecated**: Use [thumbWidth] and [trackWidth] for independent control.
-  /// If [thumbWidth] or [trackWidth] is set, this property is ignored.
+  /// If null, the ambient `ScrollbarTheme` decides, then Flutter's own
+  /// platform-dependent default. [thumbWidth] wins over this.
   final double? thickness;
 
-  /// Width of the scrollbar thumb (the draggable part).
+  /// Width of the scrollbar, named from the thumb's point of view.
   ///
-  /// If null, falls back to [thickness] or the default scrollbar thickness.
-  /// When set, allows independent control of thumb width separate from track width.
+  /// Wins over [thickness]; falls back to it, then to `8.0`.
+  ///
+  /// The track is drawn at this width too — Flutter's scrollbars have one
+  /// thickness, not two. See [trackWidth].
   final double? thumbWidth;
 
   /// Width of the scrollbar track (the background area).
   ///
-  /// If null, falls back to [thickness] or the default scrollbar thickness.
-  /// When set, allows independent control of track width separate from thumb width.
+  /// **Deprecated, and it never worked.** Flutter's `Scrollbar` and
+  /// `RawScrollbar` draw the track at the thumb's thickness; neither exposes a
+  /// separate track width, so this value was never handed to anything. Setting
+  /// it changed nothing, and combining it with `trackVisibility: true` used to
+  /// crash the menu on open.
+  ///
+  /// Use [thumbWidth] — or [thickness] — to size the scrollbar.
+  ///
+  /// Removed in 4.0.0.
+  @Deprecated(
+    'Never applied. Flutter draws the track at the thumb thickness; use '
+    'thumbWidth or thickness. This field will be removed in 4.0.0.',
+  )
   final double? trackWidth;
 
   /// Radius of the scrollbar thumb corners.
@@ -163,6 +182,10 @@ class DropdownScrollTheme {
   DropdownScrollTheme copyWith({
     double? thickness,
     double? thumbWidth,
+    @Deprecated(
+      'Never applied. Flutter draws the track at the thumb thickness; use '
+      'thumbWidth or thickness. This field will be removed in 4.0.0.',
+    )
     double? trackWidth,
     Radius? radius,
     Color? thumbColor,
@@ -182,6 +205,7 @@ class DropdownScrollTheme {
     return DropdownScrollTheme(
       thickness: thickness ?? this.thickness,
       thumbWidth: thumbWidth ?? this.thumbWidth,
+      // ignore: deprecated_member_use_from_same_package
       trackWidth: trackWidth ?? this.trackWidth,
       radius: radius ?? this.radius,
       thumbColor: thumbColor ?? this.thumbColor,
@@ -200,23 +224,48 @@ class DropdownScrollTheme {
     );
   }
 
-  /// The scrollbar's measurements as they should be applied.
+  /// The scrollbar as it should be drawn.
   ///
   /// Pure: it needs no ambient palette and no [BuildContext].
+  ///
+  /// Slots this theme does not name are left null, so an app-wide
+  /// [ScrollbarTheme] keeps its say. Only [overridesScrollbarTheme] slots that
+  /// were actually asked for.
   ResolvedScrollStyle resolve() {
+    // ignore: deprecated_member_use_from_same_package
+    final custom = thumbWidth != null || trackWidth != null;
+
     return ResolvedScrollStyle(
       thumbWidth: thumbWidth ?? thickness ?? 8.0,
-      trackWidth: trackWidth ?? thickness ?? 8.0,
       gradientHeight: gradientHeight ?? 24.0,
-      hasCustomWidths: thumbWidth != null || trackWidth != null,
-      thumbVisibility: thumbVisibility ?? false,
-      trackVisibility: trackVisibility ?? false,
-      interactive: interactive ?? true,
-      crossAxisMargin: crossAxisMargin ?? 0,
-      mainAxisMargin: mainAxisMargin ?? 0,
-      minThumbLength: minThumbLength ?? 18,
+      hasCustomWidths: custom,
+      thickness: custom ? (thumbWidth ?? thickness ?? 8.0) : thickness,
+      radius: radius,
+      // Flutter asserts a track is never drawn without a thumb. Asking for one
+      // implies the other, so the illegal pair cannot be built from here.
+      thumbVisibility:
+          thumbVisibility ?? (trackVisibility == true ? true : null),
+      trackVisibility: trackVisibility,
+      interactive: interactive,
+      overridesScrollbarTheme: thumbColor != null ||
+          trackColor != null ||
+          trackBorderColor != null ||
+          crossAxisMargin != null ||
+          mainAxisMargin != null ||
+          minThumbLength != null,
+      scrollbarTheme: ScrollbarThemeData(
+        thumbColor: _all(thumbColor),
+        trackColor: _all(trackColor),
+        trackBorderColor: _all(trackBorderColor),
+        crossAxisMargin: crossAxisMargin,
+        mainAxisMargin: mainAxisMargin,
+        minThumbLength: minThumbLength,
+      ),
     );
   }
+
+  static WidgetStateProperty<Color?>? _all(Color? color) =>
+      color == null ? null : WidgetStateProperty.all(color);
 
   /// Default scroll theme with standard Material Design styling.
   static const DropdownScrollTheme defaultTheme = DropdownScrollTheme();

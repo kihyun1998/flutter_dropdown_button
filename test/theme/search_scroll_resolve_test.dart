@@ -92,18 +92,13 @@ void main() {
   });
 
   group('scrollbar', () {
-    test('thumb and track fall back to thickness, then to 8', () {
+    test('the thumb falls back to thickness, then to 8', () {
       expect(const DropdownScrollTheme().resolve().thumbWidth, 8);
-      expect(const DropdownScrollTheme(thickness: 4).resolve().trackWidth, 4);
-      expect(
-        const DropdownScrollTheme(thickness: 4, trackWidth: 12)
-            .resolve()
-            .trackWidth,
-        12,
-      );
+      expect(const DropdownScrollTheme(thickness: 4).resolve().thumbWidth, 4);
+      expect(const DropdownScrollTheme(thumbWidth: 6).resolve().thumbWidth, 6);
     });
 
-    test('custom widths are flagged, because Scrollbar cannot honour them', () {
+    test('custom widths are flagged', () {
       expect(const DropdownScrollTheme().resolve().hasCustomWidths, isFalse);
       expect(
         const DropdownScrollTheme(thickness: 4).resolve().hasCustomWidths,
@@ -116,16 +111,59 @@ void main() {
       );
     });
 
-    test('RawScrollbar\'s non-null slots are all filled', () {
+    test('unnamed slots stay null, so an ambient ScrollbarTheme keeps its say',
+        () {
       final style = const DropdownScrollTheme().resolve();
 
-      expect(style.thumbVisibility, isFalse);
-      expect(style.trackVisibility, isFalse);
-      expect(style.interactive, isTrue);
-      expect(style.crossAxisMargin, 0);
-      expect(style.mainAxisMargin, 0);
-      expect(style.minThumbLength, 18);
-      expect(style.gradientHeight, 24);
+      expect(style.thumbVisibility, isNull);
+      expect(style.trackVisibility, isNull);
+      expect(style.interactive, isNull);
+      expect(style.thickness, isNull);
+      expect(style.radius, isNull);
+      expect(style.overridesScrollbarTheme, isFalse);
+      expect(style.gradientHeight, 24,
+          reason: 'ours to decide, not Flutter\'s');
+    });
+
+    test('a visible track implies a visible thumb', () {
+      // Flutter asserts a track cannot be drawn without a thumb. The illegal
+      // pair is unreachable: the theme's constructor rejects it outright, and
+      // leaving `thumbVisibility` unset resolves to true rather than false.
+      final style = const DropdownScrollTheme(trackVisibility: true).resolve();
+
+      expect(style.trackVisibility, isTrue);
+      expect(style.thumbVisibility, isTrue);
+
+      expect(
+        () =>
+            DropdownScrollTheme(trackVisibility: true, thumbVisibility: false),
+        throwsAssertionError,
+      );
+    });
+
+    test('the ScrollbarTheme is only overridden when the caller names a slot',
+        () {
+      expect(
+        const DropdownScrollTheme(radius: Radius.circular(4))
+            .resolve()
+            .overridesScrollbarTheme,
+        isFalse,
+        reason: 'radius goes to the Scrollbar itself, not to the theme',
+      );
+
+      final coloured = const DropdownScrollTheme(thumbColor: red).resolve();
+      expect(coloured.overridesScrollbarTheme, isTrue);
+      expect(coloured.scrollbarTheme.thumbColor!.resolve({}), red);
+    });
+
+    test('colours the caller left alone stay null in the ScrollbarThemeData',
+        () {
+      final data =
+          const DropdownScrollTheme(thumbColor: red).resolve().scrollbarTheme;
+
+      expect(data.trackColor, isNull);
+      expect(data.trackBorderColor, isNull);
+      expect(data.minThumbLength, isNull);
     });
   });
 }

@@ -153,51 +153,59 @@ class ResolvedSearchFieldStyle {
   final Widget? divider;
 }
 
-/// The scrollbar's measurements, with every slot filled in.
+/// The scrollbar as it should be drawn.
+///
+/// Every field is what the widget hands straight to Flutter. Slots the theme
+/// left unset stay **null** rather than being filled with Flutter's own
+/// default: a `Scrollbar` treats null as "ask the ambient `ScrollbarTheme`",
+/// and writing the default in would silence an app-wide theme.
 class ResolvedScrollStyle {
   /// Creates a resolved scroll style.
   const ResolvedScrollStyle({
     required this.thumbWidth,
-    required this.trackWidth,
     required this.gradientHeight,
     required this.hasCustomWidths,
-    required this.thumbVisibility,
-    required this.trackVisibility,
-    required this.interactive,
-    required this.crossAxisMargin,
-    required this.mainAxisMargin,
-    required this.minThumbLength,
+    required this.scrollbarTheme,
+    required this.overridesScrollbarTheme,
+    this.thickness,
+    this.radius,
+    this.thumbVisibility,
+    this.trackVisibility,
+    this.interactive,
   });
 
-  /// Width of the thumb.
+  /// Width of the thumb, whether the caller named it or it fell back.
   final double thumbWidth;
-
-  /// Width of the track.
-  final double trackWidth;
 
   /// Height of the fade shown when the list can scroll.
   final double gradientHeight;
 
-  /// Whether the caller asked for widths the stock `Scrollbar` cannot honour.
+  /// Whether the caller named a thumb or track width of their own.
   final bool hasCustomWidths;
 
-  /// Whether the thumb is always shown.
-  final bool thumbVisibility;
+  /// Colours, margins and thumb length, in the shape `ScrollbarTheme` takes.
+  ///
+  /// Only apply it when [overridesScrollbarTheme] is true — `ScrollbarTheme`
+  /// *replaces* the ambient one rather than merging with it.
+  final ScrollbarThemeData scrollbarTheme;
 
-  /// Whether the track is always shown.
-  final bool trackVisibility;
+  /// Whether the theme named anything [scrollbarTheme] carries.
+  final bool overridesScrollbarTheme;
 
-  /// Whether the thumb can be dragged.
-  final bool interactive;
+  /// Thickness to give the `Scrollbar`, or null to leave it to the theme.
+  final double? thickness;
 
-  /// Distance from the scroll view's edge.
-  final double crossAxisMargin;
+  /// Corner radius of the thumb.
+  final Radius? radius;
 
-  /// Distance from the scroll view's ends.
-  final double mainAxisMargin;
+  /// Whether the thumb is always shown. Null defers to the ambient theme.
+  final bool? thumbVisibility;
 
-  /// Shortest the thumb is allowed to become.
-  final double minThumbLength;
+  /// Whether the track is always shown. Null defers to the ambient theme.
+  final bool? trackVisibility;
+
+  /// Whether the thumb can be dragged. Null defers to the ambient theme.
+  final bool? interactive;
 }
 
 /// The button's appearance, with every slot filled in.

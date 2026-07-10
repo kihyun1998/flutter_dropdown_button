@@ -67,7 +67,9 @@ The second half is where the bugs are, and it is the half worth testing. When ad
 
 ## Deprecated
 
-Nothing. 3.0.0 removed the last of it — `DropdownMixin`, `DropdownTheme.animationDuration`, and `DropdownTooltipTheme.borderColor` / `.borderWidth`.
+`DropdownScrollTheme.trackWidth`, removed in 4.0.0. Flutter's scrollbars have one thickness, not two, so the field was never applied to anything.
+
+3.0.0 removed the previous batch — `DropdownMixin`, `DropdownTheme.animationDuration`, and `DropdownTooltipTheme.borderColor` / `.borderWidth`.
 
 When you deprecate a member, annotate the **field, the constructor parameter and the `copyWith` parameter** separately. `@Deprecated` does not propagate from a field to its initializing formal, so annotating only the field lets `DropdownTheme(animationDuration: ...)` compile silently. Verify from `example/`, which is a separate package — within this package the analyzer stays quiet.
 
@@ -75,7 +77,7 @@ When you deprecate a member, annotate the **field, the constructor parameter and
 
 ```bash
 flutter pub get              # install dependencies
-flutter test                 # run the suite (116 tests)
+flutter test                 # run the suite (123 tests)
 flutter analyze              # static analysis; must be clean
 dart format .                # formatting; must produce no changes
 flutter pub publish --dry-run   # validate the package before release
@@ -85,7 +87,7 @@ cd example && flutter run    # run the playground app
 
 ## Testing
 
-116 tests. 66 of them run without mounting a widget at all.
+123 tests. 69 of them run without mounting a widget at all.
 
 | Suite | What it covers |
 | --- | --- |
@@ -102,6 +104,7 @@ cd example && flutter run    # run the playground app
 | `test/theme_resolution_test.dart` | Resolution rules, observed at the rendered widget |
 | `test/tooltip_decoration_test.dart` | A partial tooltip theme keeping the box it did not name |
 | `test/semantics_label_test.dart` | What a screen reader hears, at the semantics tree |
+| `test/scrollbar_theme_test.dart` | A visible track, and the ambient `ScrollbarTheme` surviving |
 | `test/disabled_state_test.dart` | The disabled state, including single-item auto-disable |
 
 **Conventions that matter here:**
