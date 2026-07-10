@@ -1,5 +1,3 @@
-import 'dart:ui' show CheckedState, Tristate;
-
 import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
 import 'package:flutter_dropdown_button/flutter_dropdown_button.dart';
@@ -12,6 +10,15 @@ import 'package:flutter_test/flutter_test.dart';
 /// `InkWell` owns the gesture — carries `isEnabled: false` into the semantics
 /// tree. `IgnorePointer` does not strip it; it suppresses hit-testing only.
 /// Nothing on screen differs, so this is invisible to a render test.
+///
+/// `containsSemantics` is deprecated after Flutter 3.40 in favour of
+/// `isSemantics`, which does not exist on the 3.32 floor this package declares.
+/// `SemanticsData.flagsCollection` has the mirror problem, and `hasFlag` the
+/// mirror of that. `matchesSemantics` survives both but insists on describing
+/// every flag on the node, so an `InkWell` gaining one would break it.
+///
+/// So: `containsSemantics`, ignored deliberately. Drop the ignores when the
+/// floor moves past `isSemantics`.
 
 MultiSelectPresentation<T> multi<T>({
   required Set<T> selected,
@@ -59,10 +66,8 @@ void main() {
 
       final node = await rowNode(tester, presentation.buildItem('a', true));
 
-      expect(
-        node.getSemanticsData().flagsCollection.isChecked,
-        CheckedState.isTrue,
-      );
+      // ignore: deprecated_member_use
+      expect(node, containsSemantics(hasCheckedState: true, isChecked: true));
       handle.dispose();
     });
 
@@ -74,10 +79,8 @@ void main() {
 
       final node = await rowNode(tester, presentation.buildItem('b', false));
 
-      expect(
-        node.getSemanticsData().flagsCollection.isChecked,
-        CheckedState.isFalse,
-      );
+      // ignore: deprecated_member_use
+      expect(node, containsSemantics(hasCheckedState: true, isChecked: false));
       handle.dispose();
     });
 
@@ -91,8 +94,9 @@ void main() {
       final node = await rowNode(tester, presentation.buildItem('a', true));
 
       expect(
-        node.getSemanticsData().flagsCollection.isEnabled,
-        isNot(Tristate.isFalse),
+        node,
+        // ignore: deprecated_member_use
+        containsSemantics(hasEnabledState: false),
         reason: 'the box is presentational; the row is what is interactive',
       );
       handle.dispose();
