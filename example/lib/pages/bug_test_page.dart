@@ -274,9 +274,8 @@ class _DropdownBugTestPageState extends State<DropdownBugTestPage> {
                       ),
                     ),
                     ElevatedButton.icon(
-                      onPressed: _countdown == null
-                          ? _closeAllAfterDelay
-                          : null,
+                      onPressed:
+                          _countdown == null ? _closeAllAfterDelay : null,
                       icon: const Icon(Icons.timer, size: 24),
                       label: const Text(
                         '2s closeAll\n(no navigate)',

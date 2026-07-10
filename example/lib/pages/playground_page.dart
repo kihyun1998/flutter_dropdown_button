@@ -2038,9 +2038,8 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
                         decoration: BoxDecoration(
                           color: isSelected ? Colors.blue.shade50 : null,
                           border: Border.all(
-                            color: isSelected
-                                ? Colors.blue
-                                : Colors.grey.shade300,
+                            color:
+                                isSelected ? Colors.blue : Colors.grey.shade300,
                             width: isSelected ? 2 : 1,
                           ),
                           borderRadius: BorderRadius.circular(4),
