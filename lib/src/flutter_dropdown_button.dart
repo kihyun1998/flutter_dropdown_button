@@ -5,6 +5,7 @@ import 'buttons/menu_alignment.dart';
 import 'config/text_dropdown_config.dart';
 import 'overlay/dropdown_overlay_controller.dart';
 import 'presentation/item_presentation.dart';
+import 'search/dropdown_search_controller.dart';
 import 'theme/dropdown_scroll_theme.dart';
 import 'theme/dropdown_style_theme.dart';
 import 'theme/dropdown_theme.dart';
@@ -480,9 +481,8 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
 
   // ===== Search =====
 
-  TextEditingController? _searchController;
-  FocusNode? _searchFocusNode;
-  String _searchQuery = '';
+  late final DropdownSearchController<T> _search =
+      DropdownSearchController<T>(enabled: widget.searchable);
 
   /// The items the menu should show right now.
   ///
@@ -490,29 +490,20 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
   /// field. A cache here has to be invalidated from `didUpdateWidget`, from
   /// the search callback, and from open/close/select — and every past defect
   /// in this area was a missed invalidation.
-  List<T> get _visibleItems => widget.searchable
-      ? _applyFilter(widget.items, _searchQuery)
-      : widget.items;
+  ///
+  /// The caller's `searchFilter` wins; failing that, the presentation supplies
+  /// the default its mode can offer, and text mode is the only one that can.
+  List<T> get _visibleItems => _search.visibleItems(
+        widget.items,
+        widget.searchFilter ?? _presentation.defaultSearchFilter,
+      );
 
   /// The height occupied by the search field including margin and divider.
   double get _searchFieldHeight =>
       widget.searchable ? _searchStyle.totalHeight : 0.0;
 
-  /// The items [query] leaves visible.
-  ///
-  /// The caller's `searchFilter` wins; failing that, the presentation supplies
-  /// the default its mode can offer, and text mode is the only one that can.
-  List<T> _applyFilter(List<T> items, String query) {
-    if (query.isEmpty) return List<T>.from(items);
-
-    final filter = widget.searchFilter ?? _presentation.defaultSearchFilter;
-    if (filter == null) return List<T>.from(items);
-
-    return items.where((item) => filter(item, query)).toList();
-  }
-
   void _onSearchChanged(String query) {
-    _searchQuery = query;
+    _search.onQueryChanged(query);
 
     // Reset scroll position
     if (_scrollController != null && _scrollController!.hasClients) {
@@ -535,10 +526,6 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
     // The `label`-or-String invariant is asserted by TextItemPresentation,
     // which is built during the first build — still before anything paints.
     _autoSelectSingleItem();
-    if (widget.searchable) {
-      _searchController = TextEditingController();
-      _searchFocusNode = FocusNode();
-    }
   }
 
   @override
@@ -563,10 +550,9 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
       });
     }
 
-    // Handle searchable toggled on at runtime
-    if (widget.searchable && _searchController == null) {
-      _searchController = TextEditingController();
-      _searchFocusNode = FocusNode();
+    // Handle searchable toggled at runtime
+    if (widget.searchable != oldWidget.searchable) {
+      _search.enabled = widget.searchable;
     }
   }
 
@@ -576,8 +562,7 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
     _scrollController?.dispose();
     _canScrollUp.dispose();
     _canScrollDown.dispose();
-    _searchController?.dispose();
-    _searchFocusNode?.dispose();
+    _search.dispose();
     _menu.dispose();
     super.dispose();
   }
@@ -596,17 +581,14 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
 
   void _onItemSelected() => _menu.close();
 
-  void _resetSearch() {
-    _searchQuery = '';
-    _searchController?.clear();
-  }
+  void _resetSearch() => _search.reset();
 
   void _openDropdown() {
     _menu.open(context);
     if (widget.searchable && effectiveSearchTheme.autofocus) {
       // Request focus after overlay is inserted
       SchedulerBinding.instance.addPostFrameCallback((_) {
-        _searchFocusNode?.requestFocus();
+        _search.requestFocus();
       });
     }
   }
@@ -742,11 +724,11 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
 
     Widget content;
 
-    if (items.isEmpty && widget.searchable && _searchQuery.isNotEmpty) {
+    if (items.isEmpty && widget.searchable && _search.query.isNotEmpty) {
       // Empty state for search with no results
       content = SizedBox(
         height: availableContentHeight,
-        child: widget.emptyBuilder?.call(_searchQuery) ??
+        child: widget.emptyBuilder?.call(_search.query) ??
             Center(
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
@@ -767,7 +749,7 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
 
       if (widget.scrollToSelectedItem &&
           widget.value != null &&
-          _searchQuery.isEmpty) {
+          _search.query.isEmpty) {
         _scheduleScrollToSelectedItem();
       }
 
@@ -850,8 +832,8 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>>
       padding: style.padding,
       height: style.fieldHeight,
       child: TextField(
-        controller: _searchController,
-        focusNode: _searchFocusNode,
+        controller: _search.textController,
+        focusNode: _search.focusNode,
         onChanged: _onSearchChanged,
         style: style.textStyle,
         cursorColor: style.cursorColor,
