@@ -1,5 +1,16 @@
 # Changelog
 
+## 3.1.0
+
+Adds a second widget. Nothing was removed; one field is deprecated and one behaviour changed, both described below.
+
+* **FEAT**: `FlutterMultiSelectDropdown<T>` — a checklist. Several items may be chosen, the menu stays open while they are, and `onChanged` fires with a **new** `Set<T>` the moment a box is ticked. Anchored rather than modal: no scrim, no confirm button, dismissed by an outside tap. It shares every layout, theming and search parameter with `FlutterDropdownButton`. The `Set` you pass in is never mutated, and `T` must implement `==` **and** `hashCode` — a `Set` needs both, where `value == item` needed only the first
+* **FEAT**: `MultiSelectPresentation<T>`, the third `DropdownItemPresentation`. Its rows carry a checkbox that is **excluded from the semantics tree**, with the checked state re-attached to the row. A `Checkbox` with `onChanged: null` inside the row's ink well announces `isEnabled: false` once the tree merges, so a screen reader would have called every row of a working checklist *dimmed*. `IgnorePointer` does not help; it suppresses hit-testing, not semantics. Nothing about this is visible on screen
+* **CHANGE**: A `value` that is not in `items` is now **drawn** in custom mode, rather than replaced by `hintWidget`. A list refresh that drops the chosen row's data left `value` naming a row that no longer existed, and the button quietly reverted to its hint — no callback, no error. Text mode never did this, having no `items` to consult, so the two modes disagreed and neither behaviour was documented. **The widget draws what it was handed.** The menu is unchanged: it iterates `items`, and never invented a row
+* **DEPRECATED**: `CustomItemPresentation.items`. It fed the audit removed above and is now read by nothing. It is no longer `required`; drop the argument. Removed in 4.0.0. Only code that constructs a presentation by hand is affected
+* **REFACTOR**: `DropdownMenuShell` (internal) is the button, the overlay, and everything between — 994 of the widget's 1004 lines, none of which knew what selection is. It takes `isChosen(T)`, `onItemTap(T)` and `closeOnTap`; the two public widgets differ only in what they pass. `value`, `scrollToSelectedItem` and `disableWhenSingleItem` are **absent from the multi-select type** rather than asserted against at runtime
+* **TEST**: 256 tests, up from 224, still at 100% line coverage (1037 lines). The shell extraction passed the existing suite with **no test file edited**, the sixth refactor in this package to meet that standard. The coverage floor earned its keep twice: it rejected a `closeOnTap` flag that no caller set, and it caught a test named *merges the disabled style* that never reached the `merge()`
+
 ## 3.0.2
 
 Documentation only. No statement in `lib/` changed — every corrected line is a comment. It is released because pub.dev renders the dartdoc of the version it was published from, so a reader of 3.0.1's API page is still told the opposite of what the code does. A downstream app set a `trackColor`, saw no track, and was right to be confused.
