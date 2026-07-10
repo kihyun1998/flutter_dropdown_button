@@ -427,6 +427,10 @@ class _OsFilterState extends State<OsFilter> {
       },
       // Ten values is where scanning stops working.
       searchable: values.length > 10,
+      // A row is [checkbox] [leading] [label] [trailing]. Both slots are
+      // builders because each value wants a different icon and a different
+      // count. Only the label gives way when the row runs out of room.
+      itemLeadingBuilder: (v) => Icon(osIcon[v], size: 18),
       itemTrailingBuilder: (v) => Text('${counts[v]}'),
       onChanged: (next) {
         setState(() => chosen = next);
