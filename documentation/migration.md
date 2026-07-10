@@ -1,5 +1,17 @@
 # Migration Guide
 
+## Upgrading to 3.0.1
+
+No API changed. Three bugs did, and two of them are visible.
+
+**Your menu had two scrollbars on desktop.** Flutter's `MaterialScrollBehavior` adds one to every scroll view; this package added a second on top. You now see one. If you were compensating for the extra bar — a transparent thumb, an outsized `crossAxisMargin` — undo it.
+
+**The scrollbar no longer swells on hover.** It grew from 8 to 12 logical pixels when a pointer entered a visible track, because the thickness handed to Flutter was `null`. It now rests at the size it always drew at, and stays there.
+
+**A dropdown with no `DropdownScrollTheme` now gets one.** Previously the menu fell through to Flutter's automatic scrollbar entirely. The default theme draws the same thing, but `DropdownScrollTheme` now governs it — so `thumbColor` and friends take effect where they silently did not before.
+
+Nothing to change in your code.
+
 ## Migrating from 2.x to 3.0.0
 
 Version 3.0.0 removes everything deprecated during the 2.x line. Nothing was renamed and no behaviour changed — each removed member already had a replacement that was doing the work.

@@ -43,7 +43,7 @@ Add to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  flutter_dropdown_button: ^3.0.0
+  flutter_dropdown_button: ^3.0.1
 ```
 
 Import the package:
@@ -291,7 +291,8 @@ Controls scrollbar appearance inside the dropdown overlay.
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
-| `thumbWidth` | `double?` | `null` | Width of the scrollbar thumb |
+| `thumbWidth` | `double?` | `null` | Width of the scrollbar. Wins over `thickness` |
+| `thickness` | `double?` | `null` | Thickness of the scrollbar. Unset, the ambient `ScrollbarTheme` decides, then Flutter's own default — **8 on desktop, 4 on Android** |
 | `radius` | `Radius?` | `null` | Corner radius of scrollbar thumb |
 | `thumbColor` | `Color?` | `null` | Color of the scrollbar thumb |
 | `trackColor` | `Color?` | `null` | Color of the scrollbar track |
