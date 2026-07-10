@@ -278,6 +278,134 @@ class CustomItemPresentation<T> implements DropdownItemPresentation<T> {
   }
 }
 
+/// Renders items as a checklist: a box, a label, and an optional trailing
+/// widget. The button's face is whatever [labelBuilder] makes of the chosen set.
+class MultiSelectPresentation<T> implements DropdownItemPresentation<T> {
+  /// Creates the checklist presentation.
+  MultiSelectPresentation({
+    required this.selected,
+    required this.labelBuilder,
+    required this.label,
+    required this.config,
+    required this.tooltipTheme,
+    required this.enabled,
+    this.itemTrailingBuilder,
+  }) : assert(
+         label != null || T == String,
+         'FlutterMultiSelectDropdown<$T> needs a `label` callback.\n'
+         'Rows render as text, so it must know how to turn a $T into a String.',
+       );
+
+  /// The chosen items, as the caller holds them.
+  final Set<T> selected;
+
+  /// Turns an item into the string that represents it.
+  final String Function(T item)? label;
+
+  /// Turns the chosen set into the button's face.
+  final String Function(Set<T> selected) labelBuilder;
+
+  /// Text rendering rules: overflow, alignment, styles.
+  final TextDropdownConfig config;
+
+  /// Styling and behaviour of the overflow tooltip.
+  final DropdownTooltipTheme tooltipTheme;
+
+  /// Whether the button is interactive, which selects the disabled text style.
+  final bool enabled;
+
+  /// Drawn at the end of each row. Its text is merged into the row's announced
+  /// label by the row's `InkWell`, so a count reads as part of the item.
+  final Widget Function(T item)? itemTrailingBuilder;
+
+  /// The text [item] displays.
+  String labelOf(T item) {
+    final extract = label;
+    if (extract != null) return extract(item);
+    if (item is String) return item;
+
+    // coverage:ignore-start
+    throw FlutterError(
+      'FlutterMultiSelectDropdown<$T> needs a `label` callback.',
+    );
+    // coverage:ignore-end
+  }
+
+  @override
+  Alignment get contentAlignment => _alignmentOf(config.textAlign);
+
+  @override
+  DropdownSearchFilter<T>? get defaultSearchFilter =>
+      (item, query) =>
+          labelOf(item).toLowerCase().contains(query.toLowerCase());
+
+  SmartTooltipText _text(String text, TextStyle? style) => SmartTooltipText(
+    text: text,
+    tooltipTheme: tooltipTheme,
+    style: style,
+    textAlign: config.textAlign,
+    maxLines: config.maxLines,
+    overflow: config.overflow,
+    softWrap: config.softWrap,
+    textDirection: config.textDirection,
+    locale: config.locale,
+    textScaler: config.textScaler,
+  );
+
+  /// One checklist row.
+  ///
+  /// The box is **presentational**. `onChanged: null` gives it no gesture
+  /// recognizer, so a tap on it falls through to the row's `InkWell` — measured,
+  /// not assumed: a row taps once whether or not the box is wrapped in an
+  /// `IgnorePointer`, so there is no wrapper here.
+  ///
+  /// What `onChanged: null` *does* cost is the semantics tree. Once the
+  /// `InkWell` merges its descendants, the row inherits the box's
+  /// `isEnabled: false`, and a screen reader calls every row of a working
+  /// checklist *dimmed*. `IgnorePointer` does not help — it suppresses
+  /// hit-testing, not semantics. So the box is excluded from the tree and the
+  /// checked state is re-attached to the row, which is the interactive thing.
+  ///
+  /// None of this is visible on screen. It was found with a semantics probe.
+  @override
+  Widget buildItem(T item, bool isSelected) {
+    final trailing = itemTrailingBuilder?.call(item);
+
+    return Semantics(
+      checked: isSelected,
+      child: Row(
+        children: [
+          ExcludeSemantics(child: Checkbox(value: isSelected, onChanged: null)),
+          Flexible(
+            child: _text(
+              labelOf(item),
+              isSelected
+                  ? config.selectedTextStyle ?? config.textStyle
+                  : config.textStyle,
+            ),
+          ),
+          if (trailing != null) trailing,
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget buildSelected() {
+    final baseStyle = config.textStyle;
+    final resolvedStyle = !enabled && config.disabledTextStyle != null
+        ? (baseStyle?.merge(config.disabledTextStyle) ??
+              config.disabledTextStyle)
+        : baseStyle;
+
+    final face = _text(labelBuilder(selected), resolvedStyle);
+
+    final describe = config.semanticsLabel;
+    if (describe == null) return face;
+    return Semantics(label: describe, child: face);
+  }
+}
+
 Alignment _alignmentOf(TextAlign textAlign) {
   switch (textAlign) {
     case TextAlign.center:
