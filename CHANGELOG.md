@@ -1,5 +1,17 @@
 # Changelog
 
+## 3.0.2
+
+Documentation only. No statement in `lib/` changed — every corrected line is a comment. It is released because pub.dev renders the dartdoc of the version it was published from, so a reader of 3.0.1's API page is still told the opposite of what the code does. A downstream app set a `trackColor`, saw no track, and was right to be confused.
+
+* **CHANGE**: `DropdownScrollTheme.interactive`'s dartdoc said `null` meant "display only". It means the opposite: `Scrollbar` resolves a null `interactive` to `!_useAndroidScrollbar`, so the thumb is **draggable on desktop**. Pass `false` when you mean off
+* **CHANGE**: `DropdownScrollTheme.trackColor` and `.trackBorderColor` said "if null, no track is displayed", implying a colour draws one. It does not. The track is drawn by `trackVisibility: true` and by nothing else; Flutter resolves a hidden track's colour to transparent. **A colour is not a request**
+* **CHANGE**: `DropdownScrollTheme.trackVisibility` said "if true **or null**, shows the track". Null resolves to `false`. There is no track by default
+* **CHANGE**: `DropdownScrollTheme.thumbVisibility` said `false` hides the thumb. `false` and `null` behave identically — the thumb fades in while the list scrolls and fades out after. Only `true` pins it. Setting `trackVisibility: true` raises this to `true`, because Flutter cannot draw a track without a thumb
+* **CHANGE**: `DropdownScrollTheme.radius`'s "the default scrollbar radius" is `Radius.circular(8)` on desktop and **square on Android**
+* **CHANGE**: The class-level example for `DropdownScrollTheme` taught a `trackColor` with no `trackVisibility` — the combination that draws nothing — and used `withOpacity`, which is deprecated. Both fixed, here and in the `gradientColors` example. The playground's `interactive` toggle started at `false`, shipping a demo scrollbar nobody could drag
+* **TEST**: 224 tests, up from 222, still at 100% line coverage. Both new ones are guards on the corrected docs: a null `interactive` is draggable, and a track colour alone does not ask for a track. The second fails if anyone makes `trackColor` imply `trackVisibility`
+
 ## 3.0.1
 
 * **FIX**: The menu drew **two scrollbars** on desktop. `MaterialScrollBehavior` wraps every scroll view in a `Scrollbar` of its own, and this package added a second on top without suppressing it. The one underneath answered to nothing `DropdownScrollTheme` says. The list is now wrapped in `ScrollConfiguration(scrollbars: false)`
