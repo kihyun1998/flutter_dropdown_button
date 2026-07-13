@@ -16,6 +16,7 @@ A highly customizable dropdown package for Flutter with overlay-based rendering,
 - **Smooth Animations**: Scale and fade effects with configurable timing
 - **Outside-tap Dismissal**: Automatic closure when tapping outside
 - **Flexible Width**: Fixed, min/max constraints, content-based, or flex expansion
+- **Bare Anchor**: Drop the button chrome with `anchorBuilder` and embed the menu inside another field, `[All ▾] │ search…`
 - **Independent Menu Width**: Set menu width separately from button with alignment control
 - **Text Overflow Control**: Ellipsis, fade, clip, or visible overflow options
 - **Smart Tooltip**: Automatic tooltip on overflow with full customization
@@ -44,7 +45,7 @@ Add to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  flutter_dropdown_button: ^3.2.0
+  flutter_dropdown_button: ^3.3.0
 ```
 
 Import the package:
@@ -221,6 +222,22 @@ The unified dropdown widget. Use the default constructor for custom widget rende
 | `searchable` | `bool` | `false` | Enable search/filter field in dropdown |
 | `searchFilter` | `bool Function(T, String)?` | `null` | Custom filter function (required for custom mode) |
 | `emptyBuilder` | `Widget Function(String)?` | `null` | Widget builder for empty search results |
+| `anchorBuilder` | `Widget Function(BuildContext, bool isOpen)?` | `null` | Draw the anchor yourself, dropping the button chrome (**bare** mode) — see below |
+
+#### Bare anchor
+
+Supply `anchorBuilder` to embed the dropdown inside another field — a field-scope
+selector at the head of a search box, `[All ▾] │ search…` — where the button's
+own background, border and fixed width would nest a box inside a box. It drops
+that whole button box and hangs the same anchored menu (theming, keyboard
+navigation, `searchable`, `itemBuilder`) off the widget you return.
+
+The builder is handed `isOpen`, the one thing it cannot read for itself, so an
+inline chevron can turn — `AnimatedRotation(turns: isOpen ? 0.5 : 0.0, …)`. It is
+not handed a label; build the face from the `value` (or `selected`) you hold.
+The button-box params it replaces — `width`, `minWidth`, `maxWidth`, `expand`,
+`trailing` — must be left unset, and combining them asserts. `FlutterMultiSelectDropdown`
+takes the same parameter.
 
 #### A value that is not in `items`
 

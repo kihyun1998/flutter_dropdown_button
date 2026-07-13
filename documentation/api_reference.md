@@ -49,6 +49,21 @@ The button draws `value` whether or not `items` still offers it. A list refresh 
 
 Before 3.1.0, custom mode audited `value` against `items` and fell back to `hintWidget`; text mode never did, having no `items` to consult. The two now agree.
 
+### Bare anchor
+
+```dart
+Widget Function(BuildContext context, bool isOpen)? anchorBuilder
+```
+
+Supplying `anchorBuilder` puts the dropdown in **bare** mode: the button box is dropped — its background, border, fixed width, padding, ink and trailing icon — and the overlay hangs off the widget you return instead. The point is to embed the dropdown inside another field, `[All ▾] │ search…`, where a button's own chrome would nest a box inside a box.
+
+Only the button *face* becomes yours. The anchored menu — its theming, keyboard navigation, `searchable`, `itemBuilder`, the checklist — is unchanged. `FlutterMultiSelectDropdown` takes the same parameter.
+
+- **The builder is handed `isOpen`, not a label.** `isOpen` is the one thing you cannot read for yourself; a label you can, from the `value` (or `selected`) you already hold. Passing a label would leak a text-mode notion into a shell that does not know what an item says. Turn an inline chevron with `AnimatedRotation(turns: isOpen ? 0.5 : 0.0, …)`.
+- **`isOpen` flips true the moment the menu opens and false once it has finished closing** — the close animation runs while it is still true, so a chevron animated off it settles back after the menu is gone.
+- **The button-box params it replaces must be left unset.** `width`, `minWidth`, `maxWidth`, `expand` and `trailing` describe the box you no longer have; combining any with `anchorBuilder` asserts in debug.
+- **The anchor is still announced as a button.** The dropped ink well's role is restored with `Semantics(button: true)`, so a screen reader reads your widget as the control it is.
+
 ## FlutterMultiSelectDropdown\<T\>
 
 A checklist. Several items may be chosen, the menu stays open while they are, and `onChanged` fires the moment a box is ticked — no confirm button. Anchored rather than modal: no scrim, dismissed by an outside tap.

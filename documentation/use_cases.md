@@ -466,3 +466,63 @@ beside the button, and the stale one has an exit.
 
 Filter semantics. OR versus AND, `contains` versus `∈`, how an empty set reads —
 all yours. The widget takes a `Set<T>` and gives back a `Set<T>`.
+
+## Field selector inside a search box — Bare anchor
+
+A control toolbar that collapses to one row: a search box with a field-scope
+selector at its head, `[All ▾] │ search…`. The scope must stay field-scoped, so
+it wants this package's anchored, searchable menu — but a full dropdown *button*
+in front of the field nests a box inside a box.
+
+`anchorBuilder` drops the button chrome and hands the anchor to you, so the same
+overlay hangs off a compact inline widget:
+
+```dart
+Row(
+  children: [
+    // The field-scope selector — no border, no background, no fixed width.
+    FlutterDropdownButton<String>.text(
+      items: const ['All', 'Title', 'Body', 'Author'],
+      value: field,
+      onChanged: (f) => setState(() => field = f!),
+      anchorBuilder: (context, isOpen) => Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(field),
+            AnimatedRotation(
+              turns: isOpen ? 0.5 : 0.0,
+              duration: const Duration(milliseconds: 200),
+              child: const Icon(Icons.expand_more, size: 16),
+            ),
+          ],
+        ),
+      ),
+    ),
+    const SizedBox(
+      height: 20,
+      child: VerticalDivider(width: 1),
+    ),
+    // The search field fills the rest.
+    const Expanded(
+      child: TextField(
+        decoration: InputDecoration(
+          border: InputBorder.none,
+          hintText: 'Search…',
+        ),
+      ),
+    ),
+  ],
+)
+```
+
+The outer field owns the border and background; the selector contributes only
+its label and chevron. Everything the menu does — theming, keyboard navigation,
+`searchable`, `itemBuilder` — is untouched. `FlutterMultiSelectDropdown` takes
+the same `anchorBuilder` for a multi-scope selector.
+
+The chevron turns off `isOpen`, the one thing the builder cannot read for
+itself. Build the label from the `value` you already hold; the builder is not
+handed one. And drop `width`, `expand` and `trailing` — the button box they
+describe is gone, and combining them asserts.

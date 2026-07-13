@@ -81,6 +81,7 @@ class FlutterDropdownButton<T> extends StatefulWidget {
     this.searchable = false,
     this.searchFilter,
     this.emptyBuilder,
+    this.anchorBuilder,
   }) : hintText = null,
        label = null,
        config = null,
@@ -92,6 +93,18 @@ class FlutterDropdownButton<T> extends StatefulWidget {
              maxMenuWidth == null ||
              minMenuWidth <= maxMenuWidth,
          'minMenuWidth must be less than or equal to maxMenuWidth',
+       ),
+       assert(
+         anchorBuilder == null ||
+             (width == null &&
+                 minWidth == null &&
+                 maxWidth == null &&
+                 !expand &&
+                 trailing == null),
+         'anchorBuilder draws the whole anchor, so the button-box params it '
+         'replaces do not apply: drop width, minWidth, maxWidth, expand and '
+         'trailing when supplying one. Menu, scrollbar, search and tooltip '
+         'theming still take effect.',
        );
 
   /// Creates a text-only dropdown button.
@@ -132,6 +145,7 @@ class FlutterDropdownButton<T> extends StatefulWidget {
     this.searchable = false,
     this.searchFilter,
     this.emptyBuilder,
+    this.anchorBuilder,
   }) : hintText = hint,
        hintWidget = null,
        itemBuilder = null,
@@ -141,6 +155,18 @@ class FlutterDropdownButton<T> extends StatefulWidget {
              maxMenuWidth == null ||
              minMenuWidth <= maxMenuWidth,
          'minMenuWidth must be less than or equal to maxMenuWidth',
+       ),
+       assert(
+         anchorBuilder == null ||
+             (width == null &&
+                 minWidth == null &&
+                 maxWidth == null &&
+                 !expand &&
+                 trailing == null),
+         'anchorBuilder draws the whole anchor, so the button-box params it '
+         'replaces do not apply: drop width, minWidth, maxWidth, expand and '
+         'trailing when supplying one. Menu, scrollbar, search and tooltip '
+         'theming still take effect.',
        );
 
   /// The list of items available in this dropdown.
@@ -327,6 +353,42 @@ class FlutterDropdownButton<T> extends StatefulWidget {
   /// ```
   final Widget Function(String query)? emptyBuilder;
 
+  /// Draws the anchor itself, dropping the button chrome (bare mode).
+  ///
+  /// Supply this to embed the dropdown inside another field — a field-scope
+  /// selector at the head of a search box, `[All ▾] │ search…` — where the
+  /// button's own background, border and fixed width would nest a box inside a
+  /// box. The widget you return becomes the whole anchor; the overlay (theme,
+  /// keyboard navigation, [searchable], the menu) still hangs off it exactly as
+  /// before. Only the button face is yours now.
+  ///
+  /// The builder is handed whether the menu is currently open — the one thing
+  /// it cannot read for itself — so an inline chevron can turn. It is not handed
+  /// a label: build the face from the [value] you already hold.
+  ///
+  /// ```dart
+  /// FlutterDropdownButton<String>.text(
+  ///   items: fields,
+  ///   value: field,
+  ///   onChanged: onField,
+  ///   anchorBuilder: (context, isOpen) => Row(
+  ///     mainAxisSize: MainAxisSize.min,
+  ///     children: [
+  ///       Text(field),
+  ///       AnimatedRotation(
+  ///         turns: isOpen ? 0.5 : 0.0,
+  ///         duration: const Duration(milliseconds: 200),
+  ///         child: const Icon(Icons.expand_more, size: 16),
+  ///       ),
+  ///     ],
+  ///   ),
+  /// )
+  /// ```
+  ///
+  /// The button-box params it replaces — [width], [minWidth], [maxWidth],
+  /// [expand] and [trailing] — must be left unset; combining them asserts.
+  final Widget Function(BuildContext context, bool isOpen)? anchorBuilder;
+
   /// Whether this dropdown was built by [FlutterDropdownButton.text].
   ///
   /// Informational. Nothing inside the widget branches on this: rendering is
@@ -477,6 +539,7 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>> {
       searchable: widget.searchable,
       searchFilter: widget.searchFilter,
       emptyBuilder: widget.emptyBuilder,
+      anchorBuilder: widget.anchorBuilder,
     );
   }
 }

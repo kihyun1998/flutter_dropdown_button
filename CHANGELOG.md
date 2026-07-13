@@ -1,5 +1,15 @@
 # Changelog
 
+## 3.3.0
+
+Additive. One new optional field on both widgets; nothing removed, nothing else changed.
+
+* **FEAT**: `anchorBuilder` — a **bare anchor** mode on `FlutterDropdownButton` (both constructors) and `FlutterMultiSelectDropdown`. Supplying `Widget Function(BuildContext, bool isOpen)` drops the entire button box — background, border, fixed width, padding, ink and trailing icon — and hangs the same anchored overlay off the widget you return. The point is to embed the dropdown *inside* another field, `[All ▾] │ search…`, where a button's own chrome nests a box inside a box; the only clean alternative was a hand-rolled `PopupMenuButton` that threw away this package's theming, keyboard navigation and searchable menu. Only the button face becomes the caller's — the menu is untouched
+* **FEAT**: the builder is handed `isOpen`, **not a label**. `isOpen` is the one thing a caller cannot read for itself, and drives an inline chevron (`AnimatedRotation(turns: isOpen ? 0.5 : 0.0, …)`); a label the caller already holds, in the `value` or `selected` it drew the anchor from. Passing one would leak a text-mode notion into `DropdownMenuShell`, which does not know what an item says — the invariant that lets one shell back both widgets. The dropped ink well's button role is restored with `Semantics(button: true)`
+* **FEAT**: the field lives on the shell and both public widgets read it, so bare mode composes with text mode, custom mode and the checklist alike — it is orthogonal to what an item renders as, and is a parameter rather than a `.bare()` constructor for exactly that reason. A constructor would have had to pick `itemBuilder` or `label`, leaving the other settable-but-dead — the shape 3.0.0 spent a major version deleting
+* **FEAT**: the button-box params `anchorBuilder` replaces — `width`, `minWidth`, `maxWidth`, `expand`, `trailing` — **assert** when combined with it, rather than being silently ignored. A settable-but-dead field is the smell this package audits for; the assert makes the conflict a debug-time error instead
+* **TEST**: 279 tests, up from 270, still at 100% line coverage (1090 lines). The bare path is asserted at the public seam — the caller's widget is the anchor, no ink well precedes the menu, tapping it opens the same overlay, `isOpen` flips, a disabled anchor stays shut, and the anchor is announced `isButton` — and each behaviour test was shown to fail with the shell's bare branch disabled
+
 ## 3.2.0
 
 Additive. One new optional field; nothing removed, nothing else changed.
