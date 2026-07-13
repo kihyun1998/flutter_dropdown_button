@@ -90,6 +90,41 @@ void main() {
       expect(seen.last, isFalse, reason: 'a selection closes it again');
     });
 
+    testWidgets('minMenuWidth widens the menu past the compact anchor', (
+      tester,
+    ) async {
+      // The menu takes its width from the anchor, and a bare anchor is tiny by
+      // design; minMenuWidth is a menu width (allowed in bare mode) that gives
+      // the menu a usable width of its own. This is the lever that keeps a
+      // checklist's rows from overflowing under an `[All ▾]`-wide anchor.
+      await tester.pumpWidget(
+        host(
+          FlutterDropdownButton<String>.text(
+            items: List<String>.generate(12, (i) => 'Item $i'),
+            value: 'Item 0',
+            onChanged: (_) {},
+            minMenuWidth: 200,
+            anchorBuilder: (context, isOpen) => const Text('All'),
+          ),
+        ),
+      );
+
+      final anchorWidth = tester.getSize(find.text('All')).width;
+      expect(anchorWidth, lessThan(120), reason: 'the anchor is compact');
+
+      await tester.tap(find.text('All'));
+      await tester.pumpAndSettle();
+
+      // A long list lays out in a ListView, whose width is the menu's.
+      final menuWidth = tester.getSize(find.byType(ListView)).width;
+      expect(menuWidth, greaterThan(150));
+      expect(
+        menuWidth,
+        lessThan(205),
+        reason: 'driven by minMenuWidth, not the screen',
+      );
+    });
+
     testWidgets('a disabled bare anchor does not open', (tester) async {
       await tester.pumpWidget(
         host(

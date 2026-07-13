@@ -62,6 +62,7 @@ Only the button *face* becomes yours. The anchored menu — its theming, keyboar
 - **The builder is handed `isOpen`, not a label.** `isOpen` is the one thing you cannot read for yourself; a label you can, from the `value` (or `selected`) you already hold. Passing a label would leak a text-mode notion into a shell that does not know what an item says. Turn an inline chevron with `AnimatedRotation(turns: isOpen ? 0.5 : 0.0, …)`.
 - **`isOpen` flips true the moment the menu opens and false once it has finished closing** — the close animation runs while it is still true, so a chevron animated off it settles back after the menu is gone.
 - **The button-box params it replaces must be left unset.** `width`, `minWidth`, `maxWidth`, `expand` and `trailing` describe the box you no longer have; combining any with `anchorBuilder` asserts in debug.
+- **Set `minMenuWidth` — the menu inherits the anchor's width.** A bare anchor is compact by design, and the menu takes its width from it, so an `[All ▾]` anchor yields an `[All ▾]`-wide menu its rows overflow. `minMenuWidth` (and `maxMenuWidth`) are *menu* widths, not the button-box `width`/`minWidth`/`maxWidth`, so they are allowed in bare mode and are the way to give the menu a usable width of its own.
 - **The anchor is still announced as a button.** The dropped ink well's role is restored with `Semantics(button: true)`, so a screen reader reads your widget as the control it is.
 
 ## FlutterMultiSelectDropdown\<T\>

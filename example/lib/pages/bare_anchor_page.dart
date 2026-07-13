@@ -53,6 +53,11 @@ class _BareAnchorPageState extends State<BareAnchorPage> {
                     items: _fields,
                     value: _field,
                     onChanged: (f) => setState(() => _field = f!),
+                    // The anchor is tiny by design, and the menu takes its
+                    // width from the anchor. `minMenuWidth` gives the menu a
+                    // usable width of its own — it is a *menu* width, so it is
+                    // allowed in bare mode where the button-box `width` is not.
+                    minMenuWidth: 200,
                     anchorBuilder: (context, isOpen) =>
                         _AnchorFace(label: _field, isOpen: isOpen),
                   ),
@@ -66,6 +71,10 @@ class _BareAnchorPageState extends State<BareAnchorPage> {
                     items: const ['Title', 'Body', 'Author', 'Tags'],
                     selected: _tags,
                     onChanged: (next) => setState(() => _tags = next),
+                    // Without this the checklist rows would collapse to the
+                    // tiny anchor's width and overflow. See the single-select
+                    // note above.
+                    minMenuWidth: 200,
                     labelBuilder: (s) => switch (s.length) {
                       0 => 'All',
                       1 => s.first,
