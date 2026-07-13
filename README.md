@@ -239,6 +239,10 @@ The button-box params it replaces — `width`, `minWidth`, `maxWidth`, `expand`,
 `trailing` — must be left unset, and combining them asserts. `FlutterMultiSelectDropdown`
 takes the same parameter.
 
+Because the anchor is compact, the menu — which takes its width from the anchor —
+would be compact too. Set **`minMenuWidth`** to give the menu a usable width; it
+is a *menu* width, not the button-box `width`, so it is allowed in bare mode.
+
 #### A value that is not in `items`
 
 A list refresh can drop the row a `value` names while `value` still names it.

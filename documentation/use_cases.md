@@ -485,6 +485,10 @@ Row(
       items: const ['All', 'Title', 'Body', 'Author'],
       value: field,
       onChanged: (f) => setState(() => field = f!),
+      // The menu takes its width from the anchor, and a bare anchor is tiny;
+      // minMenuWidth gives the menu a usable width. It is a menu width, not the
+      // forbidden button-box width, so it is allowed here.
+      minMenuWidth: 200,
       anchorBuilder: (context, isOpen) => Padding(
         padding: const EdgeInsets.symmetric(horizontal: 8),
         child: Row(
@@ -526,3 +530,10 @@ The chevron turns off `isOpen`, the one thing the builder cannot read for
 itself. Build the label from the `value` you already hold; the builder is not
 handed one. And drop `width`, `expand` and `trailing` — the button box they
 describe is gone, and combining them asserts.
+
+Note the `minMenuWidth`. The menu takes its width from the anchor, and a bare
+anchor is compact on purpose, so without it the menu would be as narrow as
+`[All ▾]` and its rows — a checkbox and a label, in the multi-select case —
+would overflow. `minMenuWidth` and `maxMenuWidth` are *menu* widths, distinct
+from the button-box `width`/`minWidth`/`maxWidth` bare mode forbids, so they are
+the lever that sizes a bare menu.
