@@ -45,7 +45,7 @@ Add to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  flutter_dropdown_button: ^3.3.0
+  flutter_dropdown_button: ^4.0.0
 ```
 
 Import the package:
@@ -479,20 +479,23 @@ Controls the appearance and behavior of the search text field when `searchable` 
 
 ### DropdownCheckboxTheme
 
-Styles the checkbox on each row of a `FlutterMultiSelectDropdown`. Reaches the box even though the menu is drawn in the root overlay, where a `Theme` wrapped around the widget cannot — only an app-wide `CheckboxThemeData` otherwise could, and that restyles every checkbox in the app. Only the fields that render on the presentational (`onChanged: null`, semantics-excluded) box are here.
+Styles the checkbox on each row of a `FlutterMultiSelectDropdown`. The box is a `FlutterCheckbox` (the [`flutter_checkbox`](https://pub.dev/packages/flutter_checkbox) package), reached even though the menu is drawn in the root overlay where a `Theme` wrapped around the widget cannot. Only the fields that render on the presentational (`onChanged: null`, semantics-excluded) box are here.
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
-| `activeColor` | `Color?` | `null` | Fill of a **checked** box. Routed through `fillColor` so it survives the box's disabled state |
-| `fillColor` | `WidgetStateProperty<Color?>?` | `null` | Per-state fill, for full control. Wins over `activeColor` |
+| `activeColor` | `Color?` | `null` | Fill of a **checked** box |
 | `checkColor` | `Color?` | `null` | Color of the checkmark |
-| `side` | `BorderSide?` | `null` | Outline of an **unchecked** box (a checked box's fill covers it) |
-| `shape` | `OutlinedBorder?` | `null` | Box shape, e.g. rounded corners |
-| `materialTapTargetSize` | `MaterialTapTargetSize?` | `null` | Size class the box occupies |
-| `visualDensity` | `VisualDensity?` | `null` | Density adjustment to the box's size |
+| `inactiveColor` | `Color?` | `null` | Fill of an **unchecked** box |
+| `borderColor` | `Color?` | `null` | Outline of an **unchecked** box (a checked box's fill covers it) |
+| `borderWidth` | `double?` | `null` (`2`) | Width of the unchecked outline |
+| `shape` | `CheckboxShape?` | `null` (`rectangle`) | `CheckboxShape.rectangle` or `.circle` |
+| `borderRadius` | `double?` | `null` (`4`) | Corner radius of a rectangle box |
+| `size` | `double?` | `null` (`24`) | Box size in logical pixels |
+| `checkStrokeWidth` | `double?` | `null` (`2.5`) | Checkmark stroke width |
+| `checkScale` | `double?` | `null` (`1.0`) | Checkmark size within the box |
 | `mouseCursor` | `MouseCursor?` | `null` | Cursor over the box. Set to `SystemMouseCursors.click` to match the row's |
 
-Each null field defers to the ambient `CheckboxThemeData`.
+A null colour defers to the ambient `ThemeData`; a null number keeps `CheckboxStyle`'s default (in parentheses). `CheckboxShape` is exported from this package.
 
 ### TextDropdownConfig
 

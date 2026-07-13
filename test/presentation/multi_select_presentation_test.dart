@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
+import 'package:flutter_checkbox/flutter_checkbox.dart';
 import 'package:flutter_dropdown_button/flutter_dropdown_button.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 /// A checklist row must announce that it is checked, and must not announce
 /// that it is disabled.
 ///
-/// A presentational `Checkbox` — one with `onChanged: null`, so the row's own
-/// `InkWell` owns the gesture — carries `isEnabled: false` into the semantics
-/// tree. `IgnorePointer` does not strip it; it suppresses hit-testing only.
-/// Nothing on screen differs, so this is invisible to a render test.
+/// The box is a presentational `FlutterCheckbox` — `onChanged: null`, so the
+/// row's own `InkWell` owns the gesture. Its own semantics node would merge into
+/// the row's, so it is wrapped in `ExcludeSemantics` and the checked state is
+/// re-attached to the row. `IgnorePointer` would not help; it suppresses
+/// hit-testing only. Nothing on screen differs, so this is invisible to a render
+/// test.
 ///
 /// `containsSemantics` is deprecated after Flutter 3.40 in favour of
 /// `isSemantics`, which does not exist on the 3.32 floor this package declares.
@@ -43,9 +46,9 @@ MultiSelectPresentation<T> multi<T>({
   );
 }
 
-/// The `Checkbox` a row was actually rendered with.
-Checkbox renderedBox(WidgetTester tester) =>
-    tester.widget<Checkbox>(find.byType(Checkbox).first);
+/// The `FlutterCheckbox` a row was actually rendered with.
+FlutterCheckbox renderedBox(WidgetTester tester) =>
+    tester.widget<FlutterCheckbox>(find.byType(FlutterCheckbox).first);
 
 /// The style the face was actually rendered with.
 TextStyle? faceStyle(WidgetTester tester) =>
@@ -93,9 +96,11 @@ void main() {
     });
 
     testWidgets('a row never announces that it is disabled', (tester) async {
-      // The regression test. A bare `Checkbox(onChanged: null)` — and one
-      // wrapped in `IgnorePointer` — both put `isEnabled: false` on the merged
-      // row, so a screen reader calls every row of the checklist dimmed.
+      // The contract guard. Material's `Checkbox(onChanged: null)` stamped
+      // `isEnabled: false` onto the merged row (a screen reader called every row
+      // dimmed) — the bug this test was born for. `FlutterCheckbox(onChanged:
+      // null)` stays `enabled`, so it no longer leaks that; the test now guards
+      // the contract against a regression to a box that does.
       final handle = tester.ensureSemantics();
       final presentation = multi<String>(selected: {'a'});
 
@@ -112,9 +117,9 @@ void main() {
   });
 
   group('hit testing', () {
-    // Guard, not a regression test. It pins the measurement that removed an
-    // `IgnorePointer` around the box: a `Checkbox` with `onChanged: null` has
-    // no gesture recognizer, so the tap reaches the row beneath it.
+    // Guard, not a regression test. It pins the measurement that there is no
+    // `IgnorePointer` around the box: a `FlutterCheckbox` with `onChanged: null`
+    // has no gesture recognizer, so the tap reaches the row beneath it.
     testWidgets('a tap on the box is a tap on the row', (tester) async {
       var taps = 0;
       final presentation = multi<String>(selected: const {});
@@ -135,7 +140,7 @@ void main() {
           ),
         ),
       );
-      await tester.tap(find.byType(Checkbox));
+      await tester.tap(find.byType(FlutterCheckbox));
       await tester.pumpAndSettle();
 
       expect(taps, 1);
@@ -159,7 +164,9 @@ void main() {
         ),
       );
 
-      final boxes = tester.widgetList<Checkbox>(find.byType(Checkbox)).toList();
+      final boxes = tester
+          .widgetList<FlutterCheckbox>(find.byType(FlutterCheckbox))
+          .toList();
       expect(boxes.map((b) => b.value), [true, false]);
     });
 
@@ -185,7 +192,7 @@ void main() {
         MaterialApp(home: Scaffold(body: presentation.buildItem('a', false))),
       );
 
-      expect(find.byType(Checkbox), findsOneWidget);
+      expect(find.byType(FlutterCheckbox), findsOneWidget);
       expect(find.text('a'), findsOneWidget);
     });
 
@@ -211,7 +218,7 @@ void main() {
         ),
       );
 
-      final box = tester.getTopLeft(find.byType(Checkbox)).dx;
+      final box = tester.getTopLeft(find.byType(FlutterCheckbox)).dx;
       final icon = tester.getTopLeft(find.byType(Icon)).dx;
       final label = tester.getTopLeft(find.text('a')).dx;
       final count = tester.getTopLeft(find.text('12')).dx;
@@ -233,34 +240,40 @@ void main() {
   });
 
   group('checkbox theme', () {
-    // Pump a row and read the Checkbox it built. The box is `onChanged: null`,
-    // so Flutter resolves its colours in the `disabled` state — asserting the
-    // widget's own `fillColor` against `{disabled, selected}` is what proves the
-    // accent survives, since a raw `activeColor` would be dropped there.
+    // Pump a row and read the FlutterCheckbox it built. The box is themed through
+    // its `style` (a CheckboxStyle) plus the `mouseCursor` argument.
     Future<void> pumpRow(WidgetTester tester, MultiSelectPresentation p) async {
       await tester.pumpWidget(
         MaterialApp(home: Scaffold(body: p.buildItem('a', true))),
       );
     }
 
-    testWidgets('an unthemed row leaves every checkbox slot null', (
+    testWidgets('the box is presentational but not greyed', (tester) async {
+      // The whole reason for FlutterCheckbox over Material: `onChanged: null`
+      // makes it non-interactive (tap falls through) while `enabled` stays true,
+      // so it is not dimmed and needs no activeColor→fillColor workaround.
+      await pumpRow(tester, multi<String>(selected: {'a'}));
+
+      final box = renderedBox(tester);
+      expect(box.onChanged, isNull, reason: 'the row owns the gesture');
+      expect(box.enabled, isTrue, reason: 'presentational, not disabled');
+      expect(box.value, isTrue);
+    });
+
+    testWidgets('an unthemed row leaves the style colours null', (
       tester,
     ) async {
       await pumpRow(tester, multi<String>(selected: {'a'}));
 
-      final box = renderedBox(tester);
-      expect(box.fillColor, isNull, reason: 'defer to ambient CheckboxTheme');
-      expect(box.checkColor, isNull);
-      expect(box.side, isNull);
-      expect(box.shape, isNull);
-      expect(box.materialTapTargetSize, isNull);
-      expect(box.visualDensity, isNull);
-      expect(box.mouseCursor, isNull);
+      final style = renderedBox(tester).style;
+      expect(style.activeColor, isNull, reason: 'defer to the ambient theme');
+      expect(style.checkColor, isNull);
+      expect(style.borderColor, isNull);
+      expect(style.inactiveColor, isNull);
+      expect(renderedBox(tester).mouseCursor, isNull);
     });
 
-    testWidgets('activeColor reaches the box and holds in the disabled state', (
-      tester,
-    ) async {
+    testWidgets('activeColor reaches the box directly', (tester) async {
       await pumpRow(
         tester,
         multi<String>(
@@ -271,38 +284,34 @@ void main() {
         ),
       );
 
-      final fill = renderedBox(tester).fillColor;
-      expect(fill, isNotNull);
       expect(
-        fill!.resolve({WidgetState.disabled, WidgetState.selected}),
+        renderedBox(tester).style.activeColor,
         const Color(0xFF00AA88),
-        reason: 'the state the presentational box is actually in',
+        reason: 'no disabled dance — FlutterCheckbox reads it straight',
       );
     });
 
-    testWidgets('checkColor, side and shape are handed to the box', (
+    testWidgets('checkColor, borderColor, shape and cursor are handed over', (
       tester,
     ) async {
-      const side = BorderSide(color: Color(0xFFDDDDDD), width: 2);
-      const shape = RoundedRectangleBorder(
-        borderRadius: BorderRadius.all(Radius.circular(6)),
-      );
       await pumpRow(
         tester,
         multi<String>(
           selected: {'a'},
           checkboxTheme: const DropdownCheckboxTheme(
             checkColor: Color(0xFFFFFFFF),
-            side: side,
-            shape: shape,
+            borderColor: Color(0xFFDDDDDD),
+            shape: CheckboxShape.circle,
+            mouseCursor: SystemMouseCursors.click,
           ),
         ),
       );
 
       final box = renderedBox(tester);
-      expect(box.checkColor, const Color(0xFFFFFFFF));
-      expect(box.side, side);
-      expect(box.shape, shape);
+      expect(box.style.checkColor, const Color(0xFFFFFFFF));
+      expect(box.style.borderColor, const Color(0xFFDDDDDD));
+      expect(box.style.shape, CheckboxShape.circle);
+      expect(box.mouseCursor, SystemMouseCursors.click);
     });
   });
 

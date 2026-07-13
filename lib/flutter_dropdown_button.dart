@@ -1,5 +1,11 @@
 library;
 
+// The multi-select checklist draws its boxes with `flutter_checkbox`.
+// `DropdownCheckboxTheme` takes a `CheckboxShape`, and its `resolve()` returns a
+// `CheckboxStyle`, so both are re-exported for callers who name them.
+export 'package:flutter_checkbox/flutter_checkbox.dart'
+    show CheckboxShape, CheckboxStyle;
+
 export 'src/flutter_dropdown_button.dart';
 export 'src/flutter_multi_select_dropdown.dart';
 export 'src/buttons/menu_alignment.dart';

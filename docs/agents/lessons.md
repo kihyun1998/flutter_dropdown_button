@@ -40,6 +40,13 @@
   전달됐지만 `hasCustomWidths` 를 먹였고, 그게 **non-null `thickness`** 분기를 열었다.
   `trackWidth` 만 설정한 테마는 hover 두께가 *우연히* 못박혀 있었고 제거가 그걸 풀었다.
   삭제 전 **모든 read site 를 grep** 한다 — 불리언 하나 계산하는 곳까지.
+- **#80/#81 (상류 pubspec 은 버전마다 실측).** flutter_checkbox 도입 시 0.3.0 pubspec 이
+  `sdk ^3.9.2 / flutter >=3.35.0` 를 선언해 "우리 바닥을 3.35 로 올려야 한다"는 슬라이스
+  (#80)를 만들었다. 그러나 사용자가 지정한 **0.3.1** 은 실제 사용 API(`Color.withValues`,
+  3.27)에 맞춰 `>=3.27.0` 으로 바닥을 도로 넓혔고 — 0.3.0 은 *빌드된 SDK* 를 바닥으로 박은
+  과선언이었다. 현재 바닥(3.32)이 이미 충족해 **바닥 상승은 통째로 불필요**, #80 을 닫았다.
+  버전을 지정받으면 *그 버전* 의 `environment` 를 직접 연다 — 다른 버전의 숫자를 재사용 금지
+  (#47 의 거울: 이번엔 상류가 자기 바닥을 *낮췄다*).
 
 ## Step 2 — 경계 규칙
 
@@ -88,6 +95,14 @@
   더하고 있음을 찾았다 — 2.3.2·2.5.0 에서 두 번 터진 그 버그의 원인. 두 에이전트가
   `semanticsLabel` 비대칭을 두고 다르게 말했고 **둘 다 맞았다**(비대칭은 실재하나 그
   리팩터가 만든 게 아님) — 렌즈를 나누는 이유.
+- **#81 (상류 위젯의 semantics 는 Material 과 다르다).** 체크박스를 `FlutterCheckbox` 로
+  바꾼 뒤 판별력 검증(`ExcludeSemantics` 제거)에서 "행은 disabled 를 알리지 않는다" 테스트가
+  **여전히 초록**이었다. 원인: `FlutterCheckbox(onChanged: null)` 은 `enabled: true` 를
+  emit 한다(Material 의 `onChanged: null` 은 `false`). 그래서 그 테스트는 새 구현에선
+  판별력을 잃었다. 그럼에도 `ExcludeSemantics` 는 **유지** — 박스가 자기 `checked` 노드를
+  emit 하므로 배제하지 않으면 행의 `Semantics(checked:)` 와 중복되고, flutter_checkbox 는
+  0.x 라 semantics 가 바뀔 수 있다. 상류 위젯을 갈아끼우면 그 semantics 를 소스
+  (`checkbox_interaction.dart`)로 확인한다 — 렌더 결과만 보면 놓친다(#37).
 
 ## Step 6 — 정합성 스윕
 

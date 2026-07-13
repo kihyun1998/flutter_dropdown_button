@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_checkbox/flutter_checkbox.dart';
 
 import '../config/text_dropdown_config.dart';
 import '../theme/dropdown_checkbox_theme.dart';
@@ -222,30 +223,12 @@ class CustomItemPresentation<T> implements DropdownItemPresentation<T> {
   const CustomItemPresentation({
     required this.itemBuilder,
     required this.value,
-    @Deprecated(
-      'Read by nothing since 3.1.0. The button draws `value` whether or not it '
-      'appears in `items`, the way text mode always has. Drop the argument. '
-      'This parameter will be removed in 4.0.0.',
-    )
-    this.items = const [],
     this.selectedBuilder,
     this.hintWidget,
   });
 
   /// Builds one item row.
   final Widget Function(T item, bool isSelected) itemBuilder;
-
-  /// The items on offer.
-  ///
-  /// Read by nothing. [buildSelected] once consulted it to decide whether
-  /// [value] was still on offer, and drew [hintWidget] when it was not. It no
-  /// longer does: the widget draws what it was handed.
-  @Deprecated(
-    'Read by nothing since 3.1.0. The button draws `value` whether or not it '
-    'appears in `items`, the way text mode always has. Drop the argument. '
-    'This field will be removed in 4.0.0.',
-  )
-  final List<T> items;
 
   /// The chosen item, if any.
   final T? value;
@@ -370,44 +353,41 @@ class MultiSelectPresentation<T> implements DropdownItemPresentation<T> {
 
   /// One checklist row.
   ///
-  /// The box is **presentational**. `onChanged: null` gives it no gesture
-  /// recognizer, so a tap on it falls through to the row's `InkWell` — measured,
-  /// not assumed: a row taps once whether or not the box is wrapped in an
-  /// `IgnorePointer`, so there is no wrapper here.
+  /// The box is a [FlutterCheckbox], drawn **presentationally**. `onChanged: null`
+  /// gives it no gesture recognizer, so a tap on it falls through to the row's
+  /// `InkWell` — measured, not assumed. Unlike Material, `onChanged: null` does
+  /// not grey the box out: `FlutterCheckbox` dims only on `enabled: false`, which
+  /// is left at its default `true`, so the accent shows on a checked box directly
+  /// (no `activeColor` → `fillColor` workaround needed).
   ///
-  /// What `onChanged: null` *does* cost is the semantics tree. Once the
-  /// `InkWell` merges its descendants, the row inherits the box's
-  /// `isEnabled: false`, and a screen reader calls every row of a working
-  /// checklist *dimmed*. `IgnorePointer` does not help — it suppresses
-  /// hit-testing, not semantics. So the box is excluded from the tree and the
-  /// checked state is re-attached to the row, which is the interactive thing.
+  /// What a presentational box still costs is the semantics tree. Once the row's
+  /// `InkWell` merges its descendants, the box's own checked/enabled node would
+  /// merge in and a screen reader would announce every row confusingly. So the
+  /// box is excluded from the tree and the checked state is re-attached to the
+  /// row, which is the interactive thing. `IgnorePointer` would not help — it
+  /// suppresses hit-testing, not semantics.
   ///
   /// None of this is visible on screen. It was found with a semantics probe.
   @override
   Widget buildItem(T item, bool isSelected) {
     final leading = itemLeadingBuilder?.call(item);
     final trailing = itemTrailingBuilder?.call(item);
-    final checkbox = checkboxTheme.resolve();
+    final checkboxStyle = checkboxTheme.resolve();
 
     return Semantics(
       checked: isSelected,
       child: Row(
         children: [
-          // `onChanged: null` keeps the box presentational — the tap falls
-          // through to the row's InkWell. Every resolved slot is null unless the
-          // theme named it, so an unset theme leaves the box to the ambient
-          // CheckboxThemeData exactly as before.
+          // Presentational: `onChanged: null` (tap falls through), semantics
+          // excluded (the row carries `checked`). Unset style slots keep
+          // CheckboxStyle's defaults, which FlutterCheckbox resolves against the
+          // ambient ThemeData — so an unthemed box follows the app theme.
           ExcludeSemantics(
-            child: Checkbox(
+            child: FlutterCheckbox(
               value: isSelected,
               onChanged: null,
-              fillColor: checkbox.fillColor,
-              checkColor: checkbox.checkColor,
-              side: checkbox.side,
-              shape: checkbox.shape,
-              materialTapTargetSize: checkbox.materialTapTargetSize,
-              visualDensity: checkbox.visualDensity,
-              mouseCursor: checkbox.mouseCursor,
+              style: checkboxStyle,
+              mouseCursor: checkboxTheme.mouseCursor,
             ),
           ),
           if (leading != null)

@@ -123,9 +123,8 @@ class _MultiSelectPageState extends State<MultiSelectPage> {
                       checkbox: DropdownCheckboxTheme(
                         activeColor: Colors.indigo,
                         checkColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(4)),
-                        ),
+                        shape: CheckboxShape.rectangle,
+                        borderRadius: 4,
                         mouseCursor: SystemMouseCursors.click,
                       ),
                     ),

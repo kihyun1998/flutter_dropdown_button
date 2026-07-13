@@ -93,7 +93,7 @@ Text mode only. An item that needs more than text — an avatar, two lines — i
 - **`T` needs `==` and `hashCode`.** `selected.contains(item)` uses both, where single-select's `value == item` used only the first. A `T` with a hand-written `==` and the default `hashCode` will let a `Set` hold duplicates that look identical.
 - **A chosen value absent from `items`** still counts towards `labelBuilder`, and draws no row. `'3 selected'` can appear beside two ticked boxes after a refresh drops the third. Offer a way to clear it.
 - **The query survives a tick.** Only opening and closing the menu reset it.
-- **Rows announce their checked state.** The box is drawn but excluded from the semantics tree; the row carries `checked` instead. A live `Checkbox` inside the row's ink well would announce every row as *disabled*.
+- **Rows announce their checked state.** The box (a `FlutterCheckbox`) is drawn but excluded from the semantics tree; the row carries `checked` instead, so the row is the single interactive node a screen reader sees.
 - **A trailing widget's text is merged into the row's announced label.** The ink well merges its descendants, so `itemTrailingBuilder: (v) => Text('42')` makes a screen reader read `"Apple\n42"`. `itemLeadingBuilder` is the same; an `Icon` carries no label and stays silent.
 - **The row is `[checkbox] [leading] [label] [trailing]`.** Only the label gives way when space runs out, so it ellipsises and neither slot is squeezed. Material has no such arrangement — `CheckboxListTile`'s `secondary` sits on the *opposite* side of the box (`checkbox_list_tile.dart:590`), which is the layout `itemTrailingBuilder` alone gives you.
 
@@ -342,13 +342,13 @@ final presentation = MultiSelectPresentation<String>(
 );
 ```
 
-An optional `checkboxTheme` (a `DropdownCheckboxTheme`, default `defaultTheme`) styles the row's box. It resolves the box's `activeColor` through `fillColor` so the accent survives the box's `onChanged: null` disabled state; see [theming](theming.md).
+An optional `checkboxTheme` (a `DropdownCheckboxTheme`, default `defaultTheme`) styles the row's box, which is a `FlutterCheckbox` (the `flutter_checkbox` package). It resolves into a `CheckboxStyle`; see [theming](theming.md).
 
 The interface is unchanged. `buildSelected()` still takes no argument: `TextItemPresentation` swallows a `value` as a field, and this one swallows a `Set` and a `labelBuilder` the same way.
 
 Two things it does that are not visible on screen:
 
-- The `Checkbox` is **presentational** and **excluded from the semantics tree**, and the row carries `Semantics(checked:)` instead. `onChanged: null` gives the box no gesture recognizer — a tap on it falls through to the row — but it *does* put `isEnabled: false` on the merged row, which makes a screen reader call every row of a working checklist *dimmed*. `IgnorePointer` does not help; it suppresses hit-testing, not semantics.
+- The `FlutterCheckbox` is **presentational** and **excluded from the semantics tree**, and the row carries `Semantics(checked:)` instead. `onChanged: null` gives the box no gesture recognizer — a tap on it falls through to the row — while leaving it `enabled`, so (unlike Material) it does not stamp `isEnabled: false` onto the merged row. It still emits its own `checked` node, which the exclusion drops so the row is the single source of the checked state. `IgnorePointer` does not help; it suppresses hit-testing, not semantics.
 - The row's ink well **merges** its descendants' semantics, so `itemTrailingBuilder`'s text becomes part of the announced label: `"Apple\n42"`.
 
 ## DropdownSearchController\<T\>

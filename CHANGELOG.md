@@ -1,14 +1,24 @@
 # Changelog
 
-## 3.3.0
+## 4.0.0
 
-Additive. One new optional field on both widgets; nothing removed, nothing else changed.
+Breaking. The multi-select checklist now draws its boxes with the [`flutter_checkbox`](https://pub.dev/packages/flutter_checkbox) package instead of Flutter's built-in `Checkbox`, and `DropdownCheckboxTheme` is redesigned around it — several Material-only fields are removed. The **SDK floor is unchanged** (`>=3.32.0`): `flutter_checkbox` `0.3.1` needs only Flutter 3.27. This release also folds in the bare-anchor feature, which was never published on its own.
+
+### Multi-select checkbox → `flutter_checkbox`
+
+* **BREAKING**: `DropdownCheckboxTheme` is rebuilt around `flutter_checkbox`'s `CheckboxStyle`. **Removed** — the Material-`Checkbox` concepts the new box has no equivalent for: `fillColor` (`WidgetStateProperty`), `side` (`BorderSide`), `shape` (`OutlinedBorder`), `materialTapTargetSize`, `visualDensity`. **Kept**: `activeColor`, `checkColor`, `mouseCursor`. **Added**: `inactiveColor`, `borderColor`, `borderWidth`, `borderRadius`, `size`, `checkStrokeWidth`, `checkScale`, and `shape` now typed `CheckboxShape` (an enum: `rectangle` / `circle`). `resolve()` now returns a `CheckboxStyle`, and the `ResolvedCheckboxStyle` class is removed. Migration map in `documentation/migration.md`
+* **FEAT**: the box is a `FlutterCheckbox`, drawn `onChanged: null` but left `enabled: true` — presentational (a tap falls through to the row) **without** being greyed. This deletes the `activeColor` → `fillColor` workaround 3.2.0 needed: Material forced an `onChanged: null` box into its disabled state and dropped a plain `activeColor`; `FlutterCheckbox` does not, so the accent is read straight (`CheckboxStyle.activeColor`)
+* **FEAT**: `CheckboxShape` and `CheckboxStyle` are re-exported from the package barrel, so `DropdownCheckboxTheme(shape: CheckboxShape.circle)` needs no extra import
+* **CHANGE**: the box's semantics are still excluded and the row still carries `checked`. Unlike Material, `FlutterCheckbox(onChanged: null)` announces `enabled: true` — so the row no longer risks a *dimmed* announcement leaking from the box — but the box still emits its own `checked` node, which the exclusion drops to keep the row the single source of the checked state
+* **MIGRATION**: `side` → `borderColor` + `borderWidth`; `shape: RoundedRectangleBorder(borderRadius: …)` → `shape: CheckboxShape.rectangle` + `borderRadius`; `fillColor` → `activeColor` (checked) / `inactiveColor` (unchecked). `materialTapTargetSize` and `visualDensity` have no equivalent — the box sizes via `size`
+* **TEST**: 280 tests at 100% line coverage (1085 lines). The box is asserted presentational-but-not-greyed (`onChanged` null, `enabled` true), the accent reaches `style.activeColor` directly, and the semantics contract (row `checked`, never *disabled*) is held at the semantics tree
+
+### Bare anchor (folds in the unreleased 3.3.0)
 
 * **FEAT**: `anchorBuilder` — a **bare anchor** mode on `FlutterDropdownButton` (both constructors) and `FlutterMultiSelectDropdown`. Supplying `Widget Function(BuildContext, bool isOpen)` drops the entire button box — background, border, fixed width, padding, ink and trailing icon — and hangs the same anchored overlay off the widget you return. The point is to embed the dropdown *inside* another field, `[All ▾] │ search…`, where a button's own chrome nests a box inside a box; the only clean alternative was a hand-rolled `PopupMenuButton` that threw away this package's theming, keyboard navigation and searchable menu. Only the button face becomes the caller's — the menu is untouched
 * **FEAT**: the builder is handed `isOpen`, **not a label**. `isOpen` is the one thing a caller cannot read for itself, and drives an inline chevron (`AnimatedRotation(turns: isOpen ? 0.5 : 0.0, …)`); a label the caller already holds, in the `value` or `selected` it drew the anchor from. Passing one would leak a text-mode notion into `DropdownMenuShell`, which does not know what an item says — the invariant that lets one shell back both widgets. The dropped ink well's button role is restored with `Semantics(button: true)`
 * **FEAT**: the field lives on the shell and both public widgets read it, so bare mode composes with text mode, custom mode and the checklist alike — it is orthogonal to what an item renders as, and is a parameter rather than a `.bare()` constructor for exactly that reason. A constructor would have had to pick `itemBuilder` or `label`, leaving the other settable-but-dead — the shape 3.0.0 spent a major version deleting
-* **FEAT**: the button-box params `anchorBuilder` replaces — `width`, `minWidth`, `maxWidth`, `expand`, `trailing` — **assert** when combined with it, rather than being silently ignored. A settable-but-dead field is the smell this package audits for; the assert makes the conflict a debug-time error instead
-* **TEST**: 279 tests, up from 270, still at 100% line coverage (1090 lines). The bare path is asserted at the public seam — the caller's widget is the anchor, no ink well precedes the menu, tapping it opens the same overlay, `isOpen` flips, a disabled anchor stays shut, and the anchor is announced `isButton` — and each behaviour test was shown to fail with the shell's bare branch disabled
+* **FEAT**: the button-box params `anchorBuilder` replaces — `width`, `minWidth`, `maxWidth`, `expand`, `trailing` — **assert** when combined with it, rather than being silently ignored. A bare anchor is compact by design and the menu takes its width from it, so set `minMenuWidth` (a *menu* width, still allowed) to give the menu a usable width
 
 ## 3.2.0
 
