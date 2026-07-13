@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_checkbox/flutter_checkbox.dart';
 import 'package:flutter_dropdown_button/flutter_dropdown_button.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -132,7 +133,9 @@ void main() {
     await tester.tap(row('Apple').first);
     await tester.pumpAndSettle();
 
-    final boxes = tester.widgetList<Checkbox>(find.byType(Checkbox)).toList();
+    final boxes = tester
+        .widgetList<FlutterCheckbox>(find.byType(FlutterCheckbox))
+        .toList();
     expect(boxes.map((b) => b.value), [true, false, false]);
   });
 
@@ -164,7 +167,7 @@ void main() {
     await openMenu(tester);
 
     expect(find.text('ghost'), findsNothing);
-    expect(find.byType(Checkbox), findsOneWidget);
+    expect(find.byType(FlutterCheckbox), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 
@@ -217,7 +220,7 @@ void main() {
 
     expect(find.byIcon(Icons.star), findsNWidgets(2), reason: 'one per row');
 
-    final box = tester.getTopLeft(find.byType(Checkbox).first).dx;
+    final box = tester.getTopLeft(find.byType(FlutterCheckbox).first).dx;
     final icon = tester.getTopLeft(find.byIcon(Icons.star).first).dx;
     final label = tester.getTopLeft(find.text('Apple')).dx;
     final count = tester.getTopLeft(find.text('12').first).dx;
@@ -230,12 +233,12 @@ void main() {
   testWidgets('closeAll shuts a checklist too', (tester) async {
     await tester.pumpWidget(const Harness());
     await openMenu(tester);
-    expect(find.byType(Checkbox), findsNWidgets(3));
+    expect(find.byType(FlutterCheckbox), findsNWidgets(3));
 
     FlutterMultiSelectDropdown.closeAll(animate: false);
     await tester.pumpAndSettle();
 
-    expect(find.byType(Checkbox), findsNothing);
+    expect(find.byType(FlutterCheckbox), findsNothing);
   });
 
   testWidgets('opening a plain dropdown closes an open checklist', (
@@ -271,7 +274,7 @@ void main() {
 
     await tester.tap(find.byType(FlutterMultiSelectDropdown<String>));
     await tester.pumpAndSettle();
-    expect(find.byType(Checkbox), findsNWidgets(2));
+    expect(find.byType(FlutterCheckbox), findsNWidgets(2));
 
     // The open menu covers the screen with a dismiss barrier, so reaching the
     // other button may take two taps. Either way, both must never be open.
@@ -286,7 +289,11 @@ void main() {
     }
 
     expect(find.text('One'), findsOneWidget, reason: 'the other one opened');
-    expect(find.byType(Checkbox), findsNothing, reason: 'the checklist closed');
+    expect(
+      find.byType(FlutterCheckbox),
+      findsNothing,
+      reason: 'the checklist closed',
+    );
   });
 
   testWidgets('reopening the menu does reset the query', (tester) async {
@@ -311,7 +318,8 @@ void main() {
   ) async {
     // End to end: the theme travels the whole path a consumer relies on —
     // DropdownStyleTheme → the widget → the shell → the presentation → the
-    // Checkbox drawn in the root Overlay, which a local Theme could not reach.
+    // FlutterCheckbox drawn in the root Overlay, which a local Theme could not
+    // reach.
     await tester.pumpWidget(
       const Harness(
         initial: {'Apple'},
@@ -319,20 +327,22 @@ void main() {
           checkbox: DropdownCheckboxTheme(
             activeColor: Color(0xFF00AA88),
             checkColor: Color(0xFFFFFFFF),
-            side: BorderSide(color: Color(0xFFDDDDDD), width: 2),
+            borderColor: Color(0xFFDDDDDD),
           ),
         ),
       ),
     );
     await openMenu(tester);
 
-    final box = tester.widget<Checkbox>(find.byType(Checkbox).first);
-    expect(box.checkColor, const Color(0xFFFFFFFF));
-    expect(box.side, const BorderSide(color: Color(0xFFDDDDDD), width: 2));
+    final box = tester.widget<FlutterCheckbox>(
+      find.byType(FlutterCheckbox).first,
+    );
+    expect(box.style.checkColor, const Color(0xFFFFFFFF));
+    expect(box.style.borderColor, const Color(0xFFDDDDDD));
     expect(
-      box.fillColor!.resolve({WidgetState.disabled, WidgetState.selected}),
+      box.style.activeColor,
       const Color(0xFF00AA88),
-      reason: 'the checked box fills with the accent even while disabled',
+      reason: 'the checked box fills with the accent, read straight through',
     );
   });
 }

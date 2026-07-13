@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_checkbox/flutter_checkbox.dart';
 import 'package:flutter_dropdown_button/flutter_dropdown_button.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -222,13 +223,13 @@ void main() {
         ),
       );
 
-      expect(find.byType(Checkbox), findsNothing);
+      expect(find.byType(FlutterCheckbox), findsNothing);
 
       await tester.tap(find.text('BARE-ANCHOR'));
       await tester.pumpAndSettle();
 
       // The checklist opened: a box per row.
-      expect(find.byType(Checkbox), findsNWidgets(3));
+      expect(find.byType(FlutterCheckbox), findsNWidgets(3));
     });
 
     testWidgets('combining a button-box param with anchorBuilder asserts', (

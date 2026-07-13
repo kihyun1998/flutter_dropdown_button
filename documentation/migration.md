@@ -1,5 +1,57 @@
 # Migration Guide
 
+## Upgrading to 4.0.0
+
+Breaking in two places: the multi-select checkbox theme, and one field that 3.1.0 deprecated. The **SDK floor is unchanged** (`>=3.32.0`). If you use neither, nothing changes.
+
+### `DropdownCheckboxTheme` is redesigned around `flutter_checkbox`
+
+The checklist box is now a `FlutterCheckbox` (the `flutter_checkbox` package) rather than Flutter's built-in `Checkbox`, so `DropdownCheckboxTheme` speaks its `CheckboxStyle` vocabulary. Remap the removed Material fields:
+
+| Removed (3.x, Material) | Replacement (4.0.0) |
+|---|---|
+| `side: BorderSide(color: c, width: w)` | `borderColor: c` + `borderWidth: w` |
+| `shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(r))` | `shape: CheckboxShape.rectangle` + `borderRadius: r` |
+| `shape: CircleBorder()` | `shape: CheckboxShape.circle` |
+| `fillColor: WidgetStateProperty...` | `activeColor` (checked) / `inactiveColor` (unchecked) |
+| `materialTapTargetSize`, `visualDensity` | *no equivalent* — size the box with `size` |
+
+`activeColor`, `checkColor` and `mouseCursor` are unchanged. `CheckboxShape` is re-exported from the package, so it needs no extra import. `resolve()` now returns a `CheckboxStyle`, and the `ResolvedCheckboxStyle` class is removed — only code building a presentation by hand is affected.
+
+```dart
+// Before (3.x)
+DropdownCheckboxTheme(
+  activeColor: Colors.teal,
+  side: BorderSide(color: Colors.grey, width: 2),
+  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+)
+
+// After (4.0.0)
+DropdownCheckboxTheme(
+  activeColor: Colors.teal,
+  borderColor: Colors.grey,
+  borderWidth: 2,
+  shape: CheckboxShape.rectangle,
+  borderRadius: 4,
+)
+```
+
+A bonus: the `activeColor` → `fillColor` dance 3.2.0 documented is gone. `FlutterCheckbox` is drawn `onChanged: null` but stays `enabled`, so it is presentational without being greyed, and `activeColor` shows on a checked box directly.
+
+### `CustomItemPresentation.items` is removed
+
+Deprecated in 3.1.0 (read by nothing since), now removed. Drop the argument:
+
+```dart
+// Before
+CustomItemPresentation<T>(itemBuilder: ..., items: items, value: value)
+
+// After
+CustomItemPresentation<T>(itemBuilder: ..., value: value)
+```
+
+Only code that constructs a presentation by hand — a dropdown built on `DropdownOverlayController` — is affected.
+
 ## Upgrading to 3.1.0
 
 A new widget, one behaviour change, one deprecation. Nothing was removed.

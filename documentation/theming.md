@@ -98,52 +98,45 @@ DropdownTheme(
 
 ### The checkbox in a multi-select row
 
-Style it with `DropdownCheckboxTheme`, the `checkbox` slot on
-`DropdownStyleTheme`:
+The box is a `FlutterCheckbox` (the `flutter_checkbox` package). Style it with
+`DropdownCheckboxTheme`, the `checkbox` slot on `DropdownStyleTheme`:
 
 ```dart
 FlutterMultiSelectDropdown<String>(
   theme: DropdownStyleTheme(
     checkbox: DropdownCheckboxTheme(
-      activeColor: Colors.teal,                         // fill of a checked box
-      checkColor: Colors.white,                         // the checkmark
-      side: BorderSide(color: Colors.grey, width: 2),   // an unchecked box's outline
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(4),
-      ),
+      activeColor: Colors.teal,        // fill of a checked box
+      checkColor: Colors.white,        // the checkmark
+      borderColor: Colors.grey,        // an unchecked box's outline
+      borderWidth: 2,
+      shape: CheckboxShape.rectangle,  // or CheckboxShape.circle
+      borderRadius: 4,
     ),
   ),
   ...
 )
 ```
 
-Only the fields that render are here — `activeColor`, `fillColor`, `checkColor`,
-`side`, `shape`, `materialTapTargetSize`, `visualDensity`, `mouseCursor`. The
-row's box is drawn `onChanged: null` (a tap falls through to the row) with its
-semantics excluded, so the focus, hover and splash of an interactive checkbox
+Only the fields that render on the presentational box are here — `activeColor`,
+`checkColor`, `inactiveColor`, `borderColor`, `borderWidth`, `shape`,
+`borderRadius`, `size`, `checkStrokeWidth`, `checkScale`, `mouseCursor`. The box
+is drawn `onChanged: null` (a tap falls through to the row) with its semantics
+excluded, so `flutter_checkbox`'s hover/focus/splash ring and disabled-opacity
 never appear. `mouseCursor` is the exception — its `MouseRegion` is installed
 either way, so set it to `SystemMouseCursors.click` to match the row's cursor.
 
-`activeColor` is the common case — the fill of a **checked** box. Because the box
-is non-interactive, Flutter would drop a raw `Checkbox.activeColor`; the theme
-routes it through `fillColor` so it takes. For per-state control, set `fillColor`
-directly (it wins over `activeColor`):
-
-```dart
-DropdownCheckboxTheme(
-  fillColor: WidgetStateProperty.resolveWith(
-    (states) => states.contains(WidgetState.selected) ? Colors.teal : null,
-  ),
-)
-```
+`activeColor` fills a **checked** box. Unlike Material, no workaround is needed:
+`FlutterCheckbox` is drawn `onChanged: null` but stays `enabled`, so it is
+presentational without being greyed and the accent is read straight.
+`inactiveColor` fills an unchecked box (transparent by default) and `borderColor`
+outlines it; `CheckboxShape` is exported from this package.
 
 **A `Theme` wrapped around the dropdown does not reach the box.** The menu is
-drawn in the root `Overlay`, out of a local `Theme`'s subtree — a
-`CheckboxThemeData` you want to apply must live on `MaterialApp.theme`, and it
-then restyles every checkbox in the app. `DropdownCheckboxTheme` is how you reach
-just this dropdown's boxes. Everything *around* the box — the row's hover,
-splash, margin, radius, and the selected row's background — stays `DropdownTheme`'s,
-exactly as for a single-select menu.
+drawn in the root `Overlay`, out of a local `Theme`'s subtree.
+`DropdownCheckboxTheme` is how you reach just this dropdown's boxes — a null
+field defers to the ambient `ThemeData`. Everything *around* the box — the row's
+hover, splash, margin, radius, and the selected row's background — stays
+`DropdownTheme`'s, exactly as for a single-select menu.
 
 The widgets `itemLeadingBuilder` and `itemTrailingBuilder` return are **yours**.
 The package places them and styles nothing about them; colour and size are
@@ -155,19 +148,15 @@ itemTrailingBuilder: (v) => Text('${counts[v]}',
     style: TextStyle(color: Colors.grey.shade600)),
 ```
 
-`itemHeight` must leave room for the box. A `Checkbox` measures **48×48** with
-Flutter's default `materialTapTargetSize`, and **40×40** under
-`MaterialTapTargetSize.shrinkWrap` — measured, not remembered. This package's
-default `itemHeight` is 48, so a shorter row needs the smaller tap target too —
-and, unlike the ambient theme, `DropdownCheckboxTheme` scopes it to this dropdown:
+`itemHeight` must leave room for the box. A `FlutterCheckbox` is `size` logical
+pixels square — **24×24** by default — with no Material tap-target padding to
+account for. Shrink the box with `size` for a shorter row:
 
 ```dart
 FlutterMultiSelectDropdown<String>(
   itemHeight: 40,
   theme: DropdownStyleTheme(
-    checkbox: DropdownCheckboxTheme(
-      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-    ),
+    checkbox: DropdownCheckboxTheme(size: 18),
   ),
   ...
 )

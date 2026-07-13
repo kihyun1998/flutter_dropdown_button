@@ -297,55 +297,6 @@ class ResolvedOverlayStyle {
   final EdgeInsets? padding;
 }
 
-/// The checklist checkbox's appearance, in the shape [Checkbox] takes.
-///
-/// Every field is handed straight to the [Checkbox] the multi-select menu
-/// draws. A slot the theme left unset stays **null**, which a [Checkbox] reads
-/// as "ask the ambient [CheckboxThemeData]" — writing a default in would
-/// silence an app-wide theme.
-///
-/// [fillColor] is the resolved form of the theme's convenience `activeColor`:
-/// the box is drawn with `onChanged: null`, so Flutter marks it `disabled` and
-/// drops a plain `activeColor` before reading it. Routing the accent through
-/// [fillColor] — which [Checkbox] consults first — is what makes it survive.
-class ResolvedCheckboxStyle {
-  /// Creates a resolved checkbox style.
-  const ResolvedCheckboxStyle({
-    this.fillColor,
-    this.checkColor,
-    this.side,
-    this.shape,
-    this.materialTapTargetSize,
-    this.visualDensity,
-    this.mouseCursor,
-  });
-
-  /// The box's fill per state. Null defers to the ambient [CheckboxThemeData].
-  final WidgetStateProperty<Color?>? fillColor;
-
-  /// The checkmark's colour. Null defers to the ambient theme.
-  final Color? checkColor;
-
-  /// The outline of an **unchecked** box. A checked box has none — its fill
-  /// covers it. Null defers to the ambient theme.
-  final BorderSide? side;
-
-  /// The box's shape. Null defers to the ambient theme.
-  final OutlinedBorder? shape;
-
-  /// The size class the box occupies. Null defers to the ambient theme.
-  final MaterialTapTargetSize? materialTapTargetSize;
-
-  /// The density adjustment applied to the box's size. Null defers to the
-  /// ambient theme.
-  final VisualDensity? visualDensity;
-
-  /// The cursor over the box. Honoured despite `onChanged: null` — the box's
-  /// `MouseRegion` is installed regardless of interactivity. Null defers to the
-  /// ambient theme.
-  final MouseCursor? mouseCursor;
-}
-
 /// One item row's appearance, with every slot filled in.
 class ResolvedItemStyle {
   /// Creates a resolved item style.
