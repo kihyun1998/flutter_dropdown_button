@@ -1,3 +1,4 @@
+import 'dropdown_checkbox_theme.dart';
 import 'dropdown_scroll_theme.dart';
 import 'dropdown_theme.dart';
 import 'search_field_theme.dart';
@@ -36,6 +37,7 @@ class DropdownStyleTheme {
     this.scroll = const DropdownScrollTheme(),
     this.tooltip = const DropdownTooltipTheme(),
     this.search = const SearchFieldTheme(),
+    this.checkbox = const DropdownCheckboxTheme(),
   });
 
   /// General dropdown styling configuration.
@@ -64,18 +66,29 @@ class DropdownStyleTheme {
   /// is enabled.
   final SearchFieldTheme search;
 
+  /// Checklist checkbox styling configuration.
+  ///
+  /// Controls the appearance of the checkbox on each row of a
+  /// [FlutterMultiSelectDropdown]. Ignored by the single-select
+  /// [FlutterDropdownButton], which draws no checkbox. Naming a field recolours
+  /// just this dropdown's boxes, where an app-wide [CheckboxThemeData] cannot —
+  /// the menu is drawn in the root [Overlay], out of a local [Theme]'s reach.
+  final DropdownCheckboxTheme checkbox;
+
   /// Creates a copy of this theme with the given fields replaced.
   DropdownStyleTheme copyWith({
     DropdownTheme? dropdown,
     DropdownScrollTheme? scroll,
     DropdownTooltipTheme? tooltip,
     SearchFieldTheme? search,
+    DropdownCheckboxTheme? checkbox,
   }) {
     return DropdownStyleTheme(
       dropdown: dropdown ?? this.dropdown,
       scroll: scroll ?? this.scroll,
       tooltip: tooltip ?? this.tooltip,
       search: search ?? this.search,
+      checkbox: checkbox ?? this.checkbox,
     );
   }
 

@@ -14,12 +14,14 @@ class Harness extends StatefulWidget {
     this.initial = const <String>{},
     this.searchable = false,
     this.onChanged,
+    this.theme,
   });
 
   final List<String> items;
   final Set<String> initial;
   final bool searchable;
   final void Function(Set<String>)? onChanged;
+  final DropdownStyleTheme? theme;
 
   @override
   State<Harness> createState() => HarnessState();
@@ -38,6 +40,7 @@ class HarnessState extends State<Harness> {
             height: 200,
             items: widget.items,
             selected: selected,
+            theme: widget.theme,
             searchable: widget.searchable,
             labelBuilder: (s) => s.isEmpty ? 'All' : '${s.length} selected',
             onChanged: (next) {
@@ -301,5 +304,35 @@ void main() {
     await openMenu(tester);
 
     expect(find.text('Cherry'), findsOneWidget);
+  });
+
+  testWidgets('a checkbox theme reaches the boxes in the overlay', (
+    tester,
+  ) async {
+    // End to end: the theme travels the whole path a consumer relies on —
+    // DropdownStyleTheme → the widget → the shell → the presentation → the
+    // Checkbox drawn in the root Overlay, which a local Theme could not reach.
+    await tester.pumpWidget(
+      const Harness(
+        initial: {'Apple'},
+        theme: DropdownStyleTheme(
+          checkbox: DropdownCheckboxTheme(
+            activeColor: Color(0xFF00AA88),
+            checkColor: Color(0xFFFFFFFF),
+            side: BorderSide(color: Color(0xFFDDDDDD), width: 2),
+          ),
+        ),
+      ),
+    );
+    await openMenu(tester);
+
+    final box = tester.widget<Checkbox>(find.byType(Checkbox).first);
+    expect(box.checkColor, const Color(0xFFFFFFFF));
+    expect(box.side, const BorderSide(color: Color(0xFFDDDDDD), width: 2));
+    expect(
+      box.fillColor!.resolve({WidgetState.disabled, WidgetState.selected}),
+      const Color(0xFF00AA88),
+      reason: 'the checked box fills with the accent even while disabled',
+    );
   });
 }

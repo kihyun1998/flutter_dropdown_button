@@ -5,6 +5,7 @@ import 'config/text_dropdown_config.dart';
 import 'overlay/dropdown_overlay_controller.dart';
 import 'presentation/item_presentation.dart';
 import 'shell/dropdown_menu_shell.dart';
+import 'theme/dropdown_checkbox_theme.dart';
 import 'theme/dropdown_style_theme.dart';
 import 'theme/tooltip_theme.dart';
 
@@ -108,7 +109,8 @@ class FlutterMultiSelectDropdown<T> extends StatelessWidget {
   /// Text rendering rules: overflow, alignment, styles.
   final TextDropdownConfig? config;
 
-  /// Styling for the button, the menu, its scrollbar and its search field.
+  /// Styling for the button, the menu, its scrollbar, its search field and its
+  /// row checkboxes ([DropdownStyleTheme.checkbox]).
   final DropdownStyleTheme? theme;
 
   /// A fixed button width.
@@ -186,6 +188,7 @@ class FlutterMultiSelectDropdown<T> extends StatelessWidget {
         config: config ?? TextDropdownConfig.defaultConfig,
         tooltipTheme: theme?.tooltip ?? DropdownTooltipTheme.defaultTheme,
         enabled: enabled,
+        checkboxTheme: theme?.checkbox ?? DropdownCheckboxTheme.defaultTheme,
         itemLeadingBuilder: itemLeadingBuilder,
         itemTrailingBuilder: itemTrailingBuilder,
       ),

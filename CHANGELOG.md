@@ -1,5 +1,14 @@
 # Changelog
 
+## 3.2.0
+
+Additive. One new optional field; nothing removed, nothing else changed.
+
+* **FEAT**: `DropdownCheckboxTheme` — styles the checkbox on each row of a `FlutterMultiSelectDropdown`, reached through the new `checkbox` slot on `DropdownStyleTheme`. It carries the eight fields that actually render on the row's box: `activeColor`, `fillColor`, `checkColor`, `side`, `shape`, `materialTapTargetSize`, `visualDensity`, `mouseCursor`. The box is drawn `onChanged: null` with its semantics excluded, so an interactive checkbox's focus/hover/splash fields are absent by construction rather than settable-but-dead. `mouseCursor` is kept because its `MouseRegion` is installed regardless of interactivity — so it lets you match the box's cursor to the row's
+* **FEAT**: `activeColor` — the fill of a **checked** box — is the common case. The box is non-interactive, which puts it in Flutter's `disabled` state, where a raw `Checkbox.activeColor` is dropped before it is read. The theme resolves `activeColor` into `fillColor`, which `Checkbox` consults first, so it survives. Set `fillColor` yourself for per-state control; it wins over `activeColor`
+* **FIX**: `documentation/theming.md` taught a checkbox `Theme(...)` wrapped around the dropdown. It silently did nothing: the menu is drawn in the root `Overlay`, out of a local `Theme`'s subtree, so `CheckboxTheme.of` at the box resolved to the app theme, not the local one (pinned with a probe — the box's resolved fill came back null). Only an app-wide `CheckboxThemeData` reached it, and now `DropdownCheckboxTheme` reaches just this dropdown
+* **TEST**: line coverage stays at 100%, with the checked box's fill asserted against the `{disabled, selected}` state it is actually in — the state a naive `activeColor` test would miss
+
 ## 3.1.0
 
 Adds a second widget. Nothing was removed; one field is deprecated and one behaviour changed, both described below.

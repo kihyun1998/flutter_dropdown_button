@@ -44,7 +44,7 @@ Add to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  flutter_dropdown_button: ^3.1.0
+  flutter_dropdown_button: ^3.2.0
 ```
 
 Import the package:
@@ -279,14 +279,15 @@ Alignment of the dropdown menu relative to the button when the menu is wider.
 
 ## Theme System
 
-Theme is applied via the `theme` parameter using `DropdownStyleTheme`, which groups four theme objects:
+Theme is applied via the `theme` parameter using `DropdownStyleTheme`, which groups five theme objects:
 
 ```dart
 DropdownStyleTheme(
-  dropdown: DropdownTheme(...),        // General dropdown styling
-  scroll: DropdownScrollTheme(...),    // Scrollbar styling
-  tooltip: DropdownTooltipTheme(...),  // Tooltip styling
-  search: SearchFieldTheme(...),       // Search field styling
+  dropdown: DropdownTheme(...),          // General dropdown styling
+  scroll: DropdownScrollTheme(...),      // Scrollbar styling
+  tooltip: DropdownTooltipTheme(...),    // Tooltip styling
+  search: SearchFieldTheme(...),         // Search field styling
+  checkbox: DropdownCheckboxTheme(...),  // Multi-select row checkbox styling
 )
 ```
 
@@ -454,6 +455,23 @@ Controls the appearance and behavior of the search text field when `searchable` 
 | `textAlign` | `TextAlign` | `.start` | Text alignment |
 | `keyboardType` | `TextInputType?` | `.text` | Keyboard type |
 | `textInputAction` | `TextInputAction?` | `.search` | Keyboard action button |
+
+### DropdownCheckboxTheme
+
+Styles the checkbox on each row of a `FlutterMultiSelectDropdown`. Reaches the box even though the menu is drawn in the root overlay, where a `Theme` wrapped around the widget cannot — only an app-wide `CheckboxThemeData` otherwise could, and that restyles every checkbox in the app. Only the fields that render on the presentational (`onChanged: null`, semantics-excluded) box are here.
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `activeColor` | `Color?` | `null` | Fill of a **checked** box. Routed through `fillColor` so it survives the box's disabled state |
+| `fillColor` | `WidgetStateProperty<Color?>?` | `null` | Per-state fill, for full control. Wins over `activeColor` |
+| `checkColor` | `Color?` | `null` | Color of the checkmark |
+| `side` | `BorderSide?` | `null` | Outline of an **unchecked** box (a checked box's fill covers it) |
+| `shape` | `OutlinedBorder?` | `null` | Box shape, e.g. rounded corners |
+| `materialTapTargetSize` | `MaterialTapTargetSize?` | `null` | Size class the box occupies |
+| `visualDensity` | `VisualDensity?` | `null` | Density adjustment to the box's size |
+| `mouseCursor` | `MouseCursor?` | `null` | Cursor over the box. Set to `SystemMouseCursors.click` to match the row's |
+
+Each null field defers to the ambient `CheckboxThemeData`.
 
 ### TextDropdownConfig
 

@@ -28,6 +28,7 @@ MultiSelectPresentation<T> multi<T>({
   Widget Function(T)? itemTrailingBuilder,
   bool enabled = true,
   TextDropdownConfig config = TextDropdownConfig.defaultConfig,
+  DropdownCheckboxTheme checkboxTheme = DropdownCheckboxTheme.defaultTheme,
 }) {
   return MultiSelectPresentation<T>(
     selected: selected,
@@ -36,10 +37,15 @@ MultiSelectPresentation<T> multi<T>({
     config: config,
     tooltipTheme: DropdownTooltipTheme.defaultTheme,
     enabled: enabled,
+    checkboxTheme: checkboxTheme,
     itemLeadingBuilder: itemLeadingBuilder,
     itemTrailingBuilder: itemTrailingBuilder,
   );
 }
+
+/// The `Checkbox` a row was actually rendered with.
+Checkbox renderedBox(WidgetTester tester) =>
+    tester.widget<Checkbox>(find.byType(Checkbox).first);
 
 /// The style the face was actually rendered with.
 TextStyle? faceStyle(WidgetTester tester) =>
@@ -223,6 +229,80 @@ void main() {
       );
 
       expect(find.byType(Icon), findsNothing);
+    });
+  });
+
+  group('checkbox theme', () {
+    // Pump a row and read the Checkbox it built. The box is `onChanged: null`,
+    // so Flutter resolves its colours in the `disabled` state — asserting the
+    // widget's own `fillColor` against `{disabled, selected}` is what proves the
+    // accent survives, since a raw `activeColor` would be dropped there.
+    Future<void> pumpRow(WidgetTester tester, MultiSelectPresentation p) async {
+      await tester.pumpWidget(
+        MaterialApp(home: Scaffold(body: p.buildItem('a', true))),
+      );
+    }
+
+    testWidgets('an unthemed row leaves every checkbox slot null', (
+      tester,
+    ) async {
+      await pumpRow(tester, multi<String>(selected: {'a'}));
+
+      final box = renderedBox(tester);
+      expect(box.fillColor, isNull, reason: 'defer to ambient CheckboxTheme');
+      expect(box.checkColor, isNull);
+      expect(box.side, isNull);
+      expect(box.shape, isNull);
+      expect(box.materialTapTargetSize, isNull);
+      expect(box.visualDensity, isNull);
+      expect(box.mouseCursor, isNull);
+    });
+
+    testWidgets('activeColor reaches the box and holds in the disabled state', (
+      tester,
+    ) async {
+      await pumpRow(
+        tester,
+        multi<String>(
+          selected: {'a'},
+          checkboxTheme: const DropdownCheckboxTheme(
+            activeColor: Color(0xFF00AA88),
+          ),
+        ),
+      );
+
+      final fill = renderedBox(tester).fillColor;
+      expect(fill, isNotNull);
+      expect(
+        fill!.resolve({WidgetState.disabled, WidgetState.selected}),
+        const Color(0xFF00AA88),
+        reason: 'the state the presentational box is actually in',
+      );
+    });
+
+    testWidgets('checkColor, side and shape are handed to the box', (
+      tester,
+    ) async {
+      const side = BorderSide(color: Color(0xFFDDDDDD), width: 2);
+      const shape = RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(Radius.circular(6)),
+      );
+      await pumpRow(
+        tester,
+        multi<String>(
+          selected: {'a'},
+          checkboxTheme: const DropdownCheckboxTheme(
+            checkColor: Color(0xFFFFFFFF),
+            side: side,
+            shape: shape,
+          ),
+        ),
+      );
+
+      final box = renderedBox(tester);
+      expect(box.checkColor, const Color(0xFFFFFFFF));
+      expect(box.side, side);
+      expect(box.shape, shape);
     });
   });
 
