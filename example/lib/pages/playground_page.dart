@@ -404,6 +404,11 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
             onPressed: () => Navigator.pushNamed(context, '/domain-type'),
           ),
           IconButton(
+            icon: const Icon(Icons.manage_search),
+            tooltip: 'Bare Anchor (inline in a field)',
+            onPressed: () => Navigator.pushNamed(context, '/bare-anchor'),
+          ),
+          IconButton(
             icon: const Icon(Icons.bug_report),
             tooltip: 'Overlay Bug Test',
             onPressed: () => Navigator.pushNamed(context, '/dropdown-bug-test'),

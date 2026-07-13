@@ -45,6 +45,7 @@ class DropdownMenuShell<T> extends StatefulWidget {
     this.emptyBuilder,
     this.theme,
     this.trailing,
+    this.anchorBuilder,
     this.width,
     this.minWidth,
     this.maxWidth,
@@ -115,6 +116,21 @@ class DropdownMenuShell<T> extends StatefulWidget {
 
   /// Replaces the trailing icon.
   final Widget? trailing;
+
+  /// Draws the anchor itself, in place of the button.
+  ///
+  /// Non-null puts the shell in **bare** mode: it drops the whole button box —
+  /// the background, border, fixed width, padding, ink and trailing icon — and
+  /// hangs the overlay off the widget this returns instead. The caller owns
+  /// what the anchor looks like; the shell owns only the key the overlay
+  /// measures against and the gesture that toggles the menu.
+  ///
+  /// It is handed whether the menu is showing (`isOpen`), the one thing the
+  /// caller cannot read for itself, so an inline chevron can turn. It is **not**
+  /// handed a label: the shell does not know what an item says, and the caller
+  /// already holds the selection it would draw. Menu, scrollbar, search and
+  /// tooltip theming still apply — only the button face is the caller's now.
+  final Widget Function(BuildContext context, bool isOpen)? anchorBuilder;
 
   /// A fixed button width.
   final double? width;
@@ -312,6 +328,9 @@ class _DropdownMenuShellState<T> extends State<DropdownMenuShell<T>>
 
   @override
   Widget build(BuildContext context) {
+    final anchorBuilder = widget.anchorBuilder;
+    if (anchorBuilder != null) return _buildBareAnchor(context, anchorBuilder);
+
     final style = _buttonStyle;
 
     Widget button = Container(
@@ -338,6 +357,32 @@ class _DropdownMenuShellState<T> extends State<DropdownMenuShell<T>>
     );
 
     return _applyWidthConstraints(button);
+  }
+
+  /// The anchor when the caller draws it themselves.
+  ///
+  /// No chrome: no `decoration`, no `width`, no `padding`, no ink, no trailing
+  /// icon — the button-box params the widgets assert away in this mode. The
+  /// only things the shell must still own wrap the caller's widget: the
+  /// [DropdownOverlayController.buttonKey] the overlay measures to place the
+  /// menu, and the tap that toggles it. `Semantics(button: …)` restores the
+  /// role the dropped `InkWell` would have announced; the key rides on it
+  /// because a `Semantics` is a render box that takes its child's size, which
+  /// is what [DropdownOverlayController.measurePlacement] reads.
+  Widget _buildBareAnchor(
+    BuildContext context,
+    Widget Function(BuildContext context, bool isOpen) anchorBuilder,
+  ) {
+    return Semantics(
+      key: _menu.buttonKey,
+      button: true,
+      enabled: widget.enabled,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: widget.enabled ? _toggleDropdown : null,
+        child: anchorBuilder(context, _menu.isOpen),
+      ),
+    );
   }
 
   Widget _buildButtonContent(ResolvedButtonStyle style) {

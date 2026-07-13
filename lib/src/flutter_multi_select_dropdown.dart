@@ -70,7 +70,19 @@ class FlutterMultiSelectDropdown<T> extends StatelessWidget {
     this.searchable = false,
     this.searchFilter,
     this.emptyBuilder,
-  });
+    this.anchorBuilder,
+  }) : assert(
+         anchorBuilder == null ||
+             (width == null &&
+                 minWidth == null &&
+                 maxWidth == null &&
+                 !expand &&
+                 trailing == null),
+         'anchorBuilder draws the whole anchor, so the button-box params it '
+         'replaces do not apply: drop width, minWidth, maxWidth, expand and '
+         'trailing when supplying one. Menu, scrollbar, search and tooltip '
+         'theming still take effect.',
+       );
 
   /// The items the menu offers.
   final List<T> items;
@@ -161,6 +173,37 @@ class FlutterMultiSelectDropdown<T> extends StatelessWidget {
   /// Drawn when a query matches nothing.
   final Widget Function(String query)? emptyBuilder;
 
+  /// Draws the anchor itself, dropping the button chrome (bare mode).
+  ///
+  /// Supply this to embed the checklist inside another field, where the
+  /// button's own background, border and fixed width would nest a box inside a
+  /// box. The widget you return becomes the whole anchor; the menu (theme,
+  /// keyboard navigation, [searchable], the checklist) still hangs off it. Only
+  /// the button face is yours now — build it from [labelBuilder] and the
+  /// [selected] set you already hold.
+  ///
+  /// The builder is handed whether the menu is currently open, so an inline
+  /// chevron can turn. The button-box params it replaces — [width], [minWidth],
+  /// [maxWidth], [expand] and [trailing] — must be left unset; combining them
+  /// asserts.
+  ///
+  /// ```dart
+  /// FlutterMultiSelectDropdown<String>(
+  ///   items: fields,
+  ///   selected: chosen,
+  ///   onChanged: onChanged,
+  ///   labelBuilder: (s) => s.isEmpty ? 'All' : '${s.length}',
+  ///   anchorBuilder: (context, isOpen) => Row(
+  ///     mainAxisSize: MainAxisSize.min,
+  ///     children: [
+  ///       Text(chosen.isEmpty ? 'All' : '${chosen.length}'),
+  ///       const Icon(Icons.expand_more, size: 16),
+  ///     ],
+  ///   ),
+  /// )
+  /// ```
+  final Widget Function(BuildContext context, bool isOpen)? anchorBuilder;
+
   /// Closes every open dropdown overlay, of either kind.
   ///
   /// Single-open coordination lives in a registry keyed by `Overlay`, so this
@@ -215,6 +258,7 @@ class FlutterMultiSelectDropdown<T> extends StatelessWidget {
       searchable: searchable,
       searchFilter: searchFilter,
       emptyBuilder: emptyBuilder,
+      anchorBuilder: anchorBuilder,
     );
   }
 }

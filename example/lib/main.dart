@@ -3,6 +3,7 @@ import 'pages/playground_page.dart';
 import 'pages/bug_test_page.dart';
 import 'pages/domain_type_page.dart';
 import 'pages/multi_select_page.dart';
+import 'pages/bare_anchor_page.dart';
 import 'pages/result_page.dart';
 
 void main() {
@@ -26,6 +27,7 @@ class MyApp extends StatelessWidget {
         '/dropdown-bug-test': (context) => const DropdownBugTestPage(),
         '/domain-type': (context) => const DomainTypePage(),
         '/multi-select': (context) => const MultiSelectPage(),
+        '/bare-anchor': (context) => const BareAnchorPage(),
         '/result-page': (context) => const ResultPage(),
       },
     );
