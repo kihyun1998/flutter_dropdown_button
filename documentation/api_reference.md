@@ -326,6 +326,8 @@ final presentation = MultiSelectPresentation<String>(
 );
 ```
 
+An optional `checkboxTheme` (a `DropdownCheckboxTheme`, default `defaultTheme`) styles the row's box. It resolves the box's `activeColor` through `fillColor` so the accent survives the box's `onChanged: null` disabled state; see [theming](theming.md).
+
 The interface is unchanged. `buildSelected()` still takes no argument: `TextItemPresentation` swallows a `value` as a field, and this one swallows a `Set` and a `labelBuilder` the same way.
 
 Two things it does that are not visible on screen:

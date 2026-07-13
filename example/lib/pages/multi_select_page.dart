@@ -114,6 +114,21 @@ class _MultiSelectPageState extends State<MultiSelectPage> {
                       1 => s.first,
                       _ => '${s.length} selected',
                     },
+                    // The row checkbox, scoped to this dropdown — an app-wide
+                    // CheckboxThemeData would be the only ambient way to reach a
+                    // box drawn in the root overlay, and it would restyle every
+                    // checkbox in the app. `click` matches the box's cursor to
+                    // the row's.
+                    theme: const DropdownStyleTheme(
+                      checkbox: DropdownCheckboxTheme(
+                        activeColor: Colors.indigo,
+                        checkColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(4)),
+                        ),
+                        mouseCursor: SystemMouseCursors.click,
+                      ),
+                    ),
                     // An icon between the box and the label; the count after
                     // it. One slot could not have held both on the right sides.
                     itemLeadingBuilder: (v) =>

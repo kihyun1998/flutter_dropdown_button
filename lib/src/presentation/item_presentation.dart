@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../config/text_dropdown_config.dart';
+import '../theme/dropdown_checkbox_theme.dart';
 import '../theme/tooltip_theme.dart';
 import '../widgets/smart_tooltip_text.dart';
 
@@ -289,6 +290,7 @@ class MultiSelectPresentation<T> implements DropdownItemPresentation<T> {
     required this.config,
     required this.tooltipTheme,
     required this.enabled,
+    this.checkboxTheme = DropdownCheckboxTheme.defaultTheme,
     this.itemLeadingBuilder,
     this.itemTrailingBuilder,
   }) : assert(
@@ -314,6 +316,10 @@ class MultiSelectPresentation<T> implements DropdownItemPresentation<T> {
 
   /// Whether the button is interactive, which selects the disabled text style.
   final bool enabled;
+
+  /// Styling for the row's checkbox. Resolved once per row into the concrete
+  /// [Checkbox] arguments.
+  final DropdownCheckboxTheme checkboxTheme;
 
   /// Drawn between the checkbox and the label — an icon that varies by item.
   ///
@@ -381,12 +387,29 @@ class MultiSelectPresentation<T> implements DropdownItemPresentation<T> {
   Widget buildItem(T item, bool isSelected) {
     final leading = itemLeadingBuilder?.call(item);
     final trailing = itemTrailingBuilder?.call(item);
+    final checkbox = checkboxTheme.resolve();
 
     return Semantics(
       checked: isSelected,
       child: Row(
         children: [
-          ExcludeSemantics(child: Checkbox(value: isSelected, onChanged: null)),
+          // `onChanged: null` keeps the box presentational — the tap falls
+          // through to the row's InkWell. Every resolved slot is null unless the
+          // theme named it, so an unset theme leaves the box to the ambient
+          // CheckboxThemeData exactly as before.
+          ExcludeSemantics(
+            child: Checkbox(
+              value: isSelected,
+              onChanged: null,
+              fillColor: checkbox.fillColor,
+              checkColor: checkbox.checkColor,
+              side: checkbox.side,
+              shape: checkbox.shape,
+              materialTapTargetSize: checkbox.materialTapTargetSize,
+              visualDensity: checkbox.visualDensity,
+              mouseCursor: checkbox.mouseCursor,
+            ),
+          ),
           if (leading != null)
             Padding(padding: const EdgeInsets.only(right: 8.0), child: leading),
           // Only the label gives way. A squeezed icon is never what was meant.
