@@ -40,7 +40,7 @@ Read real source with `gh api …/contents/<path> --jq .content | base64 -d`, th
 | **Flutter widget behavior** (Tooltip, Scrollbar, Text) | Flutter SDK `packages/flutter/lib/src/material/` + `widgets/` — e.g. `scrollbar.dart` (`trackVisibility` returns transparent without `true`), `tooltip.dart` (bg depends on `Brightness`; `constraints` is 3.32+), `Text.semanticsLabel` **replaces** the announced string |
 | **Rendering / overlay / placement** | Flutter SDK `rendering/` + `widgets/overlay.dart`; coordinate space is the caller's business (off-screen-in-nested-`Overlay` was a real bug) |
 | **API introduced-in version** | the **CI `minimum` job** is the authority (see Step 7); or `cd /d/flutter && git log -S "<sig>"` + `git tag --contains`. Reading source alone gave the wrong floor twice (#47) |
-| **Downstream bug claim** | the consumer repo directly (`../just_make_logo`, `../penterm-2`) — verify, don't assume; the report may be the dartdoc's fault, not the code's (#59) |
+| **Downstream bug claim** | the reporting consumer's repo directly (a sibling under `../`, derived on the spot) — verify, don't assume; the report may be the dartdoc's fault, not the code's (#59) |
 | **Hidden state** | this repo's own read-sites. Removing a field can unpin behavior held incidentally through it — grep every read site first (`trackWidth` fed `hasCustomWidths` fed a non-null `thickness` branch) |
 
 **Concept ≠ mechanism.** A tooltip/scrollbar/a11y feature may be novel at the
@@ -81,7 +81,7 @@ Nothing in `lib/` changed but a comment.
 | **widget behavior** | widget tests at the **public seam** — assert the rendered `BoxDecoration`, the presence of a `ListView`; **never private state** (why the suite survived the controller extraction + theme rewrite with zero edits) |
 | **accessibility contract** | assert at the **semantics tree** (`semantics_label_test`) — a render-only test (`find.text`) passes while the announced string is wrong (#37) |
 | **coverage** | `flutter test --coverage` + `dart run tool/check_coverage.dart --min 100`. Coverage tells you what you did *not* see, not whether what you saw is right (80% covered with **zero** item-tap tests once) |
-| **downstream** | consumers `just_make_logo`, `penterm-2` |
+| **downstream** | link into a consumer's suite (derive the consumer on the spot at Step 10) |
 
 Harness fake evidence to respect: restore `debugDefaultTargetPlatformOverride`
 **in the test body** (`tearDown` is too late); do not reuse one `tester` to reopen
@@ -148,14 +148,13 @@ flutter pub publish --dry-run                        # metadata only; does not c
 
 **Downstream loop.** Derive, don't guess:
 `for d in ../*/; do grep -l 'flutter_dropdown_button:' "$d/pubspec.yaml"; done`.
-Current: `just_make_logo` (`^1.6.1`), `penterm-2` (`^1.4.6`) — **both two majors
-behind**. A decision here is one they eventually pay. After a release, in each:
-raise the constraint, remove workarounds the fix made unnecessary, flip tests
-that pinned the old bug.
+The list is not stored here — derive it on the spot. A decision here is one the
+consumers eventually pay. After a release, in each: raise the constraint, remove
+workarounds the fix made unnecessary, flip tests that pinned the old bug.
 
 ## Refs
 
 - Deprecated inventory & the "dead field = a documented field `resolve()` never
   mentions" detector: `CLAUDE.md`.
-- Consumers two majors back mean SemVer discipline is load-bearing: breaking →
-  major; adding or deprecating a member → not.
+- SemVer discipline is load-bearing (consumers pin with `^`): breaking → major;
+  adding or deprecating a member → not.

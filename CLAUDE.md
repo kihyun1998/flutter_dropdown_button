@@ -10,9 +10,9 @@ consumers) live in **`docs/agents/theflow.md`**; the per-incident evidence
 **`docs/agents/lessons.md`**. Read both before starting; add new war-stories to
 lessons.
 
-This is a **published package with consumers** (`just_make_logo`, `penterm-2` —
-both two majors behind), so theflow's downstream verification and post-release
-migration both apply.
+This is a **published package with consumers**, so theflow's downstream
+verification and post-release migration both apply (derive the consumer list on
+the spot at Step 10 — do not store it here).
 
 ## Identity & invariants (the boundary)
 
