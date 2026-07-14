@@ -2,7 +2,7 @@
 
 ## 4.0.0
 
-Breaking, on two axes. The multi-select checklist now draws its boxes with the [`flutter_checkbox`](https://pub.dev/packages/flutter_checkbox) package instead of Flutter's built-in `Checkbox` (`DropdownCheckboxTheme` redesigned around it), and the monolithic `DropdownTheme` is split into three surface sub-themes. The **SDK floor is unchanged** (`>=3.32.0`): `flutter_checkbox` `0.3.1` needs only Flutter 3.27. This release also folds in the bare-anchor feature, which was never published on its own.
+Breaking on two axes, plus one long-promised removal. The multi-select checklist now draws its boxes with the [`flutter_checkbox`](https://pub.dev/packages/flutter_checkbox) package instead of Flutter's built-in `Checkbox` (`DropdownCheckboxTheme` redesigned around it), and the monolithic `DropdownTheme` is split into three surface sub-themes. The **SDK floor is unchanged** (`>=3.32.0`): `flutter_checkbox` `0.3.1` needs only Flutter 3.27. This release also folds in the bare-anchor feature, which was never published on its own.
 
 ### `DropdownTheme` → `button` / `overlay` / `item` sub-themes
 
@@ -18,7 +18,7 @@ Breaking, on two axes. The multi-select checklist now draws its boxes with the [
 * **FEAT**: `CheckboxShape` and `CheckboxStyle` are re-exported from the package barrel, so `DropdownCheckboxTheme(shape: CheckboxShape.circle)` needs no extra import
 * **CHANGE**: the box's semantics are still excluded and the row still carries `checked`. Unlike Material, `FlutterCheckbox(onChanged: null)` announces `enabled: true` — so the row no longer risks a *dimmed* announcement leaking from the box — but the box still emits its own `checked` node, which the exclusion drops to keep the row the single source of the checked state
 * **MIGRATION**: `side` → `borderColor` + `borderWidth`; `shape: RoundedRectangleBorder(borderRadius: …)` → `shape: CheckboxShape.rectangle` + `borderRadius`; `fillColor` → `activeColor` (checked) / `inactiveColor` (unchecked). `materialTapTargetSize` and `visualDensity` have no equivalent — the box sizes via `size`
-* **TEST**: 280 tests at 100% line coverage (1085 lines). The box is asserted presentational-but-not-greyed (`onChanged` null, `enabled` true), the accent reaches `style.activeColor` directly, and the semantics contract (row `checked`, never *disabled*) is held at the semantics tree
+* **TEST**: 285 tests at 100% line coverage (1102 lines) across the whole release. The box is asserted presentational-but-not-greyed (`onChanged` null, `enabled` true), the accent reaches `style.activeColor` directly, and the semantics contract (row `checked`, never *disabled*) is held at the semantics tree
 
 ### Bare anchor (folds in the unreleased 3.3.0)
 
@@ -26,6 +26,10 @@ Breaking, on two axes. The multi-select checklist now draws its boxes with the [
 * **FEAT**: the builder is handed `isOpen`, **not a label**. `isOpen` is the one thing a caller cannot read for itself, and drives an inline chevron (`AnimatedRotation(turns: isOpen ? 0.5 : 0.0, …)`); a label the caller already holds, in the `value` or `selected` it drew the anchor from. Passing one would leak a text-mode notion into `DropdownMenuShell`, which does not know what an item says — the invariant that lets one shell back both widgets. The dropped ink well's button role is restored with `Semantics(button: true)`
 * **FEAT**: the field lives on the shell and both public widgets read it, so bare mode composes with text mode, custom mode and the checklist alike — it is orthogonal to what an item renders as, and is a parameter rather than a `.bare()` constructor for exactly that reason. A constructor would have had to pick `itemBuilder` or `label`, leaving the other settable-but-dead — the shape 3.0.0 spent a major version deleting
 * **FEAT**: the button-box params `anchorBuilder` replaces — `width`, `minWidth`, `maxWidth`, `expand`, `trailing` — **assert** when combined with it, rather than being silently ignored. A bare anchor is compact by design and the menu takes its width from it, so set `minMenuWidth` (a *menu* width, still allowed) to give the menu a usable width
+
+### Also removed
+
+* **BREAKING**: `CustomItemPresentation.items` — deprecated in 3.1.0 (read by nothing since), removed now as its dartdoc promised. Only code building a presentation by hand is affected: drop the argument. See `documentation/migration.md`
 
 ## 3.2.0
 

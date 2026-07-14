@@ -599,8 +599,8 @@ FlutterDropdownButton<String>.text(
       backgroundColor: Colors.white,
     ),
     item: DropdownItemTheme(
-      selectedColor: Colors.blue.withOpacity(0.1),
-      hoverColor: Colors.grey.withOpacity(0.1),
+      selectedColor: Colors.blue.withValues(alpha: 0.1),
+      hoverColor: Colors.grey.withValues(alpha: 0.1),
       border: Border(bottom: BorderSide(color: Colors.grey.shade300)),
       excludeLastItemBorder: true,
     ),
