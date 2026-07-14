@@ -66,7 +66,7 @@ DropdownStyleTheme(
     shadowColor: Colors.black38,        // Custom shadow
   ),
   item: DropdownItemTheme(
-    selectedColor: Colors.blue.withOpacity(0.1), // Blue selected items
+    selectedColor: Colors.blue.withValues(alpha: 0.1), // Blue selected items
   ),
 )
 ```
