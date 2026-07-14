@@ -82,6 +82,7 @@ class FlutterDropdownButton<T> extends StatefulWidget {
     this.searchFilter,
     this.emptyBuilder,
     this.anchorBuilder,
+    this.positioningKey,
   }) : hintText = null,
        label = null,
        config = null,
@@ -146,6 +147,7 @@ class FlutterDropdownButton<T> extends StatefulWidget {
     this.searchFilter,
     this.emptyBuilder,
     this.anchorBuilder,
+    this.positioningKey,
   }) : hintText = hint,
        hintWidget = null,
        itemBuilder = null,
@@ -389,6 +391,43 @@ class FlutterDropdownButton<T> extends StatefulWidget {
   /// [expand] and [trailing] — must be left unset; combining them asserts.
   final Widget Function(BuildContext context, bool isOpen)? anchorBuilder;
 
+  /// An outer box to position the menu against, instead of the anchor.
+  ///
+  /// By default the menu drops below the anchor, left-aligns to it, and defaults
+  /// to its width. Wrap some enclosing box in a widget carrying a [GlobalKey],
+  /// pass that key here, and the menu measures *that* box instead: it drops
+  /// below, left-aligns to, and defaults to the width of the enclosing box,
+  /// while the anchor keeps drawing and toggling where it sits. [menuAlignment],
+  /// [minMenuWidth] and [maxMenuWidth] all measure against the box too.
+  ///
+  /// This is the second half of the embedded-field pattern [anchorBuilder]
+  /// opens: [anchorBuilder] decouples what the anchor *renders*, this decouples
+  /// what the menu *positions against*. A compact `[All ▾]` selector at the head
+  /// of a search box drops its menu below the whole box, not the little segment.
+  ///
+  /// ```dart
+  /// final fieldKey = GlobalKey();
+  ///
+  /// Container(
+  ///   key: fieldKey, // the whole search box
+  ///   child: Row(children: [
+  ///     FlutterDropdownButton<String>.text(
+  ///       items: fields,
+  ///       value: field,
+  ///       onChanged: onField,
+  ///       anchorBuilder: (context, isOpen) => const Text('All ▾'),
+  ///       positioningKey: fieldKey, // menu drops below the whole box
+  ///     ),
+  ///     const Expanded(child: TextField(/* search… */)),
+  ///   ]),
+  /// )
+  /// ```
+  ///
+  /// The box must live in the same [Overlay] the anchor does. It is measured on
+  /// every menu build, not tracked per frame — a box that moves *while the menu
+  /// is open* is not followed, the same as the anchor.
+  final GlobalKey? positioningKey;
+
   /// Whether this dropdown was built by [FlutterDropdownButton.text].
   ///
   /// Informational. Nothing inside the widget branches on this: rendering is
@@ -540,6 +579,7 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>> {
       searchFilter: widget.searchFilter,
       emptyBuilder: widget.emptyBuilder,
       anchorBuilder: widget.anchorBuilder,
+      positioningKey: widget.positioningKey,
     );
   }
 }

@@ -1,5 +1,14 @@
 # Changelog
 
+## 4.1.0
+
+The second half of the embedded-field pattern 4.0.0's bare anchor opened. `anchorBuilder` decoupled what the anchor *renders*; a menu embedded inside a wider field still positioned and sized against the compact anchor's own box, so it dropped from mid-field and left-aligned to the little `[All ▾]` segment. `positioningKey` decouples what the menu *positions against*.
+
+* **FEAT**: `positioningKey` — an optional `GlobalKey` on `FlutterDropdownButton` (both constructors) and `FlutterMultiSelectDropdown`. Wrap the whole field in a widget carrying the key and pass it here; the menu then measures *that* box instead of the anchor — dropping below it, left-aligning to it, and defaulting to its width — while the anchor keeps drawing and toggling where it sits. `menuAlignment`, `minMenuWidth` and `maxMenuWidth` measure against the box too
+* **FEAT**: additive and orthogonal. It is a parameter on the shared `DropdownMenuShell`, not a new constructor, so it composes with text mode, custom mode, the checklist and the bare anchor alike — and with a normal chromed button, unrestricted (no assert). The placement engine is untouched: only which `RenderBox` is measured changes, and the existing width/alignment/flip logic yields the field-relative result for free
+* **CHANGE**: the box is measured on every menu build, not tracked per frame — a box that moves *while the menu is open* is not followed, the same contract the anchor already held. It must live in the same `Overlay` coordinate space as the anchor
+* **TEST**: placement is asserted at the overlay's `Positioned` — the menu's width, left and top measure the outer field, not the compact anchor — with control tests pinning the anchor-relative default, a runtime-toggle test proving the key is honoured mutably, and the checklist composition. Discriminating power confirmed by reverting the measure-key swap (the field-relative tests go red, the controls stay green)
+
 ## 4.0.0
 
 Breaking on two axes, plus one long-promised removal. The multi-select checklist now draws its boxes with the [`flutter_checkbox`](https://pub.dev/packages/flutter_checkbox) package instead of Flutter's built-in `Checkbox` (`DropdownCheckboxTheme` redesigned around it), and the monolithic `DropdownTheme` is split into three surface sub-themes. The **SDK floor is unchanged** (`>=3.32.0`): `flutter_checkbox` `0.3.1` needs only Flutter 3.27. This release also folds in the bare-anchor feature, which was never published on its own.
