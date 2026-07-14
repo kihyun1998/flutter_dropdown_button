@@ -10,6 +10,11 @@ import 'package:flutter_dropdown_button/flutter_dropdown_button.dart';
 /// outer field owns the border and background and the selector contributes only
 /// its label and chevron. The chevron turns off `isOpen`, the one thing the
 /// builder cannot read for itself.
+///
+/// `positioningKey` completes the pattern (#86): a `GlobalKey` on the outer
+/// field, so the menu drops below the *whole* field and matches its width,
+/// instead of hanging off the tiny anchor. That is what makes `minMenuWidth`
+/// unnecessary here — the menu already inherits the field's width.
 class BareAnchorPage extends StatefulWidget {
   const BareAnchorPage({super.key});
 
@@ -23,6 +28,11 @@ class _BareAnchorPageState extends State<BareAnchorPage> {
   String _field = 'All';
   Set<String> _tags = {};
   final _searchController = TextEditingController();
+
+  // One key per field, attached to the outer box and handed to its selector as
+  // `positioningKey` so the menu positions against the whole field.
+  final _singleFieldKey = GlobalKey();
+  final _multiFieldKey = GlobalKey();
 
   @override
   void dispose() {
@@ -48,16 +58,17 @@ class _BareAnchorPageState extends State<BareAnchorPage> {
                 Text('Single-select scope', style: theme.textTheme.labelLarge),
                 const SizedBox(height: 8),
                 _SearchField(
+                  fieldKey: _singleFieldKey,
                   // The scope selector — no border, no background, no width.
                   scope: FlutterDropdownButton<String>.text(
                     items: _fields,
                     value: _field,
                     onChanged: (f) => setState(() => _field = f!),
-                    // The anchor is tiny by design, and the menu takes its
-                    // width from the anchor. `minMenuWidth` gives the menu a
-                    // usable width of its own — it is a *menu* width, so it is
-                    // allowed in bare mode where the button-box `width` is not.
-                    minMenuWidth: 200,
+                    // The menu positions against the whole field, not the tiny
+                    // anchor: it drops below the field and matches its width. No
+                    // `minMenuWidth` needed — that lever is only for a bare
+                    // anchor left to size the menu itself.
+                    positioningKey: _singleFieldKey,
                     anchorBuilder: (context, isOpen) =>
                         _AnchorFace(label: _field, isOpen: isOpen),
                   ),
@@ -67,14 +78,15 @@ class _BareAnchorPageState extends State<BareAnchorPage> {
                 Text('Multi-select scope', style: theme.textTheme.labelLarge),
                 const SizedBox(height: 8),
                 _SearchField(
+                  fieldKey: _multiFieldKey,
                   scope: FlutterMultiSelectDropdown<String>(
                     items: const ['Title', 'Body', 'Author', 'Tags'],
                     selected: _tags,
                     onChanged: (next) => setState(() => _tags = next),
-                    // Without this the checklist rows would collapse to the
-                    // tiny anchor's width and overflow. See the single-select
+                    // The checklist menu positions against the whole field too,
+                    // so its rows get the field's width. See the single-select
                     // note above.
-                    minMenuWidth: 200,
+                    positioningKey: _multiFieldKey,
                     labelBuilder: (s) => switch (s.length) {
                       0 => 'All',
                       1 => s.first,
@@ -129,9 +141,17 @@ class _AnchorFace extends StatelessWidget {
 /// The outer field that owns the border and background. The [scope] anchor sits
 /// at its head, then a divider, then the text field.
 class _SearchField extends StatelessWidget {
-  const _SearchField({required this.scope, this.controller});
+  const _SearchField({
+    required this.scope,
+    required this.fieldKey,
+    this.controller,
+  });
 
   final Widget scope;
+
+  /// Attached to the outer box and handed to [scope] as its `positioningKey`,
+  /// so the selector's menu drops below the whole field.
+  final GlobalKey fieldKey;
   final TextEditingController? controller;
 
   @override
@@ -139,6 +159,7 @@ class _SearchField extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Container(
+      key: fieldKey,
       decoration: BoxDecoration(
         border: Border.all(color: theme.dividerColor),
         borderRadius: BorderRadius.circular(10),

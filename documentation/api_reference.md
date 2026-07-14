@@ -65,6 +65,38 @@ Only the button *face* becomes yours. The anchored menu — its theming, keyboar
 - **Set `minMenuWidth` — the menu inherits the anchor's width.** A bare anchor is compact by design, and the menu takes its width from it, so an `[All ▾]` anchor yields an `[All ▾]`-wide menu its rows overflow. `minMenuWidth` (and `maxMenuWidth`) are *menu* widths, not the button-box `width`/`minWidth`/`maxWidth`, so they are allowed in bare mode and are the way to give the menu a usable width of its own.
 - **The anchor is still announced as a button.** The dropped ink well's role is restored with `Semantics(button: true)`, so a screen reader reads your widget as the control it is.
 
+### Positioning against an outer box
+
+```dart
+GlobalKey? positioningKey
+```
+
+By default the menu measures the anchor: it drops below it, left-aligns to it, and defaults to its width. An embedded `[All ▾]` anchor is therefore a trap — the menu drops from the middle of the field and left-aligns to the little segment, not to the field around it.
+
+Wrap the whole field in a widget carrying a `GlobalKey`, pass that key as `positioningKey`, and the menu measures **that box** instead. It drops below the whole field, left-aligns to it, and defaults to its width — while the anchor keeps drawing and toggling where it sits. This is the second half of the embedded-field pattern `anchorBuilder` opens: `anchorBuilder` decouples what the anchor *renders*, `positioningKey` decouples what the menu *positions against*. `FlutterMultiSelectDropdown` takes the same parameter.
+
+```dart
+final fieldKey = GlobalKey();
+
+Container(
+  key: fieldKey, // the whole search box
+  child: Row(children: [
+    FlutterDropdownButton<String>.text(
+      items: fields,
+      value: field,
+      onChanged: onField,
+      anchorBuilder: (context, isOpen) => const Text('All ▾'),
+      positioningKey: fieldKey, // menu drops below the whole box
+    ),
+    const Expanded(child: TextField(/* search… */)),
+  ]),
+)
+```
+
+- **`menuAlignment`, `minMenuWidth` and `maxMenuWidth` all measure against the box too.** When `positioningKey` is set, "the button" every width-and-alignment rule refers to is the outer box, not the anchor. With the menu already defaulting to the field's width, `minMenuWidth` is usually unnecessary here — the reverse of bare mode without a `positioningKey`.
+- **The box is measured on every menu build, not tracked per frame.** A box that moves *while the menu is open* is not followed — the same as the anchor. It must live in the same `Overlay` coordinate space the anchor does.
+- **Not restricted to bare mode.** It composes with a normal chromed button too, if you want the menu to align to a container the button sits inside; there is no assert against it.
+
 ## FlutterMultiSelectDropdown\<T\>
 
 A checklist. Several items may be chosen, the menu stays open while they are, and `onChanged` fires the moment a box is ticked — no confirm button. Anchored rather than modal: no scrim, dismissed by an outside tap.
@@ -313,6 +345,7 @@ A working example lives in `example/lib/pages/domain_type_page.dart`.
 | Member | Description |
 |--------|-------------|
 | `buttonKey` | Attach to the button so the controller can measure it |
+| `positioningKey` | A `GlobalKey` on an outer box to measure the menu against instead of `buttonKey`. Mutable; null measures the button. See [Positioning against an outer box](#positioning-against-an-outer-box) |
 | `isOpen` | Whether the menu is showing |
 | `animation` | Runs forward as the menu opens. Drive your own transitions from it — a rotating trailing icon, say |
 | `open(context)` | Shows the menu, closing whichever menu is open in the same `Overlay` |

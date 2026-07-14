@@ -71,6 +71,7 @@ class FlutterMultiSelectDropdown<T> extends StatelessWidget {
     this.searchFilter,
     this.emptyBuilder,
     this.anchorBuilder,
+    this.positioningKey,
   }) : assert(
          anchorBuilder == null ||
              (width == null &&
@@ -204,6 +205,25 @@ class FlutterMultiSelectDropdown<T> extends StatelessWidget {
   /// ```
   final Widget Function(BuildContext context, bool isOpen)? anchorBuilder;
 
+  /// An outer box to position the menu against, instead of the anchor.
+  ///
+  /// By default the menu drops below the anchor, left-aligns to it, and defaults
+  /// to its width. Wrap some enclosing box in a widget carrying a [GlobalKey],
+  /// pass that key here, and the menu measures *that* box instead: it drops
+  /// below, left-aligns to, and defaults to the width of the enclosing box,
+  /// while the anchor keeps drawing and toggling where it sits. [menuAlignment],
+  /// [minMenuWidth] and [maxMenuWidth] all measure against the box too.
+  ///
+  /// The second half of the embedded-field pattern [anchorBuilder] opens:
+  /// [anchorBuilder] decouples what the anchor *renders*, this decouples what the
+  /// menu *positions against*. A compact checklist selector at the head of a
+  /// search box drops its menu below the whole box, not the little segment.
+  ///
+  /// The box must live in the same [Overlay] the anchor does. It is measured on
+  /// every menu build, not tracked per frame — a box that moves *while the menu
+  /// is open* is not followed, the same as the anchor.
+  final GlobalKey? positioningKey;
+
   /// Closes every open dropdown overlay, of either kind.
   ///
   /// Single-open coordination lives in a registry keyed by `Overlay`, so this
@@ -259,6 +279,7 @@ class FlutterMultiSelectDropdown<T> extends StatelessWidget {
       searchFilter: searchFilter,
       emptyBuilder: emptyBuilder,
       anchorBuilder: anchorBuilder,
+      positioningKey: positioningKey,
     );
   }
 }

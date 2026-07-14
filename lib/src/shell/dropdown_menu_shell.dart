@@ -53,6 +53,7 @@ class DropdownMenuShell<T> extends StatefulWidget {
     this.maxWidth,
     this.minMenuWidth,
     this.maxMenuWidth,
+    this.positioningKey,
   });
 
   /// Everything the menu may show, before the query narrows it.
@@ -148,6 +149,15 @@ class DropdownMenuShell<T> extends StatefulWidget {
 
   /// The menu's maximum width.
   final double? maxMenuWidth;
+
+  /// An outer box to position the menu against, instead of the anchor.
+  ///
+  /// A [GlobalKey] on some enclosing box the caller wraps around the whole
+  /// field. When given, the menu drops below, left-aligns to, and defaults to
+  /// the width of *that* box — [menuAlignment], [minMenuWidth] and [maxMenuWidth]
+  /// all measure against it too — while the anchor keeps drawing and toggling
+  /// where it is. See [DropdownOverlayController.positioningKey].
+  final GlobalKey? positioningKey;
 
   @override
   State<DropdownMenuShell<T>> createState() => _DropdownMenuShellState<T>();
@@ -336,6 +346,12 @@ class _DropdownMenuShellState<T> extends State<DropdownMenuShell<T>>
 
   @override
   Widget build(BuildContext context) {
+    // Kept current here rather than at construction: the caller may swap the key
+    // (or toggle it on and off), and build runs after didUpdateWidget and before
+    // the overlay re-measures. Mutating the controller in build is safe — it is
+    // a plain field assignment, not a rebuild.
+    _menu.positioningKey = widget.positioningKey;
+
     final anchorBuilder = widget.anchorBuilder;
     if (anchorBuilder != null) return _buildBareAnchor(context, anchorBuilder);
 

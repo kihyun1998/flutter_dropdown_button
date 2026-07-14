@@ -115,6 +115,22 @@ class DropdownOverlayController {
   /// Attach this to the button so the controller can measure it.
   final GlobalKey buttonKey = GlobalKey();
 
+  /// An outer box to position the menu against, instead of [buttonKey].
+  ///
+  /// Null — the default — measures the anchor itself: the menu drops below it,
+  /// left-aligns to it, and defaults to its width. Set to a [GlobalKey] on some
+  /// enclosing box and the menu measures *that* box instead — it drops below,
+  /// left-aligns to, and defaults to the width of the enclosing box, while the
+  /// anchor keeps drawing and toggling where it is. The reference for a compact
+  /// dropdown embedded at the head of a wider field.
+  ///
+  /// The box is measured on every overlay build, not tracked per frame: a box
+  /// that moves *while the menu is open* is not followed, the same as the anchor.
+  /// It must live in the same [Overlay] coordinate space the anchor does.
+  ///
+  /// Mutable: the owning widget reassigns it as its own parameter changes.
+  GlobalKey? positioningKey;
+
   /// Describes the menu as it should be drawn right now.
   final DropdownOverlaySpecBuilder spec;
 
@@ -242,7 +258,11 @@ class DropdownOverlayController {
     final context = _context;
     if (context == null || !context.mounted) return null;
 
-    final button = buttonKey.currentContext?.findRenderObject() as RenderBox?;
+    // The menu positions against [positioningKey]'s box when one is given, else
+    // the anchor's own. Only which RenderBox is read changes; the offset and
+    // size it yields feed the same pure placement resolve() unchanged.
+    final measureKey = positioningKey ?? buttonKey;
+    final button = measureKey.currentContext?.findRenderObject() as RenderBox?;
     if (button == null || !button.attached || !button.hasSize) return null;
 
     // The menu is positioned inside the Overlay's Stack, so the button must be
