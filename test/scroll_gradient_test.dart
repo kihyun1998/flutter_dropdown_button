@@ -25,7 +25,9 @@ Future<void> openScrollableMenu(
             items: const ['a', 'b', 'c', 'd', 'e', 'f'],
             hint: 'pick',
             theme: DropdownStyleTheme(
-              dropdown: const DropdownTheme(backgroundColor: menuBackground),
+              overlay: const DropdownOverlayTheme(
+                backgroundColor: menuBackground,
+              ),
               scroll: DropdownScrollTheme(
                 showScrollGradient: true,
                 gradientColors: gradientColors,

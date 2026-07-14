@@ -4,7 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 /// `leading` and `selectedLeading` are reachable from the public API and were
 /// covered by nothing. #50 changed where their height comes from — a fully
-/// resolved `ResolvedButtonStyle` became `DropdownTheme.resolvedIconSize` —
+/// resolved `ResolvedButtonStyle` became `DropdownButtonTheme.resolvedIconSize` —
 /// with no test watching.
 
 Widget host(Widget child) => MaterialApp(
@@ -38,7 +38,7 @@ Widget dropdown({
     leading: leading,
     selectedLeading: selectedLeading,
     leadingPadding: leadingPadding,
-    theme: DropdownStyleTheme(dropdown: DropdownTheme(iconSize: iconSize)),
+    theme: DropdownStyleTheme(button: DropdownButtonTheme(iconSize: iconSize)),
     onChanged: (_) {},
   );
 }
@@ -53,7 +53,7 @@ void main() {
 
     expect(
       boxAround(tester, find.byIcon(Icons.eco)).height,
-      DropdownTheme.defaultIconSize,
+      DropdownButtonTheme.defaultIconSize,
     );
   });
 

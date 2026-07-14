@@ -65,8 +65,8 @@ void main() {
           dropdown(
             enabled: false,
             theme: DropdownStyleTheme(
-              dropdown: DropdownTheme(
-                disabledButtonDecoration: const BoxDecoration(color: red),
+              button: DropdownButtonTheme(
+                disabledDecoration: const BoxDecoration(color: red),
                 disabledBackgroundColor: green,
                 border: Border.all(color: blue),
               ),
@@ -88,7 +88,7 @@ void main() {
             dropdown(
               enabled: false,
               theme: DropdownStyleTheme(
-                dropdown: DropdownTheme(
+                button: DropdownButtonTheme(
                   disabledBackgroundColor: green,
                   disabledBorder: Border.all(color: red),
                   borderRadius: 12,
@@ -111,7 +111,7 @@ void main() {
           dropdown(
             enabled: false,
             theme: DropdownStyleTheme(
-              dropdown: DropdownTheme(
+              button: DropdownButtonTheme(
                 disabledBackgroundColor: green,
                 border: Border.all(color: blue),
               ),
@@ -131,7 +131,7 @@ void main() {
             dropdown(
               enabled: false,
               theme: DropdownStyleTheme(
-                dropdown: DropdownTheme(border: Border.all(color: blue)),
+                button: DropdownButtonTheme(border: Border.all(color: blue)),
               ),
             ),
           ),
@@ -151,7 +151,7 @@ void main() {
           dropdown(
             value: 'Banana',
             theme: const DropdownStyleTheme(
-              dropdown: DropdownTheme(selectedItemColor: red),
+              item: DropdownItemTheme(selectedColor: red),
             ),
           ),
         ),
@@ -169,8 +169,8 @@ void main() {
         host(
           dropdown(
             theme: DropdownStyleTheme(
-              dropdown: DropdownTheme(
-                itemBorder: Border(bottom: BorderSide(color: blue)),
+              item: DropdownItemTheme(
+                border: Border(bottom: BorderSide(color: blue)),
               ),
             ),
           ),
@@ -191,8 +191,8 @@ void main() {
         host(
           dropdown(
             theme: DropdownStyleTheme(
-              dropdown: DropdownTheme(
-                itemBorder: Border(bottom: BorderSide(color: blue)),
+              item: DropdownItemTheme(
+                border: Border(bottom: BorderSide(color: blue)),
                 excludeLastItemBorder: false,
               ),
             ),
@@ -209,7 +209,7 @@ void main() {
         host(
           dropdown(
             theme: const DropdownStyleTheme(
-              dropdown: DropdownTheme(itemBorderRadius: 6),
+              item: DropdownItemTheme(borderRadius: 6),
             ),
           ),
         ),

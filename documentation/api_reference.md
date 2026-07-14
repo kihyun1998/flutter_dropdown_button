@@ -103,26 +103,31 @@ Text mode only. An item that needs more than text — an avatar, two lines — i
 |--------|-------------|
 | `closeAll({bool animate = true})` | The same registry as `FlutterDropdownButton.closeAll`. Either closes both kinds |
 
-## DropdownTheme
+## DropdownButtonTheme
 
-Shared theme configuration for all dropdown widgets.
+Styles the button face — its box, ink colours, content height, and the arrow icon. In **bare** mode (`anchorBuilder`) the button box is dropped, so this theme is inert.
 
 ### Constructor
 
 ```dart
-DropdownTheme({
-  Duration animationDuration = const Duration(milliseconds: 200),
+DropdownButtonTheme({
   double borderRadius = 8.0,
-  double elevation = 8.0,
-  Color? backgroundColor,
   Border? border,
-  Color? selectedItemColor,
-  Color? itemHoverColor,
-  Color? shadowColor,
-  BoxDecoration? overlayDecoration,
-  BoxDecoration? buttonDecoration,
-  EdgeInsets itemPadding = const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-  EdgeInsets buttonPadding = const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+  Color? backgroundColor,
+  BoxDecoration? decoration,
+  EdgeInsets padding = const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+  double? height,
+  Color? hoverColor,
+  Color? splashColor,
+  Color? highlightColor,
+  IconData? icon,
+  Color? iconColor,
+  Color? iconDisabledColor,
+  double? iconSize,
+  EdgeInsets? iconPadding,
+  BoxDecoration? disabledDecoration,
+  Color? disabledBackgroundColor,
+  Border? disabledBorder,
 })
 ```
 
@@ -130,45 +135,110 @@ DropdownTheme({
 
 | Property | Type | Default | Description |
 |----------|------|---------|-------------|
-| `animationDuration` | `Duration` | 200ms | Duration of show/hide animation |
-| `borderRadius` | `double` | 8.0 | Border radius for components |
+| `borderRadius` | `double` | 8.0 | Border radius of the button |
+| `border` | `Border?` | null | Border of the button |
+| `backgroundColor` | `Color?` | null | Button fill color |
+| `decoration` | `BoxDecoration?` | null | Custom decoration for button (overrides the fields above) |
+| `padding` | `EdgeInsets` | 16h, 12v | Padding for the button |
+| `height` | `double?` | null | Height of the button content area |
+| `hoverColor` | `Color?` | null | Button hover background color |
+| `splashColor` | `Color?` | null | Button tap ripple color |
+| `highlightColor` | `Color?` | null | Button focus highlight color |
+| `icon` | `IconData?` | `keyboard_arrow_down` | Dropdown arrow icon |
+| `iconColor` | `Color?` | null | Icon color when enabled |
+| `iconDisabledColor` | `Color?` | null | Icon color when disabled |
+| `iconSize` | `double?` | null (24.0) | Size of the dropdown icon |
+| `iconPadding` | `EdgeInsets?` | `left: 8.0` | Padding around the icon |
+| `disabledDecoration` | `BoxDecoration?` | null | Full custom decoration for the disabled button |
+| `disabledBackgroundColor` | `Color?` | null | Background color of the button when disabled |
+| `disabledBorder` | `Border?` | null | Border of the button when disabled |
+
+## DropdownOverlayTheme
+
+Styles the menu container — its background, border, corner radius, and shadow.
+
+### Constructor
+
+```dart
+DropdownOverlayTheme({
+  double borderRadius = 8.0,
+  double elevation = 8.0,
+  Color? backgroundColor,
+  Border? border,
+  Color? shadowColor,
+  BoxDecoration? decoration,
+  EdgeInsets? padding,
+})
+```
+
+### Properties
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `borderRadius` | `double` | 8.0 | Border radius of the overlay |
 | `elevation` | `double` | 8.0 | Shadow elevation of overlay |
 | `backgroundColor` | `Color?` | null | Background color of overlay |
-| `border` | `Border?` | null | Border style for components |
-| `selectedItemColor` | `Color?` | null | Background color of selected item |
-| `itemHoverColor` | `Color?` | null | Background color on hover |
+| `border` | `Border?` | null | Border of the overlay |
 | `shadowColor` | `Color?` | null | Shadow color for overlay |
-| `overlayDecoration` | `BoxDecoration?` | null | Custom decoration for overlay |
-| `buttonDecoration` | `BoxDecoration?` | null | Custom decoration for button |
-| `itemPadding` | `EdgeInsets` | 16h, 12v | Padding for dropdown items |
-| `buttonPadding` | `EdgeInsets` | 16h, 12v | Padding for dropdown button |
-| `itemMargin` | `EdgeInsets?` | null | Margin around each dropdown item |
-| `itemBorderRadius` | `double?` | null | Individual border radius for items |
-| `itemSplashColor` | `Color?` | null | Splash color for item interactions |
-| `itemHighlightColor` | `Color?` | null | Highlight color for item touch |
+| `decoration` | `BoxDecoration?` | null | Custom decoration for overlay |
+| `padding` | `EdgeInsets?` | null | Padding inside the overlay container |
+
+## DropdownItemTheme
+
+Styles the rows inside the menu.
+
+### Constructor
+
+```dart
+DropdownItemTheme({
+  Color? selectedColor,
+  Color? hoverColor,
+  Color? splashColor,
+  Color? highlightColor,
+  EdgeInsets padding = const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+  EdgeInsets? margin,
+  double? borderRadius,
+  Border? border,
+  bool excludeLastItemBorder = true,
+})
+```
+
+### Properties
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `selectedColor` | `Color?` | null | Background color of selected item |
+| `hoverColor` | `Color?` | null | Background color on hover |
+| `splashColor` | `Color?` | null | Splash color for item interactions |
+| `highlightColor` | `Color?` | null | Highlight color for item touch |
+| `padding` | `EdgeInsets` | 16h, 12v | Padding for dropdown items |
+| `margin` | `EdgeInsets?` | null | Margin around each dropdown item |
+| `borderRadius` | `double?` | null | Individual border radius for items |
+| `border` | `Border?` | null | Border for each item (e.g., bottom divider) |
+| `excludeLastItemBorder` | `bool` | true | Skip `border` on the last item |
 
 ## Theme resolution
 
-`DropdownTheme` fills in its own gaps. The widget reads a resolved style rather than deciding between a themed value and a framework default at each call site — so the rule for "what colour is the arrow when disabled?" exists in exactly one place.
+The button, overlay, and item themes each fill in their own gaps. The widget reads a resolved style rather than deciding between a themed value and a framework default at each call site — so the rule for "what colour is the arrow when disabled?" exists in exactly one place.
 
 Resolution takes a **plain palette**, not a `BuildContext`. Reading values out of a `ThemeData` needs an element tree; deciding with them does not, and only the second half is worth testing.
 
 ```dart
 final ambient = DropdownAmbientColors.of(context);   // once, in build
-final style = theme.resolveButton(ambient, enabled: isEnabled);
+final style = buttonTheme.resolveButton(ambient, enabled: isEnabled);
 
 Container(decoration: style.decoration, ...);
 ```
 
-Not everything a theme knows needs a palette. `DropdownTheme.resolvedIconSize` — the arrow's size, or `DropdownTheme.defaultIconSize` when unset — is a pure read, and reading it is how a caller avoids building a whole `ResolvedButtonStyle` for one number.
+Not everything a theme knows needs a palette. `DropdownButtonTheme.resolvedIconSize` — the arrow's size, or `DropdownButtonTheme.defaultIconSize` when unset — is a pure read, and reading it is how a caller avoids building a whole `ResolvedButtonStyle` for one number.
 
-### Methods on DropdownTheme
+### Resolve methods
 
-| Method | Returns | Description |
-|--------|---------|-------------|
-| `resolveButton(ambient, {required bool enabled})` | `ResolvedButtonStyle` | The button's box, ink colours, content height, and arrow. `enabled` must be the *effective* state — a single-item dropdown disabled by policy is disabled here too |
-| `resolveOverlay(ambient)` | `ResolvedOverlayStyle` | The menu container, plus the border thickness the placement module reserves |
-| `resolveItem(ambient, {required bool selected, required bool isFirst, required bool isLast})` | `ResolvedItemStyle` | One item row. The end rows are rounded to meet the menu's corners unless `itemBorderRadius` overrides |
+| Method | On | Returns | Description |
+|--------|----|---------|-------------|
+| `resolveButton(ambient, {required bool enabled})` | `DropdownButtonTheme` | `ResolvedButtonStyle` | The button's box, ink colours, content height, and arrow. `enabled` must be the *effective* state — a single-item dropdown disabled by policy is disabled here too |
+| `resolveOverlay(ambient)` | `DropdownOverlayTheme` | `ResolvedOverlayStyle` | The menu container, plus the border thickness the placement module reserves |
+| `resolveItem(ambient, {required bool selected, required bool isFirst, required bool isLast, required double menuBorderRadius})` | `DropdownItemTheme` | `ResolvedItemStyle` | One item row. `menuBorderRadius` is the enclosing menu's corner radius, so the end rows round to meet the menu's corners unless `borderRadius` overrides |
 
 ### DropdownAmbientColors
 

@@ -3,7 +3,8 @@ import 'package:flutter_dropdown_button/flutter_dropdown_button.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 /// Resolution takes plain values, so these run with no widget tree, no
-/// `pumpWidget`, and no `BuildContext`.
+/// `pumpWidget`, and no `BuildContext`. Each surface resolves through its own
+/// sub-theme (`DropdownButtonTheme` / `DropdownOverlayTheme` / `DropdownItemTheme`).
 
 const ambient = DropdownAmbientColors(
   card: Color(0xFFFFFFFF),
@@ -23,18 +24,18 @@ void main() {
   group('icon size', () {
     test('resolvedIconSize falls back to the named default', () {
       expect(
-        const DropdownTheme().resolvedIconSize,
-        DropdownTheme.defaultIconSize,
+        const DropdownButtonTheme().resolvedIconSize,
+        DropdownButtonTheme.defaultIconSize,
       );
-      expect(const DropdownTheme(iconSize: 18).resolvedIconSize, 18);
+      expect(const DropdownButtonTheme(iconSize: 18).resolvedIconSize, 18);
     });
 
     test('it agrees with the size resolveButton hands out', () {
       // Two readers, one fallback. A second copy of `24.0` is how a divider
       // came to be reserved at one height and drawn at another.
       for (final theme in const [
-        DropdownTheme(),
-        DropdownTheme(iconSize: 18),
+        DropdownButtonTheme(),
+        DropdownButtonTheme(iconSize: 18),
       ]) {
         expect(
           theme.resolveButton(ambient, enabled: true).iconSize,
@@ -44,15 +45,16 @@ void main() {
     });
 
     test('it needs no ambient palette', () {
-      // Which is the whole point: a caller wanting only this number should not
-      // have to resolve a BoxDecoration to get it.
-      expect(const DropdownTheme(iconSize: 30).resolvedIconSize, 30);
+      expect(const DropdownButtonTheme(iconSize: 30).resolvedIconSize, 30);
     });
   });
 
   group('button', () {
     test('falls back to the ambient palette', () {
-      final style = const DropdownTheme().resolveButton(ambient, enabled: true);
+      final style = const DropdownButtonTheme().resolveButton(
+        ambient,
+        enabled: true,
+      );
 
       expect(style.splashColor, ambient.splash);
       expect(style.hoverColor, ambient.hover);
@@ -61,22 +63,22 @@ void main() {
       expect(style.iconSize, 24.0);
     });
 
-    test('contentHeight prefers buttonHeight, then iconSize, then 24', () {
+    test('contentHeight prefers height, then iconSize, then 24', () {
       expect(
-        const DropdownTheme(
-          buttonHeight: 40,
+        const DropdownButtonTheme(
+          height: 40,
           iconSize: 30,
         ).resolveButton(ambient, enabled: true).contentHeight,
         40,
       );
       expect(
-        const DropdownTheme(
+        const DropdownButtonTheme(
           iconSize: 30,
         ).resolveButton(ambient, enabled: true).contentHeight,
         30,
       );
       expect(
-        const DropdownTheme()
+        const DropdownButtonTheme()
             .resolveButton(ambient, enabled: true)
             .contentHeight,
         24,
@@ -84,15 +86,26 @@ void main() {
     });
 
     test('the icon switches colour with the enabled state', () {
-      const theme = DropdownTheme(iconColor: red, iconDisabledColor: green);
+      const theme = DropdownButtonTheme(
+        iconColor: red,
+        iconDisabledColor: green,
+      );
 
       expect(theme.resolveButton(ambient, enabled: true).iconColor, red);
       expect(theme.resolveButton(ambient, enabled: false).iconColor, green);
     });
 
-    test('disabledButtonDecoration wins outright', () {
-      final theme = DropdownTheme(
-        disabledButtonDecoration: const BoxDecoration(color: red),
+    test('backgroundColor fills the enabled decoration', () {
+      final decoration = const DropdownButtonTheme(
+        backgroundColor: red,
+      ).resolveButton(ambient, enabled: true).decoration;
+
+      expect(decoration.color, red);
+    });
+
+    test('disabledDecoration wins outright', () {
+      final theme = DropdownButtonTheme(
+        disabledDecoration: const BoxDecoration(color: red),
         disabledBackgroundColor: green,
         border: Border.all(color: green),
       );
@@ -108,7 +121,7 @@ void main() {
       'disabledBorder falls back to border, then to the ambient divider',
       () {
         final withBorder =
-            DropdownTheme(
+            DropdownButtonTheme(
                   disabledBackgroundColor: green,
                   border: Border.all(color: red),
                 ).resolveButton(ambient, enabled: false).decoration.border!
@@ -116,7 +129,7 @@ void main() {
         expect(withBorder.top.color, red);
 
         final bare =
-            const DropdownTheme(
+            const DropdownButtonTheme(
                   disabledBackgroundColor: green,
                 ).resolveButton(ambient, enabled: false).decoration.border!
                 as Border;
@@ -125,7 +138,7 @@ void main() {
     );
 
     test('with no disabled styling, the enabled decoration stands', () {
-      final theme = DropdownTheme(border: Border.all(color: red));
+      final theme = DropdownButtonTheme(border: Border.all(color: red));
 
       final disabled = theme.resolveButton(ambient, enabled: false).decoration;
       final enabled = theme.resolveButton(ambient, enabled: true).decoration;
@@ -137,24 +150,26 @@ void main() {
 
   group('overlay', () {
     test('reports the border thickness the placement module reserves', () {
-      final theme = DropdownTheme(border: Border.all(color: red, width: 3));
+      final theme = DropdownOverlayTheme(
+        border: Border.all(color: red, width: 3),
+      );
 
       expect(theme.resolveOverlay(ambient).borderThickness, 6);
     });
 
     test('a borderless custom decoration reserves nothing', () {
-      const theme = DropdownTheme(overlayDecoration: BoxDecoration(color: red));
+      const theme = DropdownOverlayTheme(decoration: BoxDecoration(color: red));
 
       expect(theme.resolveOverlay(ambient).borderThickness, 0);
     });
 
     test('backgroundColor falls back to the ambient card colour', () {
       expect(
-        const DropdownTheme().resolveOverlay(ambient).backgroundColor,
+        const DropdownOverlayTheme().resolveOverlay(ambient).backgroundColor,
         ambient.card,
       );
       expect(
-        const DropdownTheme(
+        const DropdownOverlayTheme(
           backgroundColor: red,
         ).resolveOverlay(ambient).backgroundColor,
         red,
@@ -164,19 +179,21 @@ void main() {
 
   group('item', () {
     ResolvedItemStyle resolve(
-      DropdownTheme theme, {
+      DropdownItemTheme theme, {
       bool selected = false,
       bool isFirst = false,
       bool isLast = false,
+      double menuBorderRadius = 0,
     }) => theme.resolveItem(
       ambient,
       selected: selected,
       isFirst: isFirst,
       isLast: isLast,
+      menuBorderRadius: menuBorderRadius,
     );
 
     test('only the selected item is tinted', () {
-      const theme = DropdownTheme(selectedItemColor: red);
+      const theme = DropdownItemTheme(selectedColor: red);
 
       expect(resolve(theme, selected: true).decoration.color, red);
       expect(resolve(theme).decoration.color, Colors.transparent);
@@ -184,34 +201,43 @@ void main() {
 
     test('an untinted selection falls back to the ambient primary at 10%', () {
       final colour = resolve(
-        const DropdownTheme(),
+        const DropdownItemTheme(),
         selected: true,
       ).decoration.color!;
 
       expect(colour.a, closeTo(0.1, 0.001));
     });
 
-    test('without itemBorderRadius, only the end rows are rounded', () {
-      const theme = DropdownTheme(borderRadius: 10);
+    test('without a row borderRadius, only the end rows round to the menu', () {
+      const theme = DropdownItemTheme();
 
-      expect(resolve(theme, isFirst: true).inkBorderRadius, 10);
-      expect(resolve(theme, isLast: true).inkBorderRadius, 10);
-      expect(resolve(theme).inkBorderRadius, 0);
-    });
-
-    test('itemBorderRadius rounds every row', () {
-      const theme = DropdownTheme(borderRadius: 10, itemBorderRadius: 4);
-
-      expect(resolve(theme).inkBorderRadius, 4);
-      expect(resolve(theme, isFirst: true).inkBorderRadius, 4);
-    });
-
-    test('the last row drops itemBorder unless told otherwise', () {
-      final excluding = DropdownTheme(
-        itemBorder: const Border(bottom: BorderSide(color: red)),
+      expect(
+        resolve(theme, isFirst: true, menuBorderRadius: 10).inkBorderRadius,
+        10,
       );
-      final keeping = DropdownTheme(
-        itemBorder: const Border(bottom: BorderSide(color: red)),
+      expect(
+        resolve(theme, isLast: true, menuBorderRadius: 10).inkBorderRadius,
+        10,
+      );
+      expect(resolve(theme, menuBorderRadius: 10).inkBorderRadius, 0);
+    });
+
+    test('a row borderRadius rounds every row', () {
+      const theme = DropdownItemTheme(borderRadius: 4);
+
+      expect(resolve(theme, menuBorderRadius: 10).inkBorderRadius, 4);
+      expect(
+        resolve(theme, isFirst: true, menuBorderRadius: 10).inkBorderRadius,
+        4,
+      );
+    });
+
+    test('the last row drops border unless told otherwise', () {
+      final excluding = DropdownItemTheme(
+        border: const Border(bottom: BorderSide(color: red)),
+      );
+      final keeping = DropdownItemTheme(
+        border: const Border(bottom: BorderSide(color: red)),
         excludeLastItemBorder: false,
       );
 

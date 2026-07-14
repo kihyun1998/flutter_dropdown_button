@@ -6,7 +6,7 @@ const enabledIcon = Color(0xFFE53935);
 const disabledIcon = Color(0xFF9E9E9E);
 
 final theme = DropdownStyleTheme(
-  dropdown: const DropdownTheme(
+  button: const DropdownButtonTheme(
     iconColor: enabledIcon,
     iconDisabledColor: disabledIcon,
   ),

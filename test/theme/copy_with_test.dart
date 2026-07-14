@@ -31,104 +31,125 @@ void expectSame(Map<String, Object?> actual, Map<String, Object?> expected) {
 }
 
 void main() {
-  group('DropdownTheme', () {
-    Map<String, Object?> snap(DropdownTheme t) => {
+  group('DropdownButtonTheme', () {
+    Map<String, Object?> snap(DropdownButtonTheme t) => {
+      'borderRadius': t.borderRadius,
+      'backgroundColor': t.backgroundColor,
+      'border': t.border,
+      'decoration': t.decoration,
+      'padding': t.padding,
+      'hoverColor': t.hoverColor,
+      'splashColor': t.splashColor,
+      'highlightColor': t.highlightColor,
+      'height': t.height,
+      'icon': t.icon,
+      'iconColor': t.iconColor,
+      'iconDisabledColor': t.iconDisabledColor,
+      'iconSize': t.iconSize,
+      'iconPadding': t.iconPadding,
+      'disabledBackgroundColor': t.disabledBackgroundColor,
+      'disabledBorder': t.disabledBorder,
+      'disabledDecoration': t.disabledDecoration,
+    };
+
+    final a = DropdownButtonTheme(
+      borderRadius: 1,
+      backgroundColor: _a(1),
+      border: Border.all(color: _a(2)),
+      decoration: BoxDecoration(color: _a(3)),
+      padding: const EdgeInsets.all(1),
+      hoverColor: _a(4),
+      splashColor: _a(5),
+      highlightColor: _a(6),
+      height: 5,
+      icon: Icons.abc,
+      iconColor: _a(7),
+      iconDisabledColor: _a(8),
+      iconSize: 4,
+      iconPadding: const EdgeInsets.all(4),
+      disabledBackgroundColor: _a(9),
+      disabledBorder: Border.all(color: _a(10), width: 3),
+      disabledDecoration: BoxDecoration(color: _a(11)),
+    );
+
+    final b = DropdownButtonTheme(
+      borderRadius: 10,
+      backgroundColor: _b(1),
+      border: Border.all(color: _b(2)),
+      decoration: BoxDecoration(color: _b(3)),
+      padding: const EdgeInsets.all(10),
+      hoverColor: _b(4),
+      splashColor: _b(5),
+      highlightColor: _b(6),
+      height: 50,
+      icon: Icons.zoom_in,
+      iconColor: _b(7),
+      iconDisabledColor: _b(8),
+      iconSize: 40,
+      iconPadding: const EdgeInsets.all(40),
+      disabledBackgroundColor: _b(9),
+      disabledBorder: Border.all(color: _b(10), width: 30),
+      disabledDecoration: BoxDecoration(color: _b(11)),
+    );
+
+    test('copyWith() preserves every field', () {
+      expectSame(snap(a.copyWith()), snap(a));
+    });
+
+    test('copyWith(everything) reproduces the other instance', () {
+      final copy = a.copyWith(
+        borderRadius: b.borderRadius,
+        backgroundColor: b.backgroundColor,
+        border: b.border,
+        decoration: b.decoration,
+        padding: b.padding,
+        hoverColor: b.hoverColor,
+        splashColor: b.splashColor,
+        highlightColor: b.highlightColor,
+        height: b.height,
+        icon: b.icon,
+        iconColor: b.iconColor,
+        iconDisabledColor: b.iconDisabledColor,
+        iconSize: b.iconSize,
+        iconPadding: b.iconPadding,
+        disabledBackgroundColor: b.disabledBackgroundColor,
+        disabledBorder: b.disabledBorder,
+        disabledDecoration: b.disabledDecoration,
+      );
+
+      expectSame(snap(copy), snap(b));
+    });
+  });
+
+  group('DropdownOverlayTheme', () {
+    Map<String, Object?> snap(DropdownOverlayTheme t) => {
       'borderRadius': t.borderRadius,
       'elevation': t.elevation,
       'backgroundColor': t.backgroundColor,
       'border': t.border,
-      'selectedItemColor': t.selectedItemColor,
-      'itemHoverColor': t.itemHoverColor,
-      'itemSplashColor': t.itemSplashColor,
-      'itemHighlightColor': t.itemHighlightColor,
-      'buttonHoverColor': t.buttonHoverColor,
-      'buttonSplashColor': t.buttonSplashColor,
-      'buttonHighlightColor': t.buttonHighlightColor,
       'shadowColor': t.shadowColor,
-      'overlayDecoration': t.overlayDecoration,
-      'buttonDecoration': t.buttonDecoration,
-      'itemPadding': t.itemPadding,
-      'buttonPadding': t.buttonPadding,
-      'itemMargin': t.itemMargin,
-      'itemBorderRadius': t.itemBorderRadius,
-      'iconColor': t.iconColor,
-      'iconDisabledColor': t.iconDisabledColor,
-      'icon': t.icon,
-      'iconSize': t.iconSize,
-      'buttonHeight': t.buttonHeight,
-      'iconPadding': t.iconPadding,
-      'overlayPadding': t.overlayPadding,
-      'itemBorder': t.itemBorder,
-      'excludeLastItemBorder': t.excludeLastItemBorder,
-      'disabledBackgroundColor': t.disabledBackgroundColor,
-      'disabledBorder': t.disabledBorder,
-      'disabledButtonDecoration': t.disabledButtonDecoration,
+      'padding': t.padding,
+      'decoration': t.decoration,
     };
 
-    final a = DropdownTheme(
+    final a = DropdownOverlayTheme(
       borderRadius: 1,
       elevation: 2,
       backgroundColor: _a(1),
       border: Border.all(color: _a(2)),
-      selectedItemColor: _a(3),
-      itemHoverColor: _a(4),
-      itemSplashColor: _a(5),
-      itemHighlightColor: _a(6),
-      buttonHoverColor: _a(7),
-      buttonSplashColor: _a(8),
-      buttonHighlightColor: _a(9),
-      shadowColor: _a(10),
-      overlayDecoration: BoxDecoration(color: _a(11)),
-      buttonDecoration: BoxDecoration(color: _a(12)),
-      itemPadding: const EdgeInsets.all(1),
-      buttonPadding: const EdgeInsets.all(2),
-      itemMargin: const EdgeInsets.all(3),
-      itemBorderRadius: 3,
-      iconColor: _a(13),
-      iconDisabledColor: _a(14),
-      icon: Icons.abc,
-      iconSize: 4,
-      buttonHeight: 5,
-      iconPadding: const EdgeInsets.all(4),
-      overlayPadding: const EdgeInsets.all(5),
-      itemBorder: Border.all(color: _a(15), width: 2),
-      excludeLastItemBorder: false,
-      disabledBackgroundColor: _a(16),
-      disabledBorder: Border.all(color: _a(17), width: 3),
-      disabledButtonDecoration: BoxDecoration(color: _a(18)),
+      shadowColor: _a(3),
+      padding: const EdgeInsets.all(5),
+      decoration: BoxDecoration(color: _a(4)),
     );
 
-    final b = DropdownTheme(
+    final b = DropdownOverlayTheme(
       borderRadius: 10,
       elevation: 20,
       backgroundColor: _b(1),
       border: Border.all(color: _b(2)),
-      selectedItemColor: _b(3),
-      itemHoverColor: _b(4),
-      itemSplashColor: _b(5),
-      itemHighlightColor: _b(6),
-      buttonHoverColor: _b(7),
-      buttonSplashColor: _b(8),
-      buttonHighlightColor: _b(9),
-      shadowColor: _b(10),
-      overlayDecoration: BoxDecoration(color: _b(11)),
-      buttonDecoration: BoxDecoration(color: _b(12)),
-      itemPadding: const EdgeInsets.all(10),
-      buttonPadding: const EdgeInsets.all(20),
-      itemMargin: const EdgeInsets.all(30),
-      itemBorderRadius: 30,
-      iconColor: _b(13),
-      iconDisabledColor: _b(14),
-      icon: Icons.zoom_in,
-      iconSize: 40,
-      buttonHeight: 50,
-      iconPadding: const EdgeInsets.all(40),
-      overlayPadding: const EdgeInsets.all(50),
-      itemBorder: Border.all(color: _b(15), width: 20),
-      excludeLastItemBorder: true,
-      disabledBackgroundColor: _b(16),
-      disabledBorder: Border.all(color: _b(17), width: 30),
-      disabledButtonDecoration: BoxDecoration(color: _b(18)),
+      shadowColor: _b(3),
+      padding: const EdgeInsets.all(50),
+      decoration: BoxDecoration(color: _b(4)),
     );
 
     test('copyWith() preserves every field', () {
@@ -141,32 +162,67 @@ void main() {
         elevation: b.elevation,
         backgroundColor: b.backgroundColor,
         border: b.border,
-        selectedItemColor: b.selectedItemColor,
-        itemHoverColor: b.itemHoverColor,
-        itemSplashColor: b.itemSplashColor,
-        itemHighlightColor: b.itemHighlightColor,
-        buttonHoverColor: b.buttonHoverColor,
-        buttonSplashColor: b.buttonSplashColor,
-        buttonHighlightColor: b.buttonHighlightColor,
         shadowColor: b.shadowColor,
-        overlayDecoration: b.overlayDecoration,
-        buttonDecoration: b.buttonDecoration,
-        itemPadding: b.itemPadding,
-        buttonPadding: b.buttonPadding,
-        itemMargin: b.itemMargin,
-        itemBorderRadius: b.itemBorderRadius,
-        iconColor: b.iconColor,
-        iconDisabledColor: b.iconDisabledColor,
-        icon: b.icon,
-        iconSize: b.iconSize,
-        buttonHeight: b.buttonHeight,
-        iconPadding: b.iconPadding,
-        overlayPadding: b.overlayPadding,
-        itemBorder: b.itemBorder,
+        padding: b.padding,
+        decoration: b.decoration,
+      );
+
+      expectSame(snap(copy), snap(b));
+    });
+  });
+
+  group('DropdownItemTheme', () {
+    Map<String, Object?> snap(DropdownItemTheme t) => {
+      'selectedColor': t.selectedColor,
+      'hoverColor': t.hoverColor,
+      'splashColor': t.splashColor,
+      'highlightColor': t.highlightColor,
+      'padding': t.padding,
+      'margin': t.margin,
+      'borderRadius': t.borderRadius,
+      'border': t.border,
+      'excludeLastItemBorder': t.excludeLastItemBorder,
+    };
+
+    final a = DropdownItemTheme(
+      selectedColor: _a(1),
+      hoverColor: _a(2),
+      splashColor: _a(3),
+      highlightColor: _a(4),
+      padding: const EdgeInsets.all(1),
+      margin: const EdgeInsets.all(3),
+      borderRadius: 3,
+      border: Border.all(color: _a(5), width: 2),
+      excludeLastItemBorder: false,
+    );
+
+    final b = DropdownItemTheme(
+      selectedColor: _b(1),
+      hoverColor: _b(2),
+      splashColor: _b(3),
+      highlightColor: _b(4),
+      padding: const EdgeInsets.all(10),
+      margin: const EdgeInsets.all(30),
+      borderRadius: 30,
+      border: Border.all(color: _b(5), width: 20),
+      excludeLastItemBorder: true,
+    );
+
+    test('copyWith() preserves every field', () {
+      expectSame(snap(a.copyWith()), snap(a));
+    });
+
+    test('copyWith(everything) reproduces the other instance', () {
+      final copy = a.copyWith(
+        selectedColor: b.selectedColor,
+        hoverColor: b.hoverColor,
+        splashColor: b.splashColor,
+        highlightColor: b.highlightColor,
+        padding: b.padding,
+        margin: b.margin,
+        borderRadius: b.borderRadius,
+        border: b.border,
         excludeLastItemBorder: b.excludeLastItemBorder,
-        disabledBackgroundColor: b.disabledBackgroundColor,
-        disabledBorder: b.disabledBorder,
-        disabledButtonDecoration: b.disabledButtonDecoration,
       );
 
       expectSame(snap(copy), snap(b));
@@ -461,24 +517,33 @@ void main() {
 
   group('DropdownStyleTheme', () {
     Map<String, Object?> snap(DropdownStyleTheme t) => {
-      'dropdown': t.dropdown,
+      'button': t.button,
+      'overlay': t.overlay,
+      'item': t.item,
       'scroll': t.scroll,
       'tooltip': t.tooltip,
       'search': t.search,
+      'checkbox': t.checkbox,
     };
 
     final a = DropdownStyleTheme(
-      dropdown: DropdownTheme(backgroundColor: _a(1)),
-      scroll: DropdownScrollTheme(thumbColor: _a(2)),
-      tooltip: DropdownTooltipTheme(backgroundColor: _a(3)),
-      search: SearchFieldTheme(backgroundColor: _a(4)),
+      button: DropdownButtonTheme(backgroundColor: _a(1)),
+      overlay: DropdownOverlayTheme(backgroundColor: _a(2)),
+      item: DropdownItemTheme(selectedColor: _a(3)),
+      scroll: DropdownScrollTheme(thumbColor: _a(4)),
+      tooltip: DropdownTooltipTheme(backgroundColor: _a(5)),
+      search: SearchFieldTheme(backgroundColor: _a(6)),
+      checkbox: DropdownCheckboxTheme(activeColor: _a(7)),
     );
 
     final b = DropdownStyleTheme(
-      dropdown: DropdownTheme(backgroundColor: _b(1)),
-      scroll: DropdownScrollTheme(thumbColor: _b(2)),
-      tooltip: DropdownTooltipTheme(backgroundColor: _b(3)),
-      search: SearchFieldTheme(backgroundColor: _b(4)),
+      button: DropdownButtonTheme(backgroundColor: _b(1)),
+      overlay: DropdownOverlayTheme(backgroundColor: _b(2)),
+      item: DropdownItemTheme(selectedColor: _b(3)),
+      scroll: DropdownScrollTheme(thumbColor: _b(4)),
+      tooltip: DropdownTooltipTheme(backgroundColor: _b(5)),
+      search: SearchFieldTheme(backgroundColor: _b(6)),
+      checkbox: DropdownCheckboxTheme(activeColor: _b(7)),
     );
 
     test('copyWith() preserves every field', () {
@@ -487,10 +552,13 @@ void main() {
 
     test('copyWith(everything) reproduces the other instance', () {
       final copy = a.copyWith(
-        dropdown: b.dropdown,
+        button: b.button,
+        overlay: b.overlay,
+        item: b.item,
         scroll: b.scroll,
         tooltip: b.tooltip,
         search: b.search,
+        checkbox: b.checkbox,
       );
 
       expectSame(snap(copy), snap(b));
