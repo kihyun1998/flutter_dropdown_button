@@ -244,47 +244,62 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
   // ── Theme builders ──────────────────────────────────────────────────────
   DropdownStyleTheme _buildStyleTheme() {
     return DropdownStyleTheme(
-      dropdown: DropdownTheme(
+      button: DropdownButtonTheme(
+        borderRadius: _dtBorderRadius,
+        border: _dtBorderEnabled
+            ? Border.all(color: _dtBorderColor, width: _dtBorderWidth)
+            : null,
+        hoverColor: _dtButtonHoverColor,
+        padding: EdgeInsets.symmetric(
+          horizontal: _dtButtonPaddingH,
+          vertical: _dtButtonPaddingV,
+        ),
+        iconColor: _dtIconColor,
+        iconDisabledColor: _dtIconDisabledColor,
+        icon: _dtIcon,
+        iconSize: _dtIconSize,
+        height: _dtButtonHeight,
+        iconPadding: _dtIconPaddingLeft != null
+            ? EdgeInsets.only(left: _dtIconPaddingLeft!)
+            : null,
+        disabledBackgroundColor: _dtDisabledBackgroundColor,
+        disabledBorder: _dtDisabledBorderEnabled
+            ? Border.all(
+                color: _dtDisabledBorderColor,
+                width: _dtDisabledBorderWidth,
+              )
+            : null,
+      ),
+      overlay: DropdownOverlayTheme(
         borderRadius: _dtBorderRadius,
         elevation: _dtElevation,
         backgroundColor: _dtBackgroundColor,
         border: _dtBorderEnabled
             ? Border.all(color: _dtBorderColor, width: _dtBorderWidth)
             : null,
-        selectedItemColor: _dtSelectedItemColor,
-        itemHoverColor: _dtItemHoverColor,
-        itemSplashColor: _dtItemSplashColor,
-        buttonHoverColor: _dtButtonHoverColor,
-        itemPadding: EdgeInsets.symmetric(
-          horizontal: _dtItemPaddingH,
-          vertical: _dtItemPaddingV,
-        ),
-        buttonPadding: EdgeInsets.symmetric(
-          horizontal: _dtButtonPaddingH,
-          vertical: _dtButtonPaddingV,
-        ),
-        itemMargin: _dtItemMarginEnabled
-            ? EdgeInsets.symmetric(
-                horizontal: _dtItemMarginH,
-                vertical: _dtItemMarginV,
-              )
-            : null,
-        itemBorderRadius: _dtItemBorderRadius,
-        iconColor: _dtIconColor,
-        iconDisabledColor: _dtIconDisabledColor,
-        icon: _dtIcon,
-        iconSize: _dtIconSize,
-        buttonHeight: _dtButtonHeight,
-        iconPadding: _dtIconPaddingLeft != null
-            ? EdgeInsets.only(left: _dtIconPaddingLeft!)
-            : null,
-        overlayPadding: _dtOverlayPaddingEnabled
+        padding: _dtOverlayPaddingEnabled
             ? EdgeInsets.symmetric(
                 horizontal: _dtOverlayPaddingH,
                 vertical: _dtOverlayPaddingV,
               )
             : null,
-        itemBorder: _dtItemBorderEnabled
+      ),
+      item: DropdownItemTheme(
+        selectedColor: _dtSelectedItemColor,
+        hoverColor: _dtItemHoverColor,
+        splashColor: _dtItemSplashColor,
+        padding: EdgeInsets.symmetric(
+          horizontal: _dtItemPaddingH,
+          vertical: _dtItemPaddingV,
+        ),
+        margin: _dtItemMarginEnabled
+            ? EdgeInsets.symmetric(
+                horizontal: _dtItemMarginH,
+                vertical: _dtItemMarginV,
+              )
+            : null,
+        borderRadius: _dtItemBorderRadius,
+        border: _dtItemBorderEnabled
             ? Border(
                 bottom: BorderSide(
                   color: _dtItemBorderColor,
@@ -293,13 +308,6 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
               )
             : null,
         excludeLastItemBorder: _dtExcludeLastItemBorder,
-        disabledBackgroundColor: _dtDisabledBackgroundColor,
-        disabledBorder: _dtDisabledBorderEnabled
-            ? Border.all(
-                color: _dtDisabledBorderColor,
-                width: _dtDisabledBorderWidth,
-              )
-            : null,
       ),
       scroll: _dstEnabled
           ? DropdownScrollTheme(

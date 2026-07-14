@@ -2,7 +2,14 @@
 
 ## 4.0.0
 
-Breaking. The multi-select checklist now draws its boxes with the [`flutter_checkbox`](https://pub.dev/packages/flutter_checkbox) package instead of Flutter's built-in `Checkbox`, and `DropdownCheckboxTheme` is redesigned around it — several Material-only fields are removed. The **SDK floor is unchanged** (`>=3.32.0`): `flutter_checkbox` `0.3.1` needs only Flutter 3.27. This release also folds in the bare-anchor feature, which was never published on its own.
+Breaking, on two axes. The multi-select checklist now draws its boxes with the [`flutter_checkbox`](https://pub.dev/packages/flutter_checkbox) package instead of Flutter's built-in `Checkbox` (`DropdownCheckboxTheme` redesigned around it), and the monolithic `DropdownTheme` is split into three surface sub-themes. The **SDK floor is unchanged** (`>=3.32.0`): `flutter_checkbox` `0.3.1` needs only Flutter 3.27. This release also folds in the bare-anchor feature, which was never published on its own.
+
+### `DropdownTheme` → `button` / `overlay` / `item` sub-themes
+
+* **BREAKING**: the single `DropdownTheme` (~28 fields covering the button face, the menu container and the rows at once) is removed. `DropdownStyleTheme`'s `dropdown` slot is replaced by three sibling slots — `button` (`DropdownButtonTheme`), `overlay` (`DropdownOverlayTheme`), `item` (`DropdownItemTheme`) — beside the `scroll` / `tooltip` / `search` / `checkbox` slots that were always separate. Each sub-theme resolves itself. Fields keep their meaning but drop the surface prefix (`buttonHoverColor` → `button`'s `hoverColor`, `itemPadding` → `item`'s `padding`, `overlayPadding` → `overlay`'s `padding`, `selectedItemColor` → `item`'s `selectedColor`, `itemBorderRadius` → `item`'s `borderRadius`, and so on). Full map in `documentation/migration.md`
+* **CHANGE**: the shared `borderRadius`, `backgroundColor` and `border` — one field each, formerly driving two surfaces at once — are now owned per surface. `overlay.backgroundColor` colours the menu; `button.backgroundColor` (**new**) colours the button; neither reaches across. This is the coupling #75's bare mode exposed (a `backgroundColor` that painted the menu, not the button), resolved by construction
+* **CHANGE**: `DropdownButtonTheme` is **inert in bare mode** (`anchorBuilder`) — the caller draws the anchor, so the button box it styles does not exist. Overlay, item, scroll, search and tooltip theming still apply. The type now makes that boundary explicit
+* **TEST**: every field moves 1:1, the resolve logic is preserved verbatim, and the existing widget tests (which assert the rendered button/item `BoxDecoration`s) pass with the same assertions — the split is behaviour-preserving
 
 ### Multi-select checkbox → `flutter_checkbox`
 

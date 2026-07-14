@@ -2,9 +2,13 @@
 
 Learn how to customize the appearance of dropdown widgets using the shared theme system.
 
-## DropdownTheme Overview
+## Theme Overview
 
-The `DropdownTheme` class provides a unified way to style all dropdown variants. It ensures visual consistency across your application while allowing fine-grained customization.
+The button face, the menu container, and the item rows are styled by three sibling
+themes — `DropdownButtonTheme`, `DropdownOverlayTheme`, and `DropdownItemTheme` —
+carried in the `button`, `overlay`, and `item` slots of `DropdownStyleTheme`. Together
+they ensure visual consistency across your application while allowing fine-grained
+customization.
 
 ## Basic Theming
 
@@ -26,7 +30,7 @@ FlutterDropdownButton<String>.text(
   onChanged: (value) {},
   animationDuration: const Duration(milliseconds: 300),
   theme: DropdownStyleTheme(
-    dropdown: DropdownTheme(
+    overlay: DropdownOverlayTheme(
       borderRadius: 12.0,
       elevation: 4.0,
     ),
@@ -39,13 +43,13 @@ FlutterDropdownButton<String>.text(
 ### Animation and Behavior
 
 ```dart
-DropdownTheme(
+DropdownOverlayTheme(
   borderRadius: 16.0,   // More rounded corners
   elevation: 12.0,      // Higher shadow
 )
 
 // Animation timing is a widget parameter, not a theme field.
-// `DropdownTheme` describes appearance; the widget owns behaviour.
+// The style themes describe appearance; the widget owns behaviour.
 FlutterDropdownButton<String>.text(
   items: items,
   animationDuration: const Duration(milliseconds: 250),
@@ -56,20 +60,26 @@ FlutterDropdownButton<String>.text(
 ### Colors
 
 ```dart
-DropdownTheme(
-  backgroundColor: Colors.grey[50],                // Light background
-  selectedItemColor: Colors.blue.withOpacity(0.1), // Blue selected items
-  shadowColor: Colors.black38,                     // Custom shadow
+DropdownStyleTheme(
+  overlay: DropdownOverlayTheme(
+    backgroundColor: Colors.grey[50],   // Light background
+    shadowColor: Colors.black38,        // Custom shadow
+  ),
+  item: DropdownItemTheme(
+    selectedColor: Colors.blue.withOpacity(0.1), // Blue selected items
+  ),
 )
 ```
 
 ### Borders
 
 ```dart
-DropdownTheme(
-  border: Border.all(
-    color: Colors.blue,
-    width: 2.0,
+DropdownStyleTheme(
+  button: DropdownButtonTheme(
+    border: Border.all(color: Colors.blue, width: 2.0),
+  ),
+  overlay: DropdownOverlayTheme(
+    border: Border.all(color: Colors.blue, width: 2.0),
   ),
 )
 ```
@@ -77,22 +87,26 @@ DropdownTheme(
 ### Padding and Spacing
 
 ```dart
-DropdownTheme(
-  itemPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-  buttonPadding: EdgeInsets.all(16),
-  itemMargin: EdgeInsets.symmetric(horizontal: 8, vertical: 4), // Space between items
+DropdownStyleTheme(
+  button: DropdownButtonTheme(
+    padding: EdgeInsets.all(16),
+  ),
+  item: DropdownItemTheme(
+    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+    margin: EdgeInsets.symmetric(horizontal: 8, vertical: 4), // Space between items
+  ),
 )
 ```
 
 ### Item Styling
 
 ```dart
-DropdownTheme(
-  itemBorderRadius: 8.0,                    // Individual item border radius
-  itemMargin: EdgeInsets.all(4),            // Margin around each item
-  itemHoverColor: Colors.grey[100],         // Hover effect color
-  itemSplashColor: Colors.blue[50],         // Touch splash color
-  itemHighlightColor: Colors.blue[25],      // Highlight color
+DropdownItemTheme(
+  borderRadius: 8.0,                    // Individual item border radius
+  margin: EdgeInsets.all(4),            // Margin around each item
+  hoverColor: Colors.grey[100],         // Hover effect color
+  splashColor: Colors.blue[50],         // Touch splash color
+  highlightColor: Colors.blue[25],      // Highlight color
 )
 ```
 
@@ -136,7 +150,7 @@ drawn in the root `Overlay`, out of a local `Theme`'s subtree.
 `DropdownCheckboxTheme` is how you reach just this dropdown's boxes — a null
 field defers to the ambient `ThemeData`. Everything *around* the box — the row's
 hover, splash, margin, radius, and the selected row's background — stays
-`DropdownTheme`'s, exactly as for a single-select menu.
+`DropdownItemTheme`'s, exactly as for a single-select menu.
 
 The widgets `itemLeadingBuilder` and `itemTrailingBuilder` return are **yours**.
 The package places them and styles nothing about them; colour and size are
@@ -169,23 +183,27 @@ FlutterMultiSelectDropdown<String>(
 For complete control over appearance, use custom decorations:
 
 ```dart
-DropdownTheme(
-  overlayDecoration: BoxDecoration(
-    color: Colors.white,
-    borderRadius: BorderRadius.circular(12),
-    boxShadow: [
-      BoxShadow(
-        color: Colors.black26,
-        blurRadius: 10,
-        offset: Offset(0, 4),
-      ),
-    ],
-    border: Border.all(color: Colors.grey[300]!),
+DropdownStyleTheme(
+  overlay: DropdownOverlayTheme(
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(12),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black26,
+          blurRadius: 10,
+          offset: Offset(0, 4),
+        ),
+      ],
+      border: Border.all(color: Colors.grey[300]!),
+    ),
   ),
-  buttonDecoration: BoxDecoration(
-    color: Colors.grey[50],
-    borderRadius: BorderRadius.circular(12),
-    border: Border.all(color: Colors.grey[400]!),
+  button: DropdownButtonTheme(
+    decoration: BoxDecoration(
+      color: Colors.grey[50],
+      borderRadius: BorderRadius.circular(12),
+      border: Border.all(color: Colors.grey[400]!),
+    ),
   ),
 )
 ```
@@ -193,8 +211,8 @@ DropdownTheme(
 ### Gradient Backgrounds
 
 ```dart
-DropdownTheme(
-  overlayDecoration: BoxDecoration(
+DropdownOverlayTheme(
+  decoration: BoxDecoration(
     gradient: LinearGradient(
       colors: [Colors.blue[50]!, Colors.white],
       begin: Alignment.topCenter,
@@ -213,17 +231,23 @@ Create a shared theme for consistency:
 
 ```dart
 class AppThemes {
-  static const primaryDropdownTheme = DropdownTheme(
-    borderRadius: 12.0,
-    elevation: 4.0,
-    backgroundColor: Colors.white,
-    selectedItemColor: Color(0xFF1976D2),
+  static const primaryDropdownStyle = DropdownStyleTheme(
+    overlay: DropdownOverlayTheme(
+      borderRadius: 12.0,
+      elevation: 4.0,
+      backgroundColor: Colors.white,
+    ),
+    item: DropdownItemTheme(
+      selectedColor: Color(0xFF1976D2),
+    ),
   );
-  
-  static const secondaryDropdownTheme = DropdownTheme(
-    borderRadius: 8.0,
-    elevation: 2.0,
-    backgroundColor: Color(0xFFF5F5F5),
+
+  static const secondaryDropdownStyle = DropdownStyleTheme(
+    overlay: DropdownOverlayTheme(
+      borderRadius: 8.0,
+      elevation: 2.0,
+      backgroundColor: Color(0xFFF5F5F5),
+    ),
   );
 }
 ```
@@ -232,7 +256,7 @@ class AppThemes {
 
 ```dart
 FlutterDropdownButton<String>.text(
-  theme: AppThemes.primaryDropdownTheme,
+  theme: AppThemes.primaryDropdownStyle,
   // ... other properties
 )
 ```
@@ -242,34 +266,42 @@ FlutterDropdownButton<String>.text(
 ### Material 3 Style
 
 ```dart
-DropdownTheme(
-  borderRadius: 4.0,
-  elevation: 3.0,
-  backgroundColor: Theme.of(context).colorScheme.surface,
-  selectedItemColor: Theme.of(context).colorScheme.primaryContainer,
-  itemBorderRadius: 12.0,
-  itemMargin: EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+DropdownStyleTheme(
+  overlay: DropdownOverlayTheme(
+    borderRadius: 4.0,
+    elevation: 3.0,
+    backgroundColor: Theme.of(context).colorScheme.surface,
+  ),
+  item: DropdownItemTheme(
+    selectedColor: Theme.of(context).colorScheme.primaryContainer,
+    borderRadius: 12.0,
+    margin: EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+  ),
 )
 ```
 
 ### Modern Card Style
 
 ```dart
-DropdownTheme(
-  borderRadius: 12.0,
-  elevation: 2.0,
-  backgroundColor: Colors.white,
-  itemMargin: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-  itemBorderRadius: 8.0,
-  itemHoverColor: Color(0xFFF5F5F5),
-  selectedItemColor: Color(0xFFE3F2FD),
+DropdownStyleTheme(
+  overlay: DropdownOverlayTheme(
+    borderRadius: 12.0,
+    elevation: 2.0,
+    backgroundColor: Colors.white,
+  ),
+  item: DropdownItemTheme(
+    margin: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+    borderRadius: 8.0,
+    hoverColor: Color(0xFFF5F5F5),
+    selectedColor: Color(0xFFE3F2FD),
+  ),
 )
 ```
 
 ### iOS Style
 
 ```dart
-DropdownTheme(
+DropdownOverlayTheme(
   borderRadius: 10.0,
   elevation: 0.5,
   border: Border.all(
@@ -283,11 +315,15 @@ DropdownTheme(
 ### Dark Theme
 
 ```dart
-DropdownTheme(
-  backgroundColor: Colors.grey[800],
-  selectedItemColor: Colors.blue[800],
-  shadowColor: Colors.black54,
-  border: Border.all(color: Colors.grey[600]!),
+DropdownStyleTheme(
+  overlay: DropdownOverlayTheme(
+    backgroundColor: Colors.grey[800],
+    shadowColor: Colors.black54,
+    border: Border.all(color: Colors.grey[600]!),
+  ),
+  item: DropdownItemTheme(
+    selectedColor: Colors.blue[800],
+  ),
 )
 ```
 
@@ -301,14 +337,16 @@ Widget buildDropdown(BuildContext context) {
   
   return FlutterDropdownButton<String>.text(
     theme: DropdownStyleTheme(
-      dropdown: DropdownTheme(
+      overlay: DropdownOverlayTheme(
         backgroundColor: isDark ? Colors.grey[800] : Colors.white,
-        selectedItemColor: isDark 
-            ? Colors.blue[800] 
-            : Colors.blue[50],
         border: Border.all(
           color: isDark ? Colors.grey[600]! : Colors.grey[300]!,
         ),
+      ),
+      item: DropdownItemTheme(
+        selectedColor: isDark 
+            ? Colors.blue[800] 
+            : Colors.blue[50],
       ),
     ),
     // ... other properties
@@ -325,10 +363,12 @@ Widget buildResponsiveDropdown(BuildContext context) {
   
   return FlutterDropdownButton<String>.text(
     theme: DropdownStyleTheme(
-      dropdown: DropdownTheme(
+      overlay: DropdownOverlayTheme(
         borderRadius: isTablet ? 12.0 : 8.0,
         elevation: isTablet ? 8.0 : 4.0,
-        itemPadding: EdgeInsets.symmetric(
+      ),
+      item: DropdownItemTheme(
+        padding: EdgeInsets.symmetric(
           horizontal: isTablet ? 20 : 16,
           vertical: isTablet ? 16 : 12,
         ),
@@ -348,9 +388,13 @@ Use the same theme across similar dropdown instances in your app.
 Ensure sufficient contrast between text and background colors.
 
 ```dart
-DropdownTheme(
-  selectedItemColor: Colors.blue[100], // Light enough for dark text
-  backgroundColor: Colors.white,       // High contrast with text
+DropdownStyleTheme(
+  overlay: DropdownOverlayTheme(
+    backgroundColor: Colors.white,       // High contrast with text
+  ),
+  item: DropdownItemTheme(
+    selectedColor: Colors.blue[100],     // Light enough for dark text
+  ),
 )
 ```
 
@@ -359,24 +403,24 @@ Reuse theme instances instead of creating new ones:
 
 ```dart
 // Good
-static const myTheme = DropdownTheme(borderRadius: 12.0);
+static const myTheme = DropdownOverlayTheme(borderRadius: 12.0);
 
 // Avoid
-DropdownTheme(borderRadius: 12.0) // Creates new instance each time
+DropdownOverlayTheme(borderRadius: 12.0) // Creates new instance each time
 ```
 
 ### 4. Platform Adaptation
 Consider platform-specific design guidelines:
 
 ```dart
-DropdownTheme get platformTheme {
+DropdownOverlayTheme get platformTheme {
   if (Platform.isIOS) {
-    return const DropdownTheme(
+    return const DropdownOverlayTheme(
       borderRadius: 10.0,
       elevation: 0.5,
     );
   }
-  return const DropdownTheme(
+  return const DropdownOverlayTheme(
     borderRadius: 4.0,
     elevation: 3.0,
   );

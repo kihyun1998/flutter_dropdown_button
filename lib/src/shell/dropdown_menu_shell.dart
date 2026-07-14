@@ -7,7 +7,9 @@ import '../presentation/item_presentation.dart';
 import '../search/dropdown_search_controller.dart';
 import '../theme/dropdown_scroll_theme.dart';
 import '../theme/dropdown_style_theme.dart';
-import '../theme/dropdown_theme.dart';
+import '../theme/dropdown_button_theme.dart';
+import '../theme/dropdown_item_theme.dart';
+import '../theme/dropdown_overlay_theme.dart';
 import '../theme/resolved_dropdown_style.dart';
 import '../theme/search_field_theme.dart';
 import '../widgets/scroll_gradient_overlay.dart';
@@ -176,16 +178,22 @@ class _DropdownMenuShellState<T> extends State<DropdownMenuShell<T>>
 
   // ===== Theme =====
 
-  DropdownTheme get effectiveTheme =>
-      widget.theme?.dropdown ?? DropdownTheme.defaultTheme;
+  DropdownButtonTheme get effectiveButtonTheme =>
+      widget.theme?.button ?? DropdownButtonTheme.defaultTheme;
+
+  DropdownOverlayTheme get effectiveOverlayTheme =>
+      widget.theme?.overlay ?? DropdownOverlayTheme.defaultTheme;
+
+  DropdownItemTheme get effectiveItemTheme =>
+      widget.theme?.item ?? DropdownItemTheme.defaultTheme;
 
   DropdownAmbientColors get _ambient => DropdownAmbientColors.of(context);
 
   ResolvedButtonStyle get _buttonStyle =>
-      effectiveTheme.resolveButton(_ambient, enabled: widget.enabled);
+      effectiveButtonTheme.resolveButton(_ambient, enabled: widget.enabled);
 
   ResolvedOverlayStyle get _overlayStyle =>
-      effectiveTheme.resolveOverlay(_ambient);
+      effectiveOverlayTheme.resolveOverlay(_ambient);
 
   ResolvedSearchFieldStyle get _searchStyle =>
       effectiveSearchTheme.resolve(_ambient);
@@ -202,7 +210,7 @@ class _DropdownMenuShellState<T> extends State<DropdownMenuShell<T>>
   // ===== Overlay =====
 
   double get actualItemHeight {
-    final itemMargin = effectiveTheme.itemMargin;
+    final itemMargin = effectiveItemTheme.margin;
     return widget.itemHeight + (itemMargin?.vertical ?? 0.0);
   }
 
@@ -217,13 +225,13 @@ class _DropdownMenuShellState<T> extends State<DropdownMenuShell<T>>
       maxDropdownHeight: widget.height,
       chromeHeight: _searchFieldHeight,
       borderThickness: overlayBorderThickness,
-      overlayPadding: effectiveTheme.overlayPadding,
+      overlayPadding: effectiveOverlayTheme.padding,
       minMenuWidth: widget.minMenuWidth,
       maxMenuWidth: widget.maxMenuWidth,
       menuAlignment: widget.menuAlignment,
-      elevation: effectiveTheme.elevation,
-      borderRadius: effectiveTheme.borderRadius,
-      shadowColor: effectiveTheme.shadowColor,
+      elevation: effectiveOverlayTheme.elevation,
+      borderRadius: effectiveOverlayTheme.borderRadius,
+      shadowColor: effectiveOverlayTheme.shadowColor,
     );
   }
 
@@ -470,7 +478,7 @@ class _DropdownMenuShellState<T> extends State<DropdownMenuShell<T>>
     final presentation = widget.presentation;
     final items = _visibleItems();
     final scrollTheme = effectiveScrollTheme;
-    final padding = effectiveTheme.overlayPadding;
+    final padding = effectiveOverlayTheme.padding;
 
     // The same quantity `DropdownPlacement` grew the menu by, asked of the same
     // spec rather than re-added here. When these two disagreed, the item list
@@ -627,11 +635,12 @@ class _DropdownMenuShellState<T> extends State<DropdownMenuShell<T>>
     required Widget child,
     Alignment alignment = Alignment.centerLeft,
   }) {
-    final style = effectiveTheme.resolveItem(
+    final style = effectiveItemTheme.resolveItem(
       _ambient,
       selected: isSelected,
       isFirst: isFirst,
       isLast: isLast,
+      menuBorderRadius: effectiveOverlayTheme.borderRadius,
     );
 
     return Material(

@@ -5,8 +5,8 @@ import 'config/text_dropdown_config.dart';
 import 'overlay/dropdown_overlay_controller.dart';
 import 'presentation/item_presentation.dart';
 import 'shell/dropdown_menu_shell.dart';
+import 'theme/dropdown_button_theme.dart';
 import 'theme/dropdown_style_theme.dart';
-import 'theme/dropdown_theme.dart';
 import 'theme/tooltip_theme.dart';
 
 /// A highly customizable dropdown button widget with overlay-based rendering.
@@ -423,8 +423,8 @@ class FlutterDropdownButton<T> extends StatefulWidget {
 class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>> {
   // ===== Theme =====
 
-  DropdownTheme get effectiveTheme =>
-      widget.theme?.dropdown ?? DropdownTheme.defaultTheme;
+  DropdownButtonTheme get effectiveButtonTheme =>
+      widget.theme?.button ?? DropdownButtonTheme.defaultTheme;
 
   DropdownTooltipTheme get effectiveTooltipTheme =>
       widget.theme?.tooltip ?? DropdownTooltipTheme.defaultTheme;
@@ -459,7 +459,7 @@ class _FlutterDropdownButtonState<T> extends State<FlutterDropdownButton<T>> {
       // Read off the theme, not off `_buttonStyle`. Resolving the whole button
       // to reach one number would build a BoxDecoration and lift the ambient
       // palette, on every access — and this getter is read on every keystroke.
-      leadingHeight: effectiveTheme.resolvedIconSize,
+      leadingHeight: effectiveButtonTheme.resolvedIconSize,
       leading: widget.leading,
       selectedLeading: widget.selectedLeading,
       leadingPadding: widget.leadingPadding,

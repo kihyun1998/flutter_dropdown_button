@@ -173,7 +173,7 @@ void main() {
           items: const ['Apple', 'Banana'],
           hint: 'Pick a fruit',
           theme: const DropdownStyleTheme(
-            dropdown: DropdownTheme(overlayPadding: EdgeInsets.all(12)),
+            overlay: DropdownOverlayTheme(padding: EdgeInsets.all(12)),
           ),
           onChanged: (_) {},
         ),

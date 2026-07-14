@@ -1,90 +1,79 @@
+import 'dropdown_button_theme.dart';
 import 'dropdown_checkbox_theme.dart';
+import 'dropdown_item_theme.dart';
+import 'dropdown_overlay_theme.dart';
 import 'dropdown_scroll_theme.dart';
-import 'dropdown_theme.dart';
 import 'search_field_theme.dart';
 import 'tooltip_theme.dart';
 
-/// Main theme container for all dropdown styling configurations.
+/// Main theme container for all dropdown styling.
 ///
-/// This class serves as the central configuration point for all dropdown
-/// theming options, including general styling, scrollbar appearance,
-/// and any future theme extensions.
+/// Composes one sub-theme per surface. The three that replaced the monolithic
+/// `DropdownTheme` in 4.0.0 — [button], [overlay], [item] — sit beside the ones
+/// that were always separate: [scroll], [tooltip], [search], [checkbox].
 ///
-/// Example:
 /// ```dart
 /// DropdownStyleTheme(
-///   dropdown: DropdownTheme(
-///     borderRadius: 12.0,
-///     elevation: 4.0,
-///     backgroundColor: Colors.white,
-///   ),
-///   scroll: DropdownScrollTheme(
-///     thickness: 8.0,
-///     thumbColor: Colors.grey,
-///     thumbVisibility: true,
-///   ),
-///   tooltip: DropdownTooltipTheme(
-///     backgroundColor: Colors.black87,
-///     textStyle: TextStyle(color: Colors.white),
-///     padding: EdgeInsets.all(8),
-///   ),
+///   button: DropdownButtonTheme(borderRadius: 12, backgroundColor: Colors.white),
+///   overlay: DropdownOverlayTheme(elevation: 4),
+///   item: DropdownItemTheme(selectedColor: Colors.teal),
 /// )
 /// ```
 class DropdownStyleTheme {
-  /// Creates a dropdown style theme configuration.
+  /// Creates a dropdown style theme.
   const DropdownStyleTheme({
-    this.dropdown = const DropdownTheme(),
+    this.button = const DropdownButtonTheme(),
+    this.overlay = const DropdownOverlayTheme(),
+    this.item = const DropdownItemTheme(),
     this.scroll = const DropdownScrollTheme(),
     this.tooltip = const DropdownTooltipTheme(),
     this.search = const SearchFieldTheme(),
     this.checkbox = const DropdownCheckboxTheme(),
   });
 
-  /// General dropdown styling configuration.
+  /// The button face — the box the value and the arrow sit in.
   ///
-  /// Controls the appearance and behavior of dropdown components
-  /// including colors, borders, padding, animations, and decorations.
-  final DropdownTheme dropdown;
+  /// Ignored in bare mode (`anchorBuilder`): the caller draws the anchor, so
+  /// the button box this styles does not exist.
+  final DropdownButtonTheme button;
 
-  /// Scrollbar styling configuration.
-  ///
-  /// Controls the appearance and behavior of scrollbars within
-  /// dropdown overlays when content exceeds the visible area.
+  /// The menu container — the box the item list floats in.
+  final DropdownOverlayTheme overlay;
+
+  /// The rows of the menu.
+  final DropdownItemTheme item;
+
+  /// The scrollbar shown when the item list overflows.
   final DropdownScrollTheme scroll;
 
-  /// Tooltip styling configuration.
-  ///
-  /// Controls the visual appearance of tooltips that display when
-  /// dropdown item text overflows. This includes colors, borders,
-  /// padding, shadows, and text styling.
+  /// The tooltip shown when an item's text overflows.
   final DropdownTooltipTheme tooltip;
 
-  /// Search field styling configuration.
-  ///
-  /// Controls the appearance and behavior of the search text field
-  /// displayed at the top of the dropdown overlay when searchable
-  /// is enabled.
+  /// The search field shown at the top of a searchable menu.
   final SearchFieldTheme search;
 
-  /// Checklist checkbox styling configuration.
+  /// The checkbox on each row of a [FlutterMultiSelectDropdown].
   ///
-  /// Controls the appearance of the checkbox on each row of a
-  /// [FlutterMultiSelectDropdown]. Ignored by the single-select
-  /// [FlutterDropdownButton], which draws no checkbox. Naming a field recolours
-  /// just this dropdown's boxes, where an app-wide [CheckboxThemeData] cannot —
-  /// the menu is drawn in the root [Overlay], out of a local [Theme]'s reach.
+  /// Ignored by the single-select [FlutterDropdownButton], which draws no
+  /// checkbox. The menu is drawn in the root [Overlay], out of a local [Theme]'s
+  /// reach, so naming a field here recolours just this dropdown's boxes where an
+  /// app-wide theme cannot.
   final DropdownCheckboxTheme checkbox;
 
   /// Creates a copy of this theme with the given fields replaced.
   DropdownStyleTheme copyWith({
-    DropdownTheme? dropdown,
+    DropdownButtonTheme? button,
+    DropdownOverlayTheme? overlay,
+    DropdownItemTheme? item,
     DropdownScrollTheme? scroll,
     DropdownTooltipTheme? tooltip,
     SearchFieldTheme? search,
     DropdownCheckboxTheme? checkbox,
   }) {
     return DropdownStyleTheme(
-      dropdown: dropdown ?? this.dropdown,
+      button: button ?? this.button,
+      overlay: overlay ?? this.overlay,
+      item: item ?? this.item,
       scroll: scroll ?? this.scroll,
       tooltip: tooltip ?? this.tooltip,
       search: search ?? this.search,
@@ -93,7 +82,5 @@ class DropdownStyleTheme {
   }
 
   /// Default theme that works well with Material Design.
-  ///
-  /// Uses default configurations for both dropdown and scroll themes.
   static const DropdownStyleTheme defaultTheme = DropdownStyleTheme();
 }

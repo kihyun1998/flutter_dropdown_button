@@ -189,10 +189,13 @@ class _DropdownBugTestPageState extends State<DropdownBugTestPage> {
                     hint: 'Select an option',
                     width: 200,
                     theme: const DropdownStyleTheme(
-                      dropdown: DropdownTheme(
+                      button: DropdownButtonTheme(borderRadius: 12.0),
+                      overlay: DropdownOverlayTheme(
                         borderRadius: 12.0,
                         elevation: 8.0,
-                        itemPadding: EdgeInsets.symmetric(
+                      ),
+                      item: DropdownItemTheme(
+                        padding: EdgeInsets.symmetric(
                           horizontal: 16,
                           vertical: 12,
                         ),

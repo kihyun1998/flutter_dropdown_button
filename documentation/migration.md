@@ -2,7 +2,49 @@
 
 ## Upgrading to 4.0.0
 
-Breaking in two places: the multi-select checkbox theme, and one field that 3.1.0 deprecated. The **SDK floor is unchanged** (`>=3.32.0`). If you use neither, nothing changes.
+Breaking in three places: the `DropdownTheme` split, the multi-select checkbox theme, and one field that 3.1.0 deprecated. The **SDK floor is unchanged** (`>=3.32.0`). If you use none of them, nothing changes.
+
+### `DropdownTheme` is split into `button` / `overlay` / `item`
+
+The single `DropdownTheme` is gone. `DropdownStyleTheme`'s `dropdown` slot is replaced by three sibling slots — one per surface — beside `scroll` / `tooltip` / `search` / `checkbox`. Fields keep their meaning; they lose the surface prefix and move onto the matching sub-theme.
+
+```dart
+// Before (3.x)
+DropdownStyleTheme(
+  dropdown: DropdownTheme(
+    borderRadius: 12,
+    backgroundColor: Colors.white,      // this was the *menu* fill
+    buttonHoverColor: Colors.black12,
+    selectedItemColor: Colors.teal,
+    itemPadding: EdgeInsets.all(12),
+  ),
+)
+
+// After (4.0.0)
+DropdownStyleTheme(
+  button: DropdownButtonTheme(borderRadius: 12, hoverColor: Colors.black12),
+  overlay: DropdownOverlayTheme(borderRadius: 12, backgroundColor: Colors.white),
+  item: DropdownItemTheme(selectedColor: Colors.teal, padding: EdgeInsets.all(12)),
+)
+```
+
+Field map:
+
+| Old `DropdownTheme` field | New home |
+|---|---|
+| `borderRadius` | `button.borderRadius` and/or `overlay.borderRadius` (was one knob for both) |
+| `backgroundColor` | `overlay.backgroundColor` (it was the menu fill; `button.backgroundColor` is new) |
+| `border` | `button.border` and/or `overlay.border` |
+| `buttonDecoration` / `buttonPadding` / `buttonHoverColor` / `buttonSplashColor` / `buttonHighlightColor` / `buttonHeight` | `button.decoration` / `.padding` / `.hoverColor` / `.splashColor` / `.highlightColor` / `.height` |
+| `icon*`, `disabledBackgroundColor`, `disabledBorder` | `button.*` (same names) |
+| `disabledButtonDecoration` | `button.disabledDecoration` |
+| `elevation`, `shadowColor` | `overlay.elevation`, `overlay.shadowColor` |
+| `overlayDecoration` / `overlayPadding` | `overlay.decoration` / `overlay.padding` |
+| `selectedItemColor` | `item.selectedColor` |
+| `itemHoverColor` / `itemSplashColor` / `itemHighlightColor` | `item.hoverColor` / `.splashColor` / `.highlightColor` |
+| `itemPadding` / `itemMargin` / `itemBorderRadius` / `itemBorder` / `excludeLastItemBorder` | `item.padding` / `.margin` / `.borderRadius` / `.border` / `.excludeLastItemBorder` |
+
+`DropdownButtonTheme` is ignored in bare mode (`anchorBuilder`) — the caller draws the anchor. `DropdownTheme.defaultIconSize` is now `DropdownButtonTheme.defaultIconSize`.
 
 ### `DropdownCheckboxTheme` is redesigned around `flutter_checkbox`
 

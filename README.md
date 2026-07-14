@@ -300,11 +300,13 @@ Alignment of the dropdown menu relative to the button when the menu is wider.
 
 ## Theme System
 
-Theme is applied via the `theme` parameter using `DropdownStyleTheme`, which groups five theme objects:
+Theme is applied via the `theme` parameter using `DropdownStyleTheme`, which groups seven theme objects:
 
 ```dart
 DropdownStyleTheme(
-  dropdown: DropdownTheme(...),          // General dropdown styling
+  button: DropdownButtonTheme(...),      // Button face styling
+  overlay: DropdownOverlayTheme(...),    // Menu container styling
+  item: DropdownItemTheme(...),          // Item row styling
   scroll: DropdownScrollTheme(...),      // Scrollbar styling
   tooltip: DropdownTooltipTheme(...),    // Tooltip styling
   search: SearchFieldTheme(...),         // Search field styling
@@ -312,48 +314,25 @@ DropdownStyleTheme(
 )
 ```
 
-### DropdownTheme
+### DropdownButtonTheme
 
-Controls general styling for button, overlay, and items.
+Styles the button face — its box, ink colours, content height, and the arrow icon. In **bare** mode (`anchorBuilder`) the button box is dropped, so this theme is inert.
 
-The theme fills in its own gaps. `resolveButton()`, `resolveOverlay()` and `resolveItem()` return styles whose slots are all filled, taking a plain `DropdownAmbientColors` palette rather than a `BuildContext` — so the rule for "what colour is the arrow when disabled?" lives in one place and can be tested without a widget. You rarely call these directly; the widget does.
+`resolveButton()` returns a style whose slots are all filled, taking a plain `DropdownAmbientColors` palette rather than a `BuildContext` — so the rule for "what colour is the arrow when disabled?" lives in one place and can be tested without a widget. You rarely call it directly; the widget does.
 
 #### Button Styling
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
-| `buttonDecoration` | `BoxDecoration?` | `null` | Custom button decoration (overrides all below) |
-| `buttonPadding` | `EdgeInsets` | `horizontal: 16, vertical: 12` | Internal padding of button |
-| `buttonHeight` | `double?` | `null` | Height of button content area (falls back to `iconSize` or `24.0`) |
-| `buttonHoverColor` | `Color?` | `null` | Button hover background color |
-| `buttonSplashColor` | `Color?` | `null` | Button tap ripple color |
-| `buttonHighlightColor` | `Color?` | `null` | Button focus highlight color |
-
-#### Overlay Styling
-
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `overlayDecoration` | `BoxDecoration?` | `null` | Custom overlay decoration (overrides `backgroundColor`, `border`, `borderRadius`) |
-| `overlayPadding` | `EdgeInsets?` | `null` | Padding inside the overlay container |
-| `borderRadius` | `double` | `8.0` | Border radius for button and overlay |
-| `elevation` | `double` | `8.0` | Shadow depth of overlay |
-| `backgroundColor` | `Color?` | `null` | Overlay background color (falls back to `Theme.cardColor`) |
-| `border` | `Border?` | `null` | Border for button and overlay (falls back to `Theme.dividerColor`) |
-| `shadowColor` | `Color?` | `null` | Overlay shadow color |
-
-#### Item Styling
-
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `itemPadding` | `EdgeInsets` | `horizontal: 16, vertical: 12` | Internal padding of each item |
-| `itemMargin` | `EdgeInsets?` | `null` | External margin around each item |
-| `itemBorderRadius` | `double?` | `null` | Border radius for individual items |
-| `itemBorder` | `Border?` | `null` | Border for each item (e.g., bottom divider) |
-| `excludeLastItemBorder` | `bool` | `true` | Skip `itemBorder` on the last item |
-| `selectedItemColor` | `Color?` | `null` | Background color for selected item (falls back to `primaryColor` 10%) |
-| `itemHoverColor` | `Color?` | `null` | Item hover background color |
-| `itemSplashColor` | `Color?` | `null` | Item tap ripple color |
-| `itemHighlightColor` | `Color?` | `null` | Item focus highlight color |
+| `decoration` | `BoxDecoration?` | `null` | Custom button decoration (overrides all below) |
+| `backgroundColor` | `Color?` | `null` | Button fill color |
+| `padding` | `EdgeInsets` | `horizontal: 16, vertical: 12` | Internal padding of button |
+| `height` | `double?` | `null` | Height of button content area (falls back to `iconSize` or `24.0`) |
+| `hoverColor` | `Color?` | `null` | Button hover background color |
+| `splashColor` | `Color?` | `null` | Button tap ripple color |
+| `highlightColor` | `Color?` | `null` | Button focus highlight color |
+| `borderRadius` | `double` | `8.0` | Border radius of the button |
+| `border` | `Border?` | `null` | Border of the button (falls back to `Theme.dividerColor`) |
 
 #### Icon Styling
 
@@ -367,13 +346,47 @@ The theme fills in its own gaps. `resolveButton()`, `resolveOverlay()` and `reso
 
 #### Disabled State
 
-Applied when `enabled: false` (or when the single-item auto-disable kicks in). If none of these are set, the disabled button falls back to the regular `buttonDecoration` / `border`.
+Applied when `enabled: false` (or when the single-item auto-disable kicks in). If none of these are set, the disabled button falls back to the regular `decoration` / `border`.
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
-| `disabledButtonDecoration` | `BoxDecoration?` | `null` | Full custom decoration for the disabled button (takes precedence over the two below) |
+| `disabledDecoration` | `BoxDecoration?` | `null` | Full custom decoration for the disabled button (takes precedence over the two below) |
 | `disabledBackgroundColor` | `Color?` | `null` | Background color of the button when disabled |
 | `disabledBorder` | `Border?` | `null` | Border of the button when disabled (falls back to `border`) |
+
+### DropdownOverlayTheme
+
+Styles the menu container — its background, border, corner radius, and shadow.
+
+`resolveOverlay()` returns a fully-filled style from a plain `DropdownAmbientColors` palette, plus the border thickness the placement module reserves.
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `decoration` | `BoxDecoration?` | `null` | Custom overlay decoration (overrides `backgroundColor`, `border`, `borderRadius`) |
+| `padding` | `EdgeInsets?` | `null` | Padding inside the overlay container |
+| `borderRadius` | `double` | `8.0` | Border radius of the overlay |
+| `elevation` | `double` | `8.0` | Shadow depth of overlay |
+| `backgroundColor` | `Color?` | `null` | Overlay background color (falls back to `Theme.cardColor`) |
+| `border` | `Border?` | `null` | Border of the overlay (falls back to `Theme.dividerColor`) |
+| `shadowColor` | `Color?` | `null` | Overlay shadow color |
+
+### DropdownItemTheme
+
+Styles the rows inside the menu.
+
+`resolveItem()` returns a fully-filled style from a plain `DropdownAmbientColors` palette. The end rows round to meet the menu's corners unless `borderRadius` overrides.
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `padding` | `EdgeInsets` | `horizontal: 16, vertical: 12` | Internal padding of each item |
+| `margin` | `EdgeInsets?` | `null` | External margin around each item |
+| `borderRadius` | `double?` | `null` | Border radius for individual items |
+| `border` | `Border?` | `null` | Border for each item (e.g., bottom divider) |
+| `excludeLastItemBorder` | `bool` | `true` | Skip `border` on the last item |
+| `selectedColor` | `Color?` | `null` | Background color for selected item (falls back to `primaryColor` 10%) |
+| `hoverColor` | `Color?` | `null` | Item hover background color |
+| `splashColor` | `Color?` | `null` | Item tap ripple color |
+| `highlightColor` | `Color?` | `null` | Item focus highlight color |
 
 ### DropdownScrollTheme
 
@@ -580,13 +593,15 @@ FlutterDropdownButton<String>.text(
   value: selected,
   width: 200,
   theme: DropdownStyleTheme(
-    dropdown: DropdownTheme(
+    overlay: DropdownOverlayTheme(
       borderRadius: 12.0,
       elevation: 4.0,
       backgroundColor: Colors.white,
-      selectedItemColor: Colors.blue.withOpacity(0.1),
-      itemHoverColor: Colors.grey.withOpacity(0.1),
-      itemBorder: Border(bottom: BorderSide(color: Colors.grey.shade300)),
+    ),
+    item: DropdownItemTheme(
+      selectedColor: Colors.blue.withOpacity(0.1),
+      hoverColor: Colors.grey.withOpacity(0.1),
+      border: Border(bottom: BorderSide(color: Colors.grey.shade300)),
       excludeLastItemBorder: true,
     ),
     scroll: DropdownScrollTheme(
@@ -747,9 +762,9 @@ FlutterDropdownButton<String>.text(
 | Removed | Replacement |
 |---------|-------------|
 | `DropdownItem<T>` | `itemBuilder` callback |
-| `showSeparator` / `separator` | `DropdownTheme.itemBorder` |
-| `BasicDropdownButton.borderRadius` | `DropdownTheme.borderRadius` |
-| `BasicDropdownButton.decoration` | `DropdownTheme.overlayDecoration` |
+| `showSeparator` / `separator` | `DropdownItemTheme.border` |
+| `BasicDropdownButton.borderRadius` | `DropdownOverlayTheme.borderRadius` |
+| `BasicDropdownButton.decoration` | `DropdownOverlayTheme.decoration` |
 | `DropdownItem.onTap` | Handle in `onChanged` callback |
 
 ---
