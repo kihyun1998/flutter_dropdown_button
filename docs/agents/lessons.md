@@ -19,6 +19,19 @@
   코드는 **`tail` 것**이라 항상 0(`false | tail -1; echo $?` → `0`). 이 세션의
   `flutter test … | tail -1 && …` 게이트는 전부 가짜였고 실제로 포맷 안 된 코드가
   커밋됐다. 게이트는 bare 로 돌린다.
+- **#90 (`git add -A` 는 내가 안 쓴 것도 담는다).** 워킹트리에 `pubspec.yaml` 의
+  `dependency_overrides: flutter_checkbox: path: /Volumes/…` 가 있었다 — 주석에
+  "TEMPORARY … removed immediately after the run" 이라고 적힌, 내가 만들지 않은 블록.
+  `git add -A` 로 담아 푸시했고, **`test:` 라고 적힌 커밋이 패키지 매니페스트를 바꿨다.**
+  그 경로는 러너에 없으므로 `pub get` 에서 **세 잡이 20 초 만에** 죽었다. `publish
+  --dry-run` 도 같이 빨갰다 — 즉 그대로 머지됐다면 경로 override 가 아카이브 후보까지
+  갔다. 스테이징은 `git add <경로>` 로 하거나, `-A` 를 쓸 거면 **`git diff --cached
+  --stat` 을 읽고 나서** 커밋한다. 판별 신호는 커밋 stat 의 파일 수가 내가 만진 수와
+  다른 것.
+- **판별력 검증은 `git stash push -- lib/` 가 늘 되는 게 아니다.** 이미 커밋한 뒤에는
+  stash 할 게 없어 조용히 빈 stash 가 되고, `pop` 이 "No stash entries found" 로 실패해도
+  **테스트는 초록으로 돈다** — 아무것도 안 되돌린 채. 커밋 후에는 해당 줄을 직접 지우고
+  돌린 뒤 `git checkout <파일>` 로 복구한다(#90 에서 2/3 red 확인).
 
 ## Step 1 — 이슈 먼저 (근거·기각 대안·부정 결과)
 
@@ -125,6 +138,19 @@
   API 를 쓰는 상태가 **영원히 초록**. 이 잡이 첫 실행에서 둘을 잡았다 — `Tooltip.constraints`
   가 3.27/3.29 에 없음, 그리고 analyzer 규칙이 버전마다 다름(3.32 는 dartdoc 링크를
   deprecated 사용으로 셈).
+- **#90 (버전 차이는 추측으로 좁히지 말고 CI 에게 물어본다).** 새 테스트가 `stable` 에서
+  초록, `3.32.0` 에서만 빨갰는데 로그에는 `Expected: false / Actual: <true>` 뿐이었다.
+  "감싸는 스크롤 노드의 액션이겠지" 로 단언을 좁히면 초록은 되지만 그건 **초록 만들려고
+  단언을 낮추는 것**이다. 대신 실패 메시지가 액션 목록을 실어오게 고쳐 한 번 더 돌렸다.
+  답은 스크롤이 아니었다 — `[tap, moveCursorBackwardByCharacter, setSelection,
+  moveCursorBackwardByWord, setText, focus]`, 즉 `EditableText` 의 액션이고 노드 크기가
+  `200x146`. **바닥 버전에서는 빈 상태 메시지가 검색 필드로 병합된다**(3.44 에서는
+  `166x40` 에 액션 0). 추측했다면 진짜 결함 하나를 단언과 함께 지웠을 것이다. CI 왕복
+  2 분이 그 값이다.
+- **한 테스트에 무관한 두 주장을 지우지 않는다.** 위 단언은 "배리어가 아님" 과 "메시지가
+  버튼이 아님" 을 겸하고 있었다. 배리어를 구별하는 것은 **크기**(화면 전체)뿐이므로 그것만
+  단언하고, 병합 쪽은 숫자와 함께 주석·이슈 코멘트로 뺐다. 겸하면 매트릭스 한쪽에서
+  엉뚱한 이유로 빨개진다.
 - **커버리지 바닥은 100, 여유 없이.** `test/selection_test.dart` 를 통째로 지우면
   **99.57%** — 바닥이 99 였다면 통과. 실제 회귀는 임계값 바로 밑에 앉는다.
   `// coverage:ignore` 는 미커버가 아니라 **분모에서 빠진다**(프로브로 `LF` 1 감소 확인).
