@@ -220,11 +220,14 @@ require the disposition grade (`CONFIRMED` / `UNADJUDICATED` / `INERT` /
 
 - **Destination:** `docs/adr/NNNN-slug.md`, created lazily (`docs/agents/domain.md`).
   A promotion is what creates the directory; the first one writes `0001`.
-- **Inventory: zero records exist — accepted or proposed.** So the filing step's
-  "does this area already carry a record?" check currently answers **no for every
-  area**, and a sibling pair with nowhere to go opens a spine rather than a
-  conformance item. Keep this line current: an area that gains a record must be
-  listed here with its number, or the next filing re-derives it.
+- **Inventory — one record, accepted:**
+  **[0001 — accessibility semantics are attached by hand, and the word for a
+  state is the presentation's](../adr/0001-accessibility-semantics-are-attached-by-hand.md)**
+  (promoted out of #88). Anything that emits `Semantics` files as a
+  **conformance item under 0001**, never as a fresh decision and never as a new
+  spine. Every other area still answers **no**, so a sibling pair there opens a
+  spine. Keep this line current: an area that gains a record must be listed here
+  with its number, or the next filing re-derives it.
 - **The standing promotion candidate**, if a pass ever hands over two triggers:
   **deprecate-vs-remove across a major**. It has already been decided pairwise and
   *inconsistently* — asked for `alwaysVisible` (#45), not asked for `trackWidth`
@@ -267,8 +270,11 @@ flutter pub publish --dry-run                        # metadata only; does not c
 - Run each gate **bare, never piped** (`test … | tail -1 && commit` always
   commits — the exit status is `tail`'s).
 - Branch → PR (`Closes #issue`) → **CI green** → merge. Never commit to `main`.
-- **Release:** own commit `chore: release X.Y.Z` bumping `pubspec.yaml`, adding
-  the `CHANGELOG.md` section, updating `README.md`'s quick-start version.
+- **Release rides in the change's own commit, not a separate `chore:` one** —
+  checked against the history rather than assumed: `f2bb82b` (#87) bumped
+  `pubspec.yaml` and added the `CHANGELOG.md` section in the same commit as the
+  feature. So the PR that fixes a thing also picks its version and writes its
+  entry, and updates `README.md`'s quick-start constraint.
   `pub publish --dry-run` zero warnings. `flutter pub publish` is irreversible
   (retract only) — **the agent does not run it; the user does.**
 
@@ -282,8 +288,17 @@ dependency_overrides:
 then `flutter pub get && flutter test` in the consumer. Remove the override
 afterwards — a committed path override breaks that consumer's own CI.
 
-**Downstream loop.** Derive, don't guess:
-`for d in ../*/; do grep -l 'flutter_dropdown_button:' "$d/pubspec.yaml"; done`.
+**Downstream loop.** Derive, don't guess — and **do not stop at the sibling's own
+manifest.** A repo can consume this package from a nested one, and the real
+consumer does: `mobile_init_project` declares it in `template/pubspec.yaml`.
+Grepping only `../*/pubspec.yaml` returns exactly one hit, `just_make_logo`,
+pinned `^1.6.1` — a consumer that can never receive a 4.x fix — so the one-liner
+that looks like it works is the one that misses everybody who matters:
+
+```
+grep -rl 'flutter_dropdown_button:' ../*/pubspec.yaml ../*/*/pubspec.yaml 2>/dev/null
+```
+
 The list is not stored here — derive it on the spot. A decision here is one the
 consumers eventually pay. After a release, in each: raise the constraint, remove
 workarounds the fix made unnecessary, flip tests that pinned the old bug. A purely
