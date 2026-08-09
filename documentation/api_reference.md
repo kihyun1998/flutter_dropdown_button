@@ -57,7 +57,9 @@ Widget Function(BuildContext context, bool isOpen)? anchorBuilder
 
 Supplying `anchorBuilder` puts the dropdown in **bare** mode: the button box is dropped — its background, border, fixed width, padding, ink and trailing icon — and the overlay hangs off the widget you return instead. The point is to embed the dropdown inside another field, `[All ▾] │ search…`, where a button's own chrome would nest a box inside a box.
 
-Only the button *face* becomes yours. The anchored menu — its theming, keyboard navigation, `searchable`, `itemBuilder`, the checklist — is unchanged. `FlutterMultiSelectDropdown` takes the same parameter.
+Only the button *face* becomes yours. The anchored menu — its theming, `searchable`, `itemBuilder`, the checklist — is unchanged, and so is what the anchor *is*: a focusable button that announces its role, its enabled state and whether the menu is open, and that Enter or Space activates. `FlutterMultiSelectDropdown` takes the same parameter.
+
+That is the whole of the keyboard story today. The **anchor** is a tab stop and can be activated from the keyboard; the **open menu** is not navigated by arrow keys, and Escape does not close it.
 
 - **The builder is handed `isOpen`, not a label.** `isOpen` is the one thing you cannot read for yourself; a label you can, from the `value` (or `selected`) you already hold. Passing a label would leak a text-mode notion into a shell that does not know what an item says. Turn an inline chevron with `AnimatedRotation(turns: isOpen ? 0.5 : 0.0, …)`.
 - **`isOpen` flips true the moment the menu opens and false once it has finished closing** — the close animation runs while it is still true, so a chevron animated off it settles back after the menu is gone.

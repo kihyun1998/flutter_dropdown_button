@@ -380,6 +380,17 @@ class _DropdownMenuShellState<T> extends State<DropdownMenuShell<T>>
     Widget button = Semantics(
       button: true,
       enabled: widget.enabled,
+      // The state the whole control exists to toggle. `isOpen` is already
+      // handed to `anchorBuilder` as "the one thing a caller cannot read for
+      // itself" — a screen-reader user is exactly that caller, and the tree is
+      // where they would read it.
+      //
+      // It tracks the overlay entry's existence, so it stays true for the whole
+      // close animation (measured). That is deliberate: the menu is still on
+      // screen during the reverse, and the chevron a caller draws from this
+      // same flag is still turned — the tree and the screen say the same thing.
+      // The clearance holds as long as both keep reading `isOpen`.
+      expanded: _menu.isOpen,
       child: Container(
         key: _menu.buttonKey,
         width: widget.width,
@@ -410,16 +421,33 @@ class _DropdownMenuShellState<T> extends State<DropdownMenuShell<T>>
   /// The anchor when the caller draws it themselves.
   ///
   /// No chrome: no `decoration`, no `width`, no `padding`, no ink, no trailing
-  /// icon — the button-box params the widgets assert away in this mode. The
-  /// only things the shell must still own wrap the caller's widget: the
+  /// icon — the button-box params the widgets assert away in this mode. What
+  /// the shell keeps is not decoration but *what the anchor is*: the
   /// [DropdownOverlayController.buttonKey] the overlay measures to place the
-  /// menu, and the tap that toggles it. `Semantics(button: …)` is the same role
-  /// and enabled state the chrome path announces — the caller draws the anchor,
-  /// not what it *is*, and dropping the chrome does not make it stop being the
-  /// control that opens the menu. (It is not the `InkWell`'s doing in either
-  /// path: an `InkWell` declares only `onTap`/`onLongPress`,
-  /// `material/ink_well.dart:1401`.) The key rides on the `Semantics` because it
-  /// is a render box that takes its child's size, which is what
+  /// menu, the tap that toggles it, and the contract the chromed path
+  /// announces. A caller who draws their own anchor is not asking for a
+  /// different control.
+  ///
+  /// That contract is three things, and each arrives from a different place:
+  ///
+  /// * **role, enabled and expanded** from the `Semantics` below. None of them
+  ///   is the `InkWell`'s doing in the chromed path either — an `InkWell`
+  ///   declares only `onTap`/`onLongPress` (`material/ink_well.dart:1401`).
+  /// * **focusability** from [FocusableActionDetector], which is what the
+  ///   chromed path gets free from the `Focus` inside its `InkWell` and this
+  ///   path had no source for. Without it the node is not a tab stop and a
+  ///   keyboard-only user cannot reach the control at all.
+  /// * **keyboard activation** from the same detector's actions. `InkWell`
+  ///   binds `ActivateIntent` and `ButtonActivateIntent` (`ink_well.dart:853`);
+  ///   binding both here is what makes Enter and Space open the menu, rather
+  ///   than focus landing on something that then refuses to do anything.
+  ///
+  /// `enabled: widget.enabled` on the detector is what keeps a disabled anchor
+  /// out of the traversal, so the tab stop appears and disappears with the
+  /// control rather than lingering as an unusable one.
+  ///
+  /// The key rides on the `Semantics` because it is a render box that takes its
+  /// child's size, which is what
   /// [DropdownOverlayController.measurePlacement] reads.
   Widget _buildBareAnchor(
     BuildContext context,
@@ -429,10 +457,31 @@ class _DropdownMenuShellState<T> extends State<DropdownMenuShell<T>>
       key: _menu.buttonKey,
       button: true,
       enabled: widget.enabled,
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: widget.enabled ? _toggleDropdown : null,
-        child: anchorBuilder(context, _menu.isOpen),
+      expanded: _menu.isOpen,
+      child: FocusableActionDetector(
+        enabled: widget.enabled,
+        mouseCursor: widget.enabled
+            ? SystemMouseCursors.click
+            : SystemMouseCursors.forbidden,
+        actions: <Type, Action<Intent>>{
+          ActivateIntent: CallbackAction<ActivateIntent>(
+            onInvoke: (_) {
+              _toggleDropdown();
+              return null;
+            },
+          ),
+          ButtonActivateIntent: CallbackAction<ButtonActivateIntent>(
+            onInvoke: (_) {
+              _toggleDropdown();
+              return null;
+            },
+          ),
+        },
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: widget.enabled ? _toggleDropdown : null,
+          child: anchorBuilder(context, _menu.isOpen),
+        ),
       ),
     );
   }

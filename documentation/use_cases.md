@@ -522,9 +522,11 @@ Row(
 ```
 
 The outer field owns the border and background; the selector contributes only
-its label and chevron. Everything the menu does — theming, keyboard navigation,
-`searchable`, `itemBuilder` — is untouched. `FlutterMultiSelectDropdown` takes
-the same `anchorBuilder` for a multi-scope selector.
+its label and chevron. Everything the menu does — theming, `searchable`,
+`itemBuilder` — is untouched, and the anchor stays a focusable button that Enter
+or Space opens. (Arrow keys and Escape do not drive the open menu, in this mode
+or any other.) `FlutterMultiSelectDropdown` takes the same `anchorBuilder` for a
+multi-scope selector.
 
 The chevron turns off `isOpen`, the one thing the builder cannot read for
 itself. Build the label from the `value` you already hold; the builder is not
