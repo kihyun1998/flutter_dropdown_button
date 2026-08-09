@@ -15,6 +15,7 @@ A highly customizable dropdown package for Flutter with overlay-based rendering,
 - **Smart Positioning**: Automatically opens up/down based on available space
 - **Smooth Animations**: Scale and fade effects with configurable timing
 - **Outside-tap Dismissal**: Automatic closure when tapping outside
+- **Reaches a Screen Reader**: The trigger announces its role, whether it is enabled and whether the menu is open; a chosen row says so (`selected`, or `checked` on the checklist). Keyboard-activatable in both chromed and bare mode
 - **Flexible Width**: Fixed, min/max constraints, content-based, or flex expansion
 - **Bare Anchor**: Drop the button chrome with `anchorBuilder` and embed the menu inside another field, `[All ▾] │ search…`
 - **Independent Menu Width**: Set menu width separately from button with alignment control
@@ -208,7 +209,7 @@ The unified dropdown widget. Use the default constructor for custom widget rende
 | `height` | `double` | `200.0` | Maximum height of dropdown overlay |
 | `itemHeight` | `double` | `48.0` | Height of each dropdown item |
 | `animationDuration` | `Duration` | `200ms` | Duration of show/hide animation |
-| `enabled` | `bool` | `true` | Whether the dropdown is interactive |
+| `enabled` | `bool` | `true` | Whether the dropdown is interactive. Setting it false while the menu is open **closes** it, and the rows stop accepting taps at once |
 | `expand` | `bool` | `false` | Expand to fill available space in flex container |
 | `trailing` | `Widget?` | `null` | Custom widget replacing default arrow icon |
 | `scrollToSelectedItem` | `bool` | `true` | Auto-scroll to selected item on open |
@@ -229,8 +230,10 @@ The unified dropdown widget. Use the default constructor for custom widget rende
 Supply `anchorBuilder` to embed the dropdown inside another field — a field-scope
 selector at the head of a search box, `[All ▾] │ search…` — where the button's
 own background, border and fixed width would nest a box inside a box. It drops
-that whole button box and hangs the same anchored menu (theming, keyboard
-navigation, `searchable`, `itemBuilder`) off the widget you return.
+that whole button box and hangs the same anchored menu (theming, `searchable`,
+`itemBuilder`) off the widget you return — and the anchor stays what it was: a
+focusable button that announces its role, whether it is enabled, and whether the
+menu is open, and that Enter or Space activates.
 
 The builder is handed `isOpen`, the one thing it cannot read for itself, so an
 inline chevron can turn — `AnimatedRotation(turns: isOpen ? 0.5 : 0.0, …)`. It is
@@ -468,7 +471,7 @@ Controls the appearance and behavior of the search text field when `searchable` 
 | `decoration` | `InputDecoration?` | `null` | Full InputDecoration override (ignores individual properties when set) |
 | `textStyle` | `TextStyle?` | `null` | Text style for search input |
 | `backgroundColor` | `Color?` | `null` | Background color of the search field |
-| `border` | `BoxBorder?` | `null` | Border when not focused |
+| `border` | `BoxBorder?` | `null` | Border when not focused. Also the edge a **disabled** field keeps — a dropdown disabled while its menu is open disables the field for the length of the close, and an unfilled disabled slot would hand your colour back to Flutter's default |
 | `focusedBorder` | `BoxBorder?` | `null` | Border when focused |
 | `divider` | `Widget?` | `null` | Widget between search field and item list |
 
