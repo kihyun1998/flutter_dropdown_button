@@ -274,6 +274,16 @@ class SearchFieldTheme {
         borderRadius: radius,
         borderSide: BorderSide(color: edge(border, ambient.divider)),
       ),
+      // The same edge, not a greyed one. An unfilled `disabledBorder` is not
+      // "no styling": Flutter falls through to its own outline default, so a
+      // caller who set `border` would watch their colour be replaced the moment
+      // the field went disabled. A resolved style is complete, or it is null.
+      // The slot only became reachable when a disabled dropdown started
+      // disabling its field (#89).
+      disabledBorder: OutlineInputBorder(
+        borderRadius: radius,
+        borderSide: BorderSide(color: edge(border, ambient.divider)),
+      ),
       focusedBorder: OutlineInputBorder(
         borderRadius: radius,
         borderSide: BorderSide(color: edge(focusedBorder, ambient.primary)),

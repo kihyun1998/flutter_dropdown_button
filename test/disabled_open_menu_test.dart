@@ -23,7 +23,13 @@ const roles = [owner, member];
 
 /// Single-select whose `enabled` the test can flip while the menu is open.
 class SingleHost extends StatefulWidget {
-  const SingleHost({super.key});
+  const SingleHost({
+    super.key,
+    this.duration = const Duration(milliseconds: 200),
+  });
+
+  /// Lets a test pick an instant close, which reports no reverse at all.
+  final Duration duration;
 
   @override
   State<SingleHost> createState() => SingleHostState();
@@ -44,6 +50,7 @@ class SingleHostState extends State<SingleHost> {
             width: 200,
             items: roles,
             enabled: enabled,
+            animationDuration: widget.duration,
             itemBuilder: (role, isSelected) => Text(role.name),
             hintWidget: const Text('Pick'),
             onChanged: (role) => setState(() {
@@ -302,8 +309,11 @@ void main() {
       tester,
     ) async {
       // Nothing to do with `enabled`: the user dismissed the menu themselves.
-      // Measured before this was gated — 150ms into the default 200ms close the
-      // rows are still mounted at 38% opacity and a tap on one selected.
+      // Measured before this was gated — the row was still mounted and a tap on
+      // it selected. The pump lands on the close's *first* frame, at full
+      // opacity, not mid-fade: a ticker's first tick reports zero elapsed
+      // (`Ticker._tick` does `_startTime ??= elapsed`). The gate still bites
+      // there, because `reverse` is set synchronously when the tween starts.
       final key = GlobalKey<SingleHostState>();
       await tester.pumpWidget(SingleHost(key: key));
       await tester.pumpAndSettle();
@@ -345,6 +355,52 @@ void main() {
         [owner],
         reason: 'one tap, one selection — the menu was already on its way out',
       );
+    });
+  });
+
+  group('a menu that is gone accepts nothing, however it went', () {
+    testWidgets('an instant close does not let a second row through', (
+      tester,
+    ) async {
+      // `animationDuration: Duration.zero` never reports `AnimationStatus
+      // .reverse` — the controller short-circuits straight to `dismissed` — so
+      // a gate that asks "is it animating out?" answers no for a menu that is
+      // already gone. Measured before this: `[Owner, Member]`.
+      final key = GlobalKey<SingleHostState>();
+      await tester.pumpWidget(SingleHost(key: key, duration: Duration.zero));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byType(FlutterDropdownButton<Role>));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Owner'));
+      if (find.text('Member').evaluate().isNotEmpty) {
+        await tester.tap(find.text('Member'));
+      }
+      await tester.pumpAndSettle();
+
+      expect(key.currentState!.chosen, [owner]);
+    });
+
+    testWidgets('a synchronous closeAll leaves no live rows behind', (
+      tester,
+    ) async {
+      // `close(animate: false)` tears down at once, so there is no reverse to
+      // observe either. `closeAll` is public on an exported class, so this is
+      // reachable from outside the package. Measured before this: `[Owner]` —
+      // a selection made on a menu that no longer existed.
+      final key = GlobalKey<SingleHostState>();
+      await tester.pumpWidget(SingleHost(key: key));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byType(FlutterDropdownButton<Role>));
+      await tester.pumpAndSettle();
+
+      DropdownOverlayController.closeAll(animate: false);
+      if (find.text('Owner').evaluate().isNotEmpty) {
+        await tester.tap(find.text('Owner'));
+      }
+      await tester.pumpAndSettle();
+
+      expect(key.currentState!.chosen, isEmpty);
     });
   });
 

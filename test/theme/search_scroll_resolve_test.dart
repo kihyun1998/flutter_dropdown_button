@@ -62,6 +62,26 @@ void main() {
       expect(enabled.borderSide.color, red);
     });
 
+    test('and it survives the field being disabled', () {
+      // The disabled slot was empty until a disabled dropdown could reach it
+      // (#89). An unfilled `disabledBorder` is not "no styling" — Flutter falls
+      // through to its own outline default, so a caller's colour is silently
+      // replaced rather than kept. A resolved style is complete, or it is null.
+      final theme = SearchFieldTheme(border: Border.all(color: red));
+
+      final disabled =
+          theme.resolve(ambient).decoration.disabledBorder!
+              as OutlineInputBorder;
+      expect(disabled.borderSide.color, red);
+    });
+
+    test('the disabled edge falls back to the ambient palette too', () {
+      final decoration = const SearchFieldTheme().resolve(ambient).decoration;
+
+      final disabled = decoration.disabledBorder! as OutlineInputBorder;
+      expect(disabled.borderSide.color, ambient.divider);
+    });
+
     test('a full decoration override replaces the built one', () {
       const override = InputDecoration(hintText: 'Find a country');
 

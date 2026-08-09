@@ -694,10 +694,17 @@ class _DropdownMenuShellState<T> extends State<DropdownMenuShell<T>>
 
     // The row says whether it is enabled, for the same reason the trigger does
     // (ADR-0001, rules 1 and 3): dropping only the tap action would leave a
-    // node that still announces a chosen state and still takes focus while
-    // saying nothing about being a control or being unavailable — a state with
-    // no role, which reads as decoration. This also takes the focus action with
-    // it, so a disabled row stops being a stop on the traversal.
+    // node announcing a chosen state and saying nothing about being
+    // unavailable.
+    //
+    // It does **not** make the row disappear from the traversal — measured, a
+    // disabled row keeps `isFocusable` and its focus action
+    // (`flags=[hasSelectedState, hasEnabledState, isFocusable]
+    // actions=[focus]`), unlike the trigger, whose `Semantics` wrapper sits
+    // above the `InkWell` that contributes them. Announcing the state is what
+    // this buys; the row is still reachable and now correctly says it cannot be
+    // used. Rule 1's other half — the row has no role — is still open, and is
+    // recorded as such rather than claimed fixed here.
     return Semantics(
       enabled: widget.enabled,
       child: Material(
@@ -705,35 +712,39 @@ class _DropdownMenuShellState<T> extends State<DropdownMenuShell<T>>
         child: Container(
           margin: style.margin,
           child: InkWell(
-            // Three gates, because a row must refuse a tap for three different
-            // reasons and only one of them is known at build time.
+            // A row refuses a tap for three reasons, and only the first is
+            // known at build time.
             //
-            // `null` is the semantic gate: it takes the row's tap action out of
-            // the tree, so a disabled control stops announcing live rows. But
-            // the overlay is its own element subtree and only rebuilds when
-            // something marks it dirty, which cannot happen before the end of
-            // the frame — so for one frame the rows still hold the callbacks
-            // they were built with. The first guard below covers that frame.
+            // **Disabled** — `onTap: null` is the semantic gate: it takes the
+            // row's tap action out of the tree, so a disabled control stops
+            // announcing live rows. But the overlay is its own element subtree
+            // and only rebuilds when something marks it dirty, which cannot
+            // happen before the end of the frame, so for one frame the rows
+            // still hold the callbacks they were built with. The first guard
+            // below covers that frame.
             //
-            // The second covers **closing**, which is the general case the
-            // other two are special cases of. `close()` is animated, so every
-            // row outlives its own dismissal by the whole reverse tween, and
-            // `isOpen` stays true throughout — it is the entry's existence, not
-            // the menu's availability, so it cannot answer this. The animation
-            // can. Without it a user who dismissed the menu could still land a
-            // tap on a fading row and get the selection they had just
-            // cancelled: measured at 150ms into the default 200ms close, with
-            // the row at 38% opacity.
+            // **Gone** — the rows are still mounted for the frame after the
+            // entry is torn down. `close(animate: false)` and an
+            // `animationDuration` of zero both take that path, and neither ever
+            // reports a reverse, so the status cannot answer this. `isOpen`
+            // can: it is exactly the entry's existence.
             //
-            // That one is deliberately not a build-time gate. The status
-            // changes with no rebuild behind it, so putting it in the tree
-            // would cost a rebuild per animation frame to describe a 200ms
-            // transient — the row's announced tap action therefore outlives its
-            // usefulness by exactly that long, and knowingly.
+            // **Going** — a `close()` that animates keeps the entry for the
+            // whole reverse tween, so `isOpen` stays true and cannot answer
+            // *that*. The status can. Without it a user who dismissed the menu
+            // could still land a tap on a fading row and be handed the
+            // selection they had just cancelled.
+            //
+            // The last two are deliberately not build-time gates: neither
+            // changes with a rebuild behind it, so putting them in the tree
+            // would cost a rebuild per animation frame to describe a transient
+            // shorter than [animationDuration]. The row's announced tap action
+            // therefore outlives its usefulness by that much, knowingly.
             onTap: !widget.enabled
                 ? null
                 : () {
                     if (!widget.enabled) return;
+                    if (!_menu.isOpen) return;
                     if (_menu.animation.status == AnimationStatus.reverse) {
                       return;
                     }
