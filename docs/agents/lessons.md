@@ -119,6 +119,26 @@
 
 ## Step 6 — 정합성 스윕
 
+- **#88~#91 (빈 grep 결과를 "없다" 로 읽었다 — 한 릴리스에서 세 번).** 셋 다 같은 뿌리다:
+  *검색이 아무것도 안 냈다* 를 *그런 건 없다* 로 승격했다.
+  ① **줄바꿈이 문구를 갈랐다.** #91 이 "keyboard navigation" 주장을 `api_reference.md` 와
+  `use_cases.md` 에서 좁히고 **README 를 놓쳤다** — pub.dev 가 가장 먼저 렌더하는 페이지다.
+  `grep "keyboard navigation" README.md` 가 **0 건**을 냈기 때문인데, 실제로는 `(theming,
+  keyboard\nnavigation, ...)` 로 줄을 넘어 있었다. 줄 단위 검색은 줄을 넘는 주장을 못 본다.
+  여러 단어 문구는 `grep -Pzo` 나 `python re.S` 로, 아니면 첫 단어만으로 찾는다.
+  ② **`documentation/` 을 통째로 대조한 적이 없었다.** 이슈마다 *건드린* 문서만 고쳤다.
+  전체를 훑자 #88 이 쓴 문장을 #91 이 거짓으로 만든 것이 나왔다 — *"`InkWell` 이 기여하는
+  건 bare 앵커가 갖지 못한 focusability"* 인데 #91 이 바로 그 focusability 를 줬다.
+  #91 은 **같은 파일의 두 섹션 옆**을 편집하면서 못 봤다. 릴리스 끝에 `README` ·
+  `CHANGELOG` · `pubspec` · `documentation/` 을 **한 세트로** 다시 읽는다.
+  ③ **호출자를 깨뜨리는 항목이 CHANGELOG 에만 있었다.** `itemBuilder` 에서 `selected` 를
+  선언한 호출자는 행이 라벨을 잃는데(조용히), 그 경고가 한 번 읽히고 마는 문서에만 있었다.
+  깨지는 것은 그걸 디버깅할 사람이 있을 자리 — API 레퍼런스 — 에도 둔다.
+- **#90 (Edit 이 prefix 만 매치하면 나머지를 조용히 옮긴다).** `CHANGELOG` 에 #90 섹션을
+  끼울 때 `old_string` 이 #89 의 TEST 항목 **앞부분만** 매치했다. 실패하지 않았다 — 나머지
+  문장이 삽입한 블록 뒤로 밀려 마지막 줄 끝에 들러붙었고(`…along with it The tests pump a
+  single frame…`), 발행 직전에 사용자가 물어보고서야 발견됐다. 긴 줄을 앵커로 쓸 때는 그
+  줄 **전체**를 쓰거나, 커밋 전에 결과를 읽는다.
 - **#38 (dartdoc 화살표가 거꾸로).** `thickness` 문서가 "Deprecated: `thumbWidth`/
   `trackWidth` 를 쓰라" 고 했으나 `thickness` 는 deprecated 아니고 `trackWidth` 는 아무
   일도 안 했다.
