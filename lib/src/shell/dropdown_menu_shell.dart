@@ -302,9 +302,23 @@ class _DropdownMenuShellState<T> extends State<DropdownMenuShell<T>>
     //
     // Deferred to after the frame: the overlay's element is not a descendant
     // of this one, so marking it dirty mid-build is not allowed.
+    //
+    // Becoming disabled closes it instead. A menu offering options that all do
+    // nothing is its own kind of lie, and the caller cannot close it for us —
+    // they own `enabled`, not the overlay. This reaches the checklist too,
+    // where it matters most: `closeOnTap` is false there, so an open menu
+    // outlives any single tap.
+    final becameDisabled = oldWidget.enabled && !widget.enabled;
+
     if (_menu.isOpen) {
       SchedulerBinding.instance.addPostFrameCallback((_) {
-        if (mounted) _menu.rebuild();
+        if (!mounted) return;
+        // Rebuild *then* close, in that order and both. The overlay lives in
+        // its own element subtree, so the rows keep the callbacks they were
+        // built with until something marks them dirty — a close on its own
+        // would animate out a menu whose rows are still the enabled ones.
+        _menu.rebuild();
+        if (becameDisabled) _menu.close();
       });
     }
 
@@ -629,6 +643,11 @@ class _DropdownMenuShellState<T> extends State<DropdownMenuShell<T>>
       child: TextField(
         controller: _search.textController,
         focusNode: _search.focusNode,
+        // The field is part of the control, so it goes with it. Measured
+        // before this: a disabled dropdown's field stayed focused and accepted
+        // typing for the whole close animation — the query was discarded on
+        // teardown, but the soft keyboard sat over a disabled control.
+        enabled: widget.enabled,
         onChanged: _onSearchChanged,
         style: style.textStyle,
         cursorColor: style.cursorColor,
@@ -673,32 +692,73 @@ class _DropdownMenuShellState<T> extends State<DropdownMenuShell<T>>
       menuBorderRadius: effectiveOverlayTheme.borderRadius,
     );
 
-    return Material(
-      color: Colors.transparent,
-      child: Container(
-        margin: style.margin,
-        child: InkWell(
-          onTap: () {
-            widget.onItemTap(item);
-            if (widget.closeOnTap) {
-              _menu.close();
-            } else {
-              // The owner will rebuild us with a new selection; the overlay is
-              // in another element subtree and would not hear about it.
-              _menu.rebuild();
-            }
-          },
-          mouseCursor: SystemMouseCursors.click,
-          splashColor: style.splashColor,
-          highlightColor: style.highlightColor,
-          hoverColor: style.hoverColor,
-          borderRadius: BorderRadius.circular(style.inkBorderRadius),
-          child: Ink(
-            height: widget.itemHeight,
-            width: double.infinity,
-            padding: style.padding,
-            decoration: style.decoration,
-            child: Align(alignment: alignment, child: child),
+    // The row says whether it is enabled, for the same reason the trigger does
+    // (ADR-0001, rules 1 and 3): dropping only the tap action would leave a
+    // node that still announces a chosen state and still takes focus while
+    // saying nothing about being a control or being unavailable — a state with
+    // no role, which reads as decoration. This also takes the focus action with
+    // it, so a disabled row stops being a stop on the traversal.
+    return Semantics(
+      enabled: widget.enabled,
+      child: Material(
+        color: Colors.transparent,
+        child: Container(
+          margin: style.margin,
+          child: InkWell(
+            // Three gates, because a row must refuse a tap for three different
+            // reasons and only one of them is known at build time.
+            //
+            // `null` is the semantic gate: it takes the row's tap action out of
+            // the tree, so a disabled control stops announcing live rows. But
+            // the overlay is its own element subtree and only rebuilds when
+            // something marks it dirty, which cannot happen before the end of
+            // the frame — so for one frame the rows still hold the callbacks
+            // they were built with. The first guard below covers that frame.
+            //
+            // The second covers **closing**, which is the general case the
+            // other two are special cases of. `close()` is animated, so every
+            // row outlives its own dismissal by the whole reverse tween, and
+            // `isOpen` stays true throughout — it is the entry's existence, not
+            // the menu's availability, so it cannot answer this. The animation
+            // can. Without it a user who dismissed the menu could still land a
+            // tap on a fading row and get the selection they had just
+            // cancelled: measured at 150ms into the default 200ms close, with
+            // the row at 38% opacity.
+            //
+            // That one is deliberately not a build-time gate. The status
+            // changes with no rebuild behind it, so putting it in the tree
+            // would cost a rebuild per animation frame to describe a 200ms
+            // transient — the row's announced tap action therefore outlives its
+            // usefulness by exactly that long, and knowingly.
+            onTap: !widget.enabled
+                ? null
+                : () {
+                    if (!widget.enabled) return;
+                    if (_menu.animation.status == AnimationStatus.reverse) {
+                      return;
+                    }
+                    widget.onItemTap(item);
+                    if (widget.closeOnTap) {
+                      _menu.close();
+                    } else {
+                      // The owner will rebuild us with a new selection; the
+                      // overlay is in another element subtree and would not hear
+                      // about it.
+                      _menu.rebuild();
+                    }
+                  },
+            mouseCursor: SystemMouseCursors.click,
+            splashColor: style.splashColor,
+            highlightColor: style.highlightColor,
+            hoverColor: style.hoverColor,
+            borderRadius: BorderRadius.circular(style.inkBorderRadius),
+            child: Ink(
+              height: widget.itemHeight,
+              width: double.infinity,
+              padding: style.padding,
+              decoration: style.decoration,
+              child: Align(alignment: alignment, child: child),
+            ),
           ),
         ),
       ),
