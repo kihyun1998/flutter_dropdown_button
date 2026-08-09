@@ -95,11 +95,35 @@ and is filed as such rather than fixed inside the change that found it:
   keyboard-operable, while `documentation/api_reference.md:60`,
   `documentation/use_cases.md:525` and `CHANGELOG.md:34` all advertise "keyboard
   navigation".
-- **Rules 1 and 3 vs. the dismiss barrier.** Measured with a query matching
-  nothing: one node, `Rect(0, 0, 800, 600)` on an 800×600 screen,
-  `label="No results found" actions=[tap]`. The overlay's barrier declares a tap
-  and no role, and the empty state merges into it, so the whole screen becomes a
-  single target named after the empty state whose activation dismisses the menu.
+- ~~**Rules 1 and 3 vs. the dismiss barrier.**~~ **Settled in #90.** Measured
+  with a query matching nothing: one node, `Rect(0, 0, 800, 600)` on an 800×600
+  screen, `label="No results found" actions=[tap]`. The overlay's barrier
+  declared a tap and no role, and the empty state merged into it, so the whole
+  screen became a single target named after the empty state whose activation
+  dismissed the menu.
+
+  Resolved by **removing the node rather than completing it** — the barrier is a
+  gesture, not a control, so rule 1 was never the one to satisfy. Two things the
+  work established that the rules did not anticipate, and that the next pass
+  should not re-derive:
+
+  - **`ExcludeSemantics` was the wrong tool and would have been worse than the
+    defect.** The rows were *children* of the barrier node, so pruning the
+    subtree takes the menu with it. `GestureDetector.excludeFromSemantics`
+    suppresses only the detector's own annotation. Two APIs one word apart, with
+    opposite blast radii.
+  - **Rule 1 does not oblige a control per gesture.** Assistive technology never
+    needed the barrier: measured, the trigger stays in the tree while its own
+    menu is open, still carries `tap`, and activating it through the semantics
+    API closes the menu. A dismissal that is already reachable does not need a
+    second, screen-sized affordance — labelling one, measured, produces *two*
+    screen-sized nodes rather than one.
+
+  Still open on this surface, and filed rather than folded in: the barrier
+  **swallows the tap that dismisses** — not only for an empty menu but for every
+  open one (measured: 0 taps reached a button behind it, the second got
+  through). That is a hit-testing question, not a semantics one, and its remedy
+  changes documented behaviour.
 - **Rule 3 vs. the trigger's open state.** Neither anchor path announces
   expanded or collapsed, so a node that now correctly says "button, enabled" is
   still not a complete description of a control whose whole job is to toggle.
