@@ -11,7 +11,14 @@ This is a **single-context** repo.
 
 If any of these files don't exist, **proceed silently**. Don't flag their absence; don't suggest creating them upfront. The `/domain-modeling` skill (reached via `/grill-with-docs` and `/improve-codebase-architecture`) creates them lazily when terms or decisions actually get resolved.
 
-Neither `CONTEXT.md` nor `docs/adr/` exists yet in this repo. That is expected.
+`CONTEXT.md` does not exist yet in this repo. That is expected.
+
+`docs/adr/` does, as of #88, and holds one record:
+
+- **[0001 — Accessibility semantics are attached by hand, and the word for a
+  state is the presentation's](../adr/0001-accessibility-semantics-are-attached-by-hand.md)**
+  — read it before touching anything that emits `Semantics`, and file work in
+  that area as a conformance item under it rather than as a fresh decision.
 
 ## File structure
 
