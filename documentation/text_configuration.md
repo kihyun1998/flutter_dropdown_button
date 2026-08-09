@@ -281,7 +281,9 @@ TextDropdownConfig(
 
 `semanticsLabel` describes the **button**. A screen reader announces it alongside
 the selected value — `"Fruit selection dropdown, Banana"` — not in place of it.
-Menu items are unaffected: each announces its own text.
+Menu items do not take the label — each announces its own text, plus whether it
+is the chosen one (`selected`), which is the only place that state exists for a
+screen reader: on screen it is a colour.
 
 ### Locale-specific Rendering
 

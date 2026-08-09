@@ -357,24 +357,34 @@ class _DropdownMenuShellState<T> extends State<DropdownMenuShell<T>>
 
     final style = _buttonStyle;
 
-    Widget button = Container(
-      key: _menu.buttonKey,
-      width: widget.width,
-      decoration: style.decoration,
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: widget.enabled ? _toggleDropdown : null,
-          mouseCursor: widget.enabled
-              ? SystemMouseCursors.click
-              : SystemMouseCursors.forbidden,
-          borderRadius: BorderRadius.circular(style.borderRadius),
-          splashColor: style.splashColor,
-          highlightColor: style.highlightColor,
-          hoverColor: style.hoverColor,
-          child: Padding(
-            padding: style.padding,
-            child: _buildButtonContent(style),
+    // The role and the enabled state, on the same node the `InkWell` annotates
+    // with `tap`/`focus` — an `InkWell` contributes neither (it declares only
+    // `onTap`/`onLongPress`, `material/ink_well.dart:1401`), so without this the
+    // trigger reads as an unlabelled focusable thing. `container: false` is the
+    // default, so this merges into that node rather than splitting it, which is
+    // what keeps the merged `semanticsLabel` of #37 intact.
+    Widget button = Semantics(
+      button: true,
+      enabled: widget.enabled,
+      child: Container(
+        key: _menu.buttonKey,
+        width: widget.width,
+        decoration: style.decoration,
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: widget.enabled ? _toggleDropdown : null,
+            mouseCursor: widget.enabled
+                ? SystemMouseCursors.click
+                : SystemMouseCursors.forbidden,
+            borderRadius: BorderRadius.circular(style.borderRadius),
+            splashColor: style.splashColor,
+            highlightColor: style.highlightColor,
+            hoverColor: style.hoverColor,
+            child: Padding(
+              padding: style.padding,
+              child: _buildButtonContent(style),
+            ),
           ),
         ),
       ),
@@ -389,10 +399,14 @@ class _DropdownMenuShellState<T> extends State<DropdownMenuShell<T>>
   /// icon — the button-box params the widgets assert away in this mode. The
   /// only things the shell must still own wrap the caller's widget: the
   /// [DropdownOverlayController.buttonKey] the overlay measures to place the
-  /// menu, and the tap that toggles it. `Semantics(button: …)` restores the
-  /// role the dropped `InkWell` would have announced; the key rides on it
-  /// because a `Semantics` is a render box that takes its child's size, which
-  /// is what [DropdownOverlayController.measurePlacement] reads.
+  /// menu, and the tap that toggles it. `Semantics(button: …)` is the same role
+  /// and enabled state the chrome path announces — the caller draws the anchor,
+  /// not what it *is*, and dropping the chrome does not make it stop being the
+  /// control that opens the menu. (It is not the `InkWell`'s doing in either
+  /// path: an `InkWell` declares only `onTap`/`onLongPress`,
+  /// `material/ink_well.dart:1401`.) The key rides on the `Semantics` because it
+  /// is a render box that takes its child's size, which is what
+  /// [DropdownOverlayController.measurePlacement] reads.
   Widget _buildBareAnchor(
     BuildContext context,
     Widget Function(BuildContext context, bool isOpen) anchorBuilder,
