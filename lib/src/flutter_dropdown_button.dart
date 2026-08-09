@@ -273,6 +273,12 @@ class FlutterDropdownButton<T> extends StatefulWidget {
   final DropdownStyleTheme? theme;
 
   /// Whether the dropdown is interactive. Defaults to true.
+  ///
+  /// Setting this false **while the menu is open closes it**, and the rows stop
+  /// accepting taps immediately — before the close animation has played out.
+  /// The menu is part of the control, so a disabled control does not leave one
+  /// behind offering options that no longer work. `disableWhenSingleItem`
+  /// reaches the same state without this flag being touched.
   final bool enabled;
 
   /// Whether to scroll to the selected item when opened. Defaults to true.

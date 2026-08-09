@@ -302,9 +302,23 @@ class _DropdownMenuShellState<T> extends State<DropdownMenuShell<T>>
     //
     // Deferred to after the frame: the overlay's element is not a descendant
     // of this one, so marking it dirty mid-build is not allowed.
+    //
+    // Becoming disabled closes it instead. A menu offering options that all do
+    // nothing is its own kind of lie, and the caller cannot close it for us —
+    // they own `enabled`, not the overlay. This reaches the checklist too,
+    // where it matters most: `closeOnTap` is false there, so an open menu
+    // outlives any single tap.
+    final becameDisabled = oldWidget.enabled && !widget.enabled;
+
     if (_menu.isOpen) {
       SchedulerBinding.instance.addPostFrameCallback((_) {
-        if (mounted) _menu.rebuild();
+        if (!mounted) return;
+        // Rebuild *then* close, in that order and both. The overlay lives in
+        // its own element subtree, so the rows keep the callbacks they were
+        // built with until something marks them dirty — a close on its own
+        // would animate out a menu whose rows are still the enabled ones.
+        _menu.rebuild();
+        if (becameDisabled) _menu.close();
       });
     }
 
@@ -629,6 +643,11 @@ class _DropdownMenuShellState<T> extends State<DropdownMenuShell<T>>
       child: TextField(
         controller: _search.textController,
         focusNode: _search.focusNode,
+        // The field is part of the control, so it goes with it. Measured
+        // before this: a disabled dropdown's field stayed focused and accepted
+        // typing for the whole close animation — the query was discarded on
+        // teardown, but the soft keyboard sat over a disabled control.
+        enabled: widget.enabled,
         onChanged: _onSearchChanged,
         style: style.textStyle,
         cursorColor: style.cursorColor,
@@ -673,32 +692,84 @@ class _DropdownMenuShellState<T> extends State<DropdownMenuShell<T>>
       menuBorderRadius: effectiveOverlayTheme.borderRadius,
     );
 
-    return Material(
-      color: Colors.transparent,
-      child: Container(
-        margin: style.margin,
-        child: InkWell(
-          onTap: () {
-            widget.onItemTap(item);
-            if (widget.closeOnTap) {
-              _menu.close();
-            } else {
-              // The owner will rebuild us with a new selection; the overlay is
-              // in another element subtree and would not hear about it.
-              _menu.rebuild();
-            }
-          },
-          mouseCursor: SystemMouseCursors.click,
-          splashColor: style.splashColor,
-          highlightColor: style.highlightColor,
-          hoverColor: style.hoverColor,
-          borderRadius: BorderRadius.circular(style.inkBorderRadius),
-          child: Ink(
-            height: widget.itemHeight,
-            width: double.infinity,
-            padding: style.padding,
-            decoration: style.decoration,
-            child: Align(alignment: alignment, child: child),
+    // The row says whether it is enabled, for the same reason the trigger does
+    // (ADR-0001, rules 1 and 3): dropping only the tap action would leave a
+    // node announcing a chosen state and saying nothing about being
+    // unavailable.
+    //
+    // It does **not** make the row disappear from the traversal — measured, a
+    // disabled row keeps `isFocusable` and its focus action
+    // (`flags=[hasSelectedState, hasEnabledState, isFocusable]
+    // actions=[focus]`), unlike the trigger, whose `Semantics` wrapper sits
+    // above the `InkWell` that contributes them. Announcing the state is what
+    // this buys; the row is still reachable and now correctly says it cannot be
+    // used. Rule 1's other half — the row has no role — is still open, and is
+    // recorded as such rather than claimed fixed here.
+    return Semantics(
+      enabled: widget.enabled,
+      child: Material(
+        color: Colors.transparent,
+        child: Container(
+          margin: style.margin,
+          child: InkWell(
+            // A row refuses a tap for three reasons, and only the first is
+            // known at build time.
+            //
+            // **Disabled** — `onTap: null` is the semantic gate: it takes the
+            // row's tap action out of the tree, so a disabled control stops
+            // announcing live rows. But the overlay is its own element subtree
+            // and only rebuilds when something marks it dirty, which cannot
+            // happen before the end of the frame, so for one frame the rows
+            // still hold the callbacks they were built with. The first guard
+            // below covers that frame.
+            //
+            // **Gone** — the rows are still mounted for the frame after the
+            // entry is torn down. `close(animate: false)` and an
+            // `animationDuration` of zero both take that path, and neither ever
+            // reports a reverse, so the status cannot answer this. `isOpen`
+            // can: it is exactly the entry's existence.
+            //
+            // **Going** — a `close()` that animates keeps the entry for the
+            // whole reverse tween, so `isOpen` stays true and cannot answer
+            // *that*. The status can. Without it a user who dismissed the menu
+            // could still land a tap on a fading row and be handed the
+            // selection they had just cancelled.
+            //
+            // The last two are deliberately not build-time gates: neither
+            // changes with a rebuild behind it, so putting them in the tree
+            // would cost a rebuild per animation frame to describe a transient
+            // shorter than [animationDuration]. The row's announced tap action
+            // therefore outlives its usefulness by that much, knowingly.
+            onTap: !widget.enabled
+                ? null
+                : () {
+                    if (!widget.enabled) return;
+                    if (!_menu.isOpen) return;
+                    if (_menu.animation.status == AnimationStatus.reverse) {
+                      return;
+                    }
+                    widget.onItemTap(item);
+                    if (widget.closeOnTap) {
+                      _menu.close();
+                    } else {
+                      // The owner will rebuild us with a new selection; the
+                      // overlay is in another element subtree and would not hear
+                      // about it.
+                      _menu.rebuild();
+                    }
+                  },
+            mouseCursor: SystemMouseCursors.click,
+            splashColor: style.splashColor,
+            highlightColor: style.highlightColor,
+            hoverColor: style.hoverColor,
+            borderRadius: BorderRadius.circular(style.inkBorderRadius),
+            child: Ink(
+              height: widget.itemHeight,
+              width: double.infinity,
+              padding: style.padding,
+              decoration: style.decoration,
+              child: Align(alignment: alignment, child: child),
+            ),
           ),
         ),
       ),

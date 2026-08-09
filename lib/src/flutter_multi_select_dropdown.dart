@@ -145,6 +145,11 @@ class FlutterMultiSelectDropdown<T> extends StatelessWidget {
   final Duration animationDuration;
 
   /// Whether the button responds to a tap.
+  ///
+  /// Setting this false **while the checklist is open closes it**, and the rows
+  /// stop accepting taps immediately. It matters more here than for the
+  /// single-select widget: a checklist does not close on tap, so before this an
+  /// open one stayed fully operable for as long as it was on screen.
   final bool enabled;
 
   /// Whether the button fills its parent's cross-axis space.
