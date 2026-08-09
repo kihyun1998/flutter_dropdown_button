@@ -28,8 +28,3 @@ dev_dependencies:
   flutter_lints: ^5.0.0
 
 flutter:
-
-# TEMPORARY (downstream loop check) — removed immediately after the run.
-dependency_overrides:
-  flutter_checkbox:
-    path: /Volumes/T7/GitHub/flutter_checkbox
