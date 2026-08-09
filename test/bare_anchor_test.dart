@@ -158,14 +158,23 @@ void main() {
         ),
       );
 
+      // `containsSemantics`, not the exhaustive matcher this used to be. The
+      // node gained `isFocusable`/`expanded` in #91, and an exhaustive matcher
+      // would also have to name the focus *action* — which `Focus` emits only
+      // off-iOS, so naming it pins the host platform. The claim here is what
+      // this package announces, not what Flutter contributes around it.
       expect(
         tester.getSemantics(find.text('BARE-ANCHOR')),
-        matchesSemantics(
+        // ignore: deprecated_member_use
+        containsSemantics(
           label: 'BARE-ANCHOR',
           isButton: true,
           hasEnabledState: true,
           isEnabled: true,
           hasTapAction: true,
+          isFocusable: true,
+          hasExpandedState: true,
+          isExpanded: false,
         ),
       );
       handle.dispose();

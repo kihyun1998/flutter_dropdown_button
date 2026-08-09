@@ -89,12 +89,28 @@ Each of these was decided separately and falls out of the rules above:
 Adjudicated, not quietly flipped. Each is a conformance gap under this record
 and is filed as such rather than fixed inside the change that found it:
 
-- **Rule 5 vs. the bare anchor's focusability.** The bare path is a plain
-  `GestureDetector`: measured `actions=[tap]` with no `isFocusable` and no focus
-  action, where the chromed path has both from its `InkWell`. It is also not
-  keyboard-operable, while `documentation/api_reference.md:60`,
-  `documentation/use_cases.md:525` and `CHANGELOG.md:34` all advertise "keyboard
-  navigation".
+- ~~**Rule 5 vs. the bare anchor's focusability.**~~ **Settled in #91.** The bare
+  path was a plain `GestureDetector`: measured `actions=[tap]` with no
+  `isFocusable` and no focus action, where the chromed path had both from its
+  `InkWell`. It was also not keyboard-operable at all.
+
+  Resolved with a `FocusableActionDetector` binding `ActivateIntent` and
+  `ButtonActivateIntent` — the same pair `InkWell` binds, the second of which is
+  what Enter dispatches on the web. The cost was named before the choice: the
+  bare anchor becomes a tab stop where it was not, which matters most in the
+  embedded-field layout the mode exists for. The owner chose parity over the
+  saved stop, on the ground that a keyboard-only user could not open a bare
+  dropdown at all.
+
+  Parity turns out to reach further down than the rule claimed: measured,
+  `FocusableActionDetector._canRequestFocus` and `InkWell._canRequestFocus` are
+  the *same* switch — `widget.enabled` under `NavigationMode.traditional`, and
+  `true` under `directional`, so a disabled anchor stays reachable by a D-pad on
+  both paths. Rule 5 held somewhere it was never checked.
+
+  The "keyboard navigation" the docs advertised is still not all there — there
+  are no arrow keys, no Escape, no type-ahead, and this record excludes them.
+  The claims were narrowed to what exists rather than left standing.
 - ~~**Rules 1 and 3 vs. the dismiss barrier.**~~ **Settled in #90.** Measured
   with a query matching nothing: one node, `Rect(0, 0, 800, 600)` on an 800×600
   screen, `label="No results found" actions=[tap]`. The overlay's barrier
@@ -124,9 +140,27 @@ and is filed as such rather than fixed inside the change that found it:
   open one (measured: 0 taps reached a button behind it, the second got
   through). That is a hit-testing question, not a semantics one, and its remedy
   changes documented behaviour.
-- **Rule 3 vs. the trigger's open state.** Neither anchor path announces
-  expanded or collapsed, so a node that now correctly says "button, enabled" is
-  still not a complete description of a control whose whole job is to toggle.
+- ~~**Rule 3 vs. the trigger's open state.**~~ **Settled in #91.** Neither anchor
+  path announced expanded or collapsed, so a node that correctly said "button,
+  enabled" was still not a complete description of a control whose whole job is
+  to toggle. Both paths now carry `expanded`.
+
+  It reads the overlay entry's existence, so it stays true for the whole close
+  animation — measured, and left that way on purpose: the menu is still on
+  screen during the reverse, and the chevron a caller draws from the same flag
+  is still turned, so the tree and the screen agree. **The clearance holds as
+  long as both keep reading `isOpen`.**
+
+- **Rule 1 vs. the menu row.** Carried over from #89, where it was noticed and
+  described in a code comment and a changelog line but — wrongly — said to be
+  recorded here. It is now. A row announces `selected`/`checked` and
+  `enabled`, is focusable and tappable, and says nothing about *what kind of
+  thing it is*. Measured after #89: `flags=[hasSelectedState, hasEnabledState,
+  isFocusable] actions=[focus, tap]`, no role.
+
+  Not folded into #91, which is about the trigger. Note that the widget-level
+  answer (a row is a button) and the structural one (a row is a menu item) are
+  different questions, and this record already excludes the second.
 
 ## What this record does not cover
 
