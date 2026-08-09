@@ -305,6 +305,23 @@ class DropdownOverlayController {
         return GestureDetector(
           onTap: close,
           behavior: HitTestBehavior.translucent,
+          // The barrier is a gesture, not a control. Left annotating the tree,
+          // it put a screen-sized node carrying `tap`, with no label and no
+          // role, *above* the whole menu — so the rows were its children and a
+          // non-interactive empty state merged into it, naming the screen after
+          // itself. Measured: `#5 800x600 label="No results found"
+          // acts=[tap]` on an 800×600 view.
+          //
+          // `excludeFromSemantics`, not `ExcludeSemantics`: the latter prunes
+          // the subtree and would take the menu with it. This drops only the
+          // detector's own annotation, and nothing else about the barrier —
+          // hit-testing is untouched.
+          //
+          // Nothing is lost. The trigger stays in the tree while its menu is
+          // open and still carries `tap`, so assistive technology dismisses by
+          // activating the control that opened it, which is where a user would
+          // look anyway. Pinned in `dismiss_barrier_semantics_test.dart`.
+          excludeFromSemantics: true,
           child: SizedBox.expand(
             child: Stack(
               children: [
