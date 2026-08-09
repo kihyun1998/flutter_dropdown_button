@@ -29,6 +29,14 @@ abstract interface class DropdownItemPresentation<T> {
   DropdownSearchFilter<T>? get defaultSearchFilter;
 
   /// One row of the open menu.
+  ///
+  /// [isSelected] is not only a styling hint: an implementation **announces it**
+  /// on the row, in the vocabulary its cardinality calls for — a single-select
+  /// row is `selected`, a checklist row is `checked`. The shell cannot do this
+  /// on the row's behalf, because it does not know what selection is; it only
+  /// knows the answer `isChosen` gave. On screen the distinction is a colour
+  /// ([DropdownItemTheme.selectedColor]), and a colour reaches nobody using a
+  /// screen reader.
   Widget buildItem(T item, bool isSelected);
 
   /// The button's face: the selected item, or the hint when nothing is chosen.
@@ -167,7 +175,11 @@ class TextItemPresentation<T> implements DropdownItemPresentation<T> {
     // semantics label *replaces* the announced string, so applying one label to
     // every row made a screen reader read the same phrase for all of them.
     // It describes the dropdown, and it is applied in [buildSelected].
-    return _withLeading(text, leading);
+    //
+    // `selected` rather than `checked`: one value is chosen, so the row is not
+    // a box that is on or off. The row's `InkWell` is the interactive node and
+    // this merges into it.
+    return Semantics(selected: isSelected, child: _withLeading(text, leading));
   }
 
   @override
@@ -247,8 +259,23 @@ class CustomItemPresentation<T> implements DropdownItemPresentation<T> {
   @override
   DropdownSearchFilter<T>? get defaultSearchFilter => null;
 
+  /// The caller's widget, told whether it is the chosen one — and the row says
+  /// so in the tree as well.
+  ///
+  /// **A caller who also declares `selected` inside [itemBuilder] now splits the
+  /// row in two.** Two `Semantics` in one merge group cannot both set the same
+  /// field, so the caller's becomes its own node: measured, the row keeps
+  /// `selected` and the actions but loses its *label*, and the labelled node
+  /// loses its actions — a screen reader then meets an unnamed tappable row.
+  /// Any *other* property a caller declares (a label, a hint) merges as before.
+  /// The remedy is to delete the hand-rolled `selected`, which this makes
+  /// redundant; that is the workaround this change exists to retire.
+  ///
+  /// [buildSelected] deliberately does not go through here — the button's face
+  /// is not a selected row.
   @override
-  Widget buildItem(T item, bool isSelected) => itemBuilder(item, isSelected);
+  Widget buildItem(T item, bool isSelected) =>
+      Semantics(selected: isSelected, child: itemBuilder(item, isSelected));
 
   @override
   Widget buildSelected() {

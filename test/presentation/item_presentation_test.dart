@@ -144,8 +144,23 @@ void main() {
     test('an item row is drawn unselected unless it is the value', () {
       final presentation = custom<String>(value: 'a');
 
-      expect((presentation.buildItem('a', true) as Text).data, 'a/true');
-      expect((presentation.buildItem('b', false) as Text).data, 'b/false');
+      // The row is the caller's widget wrapped in the announcement of whether
+      // it is chosen — `itemBuilder`'s result is handed through untouched, and
+      // `selected` carries the same answer the styling did (#88).
+      final chosen = presentation.buildItem('a', true) as Semantics;
+      final other = presentation.buildItem('b', false) as Semantics;
+
+      expect((chosen.child as Text).data, 'a/true');
+      expect(chosen.properties.selected, isTrue);
+
+      expect((other.child as Text).data, 'b/false');
+      expect(
+        other.properties.selected,
+        isFalse,
+        reason:
+            'an unchosen row says so rather than staying silent — the '
+            'absence of a flag is not a state a screen reader can read',
+      );
     });
   });
 }

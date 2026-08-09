@@ -1,5 +1,15 @@
 # Changelog
 
+## 4.2.0
+
+What is on screen reached everyone except the people who cannot see it. The trigger announced its current value and nothing about being a control; the chosen row was distinguished from its neighbours by `DropdownItemTheme.selectedColor` and by nothing else. The checklist had been doing this correctly since 3.1.0 — `Semantics(checked:)` on the row — and the single-select path simply never got the same treatment.
+
+* **FIX**: the trigger announces `button` and its enabled state. Measured before: `flags=[isFocusable] actions=[tap, focus]` — no role at all, and a *disabled* dropdown emitted `flags=[] actions=[]`, indistinguishable from something decorative. It is one `Semantics` on the node the `InkWell` already annotates, so the merged `semanticsLabel` contract is unchanged. Both widgets get it; they share the shell
+* **FIX**: a single-select row announces `selected`. Before, the three rows of an open menu were byte-identical in the semantics tree whichever one was the value. It is attached in the presentation, not the shell — the shell does not know what selection is, so it cannot know whether "chosen" means `selected` or `checked`; that word is the presentation's, one per cardinality
+* **FIX**: `anchorBuilder`'s bare anchor was already announcing the role, and the reported direction had it backwards — it was the chromed path that was silent. The dartdoc and `documentation/api_reference.md` both credited the role to the ink well being "restored"; an `InkWell` announces no role in either path (`material/ink_well.dart` declares only `onTap`/`onLongPress`). What it does contribute is focusability, which the bare path lacks
+* **CHANGE**: if your `itemBuilder` declares `selected` itself — a hand-rolled workaround for this bug — **delete it**. Two `Semantics` in one merge group cannot both set the same field, so the caller's now becomes a node of its own: measured, the row keeps `selected` and its tap action but loses its *label*, while the labelled node loses its actions. Any other property a caller declares (a label, a hint) merges as before
+* **TEST**: asserted at the semantics tree, never the render tree — every assertion here passes under `find.text` while the tree says nothing. `containsSemantics`, matching `multi_select_presentation_test.dart`'s existing choice: an exhaustive matcher pins the host platform, because `Focus` emits its focus action only off-iOS. Discriminating power confirmed by reverting `lib/` — six of eight go red, and the two that stay green are the two labelled guards
+
 ## 4.1.0
 
 The second half of the embedded-field pattern 4.0.0's bare anchor opened. `anchorBuilder` decoupled what the anchor *renders*; a menu embedded inside a wider field still positioned and sized against the compact anchor's own box, so it dropped from mid-field and left-aligned to the little `[All ▾]` segment. `positioningKey` decouples what the menu *positions against*.

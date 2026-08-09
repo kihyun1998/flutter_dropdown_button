@@ -63,7 +63,7 @@ Only the button *face* becomes yours. The anchored menu — its theming, keyboar
 - **`isOpen` flips true the moment the menu opens and false once it has finished closing** — the close animation runs while it is still true, so a chevron animated off it settles back after the menu is gone.
 - **The button-box params it replaces must be left unset.** `width`, `minWidth`, `maxWidth`, `expand` and `trailing` describe the box you no longer have; combining any with `anchorBuilder` asserts in debug.
 - **Set `minMenuWidth` — the menu inherits the anchor's width.** A bare anchor is compact by design, and the menu takes its width from it, so an `[All ▾]` anchor yields an `[All ▾]`-wide menu its rows overflow. `minMenuWidth` (and `maxMenuWidth`) are *menu* widths, not the button-box `width`/`minWidth`/`maxWidth`, so they are allowed in bare mode and are the way to give the menu a usable width of its own.
-- **The anchor is still announced as a button.** The dropped ink well's role is restored with `Semantics(button: true)`, so a screen reader reads your widget as the control it is.
+- **The anchor is still announced as a button.** `Semantics(button: true)` wraps it, the same as the chromed path, so a screen reader reads your widget as the control it is. (It is not the ink well's role being restored — an `InkWell` announces no role in either path; it contributes the focusability that a bare anchor, being a plain gesture detector, does not have.)
 
 ### Positioning against an outer box
 
@@ -391,8 +391,8 @@ How items and the button's face are drawn. One implementation per rendering mode
 |--------|------|-------------|
 | `contentAlignment` | `Alignment` | Where the button's face and each item row sit horizontally |
 | `defaultSearchFilter` | `DropdownSearchFilter<T>?` | The filter used when the caller supplies none. Null means this mode has none to offer |
-| `buildItem(item, isSelected)` | `Widget` | One row of the open menu |
-| `buildSelected()` | `Widget` | The button's face: the selected item, or the hint |
+| `buildItem(item, isSelected)` | `Widget` | One row of the open menu. An implementation must also **announce** `isSelected` on the row, in its cardinality's vocabulary — `selected` for a single-select row, `checked` for a checklist one. The shell cannot do it for you: it does not know what selection is, only what `isChosen` answered |
+| `buildSelected()` | `Widget` | The button's face: the selected item, or the hint. Deliberately *not* routed through `buildItem` — the face is not a selected row |
 
 ### TextItemPresentation\<T\>
 
