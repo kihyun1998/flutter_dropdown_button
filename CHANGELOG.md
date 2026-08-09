@@ -19,6 +19,10 @@ What is on screen reached everyone except the people who cannot see it. The trig
 * **CHANGE**: a disabled row now carries `enabled: false` in the semantics tree rather than merely losing its tap action. Dropping the action alone left a node still announcing a chosen state while saying nothing about being unavailable — half a node, which `docs/adr/0001` rule 3 exists to forbid. It stays focusable, unlike the trigger; rule 1's other half, that the row carries no role, is still open
 * **TEST**: asserted at `onChanged`, not at the tree — this is a functional contract, and the tree was only where it first became audible.
 
+### Packaging
+
+* **CHANGE**: the test suite is no longer in the published archive — `test/.pubignore`, the same treatment `docs/` and `tool/` already had. It is how the package is developed, not how it is used, and no consumer runs it. Archive: 526 KB → 475 KB compressed. `CLAUDE.md` deliberately stays: excluding a root file needs a root `.pubignore`, which disables `.gitignore`-based listing for the root directory, and this repo has already shipped `coverage/lcov.info` once with zero dry-run warnings
+
 ### One trigger, one contract (#91)
 
 * **FIX**: the trigger now announces whether its menu is **open**. Both anchor paths carry it. `isOpen` was already handed to `anchorBuilder` as "the one thing a caller cannot read for itself" — a screen-reader user is exactly that caller. It tracks the overlay entry, so it stays true for the close animation, which is deliberate: the menu is still on screen and the chevron a caller draws from the same flag is still turned

@@ -1,0 +1,10 @@
+# The test suite is how this package is developed, not how it is used. It is a
+# third of the published archive and no consumer runs it — the same reasoning
+# that keeps `docs/` and `tool/` out.
+#
+# `CLAUDE.md` stays in, deliberately. Excluding a root file needs a root
+# `.pubignore`, and that disables `.gitignore`-based listing for the root
+# directory — every pattern in it would have to be restated by hand, and this
+# repo has already shipped `coverage/lcov.info` with zero dry-run warnings once.
+# Three kilobytes is not worth that trade.
+*
