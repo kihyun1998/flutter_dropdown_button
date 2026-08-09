@@ -209,7 +209,7 @@ The unified dropdown widget. Use the default constructor for custom widget rende
 | `height` | `double` | `200.0` | Maximum height of dropdown overlay |
 | `itemHeight` | `double` | `48.0` | Height of each dropdown item |
 | `animationDuration` | `Duration` | `200ms` | Duration of show/hide animation |
-| `enabled` | `bool` | `true` | Whether the dropdown is interactive |
+| `enabled` | `bool` | `true` | Whether the dropdown is interactive. Setting it false while the menu is open **closes** it, and the rows stop accepting taps at once |
 | `expand` | `bool` | `false` | Expand to fill available space in flex container |
 | `trailing` | `Widget?` | `null` | Custom widget replacing default arrow icon |
 | `scrollToSelectedItem` | `bool` | `true` | Auto-scroll to selected item on open |
@@ -471,7 +471,7 @@ Controls the appearance and behavior of the search text field when `searchable` 
 | `decoration` | `InputDecoration?` | `null` | Full InputDecoration override (ignores individual properties when set) |
 | `textStyle` | `TextStyle?` | `null` | Text style for search input |
 | `backgroundColor` | `Color?` | `null` | Background color of the search field |
-| `border` | `BoxBorder?` | `null` | Border when not focused |
+| `border` | `BoxBorder?` | `null` | Border when not focused. Also the edge a **disabled** field keeps — a dropdown disabled while its menu is open disables the field for the length of the close, and an unfilled disabled slot would hand your colour back to Flutter's default |
 | `focusedBorder` | `BoxBorder?` | `null` | Border when focused |
 | `divider` | `Widget?` | `null` | Widget between search field and item list |
 

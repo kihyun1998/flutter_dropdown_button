@@ -41,6 +41,37 @@ Full parameter tables live in `README.md`. The two constructors share every layo
 |--------|-------------|
 | `closeAll({bool animate = true})` | Closes every open menu. Pass `animate: false` right before navigation, when the widget may be disposed before an animation could finish |
 
+### What a screen reader hears
+
+On screen a dropdown says which item is chosen with a colour. None of that
+reaches anyone using a screen reader, so it is said in the semantics tree as
+well — by hand, because this package draws its own overlay and inherits none of
+Flutter's menu semantics.
+
+- **The trigger is a control.** It announces the button role, whether it is
+  enabled, and whether the menu is open — in both chromed and bare mode. The
+  last one is the state the widget exists to toggle, and the only one a caller
+  cannot see for themselves.
+- **A chosen row says so.** Single-select rows carry `selected`; the checklist's
+  carry `checked`. Which word is used follows from the cardinality, not from a
+  setting.
+- **A disabled control announces it, and stops accepting input** — including the
+  menu, which closes rather than being left open with rows that do nothing.
+- **Dismissing is done from the trigger.** The outside-tap barrier is a gesture,
+  not a control: it declares nothing to assistive technology, and the trigger
+  stays reachable while its own menu is open.
+
+> **If your `itemBuilder` declares `selected` itself, delete it.** That was a
+> reasonable workaround before the row carried the flag; now the two collide.
+> Two `Semantics` in one merge group cannot both set the same field, so the
+> caller's becomes a node of its own — measured, the row keeps `selected` and
+> its tap action but loses its **label**, while the labelled node loses its
+> actions. Any *other* property you declare (a label, a hint) merges as before.
+
+What is **not** here: the open menu is not navigated by arrow keys, Escape does
+not close it, and there is no type-ahead. The anchor is keyboard-activatable;
+the menu is not keyboard-driven.
+
 ### A value that is not in `items`
 
 The button draws `value` whether or not `items` still offers it. A list refresh can drop the chosen row's data while `value` still names it; the button keeps showing it, the menu draws no row for it, and nothing throws.
@@ -65,7 +96,8 @@ That is the whole of the keyboard story today. The **anchor** is a tab stop and 
 - **`isOpen` flips true the moment the menu opens and false once it has finished closing** — the close animation runs while it is still true, so a chevron animated off it settles back after the menu is gone.
 - **The button-box params it replaces must be left unset.** `width`, `minWidth`, `maxWidth`, `expand` and `trailing` describe the box you no longer have; combining any with `anchorBuilder` asserts in debug.
 - **Set `minMenuWidth` — the menu inherits the anchor's width.** A bare anchor is compact by design, and the menu takes its width from it, so an `[All ▾]` anchor yields an `[All ▾]`-wide menu its rows overflow. `minMenuWidth` (and `maxMenuWidth`) are *menu* widths, not the button-box `width`/`minWidth`/`maxWidth`, so they are allowed in bare mode and are the way to give the menu a usable width of its own.
-- **The anchor is still announced as a button.** `Semantics(button: true)` wraps it, the same as the chromed path, so a screen reader reads your widget as the control it is. (It is not the ink well's role being restored — an `InkWell` announces no role in either path; it contributes the focusability that a bare anchor, being a plain gesture detector, does not have.)
+- **The anchor is still the control it was.** It announces the button role, whether it is enabled and whether the menu is open, it is a tab stop, and Enter or Space activates it — the same contract the chromed path carries. (None of that is the ink well's doing: an `InkWell` announces no role at all. What it *does* contribute is focusability, which is why the bare path had none until it grew a focus detector of its own.)
+- **It is therefore a tab stop.** In the embedded-field layout this mode exists for, that is one more stop inside the field. It is the deliberate trade for the control being reachable by keyboard at all; a disabled anchor is not a stop.
 
 ### Positioning against an outer box
 
@@ -127,7 +159,8 @@ Text mode only. An item that needs more than text — an avatar, two lines — i
 - **`T` needs `==` and `hashCode`.** `selected.contains(item)` uses both, where single-select's `value == item` used only the first. A `T` with a hand-written `==` and the default `hashCode` will let a `Set` hold duplicates that look identical.
 - **A chosen value absent from `items`** still counts towards `labelBuilder`, and draws no row. `'3 selected'` can appear beside two ticked boxes after a refresh drops the third. Offer a way to clear it.
 - **The query survives a tick.** Only opening and closing the menu reset it.
-- **Rows announce their checked state.** The box (a `FlutterCheckbox`) is drawn but excluded from the semantics tree; the row carries `checked` instead, so the row is the single interactive node a screen reader sees.
+- **Rows announce their checked state.** The box (a `FlutterCheckbox`) is drawn but excluded from the semantics tree; the row carries `checked` instead, so the row is the single interactive node a screen reader sees. Everything under [What a screen reader hears](#what-a-screen-reader-hears) applies here too — the trigger's role, enabled and open state are the shell's, not the widget's.
+- **Disabling closes the checklist.** It matters more here than for single-select: `closeOnTap` is false, so before this an open checklist stayed fully operable for as long as it was on screen, disabled or not.
 - **A trailing widget's text is merged into the row's announced label.** The ink well merges its descendants, so `itemTrailingBuilder: (v) => Text('42')` makes a screen reader read `"Apple\n42"`. `itemLeadingBuilder` is the same; an `Icon` carries no label and stays silent.
 - **The row is `[checkbox] [leading] [label] [trailing]`.** Only the label gives way when space runs out, so it ellipsises and neither slot is squeezed. Material has no such arrangement — `CheckboxListTile`'s `secondary` sits on the *opposite* side of the box (`checkbox_list_tile.dart:590`), which is the layout `itemTrailingBuilder` alone gives you.
 
