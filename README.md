@@ -15,6 +15,7 @@ A highly customizable dropdown package for Flutter with overlay-based rendering,
 - **Smart Positioning**: Automatically opens up/down based on available space
 - **Smooth Animations**: Scale and fade effects with configurable timing
 - **Outside-tap Dismissal**: Automatic closure when tapping outside
+- **Reaches a Screen Reader**: The trigger announces its role, whether it is enabled and whether the menu is open; a chosen row says so (`selected`, or `checked` on the checklist). Keyboard-activatable in both chromed and bare mode
 - **Flexible Width**: Fixed, min/max constraints, content-based, or flex expansion
 - **Bare Anchor**: Drop the button chrome with `anchorBuilder` and embed the menu inside another field, `[All ▾] │ search…`
 - **Independent Menu Width**: Set menu width separately from button with alignment control
@@ -229,8 +230,10 @@ The unified dropdown widget. Use the default constructor for custom widget rende
 Supply `anchorBuilder` to embed the dropdown inside another field — a field-scope
 selector at the head of a search box, `[All ▾] │ search…` — where the button's
 own background, border and fixed width would nest a box inside a box. It drops
-that whole button box and hangs the same anchored menu (theming, keyboard
-navigation, `searchable`, `itemBuilder`) off the widget you return.
+that whole button box and hangs the same anchored menu (theming, `searchable`,
+`itemBuilder`) off the widget you return — and the anchor stays what it was: a
+focusable button that announces its role, whether it is enabled, and whether the
+menu is open, and that Enter or Space activates.
 
 The builder is handed `isOpen`, the one thing it cannot read for itself, so an
 inline chevron can turn — `AnimatedRotation(turns: isOpen ? 0.5 : 0.0, …)`. It is
