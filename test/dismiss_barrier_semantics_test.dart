@@ -132,12 +132,19 @@ void main() {
     // whose activation dismissed the menu.
     final screen = tester.view.physicalSize / tester.view.devicePixelRatio;
     final node = tester.getSemantics(find.text('No results found'));
+    final data = node.getSemanticsData();
+    final actions = [
+      for (final action in SemanticsAction.values)
+        if (data.hasAction(action)) action.name,
+    ];
 
     expect(node.rect.width, lessThan(screen.width));
     expect(
-      SemanticsAction.values.any(node.getSemanticsData().hasAction),
-      isFalse,
-      reason: 'a message is not a button',
+      actions,
+      isEmpty,
+      reason:
+          'a message is not a button. Node ${node.rect.width.toInt()}x'
+          '${node.rect.height.toInt()} label="${data.label}" carries: $actions',
     );
 
     semantics.dispose();
