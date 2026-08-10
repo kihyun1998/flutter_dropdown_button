@@ -14,7 +14,8 @@ import 'theme/tooltip_theme.dart';
 ///
 /// Anchored rather than modal. There is no scrim and no confirm button — a tap
 /// on a row calls [onChanged] at once with a **new** `Set`, and an outside tap
-/// dismisses the menu.
+/// dismisses the menu. The dismissing tap is consumed, so it does not also
+/// reach what is behind the menu.
 ///
 /// ```dart
 /// FlutterMultiSelectDropdown<String>(
