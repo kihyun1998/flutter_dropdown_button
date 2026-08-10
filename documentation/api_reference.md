@@ -35,6 +35,10 @@ FlutterDropdownButton<T>.text({
 
 Full parameter tables live in `README.md`. The two constructors share every layout, theming and search parameter; only the rendering parameters differ.
 
+### Outside-tap dismissal
+
+A tap outside an open menu closes it. **That tap is consumed by the dismissal and does not reach what is behind the menu** — activating a widget behind an open menu takes a second tap. Material's own `DropdownButton` behaves the same way: its `PopupRoute` mounts a dismissible, fully transparent `ModalBarrier`. This package follows it deliberately; the tap is not lost by accident.
+
 ### Statics
 
 | Member | Description |
@@ -133,7 +137,7 @@ Container(
 
 ## FlutterMultiSelectDropdown\<T\>
 
-A checklist. Several items may be chosen, the menu stays open while they are, and `onChanged` fires the moment a box is ticked — no confirm button. Anchored rather than modal: no scrim, dismissed by an outside tap.
+A checklist. Several items may be chosen, the menu stays open while they are, and `onChanged` fires the moment a box is ticked — no confirm button. Anchored rather than modal: no scrim, dismissed by an outside tap — a tap the dismissal consumes, so it does not also reach what is behind the menu.
 
 ```dart
 FlutterMultiSelectDropdown<T>({
