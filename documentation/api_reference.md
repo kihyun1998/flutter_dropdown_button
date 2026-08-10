@@ -37,7 +37,9 @@ Full parameter tables live in `README.md`. The two constructors share every layo
 
 ### Outside-tap dismissal
 
-A tap outside an open menu closes it. **That tap is consumed by the dismissal and does not reach what is behind the menu** — activating a widget behind an open menu takes a second tap. Material's own `DropdownButton` behaves the same way: its `PopupRoute` mounts a dismissible, fully transparent `ModalBarrier`. This package follows it deliberately; the tap is not lost by accident.
+A tap outside an open menu closes it. **That tap is consumed by the dismissal and does not reach what is behind the menu** — activating a widget behind an open menu takes a second tap. Material's own `DropdownButton` produces the same tap count, through a `PopupRoute` whose `ModalBarrier` is dismissible and fully transparent.
+
+The two are not the same mechanism, and the difference is observable. Material's barrier is `HitTestBehavior.opaque`, so nothing behind it is hit-tested at all. This package's is `translucent` and simply wins the gesture arena, so a widget behind an open menu **does** still receive the pointer — a `Listener` behind one fires its `onPointerDown` and `onPointerUp`; what it does not get is the tap.
 
 ### Statics
 
@@ -385,10 +387,10 @@ A working example lives in `example/lib/pages/domain_type_page.dart`.
 |--------|-------------|
 | `buttonKey` | Attach to the button so the controller can measure it |
 | `positioningKey` | A `GlobalKey` on an outer box to measure the menu against instead of `buttonKey`. Mutable; null measures the button. See [Positioning against an outer box](#positioning-against-an-outer-box) |
-| `isOpen` | Whether the menu is showing |
+| `isOpen` | Whether the menu is showing — true for the whole close animation too, since the entry is still mounted. `open()` accounts for that itself |
 | `animation` | Runs forward as the menu opens. Drive your own transitions from it — a rotating trailing icon, say |
-| `open(context)` | Shows the menu, closing whichever menu is open in the same `Overlay` |
-| `close({animate = true})` | Hides the menu. Pass `animate: false` to tear it down at once |
+| `open(context)` | Shows the menu, closing whichever menu is open in the same `Overlay`. Called while this menu is closing it takes the close back, so `closeAll()` then `open()` shows the menu |
+| `close({animate = true})` | Hides the menu. Pass `animate: false` to tear it down at once. The menu goes away either way — the animation is decoration, not the mechanism, so a disabled `TickerMode` (anything under a pushed route) cannot strand the entry |
 | `toggle(context)` | Opens if closed, closes if open |
 | `rebuild()` | Rebuilds and re-measures the menu in place. Not legal during a build — defer to a post-frame callback |
 | `dispose()` | Releases the animation and removes the overlay |

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../buttons/menu_alignment.dart';
@@ -148,6 +150,16 @@ class DropdownOverlayController {
   BuildContext? _context;
   bool _disposed = false;
 
+  /// Whether a close is in flight.
+  ///
+  /// [isOpen] cannot answer this — it is `_entry != null`, and the entry lives
+  /// for the whole close animation. Kept separate so [open] can tell a menu
+  /// that is open from one that is on its way out.
+  bool _closing = false;
+
+  /// Settles a close whose animation never ticks. See [close].
+  Timer? _closeFallback;
+
   /// The open menu in each [Overlay], so opening one closes its neighbour.
   ///
   /// Keyed by Overlay rather than held in a single static field: two menus in
@@ -156,6 +168,11 @@ class DropdownOverlayController {
       {};
 
   /// Whether the menu is showing.
+  ///
+  /// True for the whole close animation as well — the entry is still mounted
+  /// and still painting. [open] accounts for that itself, so a call that lands
+  /// mid-close reopens rather than being dropped; a caller reading this to
+  /// decide whether to open does not have to.
   bool get isOpen => _entry != null;
 
   /// Runs forward as the menu opens and backward as it closes.
@@ -175,8 +192,23 @@ class DropdownOverlayController {
   ).animate(CurvedAnimation(parent: _animation, curve: Curves.easeOut));
 
   /// Shows the menu, closing whichever menu is open in the same [Overlay].
+  ///
+  /// Called while this menu is closing, it takes the close back and the menu
+  /// stays up — so `closeAll()` immediately followed by `open()` shows the
+  /// menu rather than silently doing nothing.
   void open(BuildContext context) {
-    if (isOpen) return;
+    if (isOpen) {
+      // A close in flight still counts as open, so without this the call is
+      // dropped and the menu the caller just asked for finishes closing
+      // instead. `closeAll()` immediately followed by `open()` — the obvious
+      // "close everything, then show mine" — is exactly that sequence.
+      if (!_closing) return;
+      _cancelClose();
+      _context = context;
+      _animation.forward();
+      rebuild();
+      return;
+    }
 
     final overlay = Overlay.of(context);
     _openPerOverlay[overlay]?.close();
@@ -195,6 +227,11 @@ class DropdownOverlayController {
   /// With [animate] true the close animation plays first, so the trailing icon
   /// rotates back. Pass false to tear the overlay down at once — the owner may
   /// be disposed before an animation could finish.
+  ///
+  /// The menu goes away either way. The animation is decoration, not the
+  /// mechanism: an owner whose `TickerMode` is disabled — anything under a
+  /// route that has been pushed over — would otherwise keep the entry mounted
+  /// forever, over the new page, swallowing every tap.
   void close({bool animate = true}) {
     if (!isOpen) return;
 
@@ -204,10 +241,36 @@ class DropdownOverlayController {
       return;
     }
 
+    _closing = true;
     _animation.reverse().then((_) {
       // The owner may have been disposed while the animation ran.
-      if (!_disposed && isOpen) _teardown();
+      if (!_disposed && _closing) _teardown();
     });
+
+    // The reverse only advances while the owner's `TickerMode` is enabled, and
+    // a route pushed over an open menu mutes it. Without this the entry stayed
+    // mounted *above the new page*, swallowing every tap, until the user
+    // navigated back — measured `page2Taps=0` three taps running (#106).
+    //
+    // Asking the tree whether the ticker runs is not open to us: `TickerMode.of`
+    // is deprecated after 3.35, and this repo's analyze gate exits 1 on a single
+    // info, while `TickerMode.valuesOf` does not exist at our 3.32 floor. Both
+    // CI jobs close that door from opposite sides. A timer is not ticker-gated,
+    // so it settles the teardown either way; whichever arrives first wins and
+    // `_cancelClose` makes the loser a no-op.
+    _closeFallback?.cancel();
+    _closeFallback = Timer(_animation.duration ?? Duration.zero, () {
+      if (!_disposed && _closing) {
+        _animation.reset();
+        _teardown();
+      }
+    });
+  }
+
+  void _cancelClose() {
+    _closing = false;
+    _closeFallback?.cancel();
+    _closeFallback = null;
   }
 
   /// Opens the menu if closed, closes it if open.
@@ -223,6 +286,7 @@ class DropdownOverlayController {
   /// Releases the animation and removes the overlay without animating.
   void dispose() {
     _disposed = true;
+    _cancelClose();
     // Silent: the owner is being torn down and must not be asked to rebuild.
     if (isOpen) _teardown(notify: false);
     _animation.dispose();
@@ -236,6 +300,7 @@ class DropdownOverlayController {
   }
 
   void _teardown({bool notify = true}) {
+    _cancelClose();
     try {
       _entry?.remove();
     } catch (_) {
