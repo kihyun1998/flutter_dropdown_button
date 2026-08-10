@@ -101,4 +101,93 @@ void main() {
     );
     expect(menu.left, greaterThanOrEqualTo(0));
   });
+
+  testWidgets('"outside" is scoped to the hosting Overlay', (tester) async {
+    // Characterisation, not a defect: the dismiss barrier is `SizedBox.expand`
+    // inside the entry, so it fills the theatre of whatever `Overlay.of` gave
+    // it — a nested one covers only its own box. `documentation/api_reference.md`
+    // states this, and these are the numbers it quotes.
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: Stack(
+            children: [
+              Positioned(
+                left: 400,
+                top: 0,
+                width: 400,
+                height: 600,
+                child: Overlay(
+                  initialEntries: [
+                    OverlayEntry(
+                      builder: (_) => Align(
+                        alignment: Alignment.topLeft,
+                        child: dropdown(),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    await openAndMeasureMenu(tester);
+    expect(find.byType(ListView), findsOneWidget);
+
+    // Beyond the hosting Overlay: the barrier was never there to be tapped.
+    await tester.tapAt(const Offset(100, 300));
+    await tester.pumpAndSettle();
+    expect(
+      find.byType(ListView),
+      findsOneWidget,
+      reason: 'a tap outside the hosting Overlay does not reach the barrier',
+    );
+
+    // Inside it, outside the menu: dismisses, as documented.
+    await tester.tapAt(const Offset(600, 300));
+    await tester.pumpAndSettle();
+    expect(find.byType(ListView), findsNothing);
+  });
+
+  testWidgets('closeAll reaches a menu the outside tap cannot', (tester) async {
+    // The documented way out of the gap the previous test pins.
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: Stack(
+            children: [
+              Positioned(
+                left: 400,
+                top: 0,
+                width: 400,
+                height: 600,
+                child: Overlay(
+                  initialEntries: [
+                    OverlayEntry(
+                      builder: (_) => Align(
+                        alignment: Alignment.topLeft,
+                        child: dropdown(),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    await openAndMeasureMenu(tester);
+    await tester.tapAt(const Offset(100, 300));
+    await tester.pumpAndSettle();
+    expect(find.byType(ListView), findsOneWidget);
+
+    DropdownOverlayController.closeAll();
+    await tester.pumpAndSettle();
+    expect(find.byType(ListView), findsNothing);
+  });
 }

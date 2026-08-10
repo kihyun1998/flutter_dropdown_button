@@ -41,6 +41,8 @@ A tap outside an open menu closes it. **That tap is consumed by the dismissal an
 
 The two are not the same mechanism, and the difference is observable. Material's barrier is `HitTestBehavior.opaque`, so nothing behind it is hit-tested at all. This package's is `translucent` and simply wins the gesture arena, so a widget behind an open menu **does** still receive the pointer — a `Listener` behind one fires its `onPointerDown` and `onPointerUp`; what it does not get is the tap.
 
+**"Outside" means outside the menu but inside its `Overlay`.** The dismissing region is the size of the `Overlay` the menu was inserted into, not the size of the screen — so in a layout that nests an `Overlay` inside part of the screen (a side panel that owns its own), a tap landing *beyond that panel* does not dismiss. Measured on a 400×600 panel offset to `left: 400`: a tap at (100, 300) leaves the menu open, one at (600, 300) closes it. Everywhere the menu itself can be seen, an outside tap dismisses; the gap is only the region the hosting `Overlay` never covered. `DropdownOverlayController.closeAll()` is the way to dismiss from outside that region — it reaches every `Overlay`.
+
 ### Statics
 
 | Member | Description |
