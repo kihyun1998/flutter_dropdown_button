@@ -4,6 +4,19 @@
 
 What is on screen reached everyone except the people who cannot see it. The trigger announced its current value and nothing about being a control; the chosen row was distinguished from its neighbours by `DropdownItemTheme.selectedColor` and by nothing else. The checklist had been doing this correctly since 3.1.0 — `Semantics(checked:)` on the row — and the single-select path simply never got the same treatment.
 
+Two contracts on `DropdownOverlayController` also rested on the same wrong idea — that the overlay entry's lifetime is the same thing as the menu being open. It is not: the entry outlives the close by exactly one animation, and that animation is not guaranteed to run. Both bugs are invisible through `FlutterDropdownButton` and `FlutterMultiSelectDropdown`, because the dismiss barrier keeps the pointer away from the trigger (#95); they surface on the third-party controller path the README advertises as "Build Your Own".
+
+### `close()` finishes without a running ticker (#106)
+
+* **FIX**: an open menu no longer strands itself over a pushed route. `close()` gated teardown on `_animation.reverse().then(…)`, and `ModalRoute` disables the `TickerMode` of the route below it — so the reverse started and never advanced. Measured: `anim=reverse v=1.00` unchanged after two seconds, the entry still mounted *above the new page*, and `page2Taps=0` on three consecutive taps. The page was dead until the user navigated back. Reproduced with no `Navigator` in the tree at all — a plain `TickerMode(enabled: false)` is the whole condition, so any caller who disables ticking hit it
+* **FIX**: `onOpenStateChanged(false)` now arrives in that case. It rode on the same teardown, so an owner drawing its trigger from the callback stayed drawn as open
+* **CHANGE**: the close animation is decoration, not the mechanism. A timer settles the teardown at `animationDuration` whichever way the ticker goes, and whichever of the two arrives first wins. Querying the tree instead was not available: `TickerMode.of` is deprecated after 3.35 and this repo's `flutter analyze` gate exits 1 on a single info, while `TickerMode.valuesOf` does not exist at the `>=3.32.0` floor — both CI jobs close that door from opposite sides
+
+### `open()` is no longer dropped mid-close (#107)
+
+* **FIX**: `closeAll()` immediately followed by `open()` shows the menu. `open()`'s guard is `if (isOpen) return`, and `isOpen` is `_entry != null`, which stays true for the whole close animation — so the call was a silent no-op and the close then completed. The caller asked for a menu and got none. A close in flight is now taken back instead
+* **TEST**: `overlay_close_contract_test.dart` pins both, including the route case end to end. Discriminating power confirmed by reverting `lib/`: five of six go red, and the one that stays green is the guard against "fixing" this by never closing at all
+
 ### The trigger and the chosen row reach the semantics tree (#88)
 
 * **FIX**: the trigger announces `button` and its enabled state. Measured before: `flags=[isFocusable] actions=[tap, focus]` — no role at all, and a *disabled* dropdown emitted `flags=[] actions=[]`, indistinguishable from something decorative. It is one `Semantics` on the node the `InkWell` already annotates, so the merged `semanticsLabel` contract is unchanged. Both widgets get it; they share the shell
