@@ -348,15 +348,19 @@ class FlutterDropdownButton<T> extends StatefulWidget {
   /// ```
   final bool Function(T item, String query)? searchFilter;
 
-  /// Builder for the empty state when search yields no results.
+  /// Builder for the menu's empty state — an empty [items] list, or a search
+  /// query that matches nothing.
   ///
-  /// Called with the current search query. If null, a default
-  /// "No results found" text is displayed.
+  /// Called with the current query; an empty query means the list itself is
+  /// empty. If null, the package shows "No results found" while a query
+  /// stands and "No items" otherwise.
   ///
   /// Example:
   /// ```dart
   /// emptyBuilder: (query) => Center(
-  ///   child: Text('No items matching "$query"'),
+  ///   child: Text(
+  ///     query.isEmpty ? 'Nothing to pick yet' : 'No items matching "$query"',
+  ///   ),
   /// ),
   /// ```
   final Widget Function(String query)? emptyBuilder;

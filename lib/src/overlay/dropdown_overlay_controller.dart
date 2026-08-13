@@ -17,6 +17,7 @@ class DropdownOverlaySpec {
     required this.actualItemHeight,
     required this.maxDropdownHeight,
     this.chromeHeight = 0.0,
+    this.emptyStateHeight = 0.0,
     this.borderThickness = 0.0,
     this.overlayPadding,
     this.screenMargin = 8.0,
@@ -41,6 +42,12 @@ class DropdownOverlaySpec {
 
   /// Vertical space taken by furniture that is not an item — a search field.
   final double chromeHeight;
+
+  /// Vertical room reserved for an empty state when [itemCount] is zero.
+  ///
+  /// Zero — the default — keeps a spec written before this field existed
+  /// meaning what it meant: an empty menu holds chrome only.
+  final double emptyStateHeight;
 
   /// Total thickness of the overlay's top and bottom borders.
   final double borderThickness;
@@ -349,6 +356,7 @@ class DropdownOverlayController {
         actualItemHeight: current.actualItemHeight,
         maxDropdownHeight: current.maxDropdownHeight,
         chromeHeight: current.totalChromeHeight,
+        emptyStateHeight: current.emptyStateHeight,
         screenMargin: current.screenMargin,
         buttonGap: current.buttonGap,
         minVisibleItems: current.minVisibleItems,

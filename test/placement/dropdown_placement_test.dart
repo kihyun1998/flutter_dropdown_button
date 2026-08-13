@@ -15,6 +15,7 @@ DropdownPlacementInput roomyInput({
   double actualItemHeight = 48,
   double maxDropdownHeight = 200,
   double chromeHeight = 0,
+  double emptyStateHeight = 0,
   double buttonLeft = 20,
   double? minMenuWidth,
   double? maxMenuWidth,
@@ -30,6 +31,7 @@ DropdownPlacementInput roomyInput({
     actualItemHeight: actualItemHeight,
     maxDropdownHeight: maxDropdownHeight,
     chromeHeight: chromeHeight,
+    emptyStateHeight: emptyStateHeight,
     minMenuWidth: minMenuWidth,
     maxMenuWidth: maxMenuWidth,
     menuAlignment: menuAlignment,
@@ -104,6 +106,43 @@ void main() {
       final itemsHeight = input.itemCount * input.actualItemHeight;
 
       expect(contentHeight, greaterThanOrEqualTo(itemsHeight));
+    });
+  });
+
+  group('empty state height', () {
+    // With no items there is nothing for the item term to measure, so the
+    // caller says how much room its empty state needs. Zero — the default —
+    // keeps the old chrome-only behaviour.
+    test('an empty menu reserves nothing by default', () {
+      final result = DropdownPlacement.resolve(
+        roomyInput(itemCount: 0, chromeHeight: 48),
+      );
+
+      expect(result.height, 48.0);
+    });
+
+    test('an empty menu reserves the empty state height', () {
+      final result = DropdownPlacement.resolve(
+        roomyInput(itemCount: 0, emptyStateHeight: 48, chromeHeight: 50),
+      );
+
+      expect(result.height, 98.0);
+    });
+
+    test('maxDropdownHeight caps the empty state like it caps items', () {
+      final result = DropdownPlacement.resolve(
+        roomyInput(itemCount: 0, emptyStateHeight: 300, maxDropdownHeight: 200),
+      );
+
+      expect(result.height, 200.0);
+    });
+
+    test('a menu with items ignores the empty state height', () {
+      final result = DropdownPlacement.resolve(
+        roomyInput(emptyStateHeight: 500),
+      );
+
+      expect(result.height, 144.0);
     });
   });
 

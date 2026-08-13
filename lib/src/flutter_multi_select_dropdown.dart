@@ -177,7 +177,9 @@ class FlutterMultiSelectDropdown<T> extends StatelessWidget {
   /// Overrides the default case-insensitive `contains` over each item's label.
   final bool Function(T item, String query)? searchFilter;
 
-  /// Drawn when a query matches nothing.
+  /// Drawn when the menu has nothing to show — an empty [items] list, or a
+  /// query that matches nothing. An empty query means the list itself is
+  /// empty.
   final Widget Function(String query)? emptyBuilder;
 
   /// Draws the anchor itself, dropping the button chrome (bare mode).
