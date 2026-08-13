@@ -131,16 +131,15 @@ void main() {
     // barrier and named it: one screen-sized node reading "No results found"
     // whose activation dismissed the menu.
     //
-    // Size is the assertion, because size is what distinguishes the barrier
-    // from everything else — it was the only node as large as the view. What
-    // this deliberately does *not* assert is that the node carries no action:
-    // measured across the CI matrix, on 3.44.8 it is its own 166x40 node with
-    // none, while on the 3.32.0 floor the message merges into the **search
-    // field**, giving one 200x146 node labelled "No results found" that also
-    // carries `setText`/`setSelection`/`focus`. That is a different defect on a
-    // different mechanism, it is bounded by the menu rather than the view, and
-    // pinning it here would make this test assert two unrelated things and go
-    // red on one end of the matrix for the wrong reason.
+    // Size distinguishes the barrier — it was the only node as large as the
+    // view. The action assertions are newer (#96): before the empty state
+    // became its own semantics container, this test could only assert size,
+    // because on the 3.32.0 floor the message merged into the **search
+    // field** — one 200x146 node labelled "No results found" carrying
+    // `setText`/`setSelection`/`focus` — while on stable it was already its
+    // own node with none. The container ended that split, so the claim "the
+    // message is a message, not an input" now holds at both ends of the
+    // matrix and is pinned here.
     final screen = tester.view.physicalSize / tester.view.devicePixelRatio;
     final node = tester.getSemantics(find.text('No results found'));
 
@@ -153,6 +152,63 @@ void main() {
       node.rect.height,
       lessThan(screen.height),
       reason: 'both axes — a full-width strip would still not be the barrier',
+    );
+    final data = node.getSemanticsData();
+    expect(
+      data.hasAction(SemanticsAction.setText),
+      isFalse,
+      reason:
+          'the message must not read as the search field — on the 3.32 '
+          'floor it used to merge into it',
+    );
+    expect(
+      data.hasAction(SemanticsAction.tap),
+      isFalse,
+      reason: 'a message is not a control',
+    );
+
+    semantics.dispose();
+  });
+
+  testWidgets('an empty source list announces its state, not the field', (
+    tester,
+  ) async {
+    // #96 — the same claims for the state the builder could never reach: the
+    // menu over an empty list shows "No items", and that message is its own
+    // node beside the search field's, not folded into it.
+    final semantics = tester.ensureSemantics();
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: Center(
+            child: FlutterDropdownButton<Role>.text(
+              width: 200,
+              items: const [],
+              label: (role) => role.name,
+              searchable: true,
+              hint: 'Pick',
+              onChanged: (_) {},
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.byType(FlutterDropdownButton<Role>));
+    await tester.pumpAndSettle();
+
+    final node = tester.getSemantics(find.text('No items'));
+    final data = node.getSemanticsData();
+    expect(node.label, contains('No items'));
+    expect(
+      data.hasAction(SemanticsAction.setText),
+      isFalse,
+      reason: 'its own node, not the search field\'s',
+    );
+    expect(
+      data.hasAction(SemanticsAction.tap),
+      isFalse,
+      reason: 'a message is not a control',
     );
 
     semantics.dispose();

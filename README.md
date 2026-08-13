@@ -222,7 +222,7 @@ The unified dropdown widget. Use the default constructor for custom widget rende
 | `theme` | `DropdownStyleTheme?` | `null` | Theme configuration |
 | `searchable` | `bool` | `false` | Enable search/filter field in dropdown |
 | `searchFilter` | `bool Function(T, String)?` | `null` | Custom filter function (required for custom mode) |
-| `emptyBuilder` | `Widget Function(String)?` | `null` | Widget builder for empty search results |
+| `emptyBuilder` | `Widget Function(String)?` | `null` | Builder for the empty state — empty item list, or no search matches (the query is `""` when the list itself is empty) |
 | `anchorBuilder` | `Widget Function(BuildContext, bool isOpen)?` | `null` | Draw the anchor yourself, dropping the button chrome (**bare** mode) — see below |
 
 #### Bare anchor
@@ -556,7 +556,9 @@ FlutterDropdownButton<User>(
   searchFilter: (user, query) =>
     user.name.toLowerCase().contains(query.toLowerCase()),
   emptyBuilder: (query) => Center(
-    child: Text('No users matching "$query"'),
+    child: Text(
+      query.isEmpty ? 'No users yet' : 'No users matching "$query"',
+    ),
   ),
   itemBuilder: (user, isSelected) => Row(
     children: [

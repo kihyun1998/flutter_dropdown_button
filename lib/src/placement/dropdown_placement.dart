@@ -20,6 +20,7 @@ class DropdownPlacementInput {
     required this.actualItemHeight,
     required this.maxDropdownHeight,
     this.chromeHeight = 0.0,
+    this.emptyStateHeight = 0.0,
     this.screenMargin = 8.0,
     this.buttonGap = 4.0,
     this.minVisibleItems = 2,
@@ -62,6 +63,14 @@ class DropdownPlacementInput {
   /// enabling search does not force a short list to scroll. Callers sum the
   /// pieces themselves — this module does not care what they are made of.
   final double chromeHeight;
+
+  /// Vertical room reserved for an empty state when [itemCount] is zero.
+  ///
+  /// A menu with no items has nothing for the item term to measure, so the
+  /// caller says how much space whatever it draws instead will need. Zero —
+  /// the default — reserves nothing, leaving only [chromeHeight].
+  /// [maxDropdownHeight] caps it the same way it caps items.
+  final double emptyStateHeight;
 
   /// The gap kept between the menu and the edge of the safe area.
   final double screenMargin;
@@ -128,12 +137,11 @@ abstract final class DropdownPlacement {
   /// Calculates the menu's placement.
   static DropdownPlacementResult resolve(DropdownPlacementInput input) {
     final width = _resolveWidth(input);
+    final contentHeight = input.itemCount == 0
+        ? input.emptyStateHeight
+        : input.itemCount * input.actualItemHeight;
     final preferredHeight =
-        math.min(
-          input.itemCount * input.actualItemHeight,
-          input.maxDropdownHeight,
-        ) +
-        input.chromeHeight;
+        math.min(contentHeight, input.maxDropdownHeight) + input.chromeHeight;
 
     // Both spans already exclude the screen margin and the button gap, so a
     // menu that fits within one of them satisfies the invariant by itself.

@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dropdown_button/flutter_dropdown_button.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-/// Width constraints, `expand`, the overlay's padding, and the empty-search
-/// widget the package draws when the caller supplies no `emptyBuilder`.
+/// Width constraints, `expand`, the overlay's padding, and the empty state —
+/// what the menu shows when a query matches nothing or the source list itself
+/// is empty (#96), with or without a caller's `emptyBuilder`.
 ///
 /// All reachable from the public API; none of them covered until #56.
 
@@ -162,6 +163,152 @@ void main() {
 
       expect(find.text('No results found'), findsNothing);
       expect(find.text('Apple'), findsOneWidget);
+    });
+  });
+
+  group('the empty list state', () {
+    // #96 — the builder was reachable only through the search path, so a menu
+    // whose *source list* was empty rendered a bare card and called nothing.
+    Widget empty({
+      bool searchable = false,
+      Widget Function(String)? emptyBuilder,
+    }) => FlutterDropdownButton<String>.text(
+      width: 200,
+      items: const [],
+      hint: 'Pick',
+      searchable: searchable,
+      disableWhenSingleItem: false,
+      emptyBuilder: emptyBuilder,
+      onChanged: (_) {},
+    );
+
+    Future<void> open(WidgetTester tester) async {
+      await tester.tap(find.byType(FlutterDropdownButton<String>));
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets('with no builder, the package says "No items"', (tester) async {
+      await tester.pumpWidget(host(empty()));
+
+      await open(tester);
+
+      expect(find.text('No items'), findsOneWidget);
+      expect(
+        tester.getSize(find.text('No items')).height,
+        greaterThan(0),
+        reason:
+            'the menu reserved room for the empty state, '
+            'not a chrome-only sliver',
+      );
+    });
+
+    testWidgets('the builder runs, with an empty query', (tester) async {
+      final queries = <String>[];
+      await tester.pumpWidget(
+        host(
+          empty(
+            emptyBuilder: (q) {
+              queries.add(q);
+              return const Text('nothing here');
+            },
+          ),
+        ),
+      );
+
+      await open(tester);
+
+      expect(find.text('nothing here'), findsOneWidget);
+      expect(queries, isNotEmpty);
+      expect(queries.every((q) => q.isEmpty), isTrue);
+      expect(find.text('No items'), findsNothing);
+    });
+
+    testWidgets('searchable but untyped, the empty list still reaches the '
+        'builder', (tester) async {
+      final queries = <String>[];
+      await tester.pumpWidget(
+        host(
+          empty(
+            searchable: true,
+            emptyBuilder: (q) {
+              queries.add(q);
+              return const Text('nothing here');
+            },
+          ),
+        ),
+      );
+
+      await open(tester);
+
+      expect(find.text('nothing here'), findsOneWidget);
+      expect(queries.every((q) => q.isEmpty), isTrue);
+    });
+
+    testWidgets('a query typed over an empty list keeps the search wording', (
+      tester,
+    ) async {
+      await tester.pumpWidget(host(empty(searchable: true)));
+
+      await open(tester);
+      expect(find.text('No items'), findsOneWidget);
+
+      await tester.enterText(find.byType(TextField), 'zzz');
+      await tester.pumpAndSettle();
+
+      expect(find.text('No results found'), findsOneWidget);
+      expect(find.text('No items'), findsNothing);
+    });
+
+    testWidgets('disabling search while open drops the stale query', (
+      tester,
+    ) async {
+      // The query survives `searchable` flipping off (the controller keeps
+      // the field's text so re-enabling does not lose the caret), but a
+      // builder must not see a query the user can no longer see or edit.
+      final queries = <String>[];
+      Widget at({required bool searchable}) => host(
+        empty(
+          searchable: searchable,
+          emptyBuilder: (q) {
+            queries.add(q);
+            return Text('empty[$q]');
+          },
+        ),
+      );
+
+      await tester.pumpWidget(at(searchable: true));
+      await open(tester);
+      await tester.enterText(find.byType(TextField), 'zzz');
+      await tester.pumpAndSettle();
+      expect(queries.last, 'zzz');
+
+      await tester.pumpWidget(at(searchable: false));
+      await tester.pumpAndSettle();
+
+      expect(queries.last, '');
+      expect(find.text('empty[]'), findsOneWidget);
+    });
+
+    testWidgets('the multi-select checklist shows the same empty state', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        host(
+          FlutterMultiSelectDropdown<String>(
+            width: 200,
+            items: const [],
+            labelBuilder: (selected) =>
+                selected.isEmpty ? 'Pick' : selected.join(', '),
+            selected: const {},
+            onChanged: (_) {},
+          ),
+        ),
+      );
+
+      await tester.tap(find.byType(FlutterMultiSelectDropdown<String>));
+      await tester.pumpAndSettle();
+
+      expect(find.text('No items'), findsOneWidget);
     });
   });
 

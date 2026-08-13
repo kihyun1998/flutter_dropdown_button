@@ -83,6 +83,7 @@ Each of these was decided separately and falls out of the rules above:
 | #64 / #81 — the checklist box is excluded and `checked` is re-attached to the row | rules 2 and 3 (one complete node per interactive surface, in the checklist's vocabulary) |
 | #88 — the trigger announces `button`/`enabled`, the single-select row announces `selected` | rules 1, 2, 3 |
 | #88 — the reported direction was backwards: the *bare* path already announced the role | rule 5 |
+| #96 — the menu's empty state is its own semantics container: on the 3.32 floor a bare message text merged into the search field's node, so a screen reader read the input itself as "No results found" | rules 3 and 4 (a message must not read as an input; found and pinned at the semantics tree, at both ends of the CI matrix) |
 
 ## What these contradict
 

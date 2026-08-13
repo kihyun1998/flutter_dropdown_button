@@ -46,7 +46,16 @@ Two contracts on `DropdownOverlayController` also rested on the same wrong idea 
 * **CHANGE**: consequently **a bare anchor is a tab stop where it was not**. In the embedded-field layout the mode exists for — `[All ▾] │ search…` — that is one more stop inside the field. It is the deliberate trade for the control being reachable at all; a disabled anchor is not a stop, and under `NavigationMode.directional` it stays reachable so a D-pad user can hear that it is unavailable — the same rule `InkWell` follows
 * **CHANGE**: the docs claimed "keyboard navigation" for the anchored menu, in bare mode and generally. Narrowed to what exists: the **anchor** is focusable and activatable; the **open menu** is not navigated by arrow keys and Escape does not close it. The 4.0.0 entry that made the same claim is published and is left alone — this supersedes it
 
-### Packaging
+### The empty state reaches an empty list (#96)
+
+* **FIX**: `emptyBuilder` now runs when the source list itself is empty. It was reachable only through the search path — `items.isEmpty && searchable && query.isNotEmpty` — so the emptiest menu of all rendered a chrome-only sliver (measured 200×2 without search, 200×50 with) and called nothing, whichever builder the caller had supplied. The menu now reserves one item's height for the state, so it opens onto a readable card
+* **CHANGE**: a supplied `emptyBuilder` fires in states it could not reach before, with the query `""` when the list itself is empty — a builder written against the old "search yields no results" doc wording sees a new argument value. Interpolating the query unconditionally (the pattern this package's own docs used to teach) renders with an empty string there; branch on `query.isEmpty` for a dedicated message
+* **FIX**: without a builder, the default text now matches the situation: "No results found" only while a query stands, "No items" when the list is empty — the old text claimed a search had happened when none had
+* **FIX**: the builder no longer sees a query the user cannot see or edit. The query deliberately survives `searchable` flipping off (so flipping it back on keeps the caret), but the empty state reported it even while the field was gone; it now reports `""` unless the field is shown
+* **FIX**: on the 3.32.0 floor, the empty-state message merged into the **search field's** semantics node — a screen reader read the input itself as "No results found" (measured: one 200×146 node carrying `setText`/`setSelection`/`focus`). The state is now its own semantics container on every supported version, and the claim "the message is a message, not an input" is pinned at both ends of the CI matrix
+* **TEST**: the four-row reachability table from #96 (searchable × query × empty list), the stale-query guard, the checklist pass-through, and the placement rule that an empty menu reserves its empty-state height — none of it covered before. Discriminating power confirmed by reverting `lib/`: all six behavior tests go red
+
+
 
 * **CHANGE**: the test suite is no longer in the published archive — `test/.pubignore`, the same treatment `docs/` and `tool/` already had. It is how the package is developed, not how it is used, and no consumer runs it. Archive: 526 KB → 475 KB compressed. `CLAUDE.md` deliberately stays: excluding a root file needs a root `.pubignore`, which disables `.gitignore`-based listing for the root directory, and this repo has already shipped `coverage/lcov.info` once with zero dry-run warnings
 

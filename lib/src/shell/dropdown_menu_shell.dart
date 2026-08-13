@@ -111,7 +111,8 @@ class DropdownMenuShell<T> extends StatefulWidget {
   /// The caller's filter. Wins over the presentation's default.
   final bool Function(T item, String query)? searchFilter;
 
-  /// Drawn when a query matches nothing.
+  /// Drawn when the menu has nothing to show — an empty source list, or a
+  /// query that matches nothing.
   final Widget Function(String query)? emptyBuilder;
 
   /// Styling for the button, the menu, its scrollbar and its search field.
@@ -232,6 +233,9 @@ class _DropdownMenuShellState<T> extends State<DropdownMenuShell<T>>
     return DropdownOverlaySpec(
       itemCount: widget.items.length,
       actualItemHeight: actualItemHeight,
+      // One row's worth of room for the empty state, so an empty source list
+      // opens onto a readable card rather than a chrome-only sliver (#96).
+      emptyStateHeight: actualItemHeight,
       maxDropdownHeight: widget.height,
       chromeHeight: _searchFieldHeight,
       borderThickness: overlayBorderThickness,
@@ -584,21 +588,31 @@ class _DropdownMenuShellState<T> extends State<DropdownMenuShell<T>>
 
     Widget content;
 
-    if (items.isEmpty && widget.searchable && _search.query.isNotEmpty) {
-      // Empty state for search with no results
+    if (items.isEmpty) {
+      // Empty state: the source list is empty, or a query matched nothing.
+      // The query is reported only while the caller shows a search field — it
+      // survives `searchable` flipping off (deliberately, to keep the caret),
+      // but a builder must not see a query the user cannot see or edit.
+      final query = widget.searchable ? _search.query : '';
       content = SizedBox(
         height: availableContentHeight,
-        child:
-            widget.emptyBuilder?.call(_search.query) ??
-            Center(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Text(
-                  'No results found',
-                  style: TextStyle(color: _ambient.hint, fontSize: 14),
+        // Its own semantics node. Left to merge, the floor of the CI matrix
+        // (3.32) folds this text into the search field's node, and a screen
+        // reader announces the input as "No results found".
+        child: Semantics(
+          container: true,
+          child:
+              widget.emptyBuilder?.call(query) ??
+              Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Text(
+                    query.isNotEmpty ? 'No results found' : 'No items',
+                    style: TextStyle(color: _ambient.hint, fontSize: 14),
+                  ),
                 ),
               ),
-            ),
+        ),
       );
     } else if (needsScroll) {
       _scrollController ??= ScrollController();
