@@ -6,6 +6,8 @@ What is on screen reached everyone except the people who cannot see it. The trig
 
 Two contracts on `DropdownOverlayController` also rested on the same wrong idea — that the overlay entry's lifetime is the same thing as the menu being open. It is not: the entry outlives the close by exactly one animation, and that animation is not guaranteed to run. Both bugs are invisible through `FlutterDropdownButton` and `FlutterMultiSelectDropdown`, because the dismiss barrier keeps the pointer away from the trigger (#95); they surface on the third-party controller path the README advertises as "Build Your Own".
 
+And the empty state kept a smaller half-truth of its own: `emptyBuilder`, documented as the builder for when the menu has nothing to show, was reachable only through a search that matched nothing — the emptiest menu of all, an empty source list, called nothing and opened as a chrome-only sliver (#96).
+
 ### `close()` finishes without a running ticker (#106)
 
 * **FIX**: an open menu no longer strands itself over a pushed route. `close()` gated teardown on `_animation.reverse().then(…)`, and `ModalRoute` disables the `TickerMode` of the route below it — so the reverse started and never advanced. Measured: `anim=reverse v=1.00` unchanged after two seconds, the entry still mounted *above the new page*, and `page2Taps=0` on three consecutive taps. The page was dead until the user navigated back. Reproduced with no `Navigator` in the tree at all — a plain `TickerMode(enabled: false)` is the whole condition, so any caller who disables ticking hit it
