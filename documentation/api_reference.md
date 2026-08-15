@@ -80,6 +80,15 @@ What is **not** here: the open menu is not navigated by arrow keys, Escape does
 not close it, and there is no type-ahead. The anchor is keyboard-activatable;
 the menu is not keyboard-driven.
 
+### The search field
+
+`searchable: true` puts a text field at the top of the menu. **Its enabled state follows the control's, never the item count.** It goes dead when `enabled` is false — the field is part of the control, and before that it stayed focused and accepted typing for the whole close animation, leaving a soft keyboard over a disabled dropdown. It stays live on an empty list.
+
+So a menu opened over `items: []` shows a working search field above "No items", and one whose query matches nothing keeps the field that got it there. Both are deliberate. Emptiness is not a reason to disable, for two reasons:
+
+- **A list can be empty in transit.** A caller loading items asynchronously has `items: []` for the first frames. A field that disabled itself there would drop the focus mid-keystroke and dismiss the soft keyboard, and nothing would give either back when the items arrived — the field is focused on open, and an open menu never re-focuses it.
+- **The empty state already says it.** "There is nothing to search" is the job of `emptyBuilder`, or of the default "No items", which carries a semantics node of its own so a screen reader announces it apart from the field. A disabled field would say only that search is unavailable, and not why.
+
 ### A value that is not in `items`
 
 The button draws `value` whether or not `items` still offers it. A list refresh can drop the chosen row's data while `value` still names it; the button keeps showing it, the menu draws no row for it, and nothing throws.

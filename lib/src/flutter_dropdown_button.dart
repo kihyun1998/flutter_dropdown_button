@@ -330,6 +330,10 @@ class FlutterDropdownButton<T> extends StatefulWidget {
   ///
   /// The search field appearance can be customized via [DropdownStyleTheme.search].
   ///
+  /// The field follows [enabled], not the item count: it stays live over an
+  /// empty list, so a caller loading items asynchronously does not lose the
+  /// focus and the soft keyboard while they arrive.
+  ///
   /// Defaults to false.
   final bool searchable;
 

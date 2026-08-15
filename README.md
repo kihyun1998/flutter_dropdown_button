@@ -220,7 +220,7 @@ The unified dropdown widget. Use the default constructor for custom widget rende
 | `maxMenuWidth` | `double?` | `null` | Maximum width of dropdown menu |
 | `menuAlignment` | `MenuAlignment` | `.left` | Menu alignment when wider than button |
 | `theme` | `DropdownStyleTheme?` | `null` | Theme configuration |
-| `searchable` | `bool` | `false` | Enable search/filter field in dropdown |
+| `searchable` | `bool` | `false` | Enable search/filter field in dropdown — the field follows `enabled`, not the item count, so it stays live over an empty list |
 | `searchFilter` | `bool Function(T, String)?` | `null` | Custom filter function (required for custom mode) |
 | `emptyBuilder` | `Widget Function(String)?` | `null` | Builder for the empty state — empty item list, or no search matches (the query is `""` when the list itself is empty) |
 | `anchorBuilder` | `Widget Function(BuildContext, bool isOpen)?` | `null` | Draw the anchor yourself, dropping the button chrome (**bare** mode) — see below |

@@ -172,6 +172,10 @@ class FlutterMultiSelectDropdown<T> extends StatelessWidget {
   ///
   /// The query survives a tick: the menu does not close, and only opening and
   /// closing reset it.
+  ///
+  /// The field follows [enabled], not the item count: it stays live over an
+  /// empty list, so a caller loading items asynchronously does not lose the
+  /// focus and the soft keyboard while they arrive.
   final bool searchable;
 
   /// Overrides the default case-insensitive `contains` over each item's label.
