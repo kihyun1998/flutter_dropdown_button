@@ -58,15 +58,13 @@ void main() {
     await tester.pumpAndSettle();
     expect(alphaMenuOpen(), isTrue);
 
-    // The open menu covers the screen with a dismiss barrier, so reaching the
-    // other button may take two taps. Either way, both menus must never be
-    // open together.
-    await tester.tap(betaButton(), warnIfMissed: false);
+    // One tap, not two. The dismiss barrier declines the hit over a registered
+    // sibling trigger, so this tap reaches Beta instead of being spent closing
+    // Alpha (#95). Before that, this assertion needed a retry branch — which is
+    // what a test looks like when it is routing around the bug it should be
+    // catching.
+    await tester.tap(betaButton());
     await tester.pumpAndSettle();
-    if (!betaMenuOpen()) {
-      await tester.tap(betaButton());
-      await tester.pumpAndSettle();
-    }
 
     expect(betaMenuOpen(), isTrue);
     expect(alphaMenuOpen(), isFalse);

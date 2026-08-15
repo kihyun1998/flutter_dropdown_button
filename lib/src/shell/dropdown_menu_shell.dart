@@ -369,6 +369,11 @@ class _DropdownMenuShellState<T> extends State<DropdownMenuShell<T>>
     // the overlay re-measures. Mutating the controller in build is safe — it is
     // a plain field assignment, not a rebuild.
     _menu.positioningKey = widget.positioningKey;
+    // Same reasoning, and the same safety: a plain field assignment, not a
+    // rebuild. Another dropdown's dismiss barrier reads this to decide whether
+    // to stand down over our anchor, and it must not stand down over one that
+    // would do nothing with the tap.
+    _menu.triggerEnabled = widget.enabled;
 
     final anchorBuilder = widget.anchorBuilder;
     if (anchorBuilder != null) return _buildBareAnchor(context, anchorBuilder);

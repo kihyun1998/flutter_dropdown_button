@@ -22,7 +22,8 @@ import 'theme/tooltip_theme.dart';
 /// Features:
 /// - Smart positioning (opens up/down based on available space)
 /// - Smooth scale and opacity animations
-/// - Outside-tap dismissal (the tap is consumed, not passed through)
+/// - Outside-tap dismissal (the tap is consumed, not passed through — except
+///   over another dropdown's trigger, which swaps the two in one tap)
 /// - Custom scrollbar theming
 /// - Scroll gradient indicators
 /// - Single-item mode (auto-disable when only one option)

@@ -41,6 +41,10 @@ A tap outside an open menu closes it. **That tap is consumed by the dismissal an
 
 The two are not the same mechanism, and the difference is observable. Material's barrier is `HitTestBehavior.opaque`, so nothing behind it is hit-tested at all. This package's is `translucent` and simply wins the gesture arena, so a widget behind an open menu **does** still receive the pointer — a `Listener` behind one fires its `onPointerDown` and `onPointerUp`; what it does not get is the tap.
 
+**Another dropdown's trigger is the one exception.** With a menu open, tapping a second dropdown's anchor opens that one and closes this one, in a single tap — the barrier recognises a registered sibling trigger and declines to compete for the pointer. Everything else behind the menu still needs the second tap. The recognition is by the live hit path, not by where the trigger's box happens to be, so a trigger that is clipped, transformed, covered by a modal route or wrapped in an `IgnorePointer` is *not* one: the barrier keeps the tap and dismisses, as before. A **disabled** anchor is not one either, for the same reason it would be wrong — nothing would claim the tap and the menu would simply stay open.
+
+Two consequences worth naming. A long press over another dropdown's trigger now opens it, where it used to dismiss — the anchor gets the gesture, and an anchor treats a long press as a press. And the exception is not scoped to one `Overlay`: a trigger in a nested `Overlay` is recognised too, which is what makes a dropdown inside a side panel reachable in one tap from a menu open in the root.
+
 **"Outside" means outside the menu but inside its `Overlay`.** The dismissing region is the size of the `Overlay` the menu was inserted into, not the size of the screen — so in a layout that nests an `Overlay` inside part of the screen (a side panel that owns its own), a tap landing *beyond that panel* does not dismiss. Measured on a 400×600 panel offset to `left: 400`: a tap at (100, 300) leaves the menu open, one at (600, 300) closes it. Everywhere the menu itself can be seen, an outside tap dismisses; the gap is only the region the hosting `Overlay` never covered. `DropdownOverlayController.closeAll()` is the way to dismiss from outside that region — it reaches every `Overlay`.
 
 ### Statics
@@ -141,7 +145,7 @@ Container(
 
 ## FlutterMultiSelectDropdown\<T\>
 
-A checklist. Several items may be chosen, the menu stays open while they are, and `onChanged` fires the moment a box is ticked — no confirm button. Anchored rather than modal: no scrim, dismissed by an outside tap — a tap the dismissal consumes, so it does not also reach what is behind the menu.
+A checklist. Several items may be chosen, the menu stays open while they are, and `onChanged` fires the moment a box is ticked — no confirm button. Anchored rather than modal: no scrim, dismissed by an outside tap — a tap the dismissal consumes, so it does not also reach what is behind the menu. Another dropdown's trigger is the one exception; see [Outside-tap dismissal](#outside-tap-dismissal).
 
 ```dart
 FlutterMultiSelectDropdown<T>({

@@ -1,6 +1,8 @@
 import 'dart:async';
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 
 import '../buttons/menu_alignment.dart';
 import '../placement/dropdown_placement.dart';
@@ -119,10 +121,26 @@ class DropdownOverlayController {
   }) : _animation = AnimationController(
          duration: animationDuration,
          vsync: vsync,
-       );
+       ) {
+    _instances.add(this);
+  }
 
   /// Attach this to the button so the controller can measure it.
   final GlobalKey buttonKey = GlobalKey();
+
+  /// Whether this controller's anchor currently accepts a tap.
+  ///
+  /// Set from the owning widget's `build`, the same way [positioningKey] is,
+  /// and read only while *another* menu's dismiss barrier decides whether to
+  /// stand down over this trigger (see [_RenderSiblingTriggerVeto]).
+  ///
+  /// It has to be published rather than inferred. A disabled anchor still takes
+  /// part in hit-testing — `InkWell` sets `HitTestBehavior.opaque`
+  /// unconditionally (`material/ink_well.dart:1418`), and the bare path does the
+  /// same — so the barrier cannot tell an enabled trigger from a disabled one by
+  /// looking. Standing down over a disabled one would leave the tap claimed by
+  /// nobody and the open menu up, where today it dismisses.
+  bool triggerEnabled = true;
 
   /// An outer box to position the menu against, instead of [buttonKey].
   ///
@@ -173,6 +191,43 @@ class DropdownOverlayController {
   /// two different Overlays — a side panel and the root — do not contend.
   static final Map<OverlayState, DropdownOverlayController> _openPerOverlay =
       {};
+
+  /// Every live controller, so an open menu's barrier can recognise a *sibling*
+  /// trigger and let the tap through to it.
+  ///
+  /// [_openPerOverlay] cannot answer this — it holds only the controller that is
+  /// currently open, and the trigger we need to recognise belongs to one that is
+  /// closed. Registration is therefore by lifetime, not by open state: added
+  /// here on construction and removed in [dispose].
+  ///
+  /// Unlike [_openPerOverlay], which `_teardown` prunes on every close, nothing
+  /// prunes this on its own — a controller a third party constructs and never
+  /// disposes stays reachable for the process. Reads filter for a mounted,
+  /// attached anchor, so a leaked entry costs memory rather than behaviour: the
+  /// same bargain as an `AnimationController` nobody disposed.
+  static final Set<DropdownOverlayController> _instances =
+      <DropdownOverlayController>{};
+
+  /// Shared between the barrier's recognizer and the render object that decides
+  /// for it. Lives on the controller because the entry is rebuilt on every
+  /// animation frame while the recognizer must outlast that.
+  final _BarrierVeto _veto = _BarrierVeto();
+
+  /// The render objects a barrier owned by [self] should stand down for.
+  ///
+  /// Its *own* trigger is excluded: tapping the trigger of an open menu already
+  /// dismisses through the barrier, and routing it to the anchor's own toggle
+  /// instead would trade a measured behaviour for an identical one at the price
+  /// of a new same-tap-reopen window.
+  static Set<RenderObject> _siblingTriggersFor(DropdownOverlayController self) {
+    final targets = <RenderObject>{};
+    for (final controller in _instances) {
+      if (identical(controller, self) || !controller.triggerEnabled) continue;
+      final anchor = controller.buttonKey.currentContext?.findRenderObject();
+      if (anchor != null && anchor.attached) targets.add(anchor);
+    }
+    return targets;
+  }
 
   /// Whether the menu is showing.
   ///
@@ -294,6 +349,7 @@ class DropdownOverlayController {
   void dispose() {
     _disposed = true;
     _cancelClose();
+    _instances.remove(this);
     // Silent: the owner is being torn down and must not be asked to rebuild.
     if (isOpen) _teardown(notify: false);
     _animation.dispose();
@@ -375,9 +431,15 @@ class DropdownOverlayController {
 
         final current = spec();
 
-        return GestureDetector(
-          onTap: close,
+        return RawGestureDetector(
           behavior: HitTestBehavior.translucent,
+          gestures: <Type, GestureRecognizerFactory>{
+            _VetoableTapRecognizer:
+                GestureRecognizerFactoryWithHandlers<_VetoableTapRecognizer>(
+                  () => _VetoableTapRecognizer(_veto),
+                  (instance) => instance.onTap = close,
+                ),
+          },
           // The barrier is a gesture, not a control. Left annotating the tree,
           // it put a screen-sized node carrying `tap`, with no label and no
           // role, *above* the whole menu — so the rows were its children and a
@@ -395,50 +457,197 @@ class DropdownOverlayController {
           // activating the control that opened it, which is where a user would
           // look anyway. Pinned in `dismiss_barrier_semantics_test.dart`.
           excludeFromSemantics: true,
-          child: SizedBox.expand(
-            child: Stack(
-              children: [
-                Positioned(
-                  left: position.left,
-                  top: position.top,
-                  width: position.width,
-                  child: AnimatedBuilder(
-                    animation: _animation,
-                    // Built once and reused across animation frames.
-                    child: Material(
-                      elevation: current.elevation,
-                      shadowColor: current.shadowColor,
-                      color: Colors.transparent,
-                      borderRadius: BorderRadius.circular(current.borderRadius),
-                      child: Container(
-                        constraints: BoxConstraints(maxHeight: position.height),
-                        decoration:
-                            decorationBuilder() ??
-                            BoxDecoration(
-                              color: Theme.of(context).cardColor,
-                              borderRadius: BorderRadius.circular(
-                                current.borderRadius,
+          child: _SiblingTriggerVeto(
+            veto: _veto,
+            triggers: () => _siblingTriggersFor(this),
+            child: SizedBox.expand(
+              child: Stack(
+                children: [
+                  Positioned(
+                    left: position.left,
+                    top: position.top,
+                    width: position.width,
+                    child: AnimatedBuilder(
+                      animation: _animation,
+                      // Built once and reused across animation frames.
+                      child: Material(
+                        elevation: current.elevation,
+                        shadowColor: current.shadowColor,
+                        color: Colors.transparent,
+                        borderRadius: BorderRadius.circular(
+                          current.borderRadius,
+                        ),
+                        child: Container(
+                          constraints: BoxConstraints(
+                            maxHeight: position.height,
+                          ),
+                          decoration:
+                              decorationBuilder() ??
+                              BoxDecoration(
+                                color: Theme.of(context).cardColor,
+                                borderRadius: BorderRadius.circular(
+                                  current.borderRadius,
+                                ),
+                                border: Border.all(
+                                  color: Theme.of(context).dividerColor,
+                                  width: 1,
+                                ),
                               ),
-                              border: Border.all(
-                                color: Theme.of(context).dividerColor,
-                                width: 1,
-                              ),
-                            ),
-                        child: contentBuilder(position.height),
+                          child: contentBuilder(position.height),
+                        ),
+                      ),
+                      builder: (context, child) => Transform.scale(
+                        scale: _scale.value,
+                        alignment: position.transformAlignment,
+                        child: Opacity(opacity: _opacity.value, child: child),
                       ),
                     ),
-                    builder: (context, child) => Transform.scale(
-                      scale: _scale.value,
-                      alignment: position.transformAlignment,
-                      child: Opacity(opacity: _opacity.value, child: child),
-                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         );
       },
     );
+  }
+}
+
+/// Carries "do not claim this pointer" from the render object that decides it
+/// to the recognizer that acts on it.
+///
+/// Keyed by pointer id rather than held as one flag: two fingers landing in the
+/// same frame each get their own answer, and a flag set by one would otherwise
+/// be spent by the other.
+class _BarrierVeto {
+  final Set<int> _pointers = <int>{};
+
+  void raise(int pointer) => _pointers.add(pointer);
+
+  /// True once, for the pointer it was raised for.
+  bool take(int pointer) => _pointers.remove(pointer);
+}
+
+/// The barrier's tap recognizer, which can decline to compete for a pointer.
+///
+/// Declining is not the same as losing. A recognizer that joins the arena and
+/// then rejects itself still denies the tap to everyone below it for the frames
+/// it was a member; one that never calls `super.addAllowedPointer` was never
+/// there, so the anchor underneath wins on its own merits.
+class _VetoableTapRecognizer extends TapGestureRecognizer {
+  _VetoableTapRecognizer(this._veto);
+
+  final _BarrierVeto _veto;
+
+  @override
+  void addAllowedPointer(PointerDownEvent event) {
+    if (_veto.take(event.pointer)) return;
+    super.addAllowedPointer(event);
+  }
+}
+
+/// Decides, for each pointer, whether the barrier above it should stand down.
+///
+/// The decision cannot be made in [hitTest]. The barrier is hit-tested first —
+/// measured at index 0 of a 41-entry path, with the sibling trigger's own render
+/// objects arriving at index 10 — so at that moment the answer does not exist
+/// yet. Reconstructing it from geometry instead is what an earlier design tried,
+/// and it is not reconstructable: a trigger's rect is honest and unchanged while
+/// an `IgnorePointer`, an `Offstage`, an ancestor `ClipRect`, a `Transform` or a
+/// modal route makes it unreachable. Measured worst case: a dropdown behind a
+/// dialog reports a rect byte-identical to its uncovered one, so a barrier that
+/// stood down there would send the tap to the dialog's own barrier and dismiss
+/// the dialog.
+///
+/// So it is made in [handleEvent], which runs at dispatch, when the path is
+/// complete — and it runs *before* the recognizer above sees the pointer,
+/// because a child is added to the hit path ahead of its parent. The shape is
+/// Flutter's own: `RenderTapRegionSurface` caches the live result against its
+/// entry and tests membership of `result.path` rather than comparing rectangles
+/// (`widgets/tap_region.dart`).
+///
+/// Membership also settles a case geometry would have needed a guard for: when
+/// the menu absorbs the hit, `RenderTheatre` stops before the entries below
+/// (`widgets/overlay.dart` — `while (!isHit …)`), so no trigger can be in the
+/// path and no veto can be raised over the menu's own area.
+class _SiblingTriggerVeto extends SingleChildRenderObjectWidget {
+  const _SiblingTriggerVeto({
+    required this.veto,
+    required this.triggers,
+    required Widget super.child,
+  });
+
+  final _BarrierVeto veto;
+  final ValueGetter<Set<RenderObject>> triggers;
+
+  @override
+  _RenderSiblingTriggerVeto createRenderObject(BuildContext context) =>
+      _RenderSiblingTriggerVeto(veto, triggers);
+
+  @override
+  void updateRenderObject(
+    BuildContext context,
+    _RenderSiblingTriggerVeto renderObject,
+  ) {
+    renderObject
+      ..veto = veto
+      ..triggers = triggers;
+  }
+}
+
+class _RenderSiblingTriggerVeto extends RenderProxyBoxWithHitTestBehavior {
+  _RenderSiblingTriggerVeto(this.veto, this.triggers)
+    : super(behavior: HitTestBehavior.translucent);
+
+  _BarrierVeto veto;
+  ValueGetter<Set<RenderObject>> triggers;
+
+  /// The result each entry of ours was appended to, so [handleEvent] can read
+  /// the finished path. An `Expando` rather than a field: several pointers may
+  /// be in flight, each with its own result.
+  final Expando<BoxHitTestResult> _results = Expando<BoxHitTestResult>();
+
+  // Mirrors RenderProxyBoxWithHitTestBehavior.hitTest, keeping a reference to
+  // the result the entry goes into. Behaviour is otherwise identical, and the
+  // barrier stays translucent — what is behind an open menu still receives the
+  // pointer, exactly as before.
+  @override
+  bool hitTest(BoxHitTestResult result, {required Offset position}) {
+    var hitTarget = false;
+    if (size.contains(position)) {
+      hitTarget =
+          hitTestChildren(result, position: position) || hitTestSelf(position);
+      if (hitTarget || behavior == HitTestBehavior.translucent) {
+        final entry = BoxHitTestEntry(this, position);
+        _results[entry] = result;
+        result.add(entry);
+      }
+    }
+    return hitTarget;
+  }
+
+  @override
+  void handleEvent(PointerEvent event, HitTestEntry entry) {
+    // Only the primary button. A secondary-button press over a sibling trigger
+    // opens nothing and dismisses nothing today, and this keeps that: the veto
+    // would have suppressed the dismissal without anything replacing it.
+    // Deliberately not filtered by `PointerDeviceKind` — a veto scoped to touch
+    // passes every widget test, which defaults to touch, while doing nothing on
+    // desktop and web.
+    if (event is! PointerDownEvent || event.buttons != kPrimaryButton) return;
+
+    final targets = triggers();
+    if (targets.isEmpty) return;
+
+    // `?? const []` rather than an early return: the entry is alive for the
+    // whole dispatch, so a missing result is unreachable, and a branch nothing
+    // can reach is a line the 100% coverage floor could never cover.
+    final path = _results[entry]?.path ?? const <HitTestEntry>[];
+    for (final hit in path) {
+      if (targets.contains(hit.target)) {
+        veto.raise(event.pointer);
+        return;
+      }
+    }
   }
 }
