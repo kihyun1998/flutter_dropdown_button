@@ -276,17 +276,11 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.byType(FlutterCheckbox), findsNWidgets(2));
 
-    // The open menu covers the screen with a dismiss barrier, so reaching the
-    // other button may take two taps. Either way, both must never be open.
-    await tester.tap(
-      find.byType(FlutterDropdownButton<String>),
-      warnIfMissed: false,
-    );
+    // One tap, not two — the barrier declines the hit over the other widget's
+    // registered trigger (#95). The two widgets are different types and neither
+    // knows the other exists; the registry is on the controller they share.
+    await tester.tap(find.byType(FlutterDropdownButton<String>));
     await tester.pumpAndSettle();
-    if (find.text('One').evaluate().isEmpty) {
-      await tester.tap(find.byType(FlutterDropdownButton<String>));
-      await tester.pumpAndSettle();
-    }
 
     expect(find.text('One'), findsOneWidget, reason: 'the other one opened');
     expect(

@@ -14,7 +14,7 @@ A highly customizable dropdown package for Flutter with overlay-based rendering,
 - **Overlay-based Rendering**: Better positioning and visual effects than Flutter's built-in DropdownButton
 - **Smart Positioning**: Automatically opens up/down based on available space
 - **Smooth Animations**: Scale and fade effects with configurable timing
-- **Outside-tap Dismissal**: Automatic closure when tapping outside the menu, anywhere inside its `Overlay` — the tap is consumed by the dismissal, so it does not also reach what is behind the menu (as in Material's `DropdownButton`)
+- **Outside-tap Dismissal**: Automatic closure when tapping outside the menu, anywhere inside its `Overlay` — the tap is consumed by the dismissal, so it does not also reach what is behind the menu (as in Material's `DropdownButton`). **One exception: another dropdown's trigger.** Tapping a second dropdown while the first is open swaps them in a single tap
 - **Reaches a Screen Reader**: The trigger announces its role, whether it is enabled and whether the menu is open; a chosen row says so (`selected`, or `checked` on the checklist). Keyboard-activatable in both chromed and bare mode
 - **Flexible Width**: Fixed, min/max constraints, content-based, or flex expansion
 - **Bare Anchor**: Drop the button chrome with `anchorBuilder` and embed the menu inside another field, `[All ▾] │ search…`
@@ -263,7 +263,8 @@ Give the user a way to clear it.
 A checklist. Several items may be chosen, the menu stays open while they are,
 and `onChanged` fires the moment a box is ticked. Anchored rather than modal:
 no scrim, dismissed by an outside tap — a tap the dismissal consumes, so it
-does not also reach what is behind the menu.
+does not also reach what is behind the menu. Another dropdown's trigger is the
+one exception, and swaps the two menus in a single tap.
 
 Rows render as text, so `T` must be a `String` or `label` must say how to make
 one. `T` must implement `==` **and** `hashCode` consistently — a `Set` needs
