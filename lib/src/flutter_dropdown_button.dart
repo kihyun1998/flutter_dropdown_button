@@ -24,6 +24,8 @@ import 'theme/tooltip_theme.dart';
 /// - Smooth scale and opacity animations
 /// - Outside-tap dismissal (the tap is consumed, not passed through — except
 ///   over another dropdown's trigger, which swaps the two in one tap)
+/// - Scroll dismissal (scrolling the content around an open menu closes it,
+///   rather than leaving it behind at coordinates its anchor has left)
 /// - Custom scrollbar theming
 /// - Scroll gradient indicators
 /// - Single-item mode (auto-disable when only one option)
