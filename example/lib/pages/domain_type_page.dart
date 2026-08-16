@@ -131,6 +131,16 @@ class _ColourMenuButtonState extends State<_ColourMenuButton>
   );
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // A surrounding Scrollable rebuilds its scroll position from its own
+    // didChangeDependencies — a theme change is enough — and an open menu would
+    // be left listening to the disposed one, its scroll dismissal silently
+    // dead. Nothing throws without this line; it just stops working.
+    _menu.refreshScrollables(context);
+  }
+
+  @override
   void dispose() {
     _menu.dispose();
     super.dispose();
