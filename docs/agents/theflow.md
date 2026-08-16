@@ -7,8 +7,9 @@ prove behavior, which surfaces to sweep, and which gates to run. The method
 defers every concrete value here. Per-incident evidence lives in
 [`lessons.md`](lessons.md) (the war-story index).
 
-Identity & invariants live in `CLAUDE.md`. `CONTEXT.md` / `docs/adr/` do not
-exist yet — created lazily, when a term or decision actually needs resolving.
+Identity & invariants live in `CLAUDE.md`. `CONTEXT.md` does not exist yet —
+created lazily, when a term actually needs resolving. `docs/adr/` **does** exist
+and holds two records; the inventory is under Step 6.
 
 ## Reasoning bindings (project-wide)
 
@@ -220,14 +221,23 @@ require the disposition grade (`CONFIRMED` / `UNADJUDICATED` / `INERT` /
 
 - **Destination:** `docs/adr/NNNN-slug.md`, created lazily (`docs/agents/domain.md`).
   A promotion is what creates the directory; the first one writes `0001`.
-- **Inventory — one record, accepted:**
-  **[0001 — accessibility semantics are attached by hand, and the word for a
-  state is the presentation's](../adr/0001-accessibility-semantics-are-attached-by-hand.md)**
-  (promoted out of #88). Anything that emits `Semantics` files as a
-  **conformance item under 0001**, never as a fresh decision and never as a new
-  spine. Every other area still answers **no**, so a sibling pair there opens a
-  spine. Keep this line current: an area that gains a record must be listed here
-  with its number, or the next filing re-derives it.
+- **Inventory — two records, both accepted:**
+  - **[0001 — accessibility semantics are attached by hand, and the word for a
+    state is the presentation's](../adr/0001-accessibility-semantics-are-attached-by-hand.md)**
+    (promoted out of #88). Anything that emits `Semantics` files as a
+    **conformance item under 0001**, never as a fresh decision and never as a
+    new spine.
+  - **[0002 — the dismiss barrier stays; its arena participation is
+    conditional](../adr/0002-the-dismiss-barrier-stays-its-arena-participation-is-conditional.md)**
+    (promoted out of the #105 spine, which it closed and whose root it
+    falsifies). Anything about the barrier, hit-test participation or pointer
+    ownership in the overlay files here. **Rule 5 first**: check whether the fix
+    has to touch the barrier at all — #103 looked like a barrier symptom and was
+    not one.
+
+  Every other area still answers **no**, so a sibling pair there opens a spine.
+  Keep this list current: an area that gains a record must be listed here with
+  its number, or the next filing re-derives it.
 - **The standing promotion candidate**, if a pass ever hands over two triggers:
   **deprecate-vs-remove across a major**. It has already been decided pairwise and
   *inconsistently* — asked for `alwaysVisible` (#45), not asked for `trackWidth`

@@ -53,6 +53,11 @@ of `DropdownMenuShell`:
 `ready-for-human`, `wontfix`. Create a label with `gh label create` the first
 time it is used. See `docs/agents/triage-labels.md`.
 
-**Domain docs.** Single-context. `CONTEXT.md` and `docs/adr/` do not exist yet
-and their absence is expected — they are created lazily, when a term or a
-decision actually needs resolving. See `docs/agents/domain.md`.
+**Domain docs.** Single-context. `CONTEXT.md` does not exist yet and its absence
+is expected — it is created lazily, when a term actually needs resolving.
+`docs/adr/` **does** exist and holds two records: **0001** (accessibility
+semantics are attached by hand) and **0002** (the dismiss barrier stays; its
+arena participation is conditional). Both were created the same lazy way, by a
+promotion. Anything touching semantics emission, or the barrier and pointer
+ownership, files as a conformance item under the matching record rather than as
+a fresh decision. See `docs/agents/domain.md`.
