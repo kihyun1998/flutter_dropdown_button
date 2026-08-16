@@ -385,19 +385,39 @@ class _MyDropdownState extends State<MyDropdown>
   );
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Keeps the scroll dismissal alive across a theme or devicePixelRatio
+    // change, which rebuilds the surrounding Scrollable's position.
+    _menu.refreshScrollables(context);
+  }
+
+  @override
   void dispose() {
     _menu.dispose();
     super.dispose();
   }
 
   @override
-  Widget build(BuildContext context) => InkWell(
-        key: _menu.buttonKey,
-        onTap: () => _menu.toggle(context),
-        child: ...,
-      );
+  Widget build(BuildContext context) {
+    // Read by another dropdown's barrier, so it can tell an anchor that would
+    // act on a tap from one that would not.
+    _menu.triggerEnabled = widget.enabled;
+    return InkWell(
+      key: _menu.buttonKey,
+      onTap: widget.enabled ? () => _menu.toggle(context) : null,
+      child: ...,
+    );
+  }
 }
 ```
+
+Both of the additions above are optional in the sense that nothing throws
+without them — and both fail silently, which is why they are in the example
+rather than in a footnote. Skip `refreshScrollables` and the scroll dismissal
+dies the first time the theme changes; skip `triggerEnabled` and a neighbouring
+menu stands down over your disabled anchor, leaving its own menu open under a
+tap that did nothing.
 
 A working example lives in `example/lib/pages/domain_type_page.dart`.
 
@@ -418,12 +438,14 @@ A working example lives in `example/lib/pages/domain_type_page.dart`.
 |--------|-------------|
 | `buttonKey` | Attach to the button so the controller can measure it |
 | `positioningKey` | A `GlobalKey` on an outer box to measure the menu against instead of `buttonKey`. Mutable; null measures the button. See [Positioning against an outer box](#positioning-against-an-outer-box) |
+| `triggerEnabled` | Whether your anchor currently accepts a tap. Mutable, set it from your own `build`. Another dropdown's dismiss barrier reads it to decide whether to stand down over your anchor, and must not stand down over one that would do nothing with the tap. Defaults to true, so a controller that never sets it behaves as an enabled anchor |
 | `isOpen` | Whether the menu is showing — true for the whole close animation too, since the entry is still mounted. `open()` accounts for that itself |
 | `animation` | Runs forward as the menu opens. Drive your own transitions from it — a rotating trailing icon, say |
 | `open(context)` | Shows the menu, closing whichever menu is open in the same `Overlay`. Called while this menu is closing it takes the close back, so `closeAll()` then `open()` shows the menu |
 | `close({animate = true})` | Hides the menu. Pass `animate: false` to tear it down at once. The menu goes away either way — the animation is decoration, not the mechanism, so a disabled `TickerMode` (anything under a pushed route) cannot strand the entry |
 | `toggle(context)` | Opens if closed, closes if open |
 | `rebuild()` | Rebuilds and re-measures the menu in place. Not legal during a build — defer to a post-frame callback |
+| `refreshScrollables(context)` | Re-reads the scrollables your anchor sits in, so the scroll dismissal keeps working. Call it from your `State.didChangeDependencies`: a `Scrollable` rebuilds its position from its own, disposing the old one, and an open menu would be left listening to a dead object with no leak or exception to show for it. A no-op while closed |
 | `dispose()` | Releases the animation and removes the overlay |
 | `closeAll({animate = true})` (static) | Closes every open menu, in every `Overlay` |
 

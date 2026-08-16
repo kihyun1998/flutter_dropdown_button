@@ -108,7 +108,19 @@ typedef DropdownOverlaySpecBuilder = DropdownOverlaySpec Function();
 ///   decorationBuilder: () => null,
 ///   onOpenStateChanged: (_) => setState(() {}),
 /// );
+///
+/// @override
+/// void didChangeDependencies() {
+///   super.didChangeDependencies();
+///   _menu.refreshScrollables(context);
+/// }
 /// ```
+///
+/// Two members fail *silently* if an owner skips them, which is why they are in
+/// the sketch above rather than only in the member list: without
+/// [refreshScrollables] the scroll dismissal dies the first time the theme
+/// changes, and without [triggerEnabled] a neighbouring menu stands down over a
+/// disabled anchor and stays open under a tap that did nothing.
 class DropdownOverlayController {
   /// Creates a controller. Call [dispose] from the owner's `dispose`.
   DropdownOverlayController({
