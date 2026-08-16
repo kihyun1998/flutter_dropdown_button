@@ -155,6 +155,9 @@ class DropdownOverlayController {
   /// that moves *while the menu is open* is not followed, the same as the anchor.
   /// It must live in the same [Overlay] coordinate space the anchor does.
   ///
+  /// Moving it by **scrolling** is the exception, and not because it is followed
+  /// — the menu closes instead, so the stale position never becomes visible.
+  ///
   /// Mutable: the owning widget reassigns it as its own parameter changes.
   GlobalKey? positioningKey;
 
@@ -184,6 +187,9 @@ class DropdownOverlayController {
 
   /// Settles a close whose animation never ticks. See [close].
   Timer? _closeFallback;
+
+  /// The scroll positions an open menu is listening to. See [_handleScroll].
+  final List<ScrollPosition> _watchedScrollables = <ScrollPosition>[];
 
   /// The open menu in each [Overlay], so opening one closes its neighbour.
   ///
@@ -276,6 +282,7 @@ class DropdownOverlayController {
     _openPerOverlay[overlay]?.close();
 
     _context = context;
+    _watchScrollables(context);
     _entry = _buildEntry();
     overlay.insert(_entry!);
     _openPerOverlay[overlay] = this;
@@ -362,8 +369,77 @@ class DropdownOverlayController {
     }
   }
 
+  /// Listens to every scrollable the anchor sits inside, so the menu can close
+  /// rather than be left at coordinates that no longer point at anything.
+  ///
+  /// **From the anchor's context, never the menu's.** The menu scrolls its own
+  /// item list, and a subscription taken inside the overlay would close the
+  /// menu the moment the user scrolled it.
+  ///
+  /// **Every ancestor, not just the nearest.** Measured: with the anchor in an
+  /// inner list, scrolling the outer one moves the anchor and notifies nothing,
+  /// so the menu is left stale — which is the whole of what this closes.
+  /// **The position itself, not its `isScrollingNotifier`.** That notifier
+  /// reports a scroll *activity*, which is a proxy for the thing that matters
+  /// and misses the most ordinary programmatic scroll there is: `jumpTo` goes
+  /// idle, calls `forcePixels`, and goes idle again, so the flag never turns —
+  /// measured, a 300px jump left the menu open and stranded. `forcePixels`
+  /// does notify the position, so listening there catches every way the pixels
+  /// move. It fires per frame during a drag; `_closing` makes all but the first
+  /// a no-op.
+  void _watchScrollables(BuildContext context) {
+    context.visitAncestorElements((element) {
+      if (element is StatefulElement && element.state is ScrollableState) {
+        final position = (element.state as ScrollableState).position;
+        position.addListener(_handleScroll);
+        _watchedScrollables.add(position);
+      }
+      return true;
+    });
+  }
+
+  void _unwatchScrollables() {
+    for (final position in _watchedScrollables) {
+      position.removeListener(_handleScroll);
+    }
+    _watchedScrollables.clear();
+  }
+
+  /// Re-reads the scrollables the anchor sits in, for an owner whose
+  /// dependencies changed.
+  ///
+  /// A [Scrollable] rebuilds its position from its own `didChangeDependencies`
+  /// — a theme change, a `devicePixelRatio` change, a window dragged between
+  /// monitors — disposing the old one and installing a new one. A subscription
+  /// taken once at open time is then holding a dead object, and the dismissal
+  /// silently stops working for the rest of the menu's life. Removing a
+  /// listener from a disposed notifier is explicitly legal, so re-reading is
+  /// the whole of the repair.
+  ///
+  /// A no-op while closed: nothing is subscribed then.
+  void refreshScrollables(BuildContext context) {
+    if (!isOpen) return;
+    _unwatchScrollables();
+    _watchScrollables(context);
+  }
+
+  /// Closes when the content the anchor sits in starts moving.
+  ///
+  /// The notifier fires twice around a fling — true when the scroll starts and
+  /// false when it settles — and the `_closing` guard is what makes the second
+  /// one a no-op rather than a second close.
+  ///
+  /// Calling [close] from here is safe *because [close] defers its teardown* to
+  /// the animation and the fallback timer; it does not unmount the entry inside
+  /// this callback, which can run during layout. That clearance holds as long
+  /// as `close(animate: true)` stays deferred.
+  void _handleScroll() {
+    if (isOpen && !_closing) close();
+  }
+
   void _teardown({bool notify = true}) {
     _cancelClose();
+    _unwatchScrollables();
     try {
       _entry?.remove();
     } catch (_) {

@@ -334,3 +334,20 @@
   영원히 빨간 줄로 남는다. `_results[entry]?.path ?? const <HitTestEntry>[]` 한 줄로
   바꾸니 방어는 그대로면서 줄 커버리지가 성립한다. 바닥을 못 채우는 방어 코드는 바닥을
   내리는 게 아니라 **한 줄로 합친다.**
+- **#103 (신호가 *대리물*이면 구멍이 난다 — `isScrollingNotifier`).** "바깥이 스크롤되면
+  닫는다" 를 스크롤 **활동** 알림으로 구현했다. 드래그·플링·휠·`animateTo` 는 전부
+  잡혔고 테스트 6개가 초록이었다. 그런데 `jumpTo` 는 `goIdle()` → `forcePixels()` →
+  `goBallistic(0)` 이라 **활동 플래그가 한 번도 안 켜진다**(`scroll_position_with_single_context.dart`).
+  300px 점프에 메뉴가 그대로 열린 채 남았다 — 고치려던 바로 그 상태. 게다가
+  `Scrollable.ensureVisible` 의 `duration` 기본값이 `Duration.zero` 라 포커스 이동이
+  이 분기를 탄다. 고친 뒤 신호는 **position 자체**(`forcePixels` 가 `notifyListeners`
+  한다). **"움직였나" 를 묻고 싶을 때 "움직이는 중인가" 를 구독하면, 순간이동은 영원히
+  안 잡힌다.**
+- **#103 (한 번 잡은 참조는 늙는다).** 열 때 `ScrollPosition` 을 구독하고 끝냈다.
+  `ScrollableState.didChangeDependencies` 는 **무조건** `_updatePosition()` 을 부르고
+  옛 position 을 dispose 한 뒤 새것을 꽂는다 — 테마 변경, `devicePixelRatio` 변경,
+  모니터 간 창 이동. 그러면 우리는 죽은 객체를 붙들고 있고, **누수도 예외도 없이 기능만
+  조용히 죽는다**(`removeListener` 는 dispose 된 notifier 에도 합법이라 아무 신호가 없다).
+  테마 한 번 바꾸고 드래그하니 메뉴가 안 닫혔다. 소유자의 `didChangeDependencies` 에서
+  다시 읽는 것이 수리의 전부다. **누수 검사(`hasListeners`)는 이걸 못 잡는다 — 짝은
+  완벽하게 맞고, 짝이 맞는 대상이 시체일 뿐이다.**

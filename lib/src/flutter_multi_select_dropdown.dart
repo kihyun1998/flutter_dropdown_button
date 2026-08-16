@@ -16,7 +16,9 @@ import 'theme/tooltip_theme.dart';
 /// on a row calls [onChanged] at once with a **new** `Set`, and an outside tap
 /// dismisses the menu. The dismissing tap is consumed, so it does not also
 /// reach what is behind the menu — with one exception, another dropdown's
-/// trigger, which swaps the two menus in a single tap.
+/// trigger, which swaps the two menus in a single tap. Scrolling the content
+/// around the menu also dismisses it, rather than leaving it at coordinates its
+/// anchor has scrolled away from.
 ///
 /// ```dart
 /// FlutterMultiSelectDropdown<String>(

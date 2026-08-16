@@ -290,6 +290,16 @@ class _DropdownMenuShellState<T> extends State<DropdownMenuShell<T>>
   ScrollController? _scrollController;
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // A surrounding Scrollable rebuilds its position from its own
+    // didChangeDependencies — the same theme or devicePixelRatio change that
+    // brought us here — and an open menu would otherwise be left listening to
+    // the disposed one, with its scroll dismissal silently dead.
+    _menu.refreshScrollables(context);
+  }
+
+  @override
   void didUpdateWidget(DropdownMenuShell<T> oldWidget) {
     super.didUpdateWidget(oldWidget);
 

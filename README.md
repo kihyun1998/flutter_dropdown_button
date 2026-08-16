@@ -15,6 +15,7 @@ A highly customizable dropdown package for Flutter with overlay-based rendering,
 - **Smart Positioning**: Automatically opens up/down based on available space
 - **Smooth Animations**: Scale and fade effects with configurable timing
 - **Outside-tap Dismissal**: Automatic closure when tapping outside the menu, anywhere inside its `Overlay` — the tap is consumed by the dismissal, so it does not also reach what is behind the menu (as in Material's `DropdownButton`). **One exception: another dropdown's trigger.** Tapping a second dropdown while the first is open swaps them in a single tap
+- **Scroll Dismissal**: Scrolling the content around an open menu closes it, rather than leaving it stranded at coordinates its anchor has moved away from. Every scrollable the anchor sits inside counts; the menu's own item list does not
 - **Reaches a Screen Reader**: The trigger announces its role, whether it is enabled and whether the menu is open; a chosen row says so (`selected`, or `checked` on the checklist). Keyboard-activatable in both chromed and bare mode
 - **Flexible Width**: Fixed, min/max constraints, content-based, or flex expansion
 - **Bare Anchor**: Drop the button chrome with `anchorBuilder` and embed the menu inside another field, `[All ▾] │ search…`

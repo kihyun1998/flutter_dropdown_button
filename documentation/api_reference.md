@@ -47,6 +47,22 @@ Two consequences worth naming. A long press over another dropdown's trigger now 
 
 **"Outside" means outside the menu but inside its `Overlay`.** The dismissing region is the size of the `Overlay` the menu was inserted into, not the size of the screen — so in a layout that nests an `Overlay` inside part of the screen (a side panel that owns its own), a tap landing *beyond that panel* does not dismiss. Measured on a 400×600 panel offset to `left: 400`: a tap at (100, 300) leaves the menu open, one at (600, 300) closes it. Everywhere the menu itself can be seen, an outside tap dismisses; the gap is only the region the hosting `Overlay` never covered. `DropdownOverlayController.closeAll()` is the way to dismiss from outside that region — it reaches every `Overlay`.
 
+### Scrolling the content behind it dismisses it
+
+An open menu is placed once and does not track its anchor, so if the content around it scrolls, the menu would otherwise be left at coordinates that no longer point at anything — floating over unrelated content, still open. It closes instead, the moment the surrounding content starts moving. Touch drag and mouse wheel alike; measured identical before the fix, at 160px of background scroll against 0px of menu movement.
+
+**Every scrollable the anchor sits inside counts, not only the nearest one.** An anchor in an inner list whose *outer* page scrolls is carried just as far, so both are watched. The menu's **own** item list is not one of them — a long menu scrolls itself without closing, because the subscription is taken from the anchor rather than from the overlay.
+
+A page with no scrollable in it is unaffected, and none of the outside-tap behaviour above changes.
+
+**The menu does not follow the anchor.** Tracking it would mean re-measuring every frame or linking layers — an order of magnitude more expensive than anything else this package does, and the one choice here with a real performance cost. Closing is the deliberate trade.
+
+The signal is the scroll position itself, not a scroll *gesture*, so a programmatic `jumpTo` or `animateTo` dismisses just as a finger does — including `Scrollable.ensureVisible`, whose duration defaults to zero and which is the usual way focus moves a list. Three consequences worth knowing:
+
+- **It closes when the surroundings scroll, not when the anchor moves.** An anchor pinned in place — in a pinned `SliverAppBar`, say — has its menu dismissed by a scroll that moved it zero pixels. Erring this way keeps the rule cheap and predictable; the alternative is per-frame measurement, which is the thing being avoided.
+- **The scroll rule is scoped to the widget ancestry; the outside-*tap* rule is scoped to the hosting `Overlay`.** They are different sets. A scroll beyond a nested `Overlay`'s box can dismiss where a tap at the same coordinate would not, because that outer list really does carry the anchor.
+- **`positioningKey` is not watched — the anchor is.** If the box you position against lives in a different scrollable from the anchor, scrolling *it* moves the menu's reference without dismissing anything. Keep the two in the same scrollable, which the same-coordinate-space requirement above already implies.
+
 ### Statics
 
 | Member | Description |
