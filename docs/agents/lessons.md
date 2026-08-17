@@ -326,6 +326,21 @@
   `// coverage:ignore` 는 미커버가 아니라 **분모에서 빠진다**(프로브로 `LF` 1 감소 확인).
 - **커버리지 ≠ 정확성.** 처음 켜자 `lib/` 80.6%, 미커버 대부분이 여섯 `copyWith`, 그리고
   **테스트 155 개 중 메뉴 항목을 탭하는 게 하나도 없었다** — 이 위젯의 존재 이유.
+- **#103 (`dart format .` 이 CI 를 깬다 — 툴체인 드리프트).** 릴리스 직후 `format` 커밋
+  하나가 PR 없이 main 에 올라갔고 `format & publish check` 가 죽었다. 테스트 잡 둘은
+  통과 — 코드가 아니라 **포매팅만** 어긋난 것이다. 범인은 파일 하나
+  (`test/search/dropdown_search_controller_test.dart`)이고, 원인은 **로컬 SDK 와 CI
+  stable 의 포매터가 서로 반대를 원하는 것**이다. 컬렉션 리터럴이 낀 인자 목록에서
+  CI(3.47)는 컬렉션을 블록으로 붙이고(`expect(x, [\n 'a',\n], reason: …)`),
+  로컬(3.44.8)은 전부 쪼갠다. **로컬에서 `dart format .` 을 돌리면 그 파일이 조용히
+  옛 스타일로 되돌아가고 CI 가 거부한다.**
+
+  판별법: `dart format --output=none --set-exit-if-changed .` 이 **손 안 댄 main 에서도
+  exit 1** 이면 그건 내 변경 탓이 아니라 드리프트다. 그때는 전체가 아니라 **내가 만진
+  파일만** 검사하고, 실수로 포맷된 파일은 `git checkout <파일>` 로 되돌린다. 절대
+  하지 말 것: 이걸 "포맷이 밀렸네" 로 읽고 `dart format .` 결과를 커밋하는 것 — 그게
+  이 사고다. **아카이브에는 영향이 없다**(`test/` 는 `.pubignore` 로 빠진다).
+
 - **`dart format` 은 language version 을 따른다.** SDK 바닥을 Dart 3.8 로 올리자 tall
   style 이 켜지며 35 개 파일이 재포맷됐다.
 - **#95 (도달 불가능한 방어 분기는 100% 바닥이 영원히 못 채운다).** `handleEvent` 에
