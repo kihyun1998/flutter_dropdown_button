@@ -69,9 +69,11 @@ void main() {
     final search = searching()..onQueryChanged('a');
 
     expect(search.visibleItems(fruits, contains), ['Apple', 'Banana']);
-    expect(search.visibleItems(const ['Avocado'], contains), [
-      'Avocado',
-    ], reason: 'a different list, filtered by the same live query');
+    expect(
+      search.visibleItems(const ['Avocado'], contains),
+      ['Avocado'],
+      reason: 'a different list, filtered by the same live query',
+    );
   });
 
   test('reset clears the query and the field', () {
