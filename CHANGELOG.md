@@ -8,7 +8,7 @@ Two contracts on `DropdownOverlayController` also rested on the same wrong idea 
 
 And the empty state kept a smaller half-truth of its own: `emptyBuilder`, documented as the builder for when the menu has nothing to show, was reachable only through a search that matched nothing — the emptiest menu of all, an empty source list, called nothing and opened as a chrome-only sliver (#96).
 
-Two of this release's fixes come from the same wrong idea about the barrier and the menu it covers: that placing a menu once is the end of the story. Scrolling the page behind an open menu left it floating over whatever had moved underneath it, anchored to nothing, in every configuration measured — finger and mouse wheel alike (#103).
+A menu also turned out to be placed once and then forgotten. Scroll the page behind an open one and the content moved while the menu stayed — floating over whatever had slid underneath it, anchored to nothing, on a finger and a mouse wheel alike. That one *looked* like a barrier problem and was not: the fix touches neither the barrier nor hit-testing, and the obvious barrier-shaped remedy would have stopped the background scrolling altogether (#103).
 
 The dismiss barrier turns out to have been charging for something the package advertises. Putting several dropdowns on a page and having only one open at a time is a documented feature, but swapping between them cost two taps, because the barrier joined the gesture arena ahead of the trigger the user was aiming at. Two of this release's tests had a retry branch written around exactly that (#95).
 

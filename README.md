@@ -265,7 +265,9 @@ A checklist. Several items may be chosen, the menu stays open while they are,
 and `onChanged` fires the moment a box is ticked. Anchored rather than modal:
 no scrim, dismissed by an outside tap — a tap the dismissal consumes, so it
 does not also reach what is behind the menu. Another dropdown's trigger is the
-one exception, and swaps the two menus in a single tap.
+one exception, and swaps the two menus in a single tap. Scrolling the content
+around the menu dismisses it too, rather than leaving it at coordinates its
+anchor has scrolled away from.
 
 Rows render as text, so `T` must be a `String` or `label` must say how to make
 one. `T` must implement `==` **and** `hashCode` consistently — a `Set` needs
