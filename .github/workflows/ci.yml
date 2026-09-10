@@ -63,7 +63,7 @@ jobs:
       # Same rule as the floor above, and for the same reason: raise it when the
       # number rises, never lower it to make a red build green.
       - name: API coverage floor
-        run: dart run tool/check_api_coverage.dart --min 70.0 --report
+        run: dart run tool/check_api_coverage.dart --min 75.9 --report
 
       # Three steps rather than one `run: |` block, on purpose. A block's exit
       # status depends on the runner's shell flags to stop at the first failure;

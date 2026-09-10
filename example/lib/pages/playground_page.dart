@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dropdown_button/flutter_dropdown_button.dart';
 
-enum DropdownType { text, custom }
+enum DropdownType { text, custom, multi }
 
 class PlaygroundPage extends StatefulWidget {
   const PlaygroundPage({super.key});
@@ -13,6 +13,10 @@ class PlaygroundPage extends StatefulWidget {
 class _PlaygroundPageState extends State<PlaygroundPage> {
   // ── Dropdown type ───────────────────────────────────────────────────────
   DropdownType _type = DropdownType.text;
+
+  /// The checklist mode holds a set rather than a value, and the page holds
+  /// it — `selected` is the caller's in this package, playground included.
+  Set<String> _multiSelected = {};
 
   // ── Items ───────────────────────────────────────────────────────────────
   List<String> _items = ['Option 1', 'Option 2', 'Option 3', 'Option 4'];
@@ -554,11 +558,16 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
                       value: DropdownType.custom,
                       label: Text('custom'),
                     ),
+                    ButtonSegment(
+                      value: DropdownType.multi,
+                      label: Text('multi'),
+                    ),
                   ],
                   selected: {_type},
                   onSelectionChanged: (v) => setState(() {
                     _type = v.first;
                     _selectedValue = null;
+                    _multiSelected = {};
                   }),
                 ),
               ),
@@ -1775,6 +1784,45 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
               item.toLowerCase().contains(query.toLowerCase()),
           itemBuilder: (item, isSelected) => Text(item),
           onChanged: (v) => setState(() => _selectedValue = v),
+        );
+
+      case DropdownType.multi:
+        // Every knob the other two modes read, read here too. The check counts
+        // per constructor, and it is right to: `.text()` gains overflow
+        // handling, a tooltip and a default filter that this one cannot offer,
+        // so a `width` proven on that constructor says nothing about this one.
+        return FlutterMultiSelectDropdown<String>(
+          items: _items,
+          selected: _multiSelected,
+          labelBuilder: (chosen) => switch (chosen.length) {
+            0 => _hint,
+            1 => chosen.first,
+            final n => '$n selected',
+          },
+          width: _fixedWidth,
+          minWidth: _minWidth,
+          maxWidth: _maxWidth,
+          height: _height,
+          itemHeight: _itemHeight,
+          enabled: _enabled,
+          expand: _expand,
+          animationDuration: Duration(milliseconds: _animationMs),
+          theme: theme,
+          config: config,
+          trailing: trailing,
+          minMenuWidth: _minMenuWidth,
+          maxMenuWidth: _maxMenuWidth,
+          menuAlignment: _menuAlignment,
+          searchable: _searchable,
+          searchFilter: (item, query) =>
+              item.toLowerCase().contains(query.toLowerCase()),
+          emptyBuilder: (query) => Padding(
+            padding: const EdgeInsets.all(16),
+            child: Text(
+              query.isEmpty ? 'No items' : 'Nothing matching "$query"',
+            ),
+          ),
+          onChanged: (next) => setState(() => _multiSelected = next),
         );
     }
   }
