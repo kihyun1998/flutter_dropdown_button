@@ -1,9 +1,10 @@
 # Lessons — flutter_dropdown_button 실증
 
-이 repo 가 `theflow` 의 각 단계에서 실제로 **무엇을 놓쳤나** 의 기록 — 규칙에 무게를
-주는 근거. 전부 이 repo 에서 실제로 일어났다. 단계 번호는 `theflow` SKILL.md 와 일치.
-바인딩(`theflow.md`)의 규칙이 추상으로 읽히면 여기 사건과 대조하라. 새 실증이 나오면
-해당 단계 밑에 `#이슈번호` 와 함께 남긴다.
+이 repo 가 각 단계에서 실제로 **무엇을 놓쳤나** 의 기록 — 규칙에 무게를 주는 근거.
+전부 이 repo 에서 실제로 일어났다. 아래 Step 1–7 은 이 기록의 **자체 색인**이고, 지금
+작업 규율은 `thegraph` 다 (`CLAUDE.md`). 레퍼런스 규칙이 추상으로 읽히면
+`docs/agents/thegraph.md` 와 여기 사건을 대조하라. 새 실증이 나오면 해당 단계 밑에
+`#이슈번호` 와 함께 남긴다.
 
 ---
 
@@ -179,6 +180,12 @@
   위험" 에서 확정으로 바뀌었고, 딸린 비용(3.32 의 `consumeOutsideTaps`, CI `minimum` 잡)도
   같이 무의미해졌다. **처방을 죽이는 건 실패 측정이 아니라 무의미한 성공 측정이다.**
 
+- **하네스 가짜 증거 (바인딩에서 회수).** `debugDefaultTargetPlatformOverride` 는
+  **테스트 본문에서** 복원한다 (`tearDown` 은 이미 늦다). 하나의 `tester` 로 메뉴를 다시
+  열지 않는다 — 두 번째 탭은 메뉴를 **닫는다**. 한 `testWidgets` 안에서 제스처를 이어
+  붙이지 않는다 (앞선 스크롤이 autoscrollbar thumb 을 깨운다). `const Fruit('Apple')` 은
+  하나의 인스턴스로 정규화되므로 `const` 는 "서로 다른 인스턴스" 를 전혀 증명하지 못한다.
+
 ## Step 5 — 적대적 검증 (서로 다른 렌즈)
 
 - **#95 (이슈에 적힌 설계 초안은 승인됐어도 가설이다).** 오너가 처방 B 를 고르며 같이
@@ -279,7 +286,7 @@
 - **#95/#102 (`lib/` 를 건드려도 CHANGELOG 항목이 아닐 수 있다).** 이 커밋은 `lib/` 파일
   둘을 바꿨지만 `CHANGELOG.md` 는 비었다 — 바뀐 건 dartdoc 뿐이고, 그건 pub.dev 로 나가는
   **표면**이지 동작이 아니다. 기준은 "파일이 바뀌었나" 가 아니라 "동작이 바뀌었나" 다
-  (`theflow.md` 의 CHANGELOG = 버그 인벤토리).
+  (CHANGELOG = 버그 인벤토리).
 - **#38 (dartdoc 화살표가 거꾸로).** `thickness` 문서가 "Deprecated: `thumbWidth`/
   `trackWidth` 를 쓰라" 고 했으나 `thickness` 는 deprecated 아니고 `trackWidth` 는 아무
   일도 안 했다.

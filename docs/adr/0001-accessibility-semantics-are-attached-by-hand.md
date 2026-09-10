@@ -68,6 +68,14 @@ coverage floor. Measured on 4.1.0: the trigger of a *disabled* dropdown emitted
    `TargetPlatform.iOS`. Partial matching, with the negative assertions carrying
    the weight — an unchosen row states `selected: false` rather than staying
    silent.
+
+   **A check can lose its discriminating power without going red.** Removing
+   `ExcludeSemantics` left "the row does not announce disabled" green — not
+   because the guard was pointless, but because `flutter_checkbox` emits
+   `enabled: true` where Material emits `false`, so the test had silently lost
+   its power against the new implementation (#81). When the widget underneath
+   changes, re-derive what the test discriminates; do not reuse the old red as
+   evidence.
 5. **Both anchor paths carry the same contract.** `anchorBuilder` changes what
    the anchor *looks like*, not what it *is*. A caller who draws their own
    anchor is not asking for a different control.

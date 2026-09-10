@@ -1,18 +1,24 @@
 # CLAUDE.md
 
-## Working discipline — theflow
+## Working discipline — thegraph
 
-Substantive changes (bug fix / feature / behavior change) follow the **`theflow`**
-skill — run `/theflow` at the start. This repo's bindings (module map, reference
-routing, boundary rule, proof methods, behavior-describing surfaces, gate matrix,
-consumers) live in **`docs/agents/theflow.md`**; the per-incident evidence
-(#2, #9, #32, #37, #38, #40, #45, #47, #50, #51, #59 …) in
-**`docs/agents/lessons.md`**. Read both before starting; add new war-stories to
+Substantive changes (bug fix / feature / behavior change) follow the **`thegraph`**
+skill — run `/thegraph` at the start. This repo's references (which outside sources
+it is read against, and whether each binds) live in **`docs/agents/thegraph.md`**;
+the per-incident evidence (#2, #9, #32, #37, #38, #40, #45, #47, #50, #51, #59 …)
+in **`docs/agents/lessons.md`**. Read both before starting; add new war-stories to
 lessons.
 
-This is a **published package with consumers**, so theflow's downstream
-verification and post-release migration both apply (derive the consumer list on
-the spot at Step 10 — do not store it here).
+This is a **published package with consumers**, so downstream verification and
+post-release migration both apply (derive the consumer list on the spot — do not
+store it here).
+
+**Branch → PR (`Closes #issue`) → CI green → merge. Never commit to `main`.**
+`ci.yml` defines the gates, not this policy, so it is stated here or nowhere —
+`37113b8` went to `main` without a PR and broke the `format & publish check` job
+(#120). The release rides in the change's own commit, not a separate `chore:`
+one, and `flutter pub publish` is irreversible: **the agent never runs it, the
+user does.**
 
 ## Identity & invariants (the boundary)
 
@@ -43,6 +49,25 @@ of `DropdownMenuShell`:
 - **Dead-field detector:** a documented, settable field that `resolve()` never
   mentions is read by nothing. Making the themes resolve themselves turned the
   architecture into the detector — check that first when auditing the API.
+- **Mechanism is core; policy crosses the seam.** Core: geometry (`placement`),
+  theme resolution, overlay lifetime + single-open, search-query derivation,
+  presentation — each takes plain values and no `BuildContext`. The consumer owns
+  selection semantics (`isChosen`/`onItemTap`/`closeOnTap`), `itemBuilder`, theme
+  values.
+- **Contract ≠ defect.** A consumer report may be against behavior the core
+  deliberately holds. #59: a consumer set `trackColor`, no track appeared — neither
+  Flutter nor `lib/` was wrong; the broken invariant was **our dartdoc**, teaching
+  exactly that combination. Nothing in `lib/` changed but a comment.
+- **A leaked `OverlayEntry` is the consumer's whole app, not this widget.** It
+  stays as a dead layer swallowing taps, and once the widget is gone there is
+  nothing left to recover it with — which is why overlay lifetime and the
+  single-open registry get the completeness pass regardless of how cheap the
+  change looks.
+- **`flutter_checkbox`'s public types are part of this package's API.**
+  `CheckboxShape` / `CheckboxStyle` are re-exported from this barrel, so at `0.x`
+  an upstream breaking change is a **breaking change here** — and its
+  `environment` floor and emitted semantics are read at the exact version pinned,
+  never carried across versions (#80, #81).
 
 ## Agent skills
 
