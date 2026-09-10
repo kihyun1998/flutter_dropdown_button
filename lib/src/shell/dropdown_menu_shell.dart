@@ -99,7 +99,32 @@ class DropdownMenuShell<T> extends StatefulWidget {
   /// How long the open and close animation takes.
   final Duration animationDuration;
 
-  /// Whether the button fills its parent's cross-axis space.
+  /// Whether the button fills the space its parent offers.
+  ///
+  /// Two things at once, and the second is easy to miss:
+  ///
+  ///  * it is an [Expanded], so it fills the **main** axis of the enclosing
+  ///    [Flex] — horizontal inside a [Row], **vertical inside a [Column]**;
+  ///  * it also lays the button's content out as a filled row, so the button
+  ///    takes all the **cross**-axis width on offer as well.
+  ///
+  /// Inside a [Row] that reads as "fills the width", which is the intended
+  /// use. Inside a [Column] it is a box filling both directions, with the
+  /// content floating in the middle of it.
+  ///
+  /// Three conditions come with it, none of which this flag can check:
+  ///
+  ///  * the parent must be a [Flex]. In a [ListView], or any other non-flex
+  ///    parent, there is no `FlexParentData` to write and the framework
+  ///    asserts. Give the button a [width] instead — inside an [Align], so the
+  ///    incoming constraint is loose enough for it to take (see [width]).
+  ///  * do not also wrap this widget in an [Expanded]. That is a second one on
+  ///    the same render object, which is `Competing ParentDataWidgets`.
+  ///  * the [Column] must have a bounded height. Inside a scrollable it does
+  ///    not, and the result is *RenderFlex children have non-zero flex but
+  ///    incoming height constraints are unbounded*.
+  ///
+  /// Defaults to false.
   final bool expand;
 
   /// Which edge of the button the menu lines up with.
@@ -136,7 +161,16 @@ class DropdownMenuShell<T> extends StatefulWidget {
   /// tooltip theming still apply — only the button face is the caller's now.
   final Widget Function(BuildContext context, bool isOpen)? anchorBuilder;
 
-  /// A fixed button width.
+  /// A requested button width. If null, the button sizes to its content.
+  ///
+  /// Requested, not guaranteed: it is applied as a box constraint, and
+  /// `BoxConstraints.enforce` gives an incoming **tight** constraint the last
+  /// word. A dropdown placed directly in a [ListView] is the common case — a
+  /// list gives its children a tight cross-axis constraint, so the button is
+  /// drawn at the list's full width and this value is silently ignored.
+  ///
+  /// Wrap it in an [Align] (or any parent that loosens the constraint) for the
+  /// width to arrive.
   final double? width;
 
   /// The button's minimum width, when [width] is null.
