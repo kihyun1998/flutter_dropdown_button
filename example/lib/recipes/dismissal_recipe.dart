@@ -56,7 +56,10 @@ class DismissalRecipe extends StatelessWidget {
           style: Theme.of(context).textTheme.labelLarge,
         ),
         const SizedBox(height: 12),
-        const _Neighbour(hint: 'Scroll me', items: _left),
+        // Sized rather than expanded: this one is a direct child of a
+        // `ListView`, which is not a `Flex`, and `expand` puts an `Expanded`
+        // there. The pair above are in a `Row`, where it is the right choice.
+        const _Neighbour(hint: 'Scroll me', items: _left, expand: false),
         // Enough room below to make scrolling possible at any viewport.
         const SizedBox(height: 900),
         const Center(child: Text('— bottom —')),
@@ -69,10 +72,17 @@ const _left = ['Alpha', 'Bravo', 'Charlie', 'Delta', 'Echo'];
 const _right = ['One', 'Two', 'Three', 'Four', 'Five'];
 
 class _Neighbour extends StatefulWidget {
-  const _Neighbour({required this.hint, required this.items});
+  const _Neighbour({
+    required this.hint,
+    required this.items,
+    this.expand = true,
+  });
 
   final String hint;
   final List<String> items;
+
+  /// Only ever true inside a `Row`.
+  final bool expand;
 
   @override
   State<_Neighbour> createState() => _NeighbourState();
@@ -84,7 +94,8 @@ class _NeighbourState extends State<_Neighbour> {
   @override
   Widget build(BuildContext context) {
     return FlutterDropdownButton<String>.text(
-      expand: true,
+      expand: widget.expand,
+      width: widget.expand ? null : 260,
       items: widget.items,
       value: _value,
       hint: widget.hint,

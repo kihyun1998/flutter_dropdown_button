@@ -110,7 +110,17 @@ class _MultiSelectRecipeState extends State<MultiSelectRecipe> {
           ),
           const SizedBox(height: 8),
           FlutterMultiSelectDropdown<String>(
-            expand: true,
+            // A width, not `expand`. `expand` is implemented as `Expanded`, so
+            // it fills the *main* axis of the Flex it is in — inside this
+            // `Column` that is the vertical one, and the button becomes a tall
+            // empty box with its label floating in the middle. Reach for it in
+            // a `Row`, or wrap the dropdown in one.
+            //
+            // This does **not** fully explain what is on screen: the button is
+            // still drawn far taller and wider than 318 asks for. Left here,
+            // unexplained and reproducible, rather than bisected away — see
+            // the issue.
+            width: 318,
             height: 260,
             items: values,
             selected: _chosen,
