@@ -13,6 +13,7 @@
 // passed and never what it looked like. This file is the part that looks.
 
 import 'package:example/app/destinations.dart';
+import 'package:example/pages/playground_page.dart';
 import 'package:example/recipes/dismissal_recipe.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dropdown_button/flutter_dropdown_button.dart';
@@ -25,15 +26,38 @@ void main() {
   // exactly the fixture that would have let the twelfth recipe in unwatched.
   late DropdownDestinations destinations;
   late List<StageDestination> stages;
+  late List<(String, Widget)> screens;
 
   setUp(() {
     destinations = DropdownDestinations();
     stages = destinations.all.whereType<StageDestination>().toList();
+    screens = [
+      for (final destination in destinations.all)
+        // `ShellDestination` is sealed, so this switch is exhaustive and a new
+        // kind of destination upstream becomes a compile error here rather
+        // than a screen quietly dropping out of the sweep.
+        switch (destination) {
+          // A stage is drawn inside the shell's scaffold, so it is given one.
+          StageDestination(:final id, :final stage) => (
+            id,
+            MaterialApp(
+              home: Scaffold(body: Builder(builder: stage)),
+            ),
+          ),
+          // A route opens as its own page and brings its own scaffold. The
+          // playground is the only one, and until now nothing pumped it at
+          // all — 2400 lines reached by no test in this directory.
+          RouteDestination(:final id, :final open) => (
+            id,
+            MaterialApp(home: Builder(builder: open)),
+          ),
+        },
+    ];
   });
 
   tearDown(() => destinations.dispose());
 
-  testWidgets('every stage in the roster draws without throwing', (
+  testWidgets('every screen in the roster draws without throwing', (
     tester,
   ) async {
     tester.view.physicalSize = const Size(1440, 900);
@@ -42,21 +66,13 @@ void main() {
 
     // A guard on the guard: an empty roster would make every loop below pass
     // by never running.
-    expect(stages, isNotEmpty);
+    expect(screens, isNotEmpty);
 
-    for (final destination in stages) {
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(body: Builder(builder: destination.stage)),
-        ),
-      );
+    for (final (id, screen) in screens) {
+      await tester.pumpWidget(screen);
       await tester.pumpAndSettle();
 
-      expect(
-        tester.takeException(),
-        isNull,
-        reason: 'stage ${destination.id} threw while drawing',
-      );
+      expect(tester.takeException(), isNull, reason: '$id threw while drawing');
     }
   });
 
@@ -155,12 +171,8 @@ void main() {
     addTearDown(tester.view.reset);
 
     var measured = 0;
-    for (final destination in stages) {
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(body: Builder(builder: destination.stage)),
-        ),
-      );
+    for (final (id, screen) in screens) {
+      await tester.pumpWidget(screen);
       await tester.pumpAndSettle();
 
       final buttons = find.byWidgetPredicate(_isDropdownButton);
@@ -169,7 +181,7 @@ void main() {
         expect(
           tester.getSize(buttons.at(i)).height,
           lessThanOrEqualTo(120.0),
-          reason: 'a dropdown in ${destination.id} is stretched',
+          reason: 'a dropdown in $id is stretched',
         );
       }
     }
@@ -182,6 +194,59 @@ void main() {
       greaterThanOrEqualTo(12),
       reason: 'the finder stopped seeing most of the roster',
     );
+  });
+
+  testWidgets('the playground survives expand across a type switch', (
+    tester,
+  ) async {
+    // `expand` is passed to all three constructors, but its `Row` wrapper used
+    // to be gated on `_type == DropdownType.text` and its knob lived in the
+    // text-only section. So: turn it on, switch type, and an `Expanded` lands
+    // in a `Column` that is under unbounded height — *RenderFlex children have
+    // non-zero flex but incoming height constraints are unbounded* — with the
+    // knob that caused it no longer on screen to turn off.
+    //
+    // The sweep above cannot reach this: it pumps every screen at its opening
+    // state, and this one needs two taps first.
+    tester.view.physicalSize = const Size(1800, 2400);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(const MaterialApp(home: PlaygroundPage()));
+    await tester.pumpAndSettle();
+
+    final settings = find.byType(Scrollable).last;
+    await tester.scrollUntilVisible(
+      find.text('expand'),
+      200,
+      scrollable: settings,
+    );
+
+    // The window: if the knob is not on screen the two taps below do nothing
+    // and the test passes by never entering the state it is about.
+    expect(
+      find.text('expand'),
+      findsOneWidget,
+      reason: 'the expand knob is not reachable, so nothing was exercised',
+    );
+
+    await tester.tap(
+      find.descendant(
+        of: find
+            .ancestor(of: find.text('expand'), matching: find.byType(Row))
+            .first,
+        matching: find.byType(Switch),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull, reason: 'expand on, type text');
+
+    await tester.tap(find.text('multi'));
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull, reason: 'expand on, type multi');
+
+    // And the knob is still there to turn off, which is the other half.
+    expect(find.text('expand'), findsOneWidget);
   });
 }
 
