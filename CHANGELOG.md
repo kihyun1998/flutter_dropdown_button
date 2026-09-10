@@ -1,5 +1,16 @@
 # Changelog
 
+## 4.2.1
+
+Documentation only. No statement in `lib/` changed — every edited line is a comment, and the diff is six removed one-liners. It is released for the reason 3.0.2 was: pub.dev renders the dartdoc of the version it was published from, so a reader of 4.2.0's API page is told the opposite of what the code does.
+
+Both corrected fields describe the button box, and both were found the same way — by an example recipe written against the comment rather than against the behaviour, which then rendered as a grey block through a green build (#143).
+
+* **CHANGE**: `expand` said "the button fills its parent's **cross-axis** space". It is an `Expanded`, so it fills the **main** axis — horizontal in a `Row`, vertical in a `Column`, where the button became 402 logical pixels tall for a control that is otherwise 50. The corrected wording also names the half that is easy to miss: `expand` puts the button's content in a filled row, so it takes the offered cross-axis width *as well*, and inside a `Column` the result is a box filling both directions. And the three conditions the flag cannot check — a `Flex` parent is required, a second `Expanded` around the widget is `Competing ParentDataWidgets`, and an unbounded-height `Column` throws *RenderFlex children have non-zero flex but incoming height constraints are unbounded*
+* **CHANGE**: `width` said "a fixed button width". It is applied as a box constraint, and `BoxConstraints.enforce` gives an incoming **tight** constraint the last word — so a dropdown placed directly in a `ListView`, whose cross axis is tight, is drawn at the list's full width and the value is ignored without a word. Measured: `width: 260` rendered at 1392. Now documented as *requested*, with the remedy that makes it arrive — wrap it in an `Align`, or any parent that loosens the constraint
+* **CHANGE**: `FlutterDropdownButton.expand`'s own wording was not wrong ("fill available flex space") but named neither the axis nor the requirement. It now carries the same text as its twin, as does the internal `DropdownMenuShell`, which is where both had been copied from
+* **TEST**: `button_box_contract_test.dart`, five tests, holding each corrected claim so the comment cannot drift back to the field name and a guess. Discriminating power confirmed by making the old wording true: implementing `expand` as a cross-axis fill reddens both expand tests, and making the widget loosen its own constraints reddens the width ones. The "a tight parent overrules it" assertion is deliberately taken on the **painted** box rather than the outer widget — a render box cannot be narrower than a tight incoming constraint, so asserting on the outer one would have been a claim about Flutter that no implementation here could falsify
+
 ## 4.2.0
 
 What is on screen reached everyone except the people who cannot see it. The trigger announced its current value and nothing about being a control; the chosen row was distinguished from its neighbours by `DropdownItemTheme.selectedColor` and by nothing else. The checklist had been doing this correctly since 3.1.0 — `Semantics(checked:)` on the row — and the single-select path simply never got the same treatment.
