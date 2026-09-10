@@ -110,7 +110,19 @@ class _MultiSelectRecipeState extends State<MultiSelectRecipe> {
           ),
           const SizedBox(height: 8),
           FlutterMultiSelectDropdown<String>(
-            expand: true,
+            // A width, not `expand`. `expand` is implemented as `Expanded`
+            // (`dropdown_menu_shell.dart:580`), so it fills the *main* axis of
+            // the `Flex` it is in — inside this `Column` that is the vertical
+            // one, and the button was drawn 402 pixels tall with its label
+            // floating in the middle. Reach for `expand` in a `Row`, or wrap
+            // the dropdown in one.
+            //
+            // The width arrives because a `Column` hands its children *loose*
+            // cross-axis constraints. In a `ListView` it would not — see the
+            // note in `dismissal_recipe.dart`.
+            width: 318,
+            // The menu's maximum height, not the button's. The button is one
+            // row tall whatever this says.
             height: 260,
             items: values,
             selected: _chosen,

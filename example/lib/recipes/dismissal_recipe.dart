@@ -39,15 +39,15 @@ class DismissalRecipe extends StatelessWidget {
           style: Theme.of(context).textTheme.labelLarge,
         ),
         const SizedBox(height: 12),
+        // No `Expanded` here: `expand: true` below *is* an `Expanded`, and two
+        // of them writing `FlexParentData` to the same render object is the
+        // framework assertion `Competing ParentDataWidgets`. It threw on every
+        // build of this recipe until #143.
         const Row(
           children: [
-            Expanded(
-              child: _Neighbour(hint: 'Left', items: _left),
-            ),
+            _Neighbour(hint: 'Left', items: _left),
             SizedBox(width: 16),
-            Expanded(
-              child: _Neighbour(hint: 'Right', items: _right),
-            ),
+            _Neighbour(hint: 'Right', items: _right),
           ],
         ),
         const SizedBox(height: 32),
@@ -56,7 +56,24 @@ class DismissalRecipe extends StatelessWidget {
           style: Theme.of(context).textTheme.labelLarge,
         ),
         const SizedBox(height: 12),
-        const _Neighbour(hint: 'Scroll me', items: _left),
+        // Sized rather than expanded, and the `Align` is what makes the size
+        // arrive. Two different things go wrong for a dropdown placed directly
+        // in a `ListView`:
+        //
+        //  * `expand` puts an `Expanded` there, and a `ListView` is not a
+        //    `Flex`, so there is no `FlexParentData` for it to write;
+        //  * `width` is a `Container(width:)`, which is a *request*. The
+        //    `ListView` hands its children a **tight** cross-axis constraint,
+        //    and `BoxConstraints.enforce` gives the tight parent the last word
+        //    — so `width: 260` measured 1392 and said nothing about it.
+        //
+        // `Align` lays its child out under `constraints.loosen()`, which is the
+        // whole of what this wrapper is for. The pair above need neither: a
+        // `Row` gives its children loose cross-axis constraints already.
+        const Align(
+          alignment: Alignment.centerLeft,
+          child: _Neighbour(hint: 'Scroll me', items: _left, expand: false),
+        ),
         // Enough room below to make scrolling possible at any viewport.
         const SizedBox(height: 900),
         const Center(child: Text('— bottom —')),
@@ -69,10 +86,18 @@ const _left = ['Alpha', 'Bravo', 'Charlie', 'Delta', 'Echo'];
 const _right = ['One', 'Two', 'Three', 'Four', 'Five'];
 
 class _Neighbour extends StatefulWidget {
-  const _Neighbour({required this.hint, required this.items});
+  const _Neighbour({
+    required this.hint,
+    required this.items,
+    this.expand = true,
+  });
 
   final String hint;
   final List<String> items;
+
+  /// Only ever true inside a `Row` — and then without an `Expanded` around
+  /// this widget, because that is what `expand` already adds.
+  final bool expand;
 
   @override
   State<_Neighbour> createState() => _NeighbourState();
@@ -84,7 +109,8 @@ class _NeighbourState extends State<_Neighbour> {
   @override
   Widget build(BuildContext context) {
     return FlutterDropdownButton<String>.text(
-      expand: true,
+      expand: widget.expand,
+      width: widget.expand ? null : 260,
       items: widget.items,
       value: _value,
       hint: widget.hint,

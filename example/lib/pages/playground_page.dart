@@ -964,6 +964,10 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
           (v) => setState(() => _maxMenuWidth = v),
           enableDefault: 300,
         ),
+        // Shared, not filed under TextDropdownButton: `expand` is passed to
+        // all three constructors, and a knob visible for only one of them is
+        // a value that can be switched on and then not switched off.
+        _switchRow('expand', _expand, (v) => setState(() => _expand = v)),
         _switchRow(
           'customTrailing',
           _useCustomTrailing,
@@ -1015,7 +1019,6 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
           (v) => setState(() => _maxWidth = v),
           enableDefault: 300,
         ),
-        _switchRow('expand', _expand, (v) => setState(() => _expand = v)),
         _switchRow(
           'disableWhenSingleItem',
           _disableWhenSingleItem,
@@ -2005,7 +2008,16 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
                     ),
                   ),
                   const SizedBox(height: 24),
-                  if (_type == DropdownType.text && _expand)
+                  // `expand` is an `Expanded`, so the dropdown needs a
+                  // horizontal `Flex` around it whatever the type is. This
+                  // used to read `_type == DropdownType.text && _expand`,
+                  // while `expand: _expand` was passed on all three branches
+                  // — so turning the knob on and then switching type dropped
+                  // an `Expanded` into this `Column`, which is under
+                  // unbounded height, and the preview threw *RenderFlex
+                  // children have non-zero flex but incoming height
+                  // constraints are unbounded* (#143).
+                  if (_expand)
                     Row(children: [_buildDropdown()])
                   else
                     _buildDropdown(),
