@@ -47,3 +47,15 @@ promising more than it does:
 - whether `resolve()` ever ran with `Brightness.dark` — flip the theme toggle;
 - whether a value passed to a replacing slot was *complete*. It counts that the
   argument was passed, never that what was passed was whole.
+
+**Something does look at the drawing now**, because the gap above turned out to
+be expensive. `test/recipe_renders_test.dart` pumps every stage in the roster
+and every knob pane behind it, and fails on a thrown exception, on a dropdown
+stretched by its parent, and on a `width` that never reached the button. It
+found three defects the moment it existed — one of them a framework assertion
+throwing on every build of a recipe, while all eleven tests, `flutter analyze`,
+both contract tests and the coverage gate at 100% were green (#143).
+
+It is a smoke test and not a golden: it asks whether a recipe drew and roughly
+what size, never what it looked like. Colour, spacing and anything inside the
+menu are still seen by nobody but a person opening the app.
