@@ -49,6 +49,7 @@ void main() {
       final destinations = DropdownDestinations();
 
       expect(destinations.all.map((d) => d.id).toList(), [
+        'basic',
         'playground',
         'multi-select',
         'domain-type',
@@ -59,18 +60,38 @@ void main() {
       destinations.dispose();
     });
 
-    test('every destination is a route, and none claims a source', () {
-      // True only of this slice, and the assertion is here to stop being true
-      // quietly. The first recipe makes both halves false, and this test is
-      // what says so out loud rather than letting the shell drift into drawing
-      // something it was never given.
+    test('a source is claimed by recipes and by nothing else', () {
+      // `ShellPage` reads the Code pane's file out of the asset bundle, and the
+      // pane is the affordance of the pasteable claim rather than a general
+      // source viewer. A page that carried a `source:` would be offering to be
+      // pasted, which none of them can be.
       final destinations = DropdownDestinations();
 
-      expect(destinations.all, everyElement(isA<RouteDestination>()));
-      expect(
-        destinations.all.every((d) => d.category == ShellCategory.pages),
-        isTrue,
-      );
+      for (final destination in destinations.all) {
+        final source = destination is StageDestination
+            ? destination.source
+            : null;
+        if (destination.category == ShellCategory.recipes) {
+          expect(source, isNotNull, reason: '${destination.id} claims none');
+          expect(source, startsWith('lib/recipes/'));
+        } else {
+          expect(source, isNull, reason: '${destination.id} claims one');
+        }
+      }
+
+      destinations.dispose();
+    });
+
+    test('the shell has something to select on its first build', () {
+      // Measured, not assumed: `ShellPage` initialises its selection with
+      // `_destinations.whereType<StageDestination>().first`, so a roster of
+      // routes alone throws `Bad state: No element` before anything renders.
+      // The template documents no such requirement and `RouteDestination` reads
+      // as a first-class kind, so nothing but this assertion stands between a
+      // legal-looking roster and a blank crash.
+      final destinations = DropdownDestinations();
+
+      expect(destinations.all.whereType<StageDestination>(), isNotEmpty);
 
       destinations.dispose();
     });

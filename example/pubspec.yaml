@@ -64,6 +64,12 @@ flutter:
   # the material Icons class.
   uses-material-design: true
 
+  # The directory form, not a file list: a recipe added later needs no edit
+  # here. The Code pane reads the running file out of this bundle, so what is
+  # on screen and what executes cannot disagree.
+  assets:
+    - lib/recipes/
+
   # To add assets to your application, add an assets section, like this:
   # assets:
   #   - images/a_dot_burr.jpeg

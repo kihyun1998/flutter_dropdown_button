@@ -1,6 +1,7 @@
 /// What this example asks the shell to show.
 library;
 
+import 'package:flutter/widgets.dart';
 import 'package:flutter_example_template/flutter_example_template.dart';
 
 import '../pages/bare_anchor_page.dart';
@@ -8,6 +9,7 @@ import '../pages/bug_test_page.dart';
 import '../pages/domain_type_page.dart';
 import '../pages/multi_select_page.dart';
 import '../pages/playground_page.dart';
+import '../recipes/basic_recipe.dart';
 
 /// The destinations of *this* app, and whatever state sits behind them.
 ///
@@ -36,6 +38,17 @@ class DropdownDestinations implements ShellDestinations {
   /// right.
   @override
   late final List<ShellDestination> all = [
+    StageDestination(
+      id: 'basic',
+      label: 'Basic',
+      category: ShellCategory.recipes,
+      source: 'lib/recipes/basic_recipe.dart',
+      stage: (context) => const BasicRecipe(),
+      // Nothing to vary: this recipe is three parameters. The shell draws no
+      // knob region rather than an empty strip announcing controls that are
+      // not there.
+      knobs: (context) => const SizedBox.shrink(),
+    ),
     RouteDestination(
       id: 'playground',
       label: 'Every setting',
