@@ -34,6 +34,10 @@ dependencies:
   flutter_dropdown_button:
     path: ../
 
+  # The chrome this example is demonstrated in. `example/` is a separate
+  # package, so this reaches nobody who depends on flutter_dropdown_button.
+  flutter_example_template: ^0.1.0
+
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
@@ -59,6 +63,12 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+
+  # The directory form, not a file list: a recipe added later needs no edit
+  # here. The Code pane reads the running file out of this bundle, so what is
+  # on screen and what executes cannot disagree.
+  assets:
+    - lib/recipes/
 
   # To add assets to your application, add an assets section, like this:
   # assets:
