@@ -58,6 +58,45 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
   bool _enabled = true;
   bool _scrollToSelected = true;
   int _scrollToSelectedMs = 300;
+
+  // ── Advanced theme fields ────────────────────────────────────────────────
+  //
+  // Grouped rather than given a slider each, and the grouping is the point.
+  // Several of these slots **replace** the ambient value instead of merging
+  // with it, so a half-filled one demonstrates a bug rather than a feature —
+  // `CLAUDE.md`: a resolved style is complete, or it is null. The API-coverage
+  // check cannot tell the two apart; it counts that an argument was passed,
+  // never that what was passed was whole. #59 is what that looks like from a
+  // consumer's side.
+  bool _advDecoration = false;
+  bool _advTooltipRich = false;
+  bool _advTextStyles = false;
+  bool _advScrollGradientColors = false;
+
+  // Fixed demonstration values rather than knobs. They are `final` because
+  // nothing moves them, and giving each a slider would have been four more
+  // controls whose only purpose was to look like coverage.
+
+  final Color _advButtonBackground = Colors.white;
+  final Color _advSplashColor = Colors.blue.withValues(alpha: 0.2);
+  final Color _advHighlightColor = Colors.blue.withValues(alpha: 0.1);
+  final Color _advItemHighlightColor = Colors.orange.withValues(alpha: 0.15);
+  final Color _advShadowColor = Colors.black54;
+
+  double _advScrollThickness = 8;
+  double _advScrollCrossAxisMargin = 2;
+  double _advScrollMainAxisMargin = 4;
+  double _advScrollMinThumbLength = 24;
+  double _advSearchDividerHeight = 1;
+
+  double _advCheckboxSize = 20;
+  double _advCheckboxBorderWidth = 2;
+  double _advCheckStrokeWidth = 2;
+  double _advCheckScale = 1;
+  final Color _advCheckboxBorderColor = Colors.grey;
+  final Color _advCheckboxInactiveColor = Colors.transparent;
+
+  double _advTextScale = 1;
   int _animationMs = 200;
   bool _useCustomTrailing = false;
   double _trailingSize = 20;
@@ -250,6 +289,29 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
   DropdownStyleTheme _buildStyleTheme() {
     return DropdownStyleTheme(
       button: DropdownButtonTheme(
+        backgroundColor: _advButtonBackground,
+        splashColor: _advSplashColor,
+        highlightColor: _advHighlightColor,
+        // A decoration replaces the box outright: borderRadius, backgroundColor
+        // and border above stop being read the moment this is non-null. Complete
+        // or null — never half of one.
+        decoration: _advDecoration
+            ? BoxDecoration(
+                color: _advButtonBackground,
+                borderRadius: BorderRadius.circular(_dtBorderRadius),
+                border: Border.all(
+                  color: _dtBorderColor,
+                  width: _dtBorderWidth,
+                ),
+              )
+            : null,
+        disabledDecoration: _advDecoration
+            ? BoxDecoration(
+                color: _dtDisabledBackgroundColor,
+                borderRadius: BorderRadius.circular(_dtBorderRadius),
+                border: Border.all(color: _dtDisabledBorderColor),
+              )
+            : null,
         borderRadius: _dtBorderRadius,
         border: _dtBorderEnabled
             ? Border.all(color: _dtBorderColor, width: _dtBorderWidth)
@@ -276,6 +338,24 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
             : null,
       ),
       overlay: DropdownOverlayTheme(
+        shadowColor: _advShadowColor,
+        decoration: _advDecoration
+            ? BoxDecoration(
+                color: _dtBackgroundColor,
+                borderRadius: BorderRadius.circular(_dtBorderRadius),
+                border: Border.all(
+                  color: _dtBorderColor,
+                  width: _dtBorderWidth,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: _advShadowColor,
+                    blurRadius: _dtElevation,
+                    offset: Offset(0, _dtElevation / 2),
+                  ),
+                ],
+              )
+            : null,
         borderRadius: _dtBorderRadius,
         elevation: _dtElevation,
         backgroundColor: _dtBackgroundColor,
@@ -290,6 +370,7 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
             : null,
       ),
       item: DropdownItemTheme(
+        highlightColor: _advItemHighlightColor,
         selectedColor: _dtSelectedItemColor,
         hoverColor: _dtItemHoverColor,
         splashColor: _dtItemSplashColor,
@@ -316,6 +397,22 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
       ),
       scroll: _dstEnabled
           ? DropdownScrollTheme(
+              // `thickness` sizes the Scrollbar's own track region; it is one
+              // of the slots that replaces the ambient ScrollbarTheme rather
+              // than merging into it.
+              thickness: _advScrollThickness,
+              crossAxisMargin: _advScrollCrossAxisMargin,
+              mainAxisMargin: _advScrollMainAxisMargin,
+              minThumbLength: _advScrollMinThumbLength,
+              // A gradient needs at least two stops, and the second is the
+              // first made transparent. `_dtBackgroundColor` is nullable, so
+              // the fallback is the surface the menu is actually drawn on.
+              gradientColors: _advScrollGradientColors
+                  ? [
+                      _dtBackgroundColor ?? Colors.white,
+                      (_dtBackgroundColor ?? Colors.white).withValues(alpha: 0),
+                    ]
+                  : null,
               thumbWidth: _dstThumbWidth,
               radius: _dstRadius != null ? Radius.circular(_dstRadius!) : null,
               thumbColor: _dstThumbColor,
@@ -335,6 +432,55 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
         showDuration: Duration(milliseconds: _dttShowMs),
         backgroundColor: _dttBackgroundColor,
         textColor: _dttTextColor,
+        // `Tooltip.decoration` is the clearest case of a slot that replaces
+        // rather than merges: once it is non-null, backgroundColor and
+        // borderRadius above reach nothing. So it arrives complete, with the
+        // border and shadow it needs, or it does not arrive.
+        decoration: _advTooltipRich
+            ? BoxDecoration(
+                color: _dttBackgroundColor,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.white24),
+                boxShadow: const [
+                  BoxShadow(color: Colors.black45, blurRadius: 6),
+                ],
+              )
+            : null,
+        border: _advTooltipRich ? Border.all(color: Colors.white24) : null,
+        borderRadius: _advTooltipRich ? BorderRadius.circular(8) : null,
+        shadow: _advTooltipRich
+            ? const [BoxShadow(color: Colors.black45, blurRadius: 6)]
+            : null,
+        textStyle: _advTooltipRich
+            ? TextStyle(color: _dttTextColor, fontSize: 12)
+            : null,
+        textAlign: _advTooltipRich ? TextAlign.center : null,
+        padding: _advTooltipRich
+            ? const EdgeInsets.symmetric(horizontal: 10, vertical: 6)
+            : null,
+        margin: _advTooltipRich ? const EdgeInsets.all(4) : null,
+        constraints: _advTooltipRich
+            ? const BoxConstraints(maxWidth: 320)
+            : null,
+        verticalOffset: _advTooltipRich ? 18 : null,
+        preferBelow: _advTooltipRich ? false : null,
+        exitDuration: _advTooltipRich
+            ? const Duration(milliseconds: 120)
+            : Duration.zero,
+        enableTapToDismiss: _advTooltipRich ? true : null,
+        triggerMode: _advTooltipRich ? TooltipTriggerMode.longPress : null,
+      ),
+      // The playground never built one of these, because until the multi mode
+      // arrived there was no widget on this page that drew a checkbox.
+      checkbox: DropdownCheckboxTheme(
+        activeColor: Theme.of(context).colorScheme.primary,
+        checkColor: Colors.white,
+        inactiveColor: _advCheckboxInactiveColor,
+        borderColor: _advCheckboxBorderColor,
+        borderWidth: _advCheckboxBorderWidth,
+        size: _advCheckboxSize,
+        checkStrokeWidth: _advCheckStrokeWidth,
+        checkScale: _advCheckScale,
       ),
       search: SearchFieldTheme(
         backgroundColor: _sftBackgroundColor,
@@ -377,6 +523,21 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
         keyboardType: _sftKeyboardType,
         textInputAction: _sftTextInputAction,
         divider: _sftShowDivider ? const Divider(height: 1) : null,
+        dividerHeight: _advSearchDividerHeight,
+        // An InputDecoration replaces the field's own decoration wholesale, so
+        // the borders above stop being read. It arrives complete.
+        decoration: _advDecoration
+            ? InputDecoration(
+                border: InputBorder.none,
+                isDense: true,
+                hintText: 'Search…',
+                prefixIcon: const Icon(Icons.search, size: 18),
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: _sftContentPaddingH,
+                  vertical: _sftContentPaddingV,
+                ),
+              )
+            : null,
       ),
     );
   }
@@ -393,6 +554,23 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
               fontSize: _cfgDisabledTextFontSize,
             )
           : null,
+      // Three styles for three states, and they do not inherit from each
+      // other: a `selectedTextStyle` left null does not fall back to a bolder
+      // `textStyle`, it falls back to the ambient one.
+      textStyle: _advTextStyles ? const TextStyle(fontSize: 14) : null,
+      hintStyle: _advTextStyles
+          ? TextStyle(fontSize: 14, color: Theme.of(context).hintColor)
+          : null,
+      selectedTextStyle: _advTextStyles
+          ? const TextStyle(fontSize: 14, fontWeight: FontWeight.w600)
+          : null,
+      // `semanticsLabel` **replaces** what a screen reader is told, rather than
+      // adding to it. Null is the right answer unless you have something better
+      // to say than the text itself — see ADR 0001.
+      semanticsLabel: _advTextStyles ? 'Dropdown value' : null,
+      textDirection: _advTextStyles ? TextDirection.ltr : null,
+      locale: _advTextStyles ? const Locale('en', 'US') : null,
+      textScaler: TextScaler.linear(_advTextScale),
     );
   }
 
@@ -441,9 +619,135 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
           if (_searchable) _buildSearchThemeSection(),
           _buildScrollThemeSection(),
           _buildTooltipThemeSection(),
+          _buildAdvancedSection(),
           const SizedBox(height: 24),
         ],
       ),
+    );
+  }
+
+  // ── Section: Advanced ───────────────────────────────────────────────────
+  //
+  // Four switches rather than forty sliders, and that is the right grain rather
+  // than a shortcut. Each of these flips a group of slots that **replace** the
+  // ambient value instead of merging with it, and a slot like that is complete
+  // or it is null: a `decoration` with a colour and no border is not "mostly
+  // themed", it is a box that lost its border. Splitting them into a control
+  // each would let a reader build exactly that, and call the result a feature.
+  Widget _buildAdvancedSection() {
+    return ExpansionTile(
+      title: const Text(
+        'Advanced',
+        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+      ),
+      childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+      children: [
+        _switchRow(
+          'decoration (button, overlay, search)',
+          _advDecoration,
+          (v) => setState(() => _advDecoration = v),
+        ),
+        const Padding(
+          padding: EdgeInsets.only(left: 8, bottom: 8),
+          child: Text(
+            'While on, borderRadius / backgroundColor / border above reach '
+            'nothing: a decoration replaces the box rather than merging into it.',
+            style: TextStyle(fontSize: 11, fontStyle: FontStyle.italic),
+          ),
+        ),
+        _switchRow(
+          'rich tooltip (14 fields)',
+          _advTooltipRich,
+          (v) => setState(() => _advTooltipRich = v),
+        ),
+        _switchRow(
+          'text styles, locale, semantics label',
+          _advTextStyles,
+          (v) => setState(() => _advTextStyles = v),
+        ),
+        _switchRow(
+          'scroll gradient colours',
+          _advScrollGradientColors,
+          (v) => setState(() => _advScrollGradientColors = v),
+        ),
+        const Divider(height: 20),
+        _sliderRow(
+          'textScaler',
+          _advTextScale,
+          0.8,
+          2.0,
+          (v) => setState(() => _advTextScale = v),
+          divisions: 12,
+        ),
+        _sliderRow(
+          'scrollbar thickness',
+          _advScrollThickness,
+          0,
+          20,
+          (v) => setState(() => _advScrollThickness = v),
+        ),
+        _sliderRow(
+          'scrollbar crossAxisMargin',
+          _advScrollCrossAxisMargin,
+          0,
+          16,
+          (v) => setState(() => _advScrollCrossAxisMargin = v),
+        ),
+        _sliderRow(
+          'scrollbar mainAxisMargin',
+          _advScrollMainAxisMargin,
+          0,
+          16,
+          (v) => setState(() => _advScrollMainAxisMargin = v),
+        ),
+        _sliderRow(
+          'scrollbar minThumbLength',
+          _advScrollMinThumbLength,
+          8,
+          80,
+          (v) => setState(() => _advScrollMinThumbLength = v),
+        ),
+        _sliderRow(
+          'search dividerHeight',
+          _advSearchDividerHeight,
+          0,
+          8,
+          (v) => setState(() => _advSearchDividerHeight = v),
+          divisions: 8,
+        ),
+        const Divider(height: 20),
+        _sliderRow(
+          'checkbox size',
+          _advCheckboxSize,
+          12,
+          40,
+          (v) => setState(() => _advCheckboxSize = v),
+        ),
+        _sliderRow(
+          'checkbox borderWidth',
+          _advCheckboxBorderWidth,
+          0,
+          6,
+          (v) => setState(() => _advCheckboxBorderWidth = v),
+          divisions: 12,
+        ),
+        _sliderRow(
+          'check strokeWidth',
+          _advCheckStrokeWidth,
+          0.5,
+          6,
+          (v) => setState(() => _advCheckStrokeWidth = v),
+          divisions: 11,
+        ),
+        _sliderRow(
+          'check scale',
+          _advCheckScale,
+          0.4,
+          1.6,
+          (v) => setState(() => _advCheckScale = v),
+          divisions: 12,
+        ),
+      ],
     );
   }
 
