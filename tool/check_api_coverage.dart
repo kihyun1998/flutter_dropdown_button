@@ -21,6 +21,19 @@ const _package = 'package:flutter_dropdown_button/';
 const _declSources = {
   'FlutterDropdownButton': 'lib/src/flutter_dropdown_button.dart',
   'FlutterMultiSelectDropdown': 'lib/src/flutter_multi_select_dropdown.dart',
+  // The themes are counted too. `theme:` is one named argument on the widget,
+  // so without these entries ~40 settable fields — the largest part of this
+  // package's public surface — sit outside the only gate that watches it.
+  // #59 happened on exactly that surface.
+  'DropdownStyleTheme': 'lib/src/theme/dropdown_style_theme.dart',
+  'DropdownButtonTheme': 'lib/src/theme/dropdown_button_theme.dart',
+  'DropdownItemTheme': 'lib/src/theme/dropdown_item_theme.dart',
+  'DropdownOverlayTheme': 'lib/src/theme/dropdown_overlay_theme.dart',
+  'DropdownScrollTheme': 'lib/src/theme/dropdown_scroll_theme.dart',
+  'SearchFieldTheme': 'lib/src/theme/search_field_theme.dart',
+  'DropdownTooltipTheme': 'lib/src/theme/tooltip_theme.dart',
+  'DropdownCheckboxTheme': 'lib/src/theme/dropdown_checkbox_theme.dart',
+  'TextDropdownConfig': 'lib/src/config/text_dropdown_config.dart',
 };
 
 CompilationUnit _parse(String path) => parseFile(
