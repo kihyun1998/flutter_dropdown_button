@@ -194,7 +194,7 @@ class _MyDropdownState extends State<MyDropdown>
 }
 ```
 
-`spec` is a **callback**, not a value: it is re-read on every overlay build, so an open menu resizes when its items change. See `example/lib/pages/domain_type_page.dart` for a working dropdown built this way.
+`spec` is a **callback**, not a value: it is re-read on every overlay build, so an open menu resizes when its items change. See `example/lib/recipes/build_your_own_recipe.dart` for a working dropdown built this way.
 
 ### DropdownTheme.animationDuration
 
