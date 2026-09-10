@@ -50,11 +50,12 @@ void main() {
 
       expect(destinations.all.map((d) => d.id).toList(), [
         'basic',
-        'playground',
-        'multi-select',
         'domain-type',
+        'multi-select',
         'bare-anchor',
-        'overlay-teardown',
+        'build-your-own',
+        'overlay-lifetime',
+        'playground',
       ]);
 
       destinations.dispose();
@@ -96,10 +97,28 @@ void main() {
       destinations.dispose();
     });
 
-    test('dispose is safe while every destination is a route', () {
+    test('dispose releases what this host owns', () {
       final destinations = DropdownDestinations();
 
       expect(destinations.dispose, returnsNormally);
+    });
+
+    test('recipes come before pages, so the shell opens on one', () {
+      // `ShellPage` selects `whereType<StageDestination>().first`, and the menu
+      // walks `all` in order. A page drifting to the top would change what the
+      // reader lands on without changing a single test that only checks
+      // membership.
+      final destinations = DropdownDestinations();
+      final categories = destinations.all.map((d) => d.category).toList();
+
+      expect(categories.first, ShellCategory.recipes);
+      expect(
+        categories.indexOf(ShellCategory.pages),
+        categories.lastIndexOf(ShellCategory.recipes) + 1,
+        reason: 'recipes and pages are interleaved',
+      );
+
+      destinations.dispose();
     });
   });
 }

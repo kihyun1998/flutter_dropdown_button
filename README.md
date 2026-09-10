@@ -26,7 +26,7 @@ A highly customizable dropdown package for Flutter with overlay-based rendering,
 - **Single-Item Mode**: Auto-disable when only one option exists
 - **Leading Widgets**: Optional icons/widgets before text content
 - **Searchable Dropdown**: Real-time filtering with customizable search field
-- **Build Your Own**: `DropdownOverlayController` exposes the overlay machinery, and `TextItemPresentation` the text rendering
+- **Build Your Own**: `DropdownOverlayController` exposes the overlay machinery, and the presentations expose the rendering — `TextItemPresentation` for text, `CustomItemPresentation` for arbitrary widgets, `MultiSelectPresentation` for a checklist. Each announces row selection in the vocabulary its cardinality calls for, which is the part a hand-drawn row loses
 
 ## Screenshots
 

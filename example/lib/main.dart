@@ -2,11 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_example_template/flutter_example_template.dart';
 
 import 'app/destinations.dart';
-import 'pages/bare_anchor_page.dart';
-import 'pages/bug_test_page.dart';
-import 'pages/domain_type_page.dart';
-import 'pages/multi_select_page.dart';
-import 'pages/result_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -56,17 +51,6 @@ class _MyAppState extends State<MyApp> {
             title: 'Flutter Dropdown Button',
             createDestinations: DropdownDestinations.new,
           ),
-          // The named routes stay exactly as they were, and are load-bearing
-          // for as long as the old pages are: `bug_test_page` pushes
-          // `/result-page` and `result_page` pushes `/`, which is this
-          // `home:`. They retire with the pages that use them, not here.
-          routes: {
-            '/dropdown-bug-test': (context) => const DropdownBugTestPage(),
-            '/domain-type': (context) => const DomainTypePage(),
-            '/multi-select': (context) => const MultiSelectPage(),
-            '/bare-anchor': (context) => const BareAnchorPage(),
-            '/result-page': (context) => const ResultPage(),
-          },
         ),
       ),
     );

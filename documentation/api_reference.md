@@ -419,7 +419,7 @@ dies the first time the theme changes; skip `triggerEnabled` and a neighbouring
 menu stands down over your disabled anchor, leaving its own menu open under a
 tap that did nothing.
 
-A working example lives in `example/lib/pages/domain_type_page.dart`.
+A working example lives in `example/lib/recipes/build_your_own_recipe.dart`.
 
 ### Constructor
 

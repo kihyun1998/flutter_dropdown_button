@@ -25,11 +25,12 @@ void main() {
 
     for (final label in const [
       'Basic',
-      'Every setting',
-      'Multi-select',
       'Domain type',
+      'Multi-select',
       'Bare anchor',
-      'Overlay teardown',
+      'Build your own',
+      'Overlay lifetime',
+      'Every setting',
     ]) {
       expect(find.text(label), findsWidgets, reason: 'menu is missing $label');
     }
