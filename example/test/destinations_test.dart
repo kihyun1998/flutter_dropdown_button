@@ -7,6 +7,8 @@
 // one question.
 
 import 'package:example/app/destinations.dart';
+import 'package:example/app/recipe_knobs.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_example_template/flutter_example_template.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -97,10 +99,37 @@ void main() {
       destinations.dispose();
     });
 
-    test('dispose releases what this host owns', () {
+    testWidgets('dispose releases what this host owns', (tester) async {
+      // `returnsNormally` alone was a proxy condition: it measures that
+      // `dispose` did not throw, which a `dispose` that releases nothing
+      // satisfies perfectly. Measured — emptying the body left every test in
+      // this file green.
+      //
+      // So reach the notifier through the surface that hands it out, and ask
+      // it directly. A `ChangeNotifier` used after disposal throws in debug;
+      // one that was never disposed does not.
       final destinations = DropdownDestinations();
 
-      expect(destinations.dispose, returnsNormally);
+      late MultiSelectKnobPane pane;
+      await tester.pumpWidget(
+        Builder(
+          builder: (context) {
+            pane =
+                destinations.all
+                        .whereType<StageDestination>()
+                        .firstWhere((d) => d.id == 'multi-select')
+                        .knobs(context)
+                    as MultiSelectKnobPane;
+            return const SizedBox.shrink();
+          },
+        ),
+      );
+
+      expect(() => pane.knobs.addListener(() {}), returnsNormally);
+
+      destinations.dispose();
+
+      expect(() => pane.knobs.addListener(() {}), throwsFlutterError);
     });
 
     test('recipes come before pages, so the shell opens on one', () {
