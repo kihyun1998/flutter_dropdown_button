@@ -4,6 +4,7 @@ library;
 import 'package:flutter/material.dart';
 
 import '../recipes/multi_select_recipe.dart';
+import '../recipes/search_recipe.dart';
 
 /// What the multi-select recipe's knobs hold.
 ///
@@ -76,6 +77,57 @@ class MultiSelectKnobPane extends StatelessWidget {
           ),
           value: knobs.solarisDropped,
           onChanged: (v) => knobs.solarisDropped = v,
+        ),
+      ],
+    ),
+  );
+}
+
+/// What the search recipe's knobs hold.
+class SearchKnobs extends ChangeNotifier {
+  bool _matchCountry = true;
+  bool get matchCountry => _matchCountry;
+  set matchCountry(bool value) {
+    if (_matchCountry == value) return;
+    _matchCountry = value;
+    notifyListeners();
+  }
+}
+
+/// The stage half.
+class SearchStage extends StatelessWidget {
+  const SearchStage({super.key, required this.knobs});
+
+  final SearchKnobs knobs;
+
+  @override
+  Widget build(BuildContext context) => AnimatedBuilder(
+    animation: knobs,
+    builder: (context, _) => SearchRecipe(matchCountry: knobs.matchCountry),
+  );
+}
+
+/// The knob half.
+class SearchKnobPane extends StatelessWidget {
+  const SearchKnobPane({super.key, required this.knobs});
+
+  final SearchKnobs knobs;
+
+  @override
+  Widget build(BuildContext context) => AnimatedBuilder(
+    animation: knobs,
+    builder: (context, _) => ListView(
+      padding: const EdgeInsets.all(12),
+      children: [
+        SwitchListTile(
+          contentPadding: EdgeInsets.zero,
+          title: const Text('searchFilter matches the country'),
+          subtitle: const Text(
+            'Off, the default filter reads only the label. Type "korea" with '
+            'it off to reach the empty state.',
+          ),
+          value: knobs.matchCountry,
+          onChanged: (v) => knobs.matchCountry = v,
         ),
       ],
     ),

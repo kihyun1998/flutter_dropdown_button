@@ -8,8 +8,11 @@ import '../pages/playground_page.dart';
 import '../recipes/bare_anchor_recipe.dart';
 import '../recipes/basic_recipe.dart';
 import '../recipes/build_your_own_recipe.dart';
+import '../recipes/custom_items_recipe.dart';
+import '../recipes/dismissal_recipe.dart';
 import '../recipes/domain_type_recipe.dart';
 import '../recipes/overlay_lifetime_recipe.dart';
+import '../recipes/text_config_recipe.dart';
 import 'recipe_knobs.dart';
 
 /// The destinations of *this* app, and whatever state sits behind them.
@@ -27,6 +30,7 @@ class DropdownDestinations implements ShellDestinations {
   DropdownDestinations();
 
   final _multiSelectKnobs = MultiSelectKnobs();
+  final _searchKnobs = SearchKnobs();
 
   /// Every destination, in menu order.
   ///
@@ -64,6 +68,38 @@ class DropdownDestinations implements ShellDestinations {
       source: 'lib/recipes/multi_select_recipe.dart',
       stage: (context) => MultiSelectStage(knobs: _multiSelectKnobs),
       knobs: (context) => MultiSelectKnobPane(knobs: _multiSelectKnobs),
+    ),
+    StageDestination(
+      id: 'search',
+      label: 'Search',
+      category: ShellCategory.recipes,
+      source: 'lib/recipes/search_recipe.dart',
+      stage: (context) => SearchStage(knobs: _searchKnobs),
+      knobs: (context) => SearchKnobPane(knobs: _searchKnobs),
+    ),
+    StageDestination(
+      id: 'custom-items',
+      label: 'Custom items',
+      category: ShellCategory.recipes,
+      source: 'lib/recipes/custom_items_recipe.dart',
+      stage: (context) => const CustomItemsRecipe(),
+      knobs: (context) => const SizedBox.shrink(),
+    ),
+    StageDestination(
+      id: 'text-config',
+      label: 'Text overflow',
+      category: ShellCategory.recipes,
+      source: 'lib/recipes/text_config_recipe.dart',
+      stage: (context) => const TextConfigRecipe(),
+      knobs: (context) => const SizedBox.shrink(),
+    ),
+    StageDestination(
+      id: 'dismissal',
+      label: 'Dismissal',
+      category: ShellCategory.recipes,
+      source: 'lib/recipes/dismissal_recipe.dart',
+      stage: (context) => const DismissalRecipe(),
+      knobs: (context) => const SizedBox.shrink(),
     ),
     StageDestination(
       id: 'bare-anchor',
@@ -108,5 +144,6 @@ class DropdownDestinations implements ShellDestinations {
   @override
   void dispose() {
     _multiSelectKnobs.dispose();
+    _searchKnobs.dispose();
   }
 }
