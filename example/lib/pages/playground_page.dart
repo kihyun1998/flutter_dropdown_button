@@ -57,6 +57,7 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
   double _itemHeight = 48;
   bool _enabled = true;
   bool _scrollToSelected = true;
+  int _scrollToSelectedMs = 300;
   int _animationMs = 200;
   bool _useCustomTrailing = false;
   double _trailingSize = 20;
@@ -601,6 +602,16 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
           'scrollToSelectedItem',
           _scrollToSelected,
           (v) => setState(() => _scrollToSelected = v),
+        ),
+        // The duration is meaningless without the flag above, so it sits with
+        // it rather than in the geometry section.
+        _sliderRow(
+          'scrollToSelectedDuration (ms)',
+          _scrollToSelectedMs.toDouble(),
+          0,
+          1000,
+          (v) => setState(() => _scrollToSelectedMs = v.round()),
+          divisions: 20,
         ),
         _switchRow(
           'searchable',
@@ -1744,6 +1755,7 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
           itemHeight: _itemHeight,
           enabled: _enabled,
           scrollToSelectedItem: _scrollToSelected,
+          scrollToSelectedDuration: Duration(milliseconds: _scrollToSelectedMs),
           animationDuration: Duration(milliseconds: _animationMs),
           theme: theme,
           config: config,
@@ -1769,6 +1781,23 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
           items: _items,
           value: _selectedValue,
           hintWidget: const Text('Select an option'),
+          // The six below were already drawn by this page and read by the text
+          // branch only. Nothing was missing from the UI; the arguments simply
+          // were not passed — and the check counts per constructor because the
+          // two constructors make different promises.
+          width: _fixedWidth,
+          minWidth: _minWidth,
+          maxWidth: _maxWidth,
+          expand: _expand,
+          disableWhenSingleItem: _disableWhenSingleItem,
+          hideIconWhenSingleItem: _hideIconWhenSingleItem,
+          scrollToSelectedDuration: Duration(milliseconds: _scrollToSelectedMs),
+          emptyBuilder: (query) => Padding(
+            padding: const EdgeInsets.all(16),
+            child: Text(
+              query.isEmpty ? 'No items' : 'Nothing matching "$query"',
+            ),
+          ),
           height: _height,
           itemHeight: _itemHeight,
           enabled: _enabled,
