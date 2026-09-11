@@ -59,6 +59,7 @@ void main() {
         'text-config',
         'button-theme',
         'menu-theme',
+        'geometry',
         'dismissal',
         'bare-anchor',
         'build-your-own',
