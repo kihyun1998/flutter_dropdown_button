@@ -60,6 +60,7 @@ void main() {
         'button-theme',
         'menu-theme',
         'geometry',
+        'states',
         'dismissal',
         'bare-anchor',
         'build-your-own',
