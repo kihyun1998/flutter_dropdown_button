@@ -4,7 +4,6 @@ library;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_example_template/flutter_example_template.dart';
 
-import '../pages/playground_page.dart';
 import '../recipes/bare_anchor_recipe.dart';
 import '../recipes/basic_recipe.dart';
 import '../recipes/build_your_own_recipe.dart';
@@ -160,12 +159,6 @@ class DropdownDestinations implements ShellDestinations {
       source: 'lib/recipes/overlay_lifetime_recipe.dart',
       stage: (context) => const OverlayLifetimeRecipe(),
       knobs: (context) => const SizedBox.shrink(),
-    ),
-    RouteDestination(
-      id: 'playground',
-      label: 'Every setting',
-      category: ShellCategory.pages,
-      open: (context) => const PlaygroundPage(),
     ),
   ];
 

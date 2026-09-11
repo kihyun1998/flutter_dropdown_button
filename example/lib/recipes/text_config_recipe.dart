@@ -28,8 +28,8 @@ const _longItems = <String>[
 ///   nobody knows exists.
 ///
 /// `leading` and `leadingPadding` ride along on the same widget: the padding is
-/// the space between the leading widget and the text, and it is one of the two
-/// fields the playground never wires because it has no reason to move.
+/// the space between the leading widget and the text, and this is the only
+/// place either is set.
 class TextConfigRecipe extends StatefulWidget {
   const TextConfigRecipe({super.key});
 

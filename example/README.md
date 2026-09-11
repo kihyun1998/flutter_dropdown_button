@@ -23,15 +23,14 @@ from this app, which `test/recipe_contract_test.dart` holds.
 | Search | `searchFilter` reading the item rather than its label, and `emptyBuilder` for when it matches nothing |
 | Custom items | `itemBuilder`, `selectedBuilder`, `hintWidget` — a button face that need not be a row |
 | Text overflow | the three `TextDropdownConfig` presets, and the `itemHeight` trap that comes with wrapping |
+| Button theming | `DropdownButtonTheme`, `TextDropdownConfig` and `DropdownTooltipTheme` — the box, its text, and the tooltip for what did not fit, each drawn twice so `decoration` can be seen replacing its neighbours |
+| Menu theming | `DropdownOverlayTheme`, `DropdownItemTheme`, `DropdownScrollTheme`, `DropdownCheckboxTheme` — and the scrollbar track that a colour alone does not draw |
+| Sizing and placement | the button's bounds and the menu's bounds are two different pairs, `MenuAlignment` between them, and `expand` in the only parent it belongs in |
+| States | one item, no interaction, nothing matched, and how long the open takes |
 | Dismissal | switching between two adjacent dropdowns in **one** tap, a menu following its button as the page scrolls, keyboard navigation |
 | Bare anchor | `anchorBuilder` + `positioningKey`, in all three cardinalities |
 | Build your own | `DropdownOverlayController` + `TextItemPresentation`, without `FlutterDropdownButton` at all |
 | Overlay lifetime | `closeAll()` and `closeAll(animate: false)` across a route change |
-
-**Every setting** — a page rather than a recipe, because it is the one surface
-that holds all ~200 knobs at once: three modes, every theme class, and the
-`Advanced` section for the slots that replace the ambient value rather than
-merging into it.
 
 ## The claim this example holds itself to
 
