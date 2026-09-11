@@ -113,8 +113,9 @@ class _BareAnchorRecipeState extends State<BareAnchorRecipe> {
                 // `itemBuilder` returns, and bare mode applies the same way.
                 // Showing it here is not symmetry for its own sake —
                 // `anchorBuilder` asserts against `width`, `minWidth`,
-                // `maxWidth`, `expand` and `trailing`, so a playground owning
-                // those knobs can never put this combination on screen.
+                // `maxWidth`, `expand` and `trailing`, so any surface that
+                // offers those as knobs can never put this combination on
+                // screen — a file is the only place it fits.
                 scope: FlutterDropdownButton<String>(
                   items: _fields,
                   value: _field,

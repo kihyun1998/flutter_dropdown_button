@@ -38,7 +38,6 @@ void main() {
       'Bare anchor',
       'Build your own',
       'Overlay lifetime',
-      'Every setting',
     ]) {
       expect(find.text(label), findsWidgets, reason: 'menu is missing $label');
     }

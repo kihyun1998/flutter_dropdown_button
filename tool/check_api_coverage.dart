@@ -266,8 +266,8 @@ void main(List<String> args) {
       'passed anywhere in example/lib.',
     );
     stderr.writeln(
-      '  Pass them from a recipe or the playground. If one genuinely should '
-      'not be demonstrated,',
+      '  Pass them from a recipe. If one genuinely should not be '
+      'demonstrated,',
     );
     stderr.writeln(
       '  add it to _exempt in this file *with the reason*. Never lower --min '

@@ -65,7 +65,6 @@ void main() {
         'bare-anchor',
         'build-your-own',
         'overlay-lifetime',
-        'playground',
       ]);
 
       destinations.dispose();
@@ -140,19 +139,30 @@ void main() {
       expect(() => pane.knobs.addListener(() {}), throwsFlutterError);
     });
 
-    test('recipes come before pages, so the shell opens on one', () {
+    test('the recipes are one unbroken run at the front', () {
       // `ShellPage` selects `whereType<StageDestination>().first`, and the menu
-      // walks `all` in order. A page drifting to the top would change what the
-      // reader lands on without changing a single test that only checks
-      // membership.
+      // walks `all` in order. Anything drifting above or into the recipes would
+      // change what the reader lands on without changing a single test that
+      // only checks membership.
+      //
+      // Written as "one unbroken run" rather than as "recipes before pages",
+      // which is what it used to say. #147 deleted the only page, and that
+      // phrasing then compared an index of -1 against a real one. This version
+      // asserts something in both worlds: it holds now, with the run covering
+      // the whole roster, and it starts constraining a page the day one is
+      // added rather than passing because there is nothing to order.
       final destinations = DropdownDestinations();
       final categories = destinations.all.map((d) => d.category).toList();
+      final recipes = categories
+          .where((c) => c == ShellCategory.recipes)
+          .length;
 
       expect(categories.first, ShellCategory.recipes);
+      expect(recipes, greaterThan(0));
       expect(
-        categories.indexOf(ShellCategory.pages),
-        categories.lastIndexOf(ShellCategory.recipes) + 1,
-        reason: 'recipes and pages are interleaved',
+        categories.lastIndexOf(ShellCategory.recipes),
+        recipes - 1,
+        reason: 'something non-recipe sits inside the run of recipes',
       );
 
       destinations.dispose();

@@ -13,7 +13,6 @@
 // passed and never what it looked like. This file is the part that looks.
 
 import 'package:example/app/destinations.dart';
-import 'package:example/pages/playground_page.dart';
 import 'package:example/recipes/dismissal_recipe.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dropdown_button/flutter_dropdown_button.dart';
@@ -44,9 +43,12 @@ void main() {
               home: Scaffold(body: Builder(builder: stage)),
             ),
           ),
-          // A route opens as its own page and brings its own scaffold. The
-          // playground is the only one, and until now nothing pumped it at
-          // all — 2400 lines reached by no test in this directory.
+          // No destination is a route any more — the playground was the only
+          // one and #147 deleted it. The arm stays because the switch is
+          // exhaustive over a sealed type: a route added back is covered by
+          // this sweep on the day it appears, rather than quietly sitting
+          // outside it, which is how the playground went 2400 lines with no
+          // test at all.
           RouteDestination(:final id, :final open) => (
             id,
             MaterialApp(home: Builder(builder: open)),
@@ -194,59 +196,6 @@ void main() {
       greaterThanOrEqualTo(12),
       reason: 'the finder stopped seeing most of the roster',
     );
-  });
-
-  testWidgets('the playground survives expand across a type switch', (
-    tester,
-  ) async {
-    // `expand` is passed to all three constructors, but its `Row` wrapper used
-    // to be gated on `_type == DropdownType.text` and its knob lived in the
-    // text-only section. So: turn it on, switch type, and an `Expanded` lands
-    // in a `Column` that is under unbounded height — *RenderFlex children have
-    // non-zero flex but incoming height constraints are unbounded* — with the
-    // knob that caused it no longer on screen to turn off.
-    //
-    // The sweep above cannot reach this: it pumps every screen at its opening
-    // state, and this one needs two taps first.
-    tester.view.physicalSize = const Size(1800, 2400);
-    tester.view.devicePixelRatio = 1.0;
-    addTearDown(tester.view.reset);
-
-    await tester.pumpWidget(const MaterialApp(home: PlaygroundPage()));
-    await tester.pumpAndSettle();
-
-    final settings = find.byType(Scrollable).last;
-    await tester.scrollUntilVisible(
-      find.text('expand'),
-      200,
-      scrollable: settings,
-    );
-
-    // The window: if the knob is not on screen the two taps below do nothing
-    // and the test passes by never entering the state it is about.
-    expect(
-      find.text('expand'),
-      findsOneWidget,
-      reason: 'the expand knob is not reachable, so nothing was exercised',
-    );
-
-    await tester.tap(
-      find.descendant(
-        of: find
-            .ancestor(of: find.text('expand'), matching: find.byType(Row))
-            .first,
-        matching: find.byType(Switch),
-      ),
-    );
-    await tester.pumpAndSettle();
-    expect(tester.takeException(), isNull, reason: 'expand on, type text');
-
-    await tester.tap(find.text('multi'));
-    await tester.pumpAndSettle();
-    expect(tester.takeException(), isNull, reason: 'expand on, type multi');
-
-    // And the knob is still there to turn off, which is the other half.
-    expect(find.text('expand'), findsOneWidget);
   });
 }
 
