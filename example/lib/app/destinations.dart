@@ -12,6 +12,7 @@ import '../recipes/button_theme_recipe.dart';
 import '../recipes/custom_items_recipe.dart';
 import '../recipes/dismissal_recipe.dart';
 import '../recipes/domain_type_recipe.dart';
+import '../recipes/geometry_recipe.dart';
 import '../recipes/menu_theme_recipe.dart';
 import '../recipes/overlay_lifetime_recipe.dart';
 import '../recipes/text_config_recipe.dart';
@@ -109,6 +110,14 @@ class DropdownDestinations implements ShellDestinations {
       category: ShellCategory.recipes,
       source: 'lib/recipes/menu_theme_recipe.dart',
       stage: (context) => const MenuThemeRecipe(),
+      knobs: (context) => const SizedBox.shrink(),
+    ),
+    StageDestination(
+      id: 'geometry',
+      label: 'Sizing and placement',
+      category: ShellCategory.recipes,
+      source: 'lib/recipes/geometry_recipe.dart',
+      stage: (context) => const GeometryRecipe(),
       knobs: (context) => const SizedBox.shrink(),
     ),
     StageDestination(
