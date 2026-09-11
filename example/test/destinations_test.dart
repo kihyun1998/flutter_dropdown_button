@@ -57,6 +57,7 @@ void main() {
         'search',
         'custom-items',
         'text-config',
+        'menu-theme',
         'dismissal',
         'bare-anchor',
         'build-your-own',

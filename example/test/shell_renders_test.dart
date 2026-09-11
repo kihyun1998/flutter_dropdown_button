@@ -30,6 +30,7 @@ void main() {
       'Search',
       'Custom items',
       'Text overflow',
+      'Menu theming',
       'Dismissal',
       'Bare anchor',
       'Build your own',
