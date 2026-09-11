@@ -54,16 +54,26 @@ class SearchRecipe extends StatefulWidget {
 
 class _SearchRecipeState extends State<SearchRecipe> {
   Airport? _selected;
+  Airport? _themed;
+  Airport? _decorated;
 
   static String _label(Airport a) => '${a.iata} — ${a.city}';
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          FlutterDropdownButton<Airport>.text(
+    return ListView(
+      padding: const EdgeInsets.all(24),
+      children: [
+        _caption(
+          context,
+          'The filter, and the state when it matches none',
+          'Type "korea" or "jp": the label says neither, and searchFilter is '
+              'what finds them anyway. Type "zzz" for the empty state, which '
+              'is handed the query.',
+        ),
+        Align(
+          alignment: Alignment.centerLeft,
+          child: FlutterDropdownButton<Airport>.text(
             width: 300,
             height: 260,
             items: _airports,
@@ -100,14 +110,127 @@ class _SearchRecipeState extends State<SearchRecipe> {
             ),
             onChanged: (airport) => setState(() => _selected = airport),
           ),
-          const SizedBox(height: 24),
-          Text(
-            _selected == null
-                ? 'Try "korea", "jp", or "zzz"'
-                : '${_selected!.iata} · ${_selected!.country}',
+        ),
+        const SizedBox(height: 12),
+        Text(
+          _selected == null
+              ? 'Try "korea", "jp", or "zzz"'
+              : '${_selected!.iata} · ${_selected!.country}',
+        ),
+        const SizedBox(height: 32),
+        _caption(
+          context,
+          'The field itself, themed',
+          'Every field SearchFieldTheme declares. The divider is the one worth '
+              'reading about: Flutter\'s Divider is 16 pixels tall, not one, '
+              'and the height reserved for it has to say so.',
+        ),
+        Align(
+          alignment: Alignment.centerLeft,
+          child: FlutterDropdownButton<Airport>.text(
+            width: 300,
+            height: 280,
+            items: _airports,
+            value: _themed,
+            label: _label,
+            hint: 'Themed search',
+            searchable: true,
+            onChanged: (airport) => setState(() => _themed = airport),
+            theme: _searchTheme,
           ),
-        ],
-      ),
+        ),
+        const SizedBox(height: 32),
+        _caption(
+          context,
+          'The field, described as an InputDecoration',
+          'decoration takes precedence over the individual properties it '
+              'covers — contentPadding among them — so this one names what it '
+              'wants there and nothing that would be ignored.',
+        ),
+        Align(
+          alignment: Alignment.centerLeft,
+          child: FlutterDropdownButton<Airport>.text(
+            width: 300,
+            height: 280,
+            items: _airports,
+            value: _decorated,
+            label: _label,
+            hint: 'Decorated search',
+            searchable: true,
+            onChanged: (airport) => setState(() => _decorated = airport),
+            theme: _decoratedSearchTheme,
+          ),
+        ),
+        const SizedBox(height: 24),
+      ],
     );
   }
+
+  Widget _caption(BuildContext context, String title, String body) => Padding(
+    padding: const EdgeInsets.only(bottom: 12),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(title, style: Theme.of(context).textTheme.labelLarge),
+        const SizedBox(height: 4),
+        Text(body, style: const TextStyle(fontSize: 12, color: Colors.grey)),
+      ],
+    ),
+  );
 }
+
+/// Every field the search field declares, named one at a time.
+final _searchTheme = DropdownStyleTheme(
+  overlay: const DropdownOverlayTheme(backgroundColor: Color(0xFF1B1F27)),
+  search: SearchFieldTheme(
+    backgroundColor: const Color(0xFF141821),
+    textStyle: const TextStyle(fontSize: 14, color: Color(0xFFD7DEEC)),
+    cursorColor: const Color(0xFF6E8BFF),
+    cursorWidth: 2,
+    cursorHeight: 16,
+    cursorRadius: const Radius.circular(1),
+    height: 40,
+    margin: const EdgeInsets.fromLTRB(8, 8, 8, 4),
+    padding: const EdgeInsets.symmetric(horizontal: 4),
+    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+    borderRadius: BorderRadius.circular(8),
+    border: Border.all(color: const Color(0xFF39404E)),
+    focusedBorder: Border.all(color: const Color(0xFF6E8BFF), width: 1.5),
+    // The pair. Flutter's `Divider` is **16** logical pixels tall by default,
+    // not one — the overlay reserves `dividerHeight` and constrains the widget
+    // to it, so a reservation of 1.0 under a real `Divider` used to overflow
+    // the item list by fifteen pixels. Name both, or neither.
+    divider: const Divider(height: 16, thickness: 1, color: Color(0xFF2C323D)),
+    dividerHeight: 16,
+    // The default is true, which is right for a menu opened to be typed into.
+    // Turn it off when the menu is opened to be read.
+    autofocus: false,
+    keyboardType: TextInputType.text,
+    textInputAction: TextInputAction.search,
+    textAlign: TextAlign.start,
+  ),
+);
+
+/// The same field, handed an [InputDecoration] instead.
+final _decoratedSearchTheme = DropdownStyleTheme(
+  overlay: const DropdownOverlayTheme(backgroundColor: Color(0xFF1B1F27)),
+  search: SearchFieldTheme(
+    backgroundColor: const Color(0xFF141821),
+    textStyle: const TextStyle(fontSize: 14, color: Color(0xFFD7DEEC)),
+    height: 44,
+    borderRadius: BorderRadius.circular(10),
+    // `contentPadding` is deliberately absent: this takes precedence over it,
+    // so naming it here would be a value nothing reads.
+    decoration: const InputDecoration(
+      border: InputBorder.none,
+      isDense: true,
+      contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      prefixIcon: Icon(Icons.travel_explore, size: 18),
+      hintText: 'City, code or country',
+      hintStyle: TextStyle(fontSize: 13, color: Color(0xFF7A8296)),
+    ),
+    divider: const Divider(height: 16, thickness: 1, color: Color(0xFF2C323D)),
+    dividerHeight: 16,
+    autofocus: false,
+  ),
+);
