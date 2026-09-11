@@ -32,6 +32,7 @@ void main() {
       'Text overflow',
       'Button theming',
       'Menu theming',
+      'Sizing and placement',
       'Dismissal',
       'Bare anchor',
       'Build your own',
