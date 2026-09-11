@@ -8,6 +8,7 @@ import '../pages/playground_page.dart';
 import '../recipes/bare_anchor_recipe.dart';
 import '../recipes/basic_recipe.dart';
 import '../recipes/build_your_own_recipe.dart';
+import '../recipes/button_theme_recipe.dart';
 import '../recipes/custom_items_recipe.dart';
 import '../recipes/dismissal_recipe.dart';
 import '../recipes/domain_type_recipe.dart';
@@ -92,6 +93,14 @@ class DropdownDestinations implements ShellDestinations {
       category: ShellCategory.recipes,
       source: 'lib/recipes/text_config_recipe.dart',
       stage: (context) => const TextConfigRecipe(),
+      knobs: (context) => const SizedBox.shrink(),
+    ),
+    StageDestination(
+      id: 'button-theme',
+      label: 'Button theming',
+      category: ShellCategory.recipes,
+      source: 'lib/recipes/button_theme_recipe.dart',
+      stage: (context) => const ButtonThemeRecipe(),
       knobs: (context) => const SizedBox.shrink(),
     ),
     StageDestination(
