@@ -81,10 +81,10 @@ packages:
     dependency: "direct main"
     description:
       name: flutter_example_template
-      sha256: "394723974f423dd04333d03bf3464ecb5f3b34cd7f6a2e63efdf19041cbc8172"
+      sha256: "6d715cc0035b566f0f16463d403112dc840f260531f937963316ac303af8feab"
       url: "https://pub.dev"
     source: hosted
-    version: "0.1.0"
+    version: "0.2.0"
   flutter_lints:
     dependency: "direct dev"
     description:
