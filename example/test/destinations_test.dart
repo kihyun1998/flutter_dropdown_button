@@ -59,6 +59,7 @@ void main() {
         'text-config',
         'button-theme',
         'menu-theme',
+        'wheel-scroll',
         'geometry',
         'states',
         'dismissal',
@@ -123,25 +124,28 @@ void main() {
       final destinations = DropdownDestinations();
 
       late MultiSelectKnobPane pane;
+      late WheelScrollKnobPane wheelPane;
       await tester.pumpWidget(
         Builder(
           builder: (context) {
-            pane =
-                destinations.all
-                        .whereType<StageDestination>()
-                        .firstWhere((d) => d.id == 'multi-select')
-                        .knobs(context)
-                    as MultiSelectKnobPane;
+            Widget knobsOf(String id) => destinations.all
+                .whereType<StageDestination>()
+                .firstWhere((d) => d.id == id)
+                .knobs(context);
+            pane = knobsOf('multi-select') as MultiSelectKnobPane;
+            wheelPane = knobsOf('wheel-scroll') as WheelScrollKnobPane;
             return const SizedBox.shrink();
           },
         ),
       );
 
       expect(() => pane.knobs.addListener(() {}), returnsNormally);
+      expect(() => wheelPane.knobs.addListener(() {}), returnsNormally);
 
       destinations.dispose();
 
       expect(() => pane.knobs.addListener(() {}), throwsFlutterError);
+      expect(() => wheelPane.knobs.addListener(() {}), throwsFlutterError);
     });
 
     test('the recipes are one unbroken run at the front', () {

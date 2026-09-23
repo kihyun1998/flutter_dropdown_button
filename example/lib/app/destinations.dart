@@ -34,6 +34,7 @@ class DropdownDestinations implements ShellDestinations {
 
   final _multiSelectKnobs = MultiSelectKnobs();
   final _searchKnobs = SearchKnobs();
+  final _wheelKnobs = WheelKnobs();
 
   /// Every destination, in menu order.
   ///
@@ -113,6 +114,14 @@ class DropdownDestinations implements ShellDestinations {
       knobs: (context) => const SizedBox.shrink(),
     ),
     StageDestination(
+      id: 'wheel-scroll',
+      label: 'Wheel scrolling',
+      category: ShellCategory.recipes,
+      source: 'lib/recipes/wheel_scroll_recipe.dart',
+      stage: (context) => WheelScrollStage(knobs: _wheelKnobs),
+      knobs: (context) => WheelScrollKnobPane(knobs: _wheelKnobs),
+    ),
+    StageDestination(
       id: 'geometry',
       label: 'Sizing and placement',
       category: ShellCategory.recipes,
@@ -174,5 +183,6 @@ class DropdownDestinations implements ShellDestinations {
   void dispose() {
     _multiSelectKnobs.dispose();
     _searchKnobs.dispose();
+    _wheelKnobs.dispose();
   }
 }
