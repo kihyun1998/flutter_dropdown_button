@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_smooth_wheel_scroll/flutter_smooth_wheel_scroll.dart'
+    show WheelMotion;
 
 /// The ambient values a dropdown falls back to when its theme leaves a slot
 /// empty, lifted out of [ThemeData] as plain colours.
@@ -153,12 +155,16 @@ class ResolvedSearchFieldStyle {
   final Widget? divider;
 }
 
-/// The scrollbar as it should be drawn.
+/// How a scrolling menu is drawn and how it moves.
 ///
-/// Every field is what the widget hands straight to Flutter. Slots the theme
-/// left unset stay **null** rather than being filled with Flutter's own
-/// default: a `Scrollbar` treats null as "ask the ambient `ScrollbarTheme`",
-/// and writing the default in would silence an app-wide theme.
+/// The scrollbar fields are what the widget hands straight to Flutter. Slots
+/// the theme left unset stay **null** rather than being filled with Flutter's
+/// own default: a `Scrollbar` treats null as "ask the ambient
+/// `ScrollbarTheme`", and writing the default in would silence an app-wide
+/// theme.
+///
+/// [wheelMotion] is the exception: Flutter has no slot for it, so it is never
+/// null.
 class ResolvedScrollStyle {
   /// Creates a resolved scroll style.
   const ResolvedScrollStyle({
@@ -172,7 +178,12 @@ class ResolvedScrollStyle {
     this.thumbVisibility,
     this.trackVisibility,
     this.interactive,
-  });
+    WheelMotion? wheelMotion,
+  }) : wheelMotion = wheelMotion ?? _defaultWheelMotion;
+
+  /// How the menu moves on a scroll-wheel notch. Never null: an unnamed motion
+  /// is a 250 ms spring that does not pass its target.
+  final WheelMotion wheelMotion;
 
   /// Width of the thumb, whether the caller named it or it fell back.
   final double thumbWidth;
@@ -210,6 +221,10 @@ class ResolvedScrollStyle {
   /// Whether the thumb can be dragged. Null defers to the ambient theme.
   final bool? interactive;
 }
+
+const WheelMotion _defaultWheelMotion = WheelMotion.spring(
+  duration: Duration(milliseconds: 250),
+);
 
 /// The button's appearance, with every slot filled in.
 class ResolvedButtonStyle {

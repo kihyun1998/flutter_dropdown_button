@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_smooth_wheel_scroll/flutter_smooth_wheel_scroll.dart'
+    show WheelMotion;
 
 import 'resolved_dropdown_style.dart';
 
-/// Theme configuration for dropdown scrollbar styling.
+/// Theme configuration for a scrolling dropdown menu.
 ///
 /// This class contains all properties related to scrollbar appearance
-/// and behavior within dropdown overlays.
+/// and behavior within dropdown overlays, and how the menu moves on a
+/// scroll-wheel notch ([wheelMotion]).
 ///
 /// Example:
 /// ```dart
@@ -45,6 +48,7 @@ class DropdownScrollTheme {
     this.showScrollGradient,
     this.gradientHeight,
     this.gradientColors,
+    this.wheelMotion,
   }) : assert(
          !(trackVisibility == true && thumbVisibility == false),
          'A scrollbar track cannot be drawn without a thumb.\n'
@@ -187,6 +191,22 @@ class DropdownScrollTheme {
   /// If null, auto-detects from dropdown background color.
   final List<Color>? gradientColors;
 
+  /// How the menu moves on a scroll-wheel notch.
+  ///
+  /// A notch glides to where it would have jumped. This applies to every
+  /// discrete scroll signal: a mouse wheel on any platform, including one
+  /// plugged into an Android device, and trackpad scrolling on the web, which
+  /// arrives the same way. Dragging, touch, the scrollbar thumb and the
+  /// keyboard are not affected, nor is trackpad scrolling on native desktop.
+  ///
+  /// If null, a 250 ms spring that does not pass its target.
+  ///
+  /// A zero duration (or time constant) jumps, exactly as before:
+  /// ```dart
+  /// wheelMotion: WheelMotion.spring(duration: Duration.zero)
+  /// ```
+  final WheelMotion? wheelMotion;
+
   /// Creates a copy of this theme with the given fields replaced.
   DropdownScrollTheme copyWith({
     double? thickness,
@@ -204,6 +224,7 @@ class DropdownScrollTheme {
     bool? showScrollGradient,
     double? gradientHeight,
     List<Color>? gradientColors,
+    WheelMotion? wheelMotion,
   }) {
     return DropdownScrollTheme(
       thickness: thickness ?? this.thickness,
@@ -221,6 +242,7 @@ class DropdownScrollTheme {
       showScrollGradient: showScrollGradient ?? this.showScrollGradient,
       gradientHeight: gradientHeight ?? this.gradientHeight,
       gradientColors: gradientColors ?? this.gradientColors,
+      wheelMotion: wheelMotion ?? this.wheelMotion,
     );
   }
 
@@ -246,6 +268,7 @@ class DropdownScrollTheme {
           thumbVisibility ?? (trackVisibility == true ? true : null),
       trackVisibility: trackVisibility,
       interactive: interactive,
+      wheelMotion: wheelMotion,
       overridesScrollbarTheme:
           thumbColor != null ||
           trackColor != null ||

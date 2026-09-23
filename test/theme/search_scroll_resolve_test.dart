@@ -117,6 +117,24 @@ void main() {
   });
 
   group('scrollbar', () {
+    test('the wheel motion falls back to a 250 ms spring with no bounce', () {
+      final motion = const DropdownScrollTheme().resolve().wheelMotion;
+
+      expect(motion, isA<SpringWheelMotion>());
+      motion as SpringWheelMotion;
+      expect(motion.duration, const Duration(milliseconds: 250));
+      expect(motion.bounce, 0);
+    });
+
+    test('a named wheel motion is handed through untouched', () {
+      const lerp = WheelMotion.lerp(timeConstant: Duration(milliseconds: 90));
+
+      expect(
+        const DropdownScrollTheme(wheelMotion: lerp).resolve().wheelMotion,
+        same(lerp),
+      );
+    });
+
     test('the thumb falls back to thickness, then to 8', () {
       expect(const DropdownScrollTheme().resolve().thumbWidth, 8);
       expect(const DropdownScrollTheme(thickness: 4).resolve().thumbWidth, 4);

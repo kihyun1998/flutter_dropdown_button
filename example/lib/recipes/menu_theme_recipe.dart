@@ -133,6 +133,12 @@ class _MenuThemeRecipeState extends State<MenuThemeRecipe> {
                 showScrollGradient: true,
                 gradientHeight: 18,
                 gradientColors: [Color(0xFF1B1F27), Color(0x001B1F27)],
+                // A wheel notch glides instead of jumping. A zero duration
+                // jumps, as a plain ScrollController does.
+                wheelMotion: WheelMotion.spring(
+                  duration: Duration(milliseconds: 300),
+                  bounce: 0.1,
+                ),
               ),
               // The box on each row is drawn in the root overlay, which is why
               // it is themed here rather than by an ambient `CheckboxThemeData`

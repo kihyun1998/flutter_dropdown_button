@@ -76,7 +76,7 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "4.2.1"
+    version: "4.3.0"
   flutter_example_template:
     dependency: "direct main"
     description:
@@ -93,6 +93,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "5.0.0"
+  flutter_smooth_wheel_scroll:
+    dependency: transitive
+    description:
+      name: flutter_smooth_wheel_scroll
+      sha256: "3f211ea771fc8012a147d997d73678b3405bf7655eee88897f60cd491531e612"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.1.2"
   flutter_syntax_highlight:
     dependency: transitive
     description:

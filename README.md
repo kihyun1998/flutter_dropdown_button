@@ -23,6 +23,7 @@ A highly customizable dropdown package for Flutter with overlay-based rendering,
 - **Text Overflow Control**: Ellipsis, fade, clip, or visible overflow options
 - **Smart Tooltip**: Automatic tooltip on overflow with full customization
 - **Custom Scrollbar**: Scrollbar theming with colors, thickness, and visibility
+- **Smooth Wheel Scrolling**: A scroll-wheel notch glides instead of jumping, with an adjustable spring, curve or lerp
 - **Single-Item Mode**: Auto-disable when only one option exists
 - **Leading Widgets**: Optional icons/widgets before text content
 - **Searchable Dropdown**: Real-time filtering with customizable search field
@@ -398,7 +399,7 @@ Styles the rows inside the menu.
 
 ### DropdownScrollTheme
 
-Controls scrollbar appearance inside the dropdown overlay.
+Controls scrollbar appearance inside the dropdown overlay, and how the menu moves on a scroll-wheel notch.
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
@@ -417,6 +418,7 @@ Controls scrollbar appearance inside the dropdown overlay.
 | `showScrollGradient` | `bool?` | `false` | Show fade gradient when scrollable |
 | `gradientHeight` | `double?` | `24.0` | Height of gradient effect |
 | `gradientColors` | `List<Color>?` | `null` | Custom gradient colors (auto-detects from background if `null`) |
+| `wheelMotion` | `WheelMotion?` | `null` | How a scroll-wheel notch moves the menu. Unset, a 250 ms spring. `WheelMotion.spring(duration: Duration.zero)` jumps, as before 4.3.0 |
 
 > A colour is not a request. `trackColor` describes the track; `trackVisibility`
 > is what draws it. A `null` `bool?` means *let the ambient `ScrollbarTheme`
