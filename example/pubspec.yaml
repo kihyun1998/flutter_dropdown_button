@@ -36,7 +36,7 @@ dependencies:
 
   # The chrome this example is demonstrated in. `example/` is a separate
   # package, so this reaches nobody who depends on flutter_dropdown_button.
-  flutter_example_template: ^0.2.0
+  flutter_example_template: ^0.3.0
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.

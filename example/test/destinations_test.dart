@@ -97,10 +97,10 @@ void main() {
       // `ShellPage` opens the first `StageDestination` in the roster, and one
       // with none draws the menu alone — no stage, no knob region, no Code
       // pane. Since `flutter_example_template` 0.2.0 that is a legal page
-      // rather than a crash (template#10, `firstOrNull` at
-      // `shell_page.dart:88`), which is exactly why this assertion is kept:
-      // nothing fails loudly any more, and a reader landing on a menu with
-      // nothing beside it is this example failing at its one job.
+      // rather than a crash (template#10, `firstOrNull` in the initialiser of
+      // `ShellPage`'s `_selectedId`), which is exactly why this assertion is
+      // kept: nothing fails loudly any more, and a reader landing on a menu
+      // with nothing beside it is this example failing at its one job.
       //
       // Under 0.1.0 the same roster threw `Bad state: No element` on the first
       // build. The assertion did not change when that stopped being true; its
