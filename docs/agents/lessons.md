@@ -327,6 +327,17 @@
   **둘 다 `dry-run` 경고 0** 이었다. `├──` 로 확인한다(`|--` grep 은 뭘 넣든 빈 결과).
 - **낡은 근거 회수.** 3.0.0 머리말의 "deprecated 된 것만 제거"(→ `alwaysVisible` 은
   deprecated 된 적 없음)와 "동작 변화 없음"(→ `semanticsLabel` 수정으로 거짓) 둘 다 고쳤다.
+- **#163 (주석 속 줄 번호는 아무 신호 없이 어긋난다).** `destinations_test.dart` 가
+  template#10 의 `firstOrNull` 을 `shell_page.dart:88` 로 가리켰는데, 그 인용은 **0.2.0
+  에서 이미** 틀려 있었다(90번째 줄, 0.3.0 에서는 91). 같은 모양을 찾아보니 저장소 **안쪽**에도
+  하나 있었다. multi-select 레시피가 `expand` 가 `Expanded` 로 바뀌는 곳을
+  `dropdown_menu_shell.dart:580` 이라 적었는데, 580 은 trailing 아이콘의 `Padding` 이고
+  `Expanded` 는 617 에 있었다. 둘 다 컴파일·분석·테스트 어느 것에도 걸리지 않는다. 주석은
+  줄 번호 대신 **심볼**(`_selectedId` 의 초기화식, `_applyWidthConstraints`)을 가리킨다.
+  찾을 때는 `grep -rnE "[a-z_]+\.dart:[0-9]+"`. 같은 검색으로 `lib/`·`test/` 를 보면 Flutter
+  SDK 를 줄 번호로 인용한 곳이 **13 곳** 나온다(`material/ink_well.dart:1401`,
+  `material/scrollbar.dart:303` 등). SDK 버전이 오르면 같은 방식으로 어긋나지만 #163 에서는
+  고치지 않았다.
 
 ## Step 7 — 게이트 & 릴리스
 
@@ -417,3 +428,12 @@
   `width` 는 들어오는 제약이 이미 tight 라 `BoxConstraints.enforce` 가 부모 손을 들어줘서
   죽는다. 하나를 다른 하나로 바꾸는 것은 수리가 아니다 — `Align` 이 `constraints.loosen()`
   으로 눕혀줘야 비로소 `width` 가 버튼에 닿는다.
+- **#165 (예제를 macOS 에서 한 번 실행하면 발행 dry-run 이 깨진다).** #163 을 실제 실행으로
+  검증하려고 `flutter run -d macos` 를 돌리자 Flutter 3.47 도구가 예제 Xcode 프로젝트의
+  `MACOSX_DEPLOYMENT_TARGET` 을 10.15 → 12.0 으로 세 곳 모두 바꿨다. 트리가 더러워졌고
+  `flutter pub publish --dry-run` 이 *"checked-in files are modified in git"* 로
+  **exit 65** 를 냈다. 파일을 되돌리자 0 이 됐다. CI 는 macOS 러너를 빌드하지 않으므로 이
+  드리프트는 로컬에서만 생긴다. 즉 발행을 손으로 돌리는 사람 앞에서만 나타난다. 도구가
+  만든 diff 를 그대로 커밋해서 닫았다(패키지 자체에는 macOS 플랫폼 코드가 없다). 다시
+  빌드하면 트리가 깨끗하게 남는 것까지 확인했다. **실제 실행 검증이 끝나면 `git status`
+  부터 본다.** 검증 도구가 남긴 흔적은 변경에 섞여 들어가거나 게이트를 빨갛게 만든다.
