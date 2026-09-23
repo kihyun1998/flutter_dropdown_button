@@ -69,6 +69,8 @@ versus remove) in issues, not in a record.
 
 Tests: `test/scrollbar_theme_test.dart`, `test/scrollbar_duplication_test.dart`, `test/scroll_gradient_test.dart`, `test/wheel_scroll_test.dart`.
 
+Demonstrated by `example/lib/recipes/wheel_scroll_recipe.dart` (#159).
+
 ## Reference behaviour
 
 - `flutter_smooth_wheel_scroll`, read raw at the version `pubspec.lock` pins

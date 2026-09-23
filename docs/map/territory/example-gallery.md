@@ -24,11 +24,19 @@ contracts bind whether or not they are written down.
 - **The roster is the destinations list**, and the shell's menu labels come from
   it, not from the stages. That is why a label test cannot detect a throwing
   stage.
+- **The API-coverage gate can be satisfied by a recipe that shows nothing.**
+  #155 passed `wheelMotion` once, inside Menu theming, with a custom value:
+  the gate went to 100% while the default could be seen nowhere. The Wheel
+  scrolling recipe (#159) is what shows it.
+- **Knob panes use no `Radio`.** `Radio.groupValue` is deprecated above the
+  floor, and `RadioGroup`, which replaces it, does not exist at the floor, so
+  one of the two CI jobs fails `flutter analyze` either way. A pick-one knob is
+  a `ListTile` with a radio icon.
 
 ## Code
 
 - `example/lib/app/destinations.dart` — `DropdownDestinations`
-- `example/lib/app/recipe_knobs.dart` — `MultiSelectKnobs`, `SearchKnobs`, `MultiSelectStage`, `SearchStage`
+- `example/lib/app/recipe_knobs.dart` — `MultiSelectKnobs`, `SearchKnobs`, `WheelKnobs`, `MultiSelectStage`, `SearchStage`, `WheelScrollStage`, `WheelScrollKnobPane`
 - `example/lib/main.dart` — `MyApp`
 
 Recipes: `ls example/lib/recipes/` (the folder is the roster). Tests: `example/test/`.

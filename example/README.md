@@ -25,6 +25,7 @@ from this app, which `test/recipe_contract_test.dart` holds.
 | Text overflow | the three `TextDropdownConfig` presets, and the `itemHeight` trap that comes with wrapping |
 | Button theming | `DropdownButtonTheme`, `TextDropdownConfig` and `DropdownTooltipTheme` — the box, its text, and the tooltip for what did not fit, each drawn twice so `decoration` can be seen replacing its neighbours |
 | Menu theming | `DropdownOverlayTheme`, `DropdownItemTheme`, `DropdownScrollTheme`, `DropdownCheckboxTheme` — and the scrollbar track that a colour alone does not draw |
+| Wheel scrolling | `DropdownScrollTheme.wheelMotion`: the default glide next to the old jump, and every motion on the knobs with the line that produces it |
 | Sizing and placement | the button's bounds and the menu's bounds are two different pairs, `MenuAlignment` between them, and `expand` in the only parent it belongs in |
 | States | one item, no interaction, nothing matched, and how long the open takes |
 | Dismissal | switching between two adjacent dropdowns in **one** tap, a menu following its button as the page scrolls, keyboard navigation |
