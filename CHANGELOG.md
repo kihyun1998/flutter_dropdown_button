@@ -1,5 +1,16 @@
 # Changelog
 
+## 4.3.0
+
+A mouse-wheel notch over an overflowing menu jumped the list the whole distance at once, with nothing in between. It now glides there. The menu's scroll controller is `SmoothScrollController` from [`flutter_smooth_wheel_scroll`](https://pub.dev/packages/flutter_smooth_wheel_scroll), which animates wheel input and nothing else (#155).
+
+* **CHANGE**: on by default, for every dropdown that scrolls. The destination of a notch is unchanged; only the path to it is. It applies to every discrete scroll signal — a mouse wheel on any platform, an Android device's included, and trackpad scrolling on the web, which the browser delivers the same way. Dragging, touch, the scrollbar thumb, the keyboard, native-desktop trackpads, `scrollToSelectedItem` and the reset on a new search query behave as before
+* **NEW**: `DropdownScrollTheme.wheelMotion` chooses the motion — `WheelMotion.spring`, `.curve` or `.lerp`. Unset, a 250 ms spring that does not pass its target, shorter than the upstream 400 ms because a menu is a few rows tall. `WheelMotion.spring(duration: Duration.zero)` restores the jump exactly, not an approximation of it
+* **NEW**: `WheelMotion`, `SpringWheelMotion`, `CurveWheelMotion` and `LerpWheelMotion` are re-exported, so callers name them without depending on `flutter_smooth_wheel_scroll` themselves. Like `CheckboxShape` / `CheckboxStyle`, they are that package's types: a breaking change there is one here
+* **NEW**: `ResolvedScrollStyle.wheelMotion`, never null. The constructor parameter is optional, so code that builds a `ResolvedScrollStyle` itself still compiles
+* **DOCS**: `documentation/api_reference.md` said `SearchFieldTheme` and `DropdownScrollTheme` "do not resolve themselves yet — see issue #26". Both have resolved themselves since #26 closed; the sentence is replaced by their rows in the resolve table
+* **TEST**: `wheel_scroll_test.dart` sends real wheel events to an open menu. Discriminating power confirmed by mutation: a controller that jumps reddens the glide test, a 400 ms default reddens the 300 ms settle test, and assigning the motion only when the controller is created reddens both "motion changed" tests. It also pins a search query mid-glide (reddens without the reset to the top), closing or removing the dropdown mid-glide, and a notch past the end of a gliding menu reaching the page around it (reddens when upstream stops passing it outward)
+
 ## 4.2.1
 
 Documentation only. No statement in `lib/` changed — every edited line is a comment, and the diff is six removed one-liners. It is released for the reason 3.0.2 was: pub.dev renders the dartdoc of the version it was published from, so a reader of 4.2.0's API page is told the opposite of what the code does.

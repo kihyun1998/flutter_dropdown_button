@@ -45,7 +45,7 @@ reasons are stated in `ci.yml`'s own comments.
 
 - `tool/check_coverage.dart` — `main`, `_parse`
 - `tool/check_api_coverage.dart` — `main`, `readDeclarations`, `readCallSites`, `_declSources`
-- `lib/flutter_dropdown_button.dart` — `CheckboxShape`, `CheckboxStyle`
+- `lib/flutter_dropdown_button.dart` — `CheckboxShape`, `CheckboxStyle`, `WheelMotion`, `SpringWheelMotion`, `CurveWheelMotion`, `LerpWheelMotion`
 
 Not Dart, so they cannot be symbol-checked: `pubspec.yaml`, `CHANGELOG.md`, `README.md`, `documentation/*.md`, `.github/workflows/ci.yml`.
 
@@ -61,6 +61,7 @@ Not Dart, so they cannot be symbol-checked: `pubspec.yaml`, `CHANGELOG.md`, `REA
 
 - [Multi-select](multi-select.md) — a `flutter_checkbox` bump is an API change
   through the barrel.
+- [Scroll chrome](scroll-chrome.md) — so is a `flutter_smooth_wheel_scroll` bump.
 - [Example gallery](example-gallery.md) — CI runs the example's analyze and
   tests, and the API floor counts its call sites.
 - Every territory, through its dartdoc. The notes whose dartdoc has already

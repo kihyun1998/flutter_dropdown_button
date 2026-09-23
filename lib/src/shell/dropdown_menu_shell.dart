@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:flutter_smooth_wheel_scroll/flutter_smooth_wheel_scroll.dart'
+    show SmoothScrollController;
 
 import '../buttons/menu_alignment.dart';
 import '../overlay/dropdown_overlay_controller.dart';
@@ -321,7 +323,7 @@ class _DropdownMenuShellState<T> extends State<DropdownMenuShell<T>>
 
   // ===== Lifecycle =====
 
-  ScrollController? _scrollController;
+  SmoothScrollController? _scrollController;
 
   @override
   void didChangeDependencies() {
@@ -664,7 +666,9 @@ class _DropdownMenuShellState<T> extends State<DropdownMenuShell<T>>
         ),
       );
     } else if (needsScroll) {
-      _scrollController ??= ScrollController();
+      final scrollStyle = scrollTheme.resolve();
+      _scrollController ??= SmoothScrollController();
+      _scrollController!.motion = scrollStyle.wheelMotion;
 
       // The index below is taken against `widget.items`, not the filtered list,
       // so a query in flight would send us to the wrong row.
@@ -700,7 +704,7 @@ class _DropdownMenuShellState<T> extends State<DropdownMenuShell<T>>
         content = ScrollGradientOverlay(
           controller: _scrollController!,
           fadeInto: _overlayStyle.backgroundColor,
-          height: scrollTheme.resolve().gradientHeight,
+          height: scrollStyle.gradientHeight,
           borderRadius: _overlayStyle.borderRadius,
           colors: scrollTheme.gradientColors,
           child: content,

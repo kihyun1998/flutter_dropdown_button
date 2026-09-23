@@ -6,6 +6,12 @@ library;
 export 'package:flutter_checkbox/flutter_checkbox.dart'
     show CheckboxShape, CheckboxStyle;
 
+// The menu glides on a scroll-wheel notch with `flutter_smooth_wheel_scroll`.
+// `DropdownScrollTheme.wheelMotion` takes a `WheelMotion`, so it and its three
+// kinds are re-exported for callers who name them.
+export 'package:flutter_smooth_wheel_scroll/flutter_smooth_wheel_scroll.dart'
+    show WheelMotion, SpringWheelMotion, CurveWheelMotion, LerpWheelMotion;
+
 export 'src/flutter_dropdown_button.dart';
 export 'src/flutter_multi_select_dropdown.dart';
 export 'src/buttons/menu_alignment.dart';

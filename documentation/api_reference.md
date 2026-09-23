@@ -343,6 +343,8 @@ Not everything a theme knows needs a palette. `DropdownButtonTheme.resolvedIconS
 | `resolveButton(ambient, {required bool enabled})` | `DropdownButtonTheme` | `ResolvedButtonStyle` | The button's box, ink colours, content height, and arrow. `enabled` must be the *effective* state — a single-item dropdown disabled by policy is disabled here too |
 | `resolveOverlay(ambient)` | `DropdownOverlayTheme` | `ResolvedOverlayStyle` | The menu container, plus the border thickness the placement module reserves |
 | `resolveItem(ambient, {required bool selected, required bool isFirst, required bool isLast, required double menuBorderRadius})` | `DropdownItemTheme` | `ResolvedItemStyle` | One item row. `menuBorderRadius` is the enclosing menu's corner radius, so the end rows round to meet the menu's corners unless `borderRadius` overrides |
+| `resolve(ambient)` | `SearchFieldTheme` | `ResolvedSearchFieldStyle` | The search field's decoration and the total height it takes from the menu, divider included |
+| `resolve()` | `DropdownScrollTheme` | `ResolvedScrollStyle` | The scrollbar, the edge gradient, and the wheel motion. Needs no ambient palette: unset scrollbar slots stay null so an app-wide `ScrollbarTheme` keeps its say |
 
 ### DropdownAmbientColors
 
@@ -356,8 +358,6 @@ The ambient palette, lifted out of `ThemeData`. Construct it with `.of(context)`
 | `primary` | Accent, tinting the selected item at 10% opacity |
 | `disabled` | Foreground of anything switched off |
 | `icon` | Default icon colour; null when the ambient theme leaves it unset |
-
-`SearchFieldTheme` and `DropdownScrollTheme` do not resolve themselves yet — see issue #26.
 
 ## DropdownOverlayController
 

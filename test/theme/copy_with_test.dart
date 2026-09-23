@@ -246,6 +246,7 @@ void main() {
       'showScrollGradient': t.showScrollGradient,
       'gradientHeight': t.gradientHeight,
       'gradientColors': t.gradientColors,
+      'wheelMotion': t.wheelMotion,
     };
 
     final a = DropdownScrollTheme(
@@ -264,6 +265,7 @@ void main() {
       showScrollGradient: true,
       gradientHeight: 7,
       gradientColors: [_a(4)],
+      wheelMotion: const WheelMotion.lerp(),
     );
 
     final b = DropdownScrollTheme(
@@ -282,6 +284,7 @@ void main() {
       showScrollGradient: false,
       gradientHeight: 70,
       gradientColors: [_b(4)],
+      wheelMotion: const WheelMotion.curve(),
     );
 
     test('copyWith() preserves every field', () {
@@ -305,6 +308,7 @@ void main() {
         showScrollGradient: b.showScrollGradient,
         gradientHeight: b.gradientHeight,
         gradientColors: b.gradientColors,
+        wheelMotion: b.wheelMotion,
       );
 
       expectSame(snap(copy), snap(b));

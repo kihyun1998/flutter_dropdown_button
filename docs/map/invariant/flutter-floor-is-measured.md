@@ -26,6 +26,8 @@ the SDK they are compiled against.
   merges into the search field's node.
 - [Multi-select](../territory/multi-select.md) — `flutter_checkbox`'s declared
   floor is read per pinned version.
+- [Scroll chrome](../territory/scroll-chrome.md) — `flutter_smooth_wheel_scroll`'s
+  declared floor, and the `SpringDescription.withDurationAndBounce` it calls.
 - [Release surfaces](../territory/release-surfaces.md) — the `minimum` CI job
   enforces all of the above.
 
