@@ -86,3 +86,12 @@ arena participation is conditional). Both were created the same lazy way, by a
 promotion. Anything touching semantics emission, or the barrier and pointer
 ownership, files as a conformance item under the matching record rather than as
 a fresh decision. See `docs/agents/domain.md`.
+
+**Map.** `docs/map/README.md` is the territory map: one note per area of what
+the package does, one per cross-cutting invariant. Open the territory note
+before the design is fixed; update its `## Code` and `## Blast radius` after the
+change.
+
+**Comments.** A comment says what the code is. Why it is this way, what it
+deliberately leaves out, the trap and the measured value go to the territory
+note under `docs/map/`; history goes to the commit message.
