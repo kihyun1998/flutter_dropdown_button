@@ -32,6 +32,18 @@ contracts bind whether or not they are written down.
   floor, and `RadioGroup`, which replaces it, does not exist at the floor, so
   one of the two CI jobs fails `flutter analyze` either way. A pick-one knob is
   a `ListTile` with a radio icon.
+- **The roster has to hold a `StageDestination`, and only a test enforces it.**
+  `ShellPage` opens the first one, and a roster with none draws the menu alone.
+  Under template 0.1.0 that roster threw `Bad state: No element` on the first
+  build. Since 0.2.0 it is a legal page (template#10), so nothing fails loudly
+  any more. `destinations_test.dart`'s "the shell opens on a recipe" is what
+  catches it. The assertion did not change when the crash went away; its reason
+  did.
+- **Room is the only viewport mode where the menu opens in the app's own
+  overlay** (template 0.3.0, #163). The framed and wall modes each hold a
+  contained `Overlay`, so there the single-open registry and placement see one
+  frame, scaled. In Room they see the root overlay at 1:1, as a consumer's app
+  does.
 
 ## Code
 
