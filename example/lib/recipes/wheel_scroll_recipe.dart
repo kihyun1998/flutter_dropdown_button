@@ -53,9 +53,8 @@ const _stations = [
 /// the exact jump rather than a very fast glide. The right one uses
 /// [wheelMotion], and null there is the package default.
 ///
-/// **Only the wheel is affected.** Drag the scrollbar thumb or use the keyboard
-/// and both menus behave identically. On the web a trackpad counts as a wheel,
-/// because the browser delivers its scrolling the same way.
+/// **Only a mouse wheel is affected.** Drag the scrollbar thumb, use the
+/// keyboard or scroll with a trackpad and both menus behave identically.
 class WheelScrollRecipe extends StatefulWidget {
   const WheelScrollRecipe({super.key, this.wheelMotion});
 

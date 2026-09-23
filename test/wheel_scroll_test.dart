@@ -91,6 +91,19 @@ void main() {
     expect(offset(tester), notch);
   });
 
+  testWidgets('a trackpad scroll signal jumps, as on the web', (tester) async {
+    await tester.pumpWidget(host());
+    await open(tester);
+
+    final trackpad = TestPointer(2, PointerDeviceKind.trackpad);
+    await tester.sendEventToBinding(
+      trackpad.hover(tester.getCenter(find.byType(ListView))),
+    );
+    await tester.sendEventToBinding(trackpad.scroll(const Offset(0, notch)));
+
+    expect(offset(tester), notch);
+  });
+
   testWidgets('a zero duration jumps, as a plain ScrollController does', (
     tester,
   ) async {

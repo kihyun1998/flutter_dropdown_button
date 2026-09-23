@@ -193,11 +193,11 @@ class DropdownScrollTheme {
 
   /// How the menu moves on a scroll-wheel notch.
   ///
-  /// A notch glides to where it would have jumped. This applies to every
-  /// discrete scroll signal: a mouse wheel on any platform, including one
-  /// plugged into an Android device, and trackpad scrolling on the web, which
-  /// arrives the same way. Dragging, touch, the scrollbar thumb and the
-  /// keyboard are not affected, nor is trackpad scrolling on native desktop.
+  /// A notch glides to where it would have jumped. This applies to a mouse
+  /// wheel on any platform, including one plugged into an Android device.
+  /// Trackpads, dragging, touch, the scrollbar thumb and the keyboard are not
+  /// affected. The one exception is Firefox, which reports a trackpad as a
+  /// mouse, so there a trackpad glides too.
   ///
   /// If null, a 250 ms spring that does not pass its target.
   ///

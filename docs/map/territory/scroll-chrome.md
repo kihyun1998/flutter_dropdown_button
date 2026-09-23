@@ -43,12 +43,15 @@ versus remove) in issues, not in a record.
   `RawScrollbar` calls `position.pointerScroll` on its controller
   (`widgets/scrollbar.dart`, `_handlePointerScroll`); upstream's "scrollbar is
   not smoothed" limitation is for a scrollbar with its own controller.
-- **"Wheel" means every discrete scroll signal, not only a mouse.** Upstream's
-  `pointerScroll` does not check the device kind, and the web engine delivers
-  trackpad scrolling as `PointerSignalKind.scroll` with kind `trackpad`
-  (`web_ui/.../pointer_binding.dart`), so on the web a trackpad glides too. A
-  mouse on Android does as well. Native-desktop trackpads arrive as `PanZoom`
-  and are untouched. Read from source, not run in a browser.
+- **Only a mouse glides.** The web engine delivers trackpad scrolling as
+  `PointerSignalKind.scroll` with kind `trackpad`
+  (`web_ui/.../pointer_binding.dart`), the same path as a wheel, and
+  `ScrollPosition.pointerScroll` receives only a delta. Upstream 0.1.2 therefore
+  animated web trackpads too; 0.1.3 records the kind from a global
+  `PointerRouter` route and animates only `PointerDeviceKind.mouse`, which is
+  why the floor is `^0.1.3` (#161). Firefox reports a trackpad as a mouse, so
+  there it still glides. A mouse on Android glides. Native-desktop trackpads
+  arrive as `PanZoom` and never reach this path.
 - **A notch past the end during a glide goes to the page around the menu**,
   as with `ScrollController` — which scrolls it, and scroll dismissal closes the
   menu. That needs the menu inside a nested `Overlay` under a scroll view; in
@@ -98,7 +101,3 @@ hover thickness. The pins are in source comments and
 - **`wheelMotion` exposes every upstream option on purpose, to be narrowed
   later** (#155, the maintainer's call). Narrowing removes public API, which is
   a major version. Held by #156 until real use shows which options matter.
-- **Web trackpads glide too**, because upstream's position never sees the
-  device kind — filed upstream as
-  [flutter_smooth_wheel_scroll#11](https://github.com/kihyun1998/flutter_smooth_wheel_scroll/issues/11).
-  The dartdoc and CHANGELOG state it as current behaviour.
