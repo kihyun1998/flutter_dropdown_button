@@ -98,6 +98,16 @@ hover thickness. The pins are in source comments and
 
 ## Known holes / open
 
-- **`wheelMotion` exposes every upstream option on purpose, to be narrowed
-  later** (#155, the maintainer's call). Narrowing removes public API, which is
-  a major version. Held by #156 until real use shows which options matter.
+**None.** `wheelMotion` was exposed whole in #155 so that it could be narrowed
+later. #156 decided not to narrow it; that was the maintainer's call, made on a
+measurement. In a 200 px menu the three kinds differ by 15–36 px, along two axes
+a single `Duration` would drop: how front-loaded the motion is, and overshoot.
+Four more findings went into the call:
+- The upstream coupling is the one already accepted for `flutter_checkbox`, and
+  both upstreams are the same maintainer's.
+- A deprecation window would collide with the API-coverage gate and with
+  `flutter analyze --fatal-infos`.
+- `flutter_table_plus` exposes the same `WheelMotion?`.
+- Nothing here switches over the sealed type.
+
+#156 records what would reopen it.
