@@ -1,5 +1,13 @@
 # Changelog
 
+## 4.3.1
+
+With `scrollToSelectedItem` on (the default) and a value chosen, an open menu the user had scrolled went back to the chosen row whenever anything above the dropdown rebuilt. Any `setState` did it. The scroll was scheduled on every build of the open menu rather than once when it opened. This goes back before 4.3.0: the same happened with the plain `ScrollController` that 4.3.0 replaced (#157).
+
+* **FIX**: the scroll to the selected item happens once per open, as the documentation always said. A rebuild above the dropdown leaves the list where the user put it. Items that arrive after the menu opened are still scrolled to, once, by the first list long enough to scroll
+* **CHANGE**: clearing a search query leaves the list at the top, where every other query change already puts it. It used to go back to the selected item, through the same path as the bug
+* **TEST**: `scroll_to_selected_test.dart` pins an owner rebuild, a cleared query, items arriving after open, and a reopen. Each was seen red: the old build-time schedule reddens the first three, spending the scroll on a first build that has nothing to scroll reddens items-after-open, arming it once per widget rather than per open reddens the reopen, and re-arming on an empty query reddens the cleared query
+
 ## 4.3.0
 
 A mouse-wheel notch over an overflowing menu jumped the list the whole distance at once, with nothing in between. It now glides there. The menu's scroll controller is `SmoothScrollController` from [`flutter_smooth_wheel_scroll`](https://pub.dev/packages/flutter_smooth_wheel_scroll), which animates wheel input and nothing else (#155).

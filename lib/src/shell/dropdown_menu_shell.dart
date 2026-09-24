@@ -211,8 +211,9 @@ class _DropdownMenuShellState<T> extends State<DropdownMenuShell<T>>
     // Opening and closing both start the search over. The overlay's dismiss
     // barrier closes the menu without going through this State, so the reset
     // has to be driven from the controller rather than from our callers.
-    onOpenStateChanged: (_) {
+    onOpenStateChanged: (isOpen) {
       _resetSearch();
+      _scrollToItemPending = isOpen;
       if (mounted) setState(() {});
     },
   );
@@ -324,6 +325,10 @@ class _DropdownMenuShellState<T> extends State<DropdownMenuShell<T>>
   // ===== Lifecycle =====
 
   SmoothScrollController? _scrollController;
+
+  /// Whether this open has yet to scroll to [DropdownMenuShell.scrollToItem].
+  /// Set when the menu opens, spent by the first list that overflows.
+  bool _scrollToItemPending = false;
 
   @override
   void didChangeDependencies() {
@@ -672,8 +677,11 @@ class _DropdownMenuShellState<T> extends State<DropdownMenuShell<T>>
 
       // The index below is taken against `widget.items`, not the filtered list,
       // so a query in flight would send us to the wrong row.
-      if (widget.scrollToItem != null && _search.query.isEmpty) {
-        _scheduleScrollToItem();
+      if (_scrollToItemPending) {
+        _scrollToItemPending = false;
+        if (widget.scrollToItem != null && _search.query.isEmpty) {
+          _scheduleScrollToItem();
+        }
       }
 
       content = SizedBox(

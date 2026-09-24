@@ -36,6 +36,16 @@ CLAUDE.md, not in a record.
   `emptyStateHeight`. It reports the query only while the field is shown (#96).
 - **Scroll-to-item indexes `widget.items`, not the filtered list,** so it is
   skipped while a query stands.
+- **Scroll-to-item happens once per open** (#157). `onOpenStateChanged(true)`
+  arms `_scrollToItemPending`, and the first build of the `ListView` branch
+  spends it. It used to be scheduled on every overlay build, so every owner
+  rebuild, which reaches the overlay through `didUpdateWidget` → `rebuild()`,
+  took an open menu back to the chosen row. A cleared query went back there
+  too; it now stays at the top, the maintainer's call on #157. The first build
+  that *overflows* spends it, not the first build: a list that arrives after
+  open is still scrolled to, and before it arrives there is nothing the user
+  could have scrolled. Taking back a close in flight (`_cancelClose`) notifies
+  nothing, so it is the same open and is not scrolled again.
 - **The list becomes a `ListView` only when it overflows**; otherwise it is a
   `Column`, and the scrollbar and gradient apply only on the `ListView` path.
 
@@ -47,8 +57,11 @@ Tests: `test/selection_test.dart`, `test/scroll_to_selected_test.dart`, `test/la
 
 ## Reference behaviour
 
-**None.** `material/dropdown.dart` scrolls its menu to the selected item too, but
-nothing here has been compared against how it does it.
+- `material/dropdown.dart`, for scroll-to-item only (#157). It computes the
+  offset once per route, in `_DropdownRoutePageState.initState`, as the
+  `ScrollController`'s `initialScrollOffset`. That matches once per open. The
+  mechanism is not copied, because this controller is created once (`??=`) and
+  outlives every open, so an initial offset would hold only for the first.
 
 ## Cross-cutting invariants
 

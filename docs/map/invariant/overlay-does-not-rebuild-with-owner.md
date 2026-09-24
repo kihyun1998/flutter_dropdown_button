@@ -47,10 +47,21 @@ which is the usual test shape.
    rebuilds, then closes, and adds a one-frame guard for the window before the
    rebuild lands.
 
-Three occurrences, each fixed at its own site.
+4. **#157**: the other direction. An effect scheduled from the overlay's
+   build re-ran on every owner rebuild, pulling a scrolled menu back to the
+   chosen row. The fix arms it on open and spends it once.
+
+Four occurrences, each fixed at its own site.
 
 ## Where it will recur
 
 Any new input that the overlay content reads from `widget.*` or from owner state
 is subject to this. Check: when that input changes while the menu is open, what
 calls `rebuild()`? If the answer is "the owner's rebuild", nothing does.
+
+The other direction holds too. `didUpdateWidget` calls `rebuild()` on every
+owner rebuild, so anything the overlay's build *does* rather than draws runs
+again each time. #157: scroll-to-item was scheduled from the build and took the
+user's scroll back on every `setState` above the dropdown. A one-shot effect is
+armed by the event it belongs to (`onOpenStateChanged`) and spent in the build.
+Only idempotent work, such as reassigning `motion`, belongs in the build itself.

@@ -141,4 +141,99 @@ void main() {
       reason: 'fifty milliseconds into a one-second glide',
     );
   });
+
+  group('the scroll to the chosen row happens once per open', () {
+    late StateSetter setOwner;
+
+    Widget owner({
+      required List<String> Function() currentItems,
+      bool searchable = false,
+    }) {
+      return host(
+        StatefulBuilder(
+          builder: (context, setState) {
+            setOwner = setState;
+            return FlutterDropdownButton<String>.text(
+              width: 200,
+              height: 150,
+              items: currentItems(),
+              value: 'i10',
+              hint: 'Pick one',
+              searchable: searchable,
+              onChanged: (_) {},
+            );
+          },
+        ),
+      );
+    }
+
+    testWidgets('an owner rebuild leaves the list where the user put it', (
+      tester,
+    ) async {
+      await tester.pumpWidget(owner(currentItems: () => items));
+      await open(tester);
+      expect(menuController(tester).offset, greaterThan(0));
+
+      menuController(tester).jumpTo(0);
+      await tester.pumpAndSettle();
+      setOwner(() {});
+      await tester.pumpAndSettle();
+
+      expect(menuController(tester).offset, 0);
+    });
+
+    testWidgets('clearing the search query leaves the list at the top', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        owner(currentItems: () => items, searchable: true),
+      );
+      await open(tester);
+      expect(menuController(tester).offset, greaterThan(0));
+
+      await tester.enterText(find.byType(TextField), 'i');
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextField), '');
+      await tester.pumpAndSettle();
+
+      expect(menuController(tester).offset, 0);
+    });
+
+    testWidgets('items that arrive after opening are scrolled to once', (
+      tester,
+    ) async {
+      var loaded = const <String>[];
+      await tester.pumpWidget(owner(currentItems: () => loaded));
+      await open(tester);
+      expect(find.byType(ListView), findsNothing, reason: 'nothing to list');
+
+      setOwner(() => loaded = items);
+      await tester.pumpAndSettle();
+      expect(
+        menuController(tester).offset,
+        greaterThan(0),
+        reason: 'the first list that overflows is the one opened into',
+      );
+
+      menuController(tester).jumpTo(0);
+      await tester.pumpAndSettle();
+      setOwner(() {});
+      await tester.pumpAndSettle();
+      expect(menuController(tester).offset, 0);
+    });
+
+    testWidgets('reopening scrolls to the chosen row again', (tester) async {
+      await tester.pumpWidget(owner(currentItems: () => items));
+      await open(tester);
+      menuController(tester).jumpTo(0);
+      await tester.pumpAndSettle();
+
+      await tester.tapAt(const Offset(5, 5)); // the dismiss barrier
+      await tester.pumpAndSettle();
+      expect(find.byType(ListView), findsNothing);
+      await open(tester);
+
+      expect(menuController(tester).offset, greaterThan(0));
+    });
+  });
 }

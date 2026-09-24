@@ -5,7 +5,9 @@
 Anything computable from the widget's current inputs is computed on read, not
 stored in a field. That covers the visible (filtered) items, the item
 presentation, and the resolved styles. State is kept only for what the inputs
-cannot reproduce: the query, the open entry, the scroll controller.
+cannot reproduce: the query, the open entry, the scroll controller, and whether
+this open has scrolled to the chosen row yet (#157). The last is an event, like
+the query, and no input can say whether it has happened.
 
 ## Why it is cross-cutting
 

@@ -294,6 +294,9 @@ class FlutterDropdownButton<T> extends StatefulWidget {
   final bool enabled;
 
   /// Whether to scroll to the selected item when opened. Defaults to true.
+  ///
+  /// Once per open: a rebuild above the dropdown, a scroll by the user or a
+  /// search query typed and cleared leaves the list where it is.
   final bool scrollToSelectedItem;
 
   /// Duration for scroll-to-selected animation. If null, jumps instantly.
