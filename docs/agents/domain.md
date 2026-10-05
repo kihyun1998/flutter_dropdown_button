@@ -6,12 +6,12 @@ This is a **single-context** repo.
 
 ## Before exploring, read these
 
-- **`CONTEXT.md`** at the repo root — the domain glossary.
+- **`GLOSSARY.md`** at the repo root — the domain glossary.
 - **`docs/adr/`** — read ADRs that touch the area you're about to work in.
 
 If any of these files don't exist, **proceed silently**. Don't flag their absence; don't suggest creating them upfront. The `/domain-modeling` skill (reached via `/grill-with-docs` and `/improve-codebase-architecture`) creates them lazily when terms or decisions actually get resolved.
 
-`CONTEXT.md` does not exist yet in this repo. That is expected.
+`GLOSSARY.md` does not exist yet in this repo. That is expected.
 
 `docs/adr/` does, as of #88, and holds one record:
 
@@ -24,7 +24,7 @@ If any of these files don't exist, **proceed silently**. Don't flag their absenc
 
 ```
 /
-├── CONTEXT.md
+├── GLOSSARY.md
 ├── docs/
 │   ├── adr/
 │   │   ├── 0001-overlay-based-rendering.md
@@ -33,13 +33,13 @@ If any of these files don't exist, **proceed silently**. Don't flag their absenc
 └── lib/
 ```
 
-If this repo ever splits into multiple bounded contexts, add a `CONTEXT-MAP.md` at the root pointing at one `CONTEXT.md` per context, and let each context keep its own `docs/adr/` alongside system-wide decisions at the root.
+If this repo ever splits into multiple bounded contexts, add a `GLOSSARY-MAP.md` at the root pointing at one `GLOSSARY.md` per context, and let each context keep its own `docs/adr/` alongside system-wide decisions at the root.
 
 Note: long-form user-facing docs already live in `documentation/` (API reference, theming, migration). That directory is **not** the domain-doc surface — it's product documentation. Don't conflate the two.
 
 ## Use the glossary's vocabulary
 
-When your output names a domain concept (in an issue title, a refactor proposal, a hypothesis, a test name), use the term as defined in `CONTEXT.md`. Don't drift to synonyms the glossary explicitly avoids.
+When your output names a domain concept (in an issue title, a refactor proposal, a hypothesis, a test name), use the term as defined in `GLOSSARY.md`. Don't drift to synonyms the glossary explicitly avoids.
 
 If the concept you need isn't in the glossary yet, that's a signal — either you're inventing language the project doesn't use (reconsider) or there's a real gap (note it for `/domain-modeling`).
 

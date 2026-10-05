@@ -78,7 +78,7 @@ of `DropdownMenuShell`:
 `ready-for-human`, `wontfix`. Create a label with `gh label create` the first
 time it is used. See `docs/agents/triage-labels.md`.
 
-**Domain docs.** Single-context. `CONTEXT.md` does not exist yet and its absence
+**Domain docs.** Single-context. `GLOSSARY.md` does not exist yet and its absence
 is expected — it is created lazily, when a term actually needs resolving.
 `docs/adr/` **does** exist and holds two records: **0001** (accessibility
 semantics are attached by hand) and **0002** (the dismiss barrier stays; its
