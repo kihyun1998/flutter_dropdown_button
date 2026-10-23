@@ -37,6 +37,12 @@ reasons are stated in `ci.yml`'s own comments.
   cross-file contradictions survived (#88–#91).
 - **Coverage floors have no slack.** A deleted test file landed at 99.57%, and
   real regressions come to rest just under a threshold.
+- **A Dependabot PR on the root is a release decision.** `increase-if-necessary`
+  with no root lockfile opens one only when a release leaves the caret. At `0.x`
+  that is every `flutter_checkbox` minor, and through the barrel each one is an
+  API change here, so the root gets one PR per dependency, never a group. The
+  `minimum` job is what answers whether the raised floor still holds.
+  The example's PRs are grouped, because nothing ships from there.
 - **Formatter drift:** if local `dart format` disagrees with CI stable on an
   untouched `main`, the drift is not your change. Format only the files you
   touched (#103).
@@ -47,7 +53,7 @@ reasons are stated in `ci.yml`'s own comments.
 - `tool/check_api_coverage.dart` — `main`, `readDeclarations`, `readCallSites`, `_declSources`
 - `lib/flutter_dropdown_button.dart` — `CheckboxShape`, `CheckboxStyle`, `WheelMotion`, `SpringWheelMotion`, `CurveWheelMotion`, `LerpWheelMotion`
 
-Not Dart, so they cannot be symbol-checked: `pubspec.yaml`, `CHANGELOG.md`, `README.md`, `documentation/*.md`, `.github/workflows/ci.yml`.
+Not Dart, so they cannot be symbol-checked: `pubspec.yaml`, `CHANGELOG.md`, `README.md`, `documentation/*.md`, `.github/workflows/ci.yml`, `.github/dependabot.yml`.
 
 ## Reference behaviour
 
