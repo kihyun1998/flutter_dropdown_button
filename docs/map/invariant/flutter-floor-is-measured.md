@@ -26,8 +26,9 @@ the SDK they are compiled against.
   floor and `TickerMode.of` is deprecated above it (the comment in
   `DropdownOverlayController.close`, #106).
 - [Semantics](../territory/semantics.md) — at the floor, the empty-state text
-  merged into the search field's node (#90); `_buildOverlayContent` now wraps
-  the empty state in `Semantics(container: true)`.
+  merged into the search field's node (found in #90's floor-only red,
+  fixed in #96); `_buildOverlayContent` now wraps the empty state in
+  `Semantics(container: true)`.
 - [Multi-select](../territory/multi-select.md) — `flutter_checkbox`'s declared
   floor is read per pinned version.
 - [Scroll chrome](../territory/scroll-chrome.md) — `flutter_smooth_wheel_scroll`'s
@@ -54,7 +55,7 @@ from a number a dependency declared in a different version.
    needed.
 3. **#90**: a test was red only at the floor. The failure message was widened
    rather than the assertion loosened, which exposed the empty state merging
-   into the field's node at the floor.
+   into the field's node at the floor. The fix landed in #96.
 4. **#106**: the design was fixed by asking `flutter analyze` while the probe
    still used `TickerMode.of`.
 

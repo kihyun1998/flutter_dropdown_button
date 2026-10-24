@@ -29,9 +29,11 @@ passes through "just the field the caller set".
   inserts a `ScrollbarTheme` only when `ResolvedScrollStyle.overridesScrollbarTheme`.
   Thickness falls back to `_restingScrollbarThickness`, the value Flutter would
   have used (ambient `ScrollbarTheme` first, else 4 on Android, 8 elsewhere).
-- [Text items](../territory/text-items.md) — `config.semanticsLabel` replaces
-  the read-out, so `TextItemPresentation` applies it only in `buildSelected`,
-  never per row in `buildItem`.
+- [Text items](../territory/text-items.md) — `Text.semanticsLabel` replaces
+  what is read, so the package never fills it: both text presentations'
+  `buildSelected` attach `config.semanticsLabel` with a merging
+  `Semantics(label:)`, never per row, and `SmartTooltipText.semanticsLabel` is
+  passed by no caller in `lib/`. The rule holds here by avoiding the slot.
 - [Semantics](../territory/semantics.md) — rule 3: a node with a role and no
   enabled state reads as unbreakable.
 
