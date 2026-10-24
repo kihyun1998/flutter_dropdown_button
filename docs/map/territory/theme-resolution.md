@@ -11,10 +11,10 @@ decides nothing with them itself.
 
 ## Governing decisions
 
-**None.** Both rules this area lives by are stated in
-[CLAUDE.md](../../../CLAUDE.md#identity--invariants-the-boundary), not in a
-record: *a resolved style is complete, or it is null*, and the *dead-field
-detector*. #9 (closed `wontfix`) is the recorded negative result:
+**None.** Neither rule this area lives by is in a record: *a resolved style is
+complete, or it is null* is stated in
+[CLAUDE.md](../../../CLAUDE.md#identity--invariants-the-boundary), and the
+*dead-field detector* is held below, under the design model. #9 (closed `wontfix`) is the recorded negative result:
 `backgroundColor` on three classes is duplicated in name, not in concept.
 
 ## Design model
