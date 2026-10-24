@@ -38,6 +38,14 @@ flag for different purposes and do not know about one another.
 - [Single-select](../territory/single-select.md) — `closeOnTap: true` starts a
   close on every row tap, so a second tap lands in the reverse and must not
   select (`test/disabled_open_menu_test.dart`, `SingleHost`).
+- [Single-open](../territory/single-open.md) — `_openPerOverlay` keeps a
+  closing menu until `_teardown`, and `open()`'s reopen branch returns before it
+  re-claims the registry.
+- Toggling, in two places that do not call each other:
+  `DropdownOverlayController.toggle` and `_DropdownMenuShellState._toggleDropdown`
+  both choose close-or-open by `isOpen`, so a toggle mid-close closes again
+  ([overlay lifetime](../territory/overlay-lifetime.md),
+  [trigger button](../territory/trigger-button.md)).
 
 ## What a violation looks like
 

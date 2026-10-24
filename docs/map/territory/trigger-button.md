@@ -109,5 +109,9 @@ The sizing behaviour has **not** been compared against `DropdownButton`'s
 - Keyboard operation beyond activation (arrow keys, Escape, type-ahead) does not
   exist. [ADR 0001](../../adr/0001-accessibility-semantics-are-attached-by-hand.md#what-this-record-does-not-cover)
   excludes it by name.
+- `_DropdownMenuShellState._toggleDropdown` picks close or open by
+  `_menu.isOpen`, so a trigger tap during the close animation closes again
+  instead of reopening (read, not measured; see
+  [the entry outlives the open menu](../invariant/entry-outlives-the-open-menu.md)).
 - `FlutterDropdownButton.anchorBuilder`'s dartdoc says the overlay keeps
   "keyboard navigation" in bare mode. Only activation exists (see above).

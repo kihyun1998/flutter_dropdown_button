@@ -64,6 +64,8 @@ Tests: `test/text_label_test.dart`, `test/semantics_label_test.dart`, `test/disa
 - [A resolved style is complete or null](../invariant/resolved-style-complete-or-null.md).
   `Text.semanticsLabel` replaces what is read. The package always hands it null
   and puts the label on a merging `Semantics` wrapper instead (#32, #37).
+- [The text presentations render a config alike](../invariant/text-presentations-render-config-alike.md). `TextItemPresentation` is the single-select copy of the five
+  config-rendering concerns.
 
 ## Blast radius
 

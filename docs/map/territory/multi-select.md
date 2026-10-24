@@ -84,6 +84,8 @@ Tests: `test/multi_select_test.dart`, `test/presentation/multi_select_presentati
   `flutter_checkbox`'s own floor is read at the version pinned: 0.3.0 declared
   `>=3.35.0`, 0.3.1 `>=3.27.0`, so the floor stayed at 3.32
   ([lessons, #80/#81](../../agents/lessons.md); CHANGELOG 4.0.0).
+- [The text presentations render a config alike](../invariant/text-presentations-render-config-alike.md). `MultiSelectPresentation` is the checklist copy of the five
+  config-rendering concerns.
 
 ## Blast radius
 

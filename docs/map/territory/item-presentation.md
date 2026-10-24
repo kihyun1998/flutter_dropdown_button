@@ -78,6 +78,8 @@ custom rendering from text rendering.
 
 - [No cached derived state](../invariant/no-cached-derived-state.md). The
   presentation is rebuilt on every build and never cached.
+- [The text presentations render a config alike](../invariant/text-presentations-render-config-alike.md). The two text implementations of this interface
+  duplicate how a config becomes text.
 
 ## Blast radius
 
@@ -107,10 +109,6 @@ custom rendering from text rendering.
   own `selected` and splits the node in two. This is documented on
   `CustomItemPresentation.buildItem`, not governed
   ([ADR 0001 non-scope](../../adr/0001-accessibility-semantics-are-attached-by-hand.md#what-this-record-does-not-cover)).
-- `TextItemPresentation` and `MultiSelectPresentation` repeat the same
-  `labelOf`, `_text`, `defaultSearchFilter` and disabled-style merge. Nothing
-  shares them, so the #37 failure mode (one copy drifts) can come back between
-  the two classes.
 - The comment on `_DropdownMenuShellState._visibleItems` says "text mode is the
   only one that can" supply a default filter. `MultiSelectPresentation` supplies
   one too. The comment is stale; the behaviour is fine.

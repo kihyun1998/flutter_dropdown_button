@@ -26,7 +26,10 @@ passes through "just the field the caller set".
   returns null unless a box slot is set, then a `BoxDecoration` with the default
   background and radius filled in.
 - [Scroll chrome](../territory/scroll-chrome.md) — `_applyScrollbarTheme`
-  inserts a `ScrollbarTheme` only when `ResolvedScrollStyle.overridesScrollbarTheme`.
+  inserts a `ScrollbarTheme` only when `ResolvedScrollStyle.overridesScrollbarTheme`
+  (the null half). The inserted data is built from the caller's slots alone and
+  does not fold in the ambient theme, so the complete half is open: see
+  scroll-chrome's `## Known holes / open`.
   Thickness falls back to `_restingScrollbarThickness`, the value Flutter would
   have used (ambient `ScrollbarTheme` first, else 4 on Android, 8 elsewhere).
 - [Text items](../territory/text-items.md) — `Text.semanticsLabel` replaces

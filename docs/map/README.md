@@ -1,7 +1,7 @@
 # Map — flutter_dropdown_button
 
 <!-- grill-map build stamp: 8e5a943 -->
-<!-- grill-map synced at: c0e5b95 (2026-10-24) -->
+<!-- grill-map synced at: ec98814 (2026-10-24) -->
 
 A dependency graph over what this package *does*. It answers two questions that
 no ADR, issue or CHANGELOG entry is indexed by:
@@ -27,29 +27,34 @@ no ADR, issue or CHANGELOG entry is indexed by:
 
 ## Why this layer exists
 
-Six facts in this repo were each discovered three or four times at different
-sites before anyone wrote them down once. Every invariant note's
+Six of the seven invariant notes are facts that were each discovered three or
+four times at different sites before anyone wrote them down once; each note's
 `## Discovery history` carries the citations. The worst was chrome height: it
 broke in 2.3.2 and again in 2.5.0, and was refactored onto one getter in 3.0.0.
 A lens then found it being re-added by hand, and #96 hit it from the
 empty-state side. No ADR could have held it, because nobody ever *decided* it.
+The seventh, [the text presentations render a config alike](invariant/text-presentations-render-config-alike.md),
+was promoted before its second occurrence (maintainer, 2026-10-24).
 
-## Measured at build time
+## Shape of the repo
 
-- **M1:** the barrel exports 34 public types. Two areas have a governing
-  record: semantics ([ADR 0001](../adr/0001-accessibility-semantics-are-attached-by-hand.md))
-  and the dismiss barrier ([ADR 0002](../adr/0002-the-dismiss-barrier-stays-its-arena-participation-is-conditional.md)).
-  Placement, overlay lifetime, single-open, theme resolution, search, tooltip,
-  scroll chrome and multi-select are governed by none. Their rules live in
-  CLAUDE.md, source comments, and closed issues.
-- **M2:** "overlay" is *mentioned* in both ADRs and is the *subject* of neither.
-- **M3:** `dropdown_menu_shell.dart` is 16% of `lib/`, and this map splits it
-  across five territories. `dropdown_overlay_controller.dart` holds two
-  registries with different lifetimes, and they get separate treatment.
-- **M4/M5:** no forward-looking promise in `lib/`, `documentation/` or the ADRs
-  points at an open issue, and there were zero open issues. Every open item in
-  this map is either an ADR's named conformance gap or an observation recorded
-  under `## Known holes / open`.
+`lib/` is two public widgets over one shell. `FlutterDropdownButton` and
+`FlutterMultiSelectDropdown` are policy (single-select, multi-select); the
+`DropdownMenuShell` draws the trigger and the menu content; the exported
+`DropdownOverlayController` owns the entry, single-open, dismissal and the
+measure half of placement. Two areas have a governing record — semantics
+([ADR 0001](../adr/0001-accessibility-semantics-are-attached-by-hand.md)) and
+the dismiss barrier ([ADR 0002](../adr/0002-the-dismiss-barrier-stays-its-arena-participation-is-conditional.md))
+— and "overlay" is *mentioned* in both and the *subject* of neither. The rest
+live by `CLAUDE.md`, source comments and closed issues; the queries below list
+them. The shell and the controller are the two largest files in `lib/`
+(`find lib -name '*.dart' | xargs wc -l | sort -n`), which is why the shell is
+split across several territories and the controller's two registries
+(`_openPerOverlay`, `_instances`) are treated apart.
+
+There were zero open issues at the synced-at commit. Every open item in this
+map is an ADR's named conformance gap or an observation under a note's
+`## Known holes / open`.
 
 ## Conventions
 
@@ -87,8 +92,9 @@ ls docs/map/territory/ docs/map/invariant/
 
 ## Coverage
 
-**Complete for `lib/`, `example/` and the release surfaces as of the build
-stamp.** Every file under `lib/src/` appears under some territory's `## Code`.
+**Complete for `lib/`, `example/` and the release surfaces as of the synced-at
+commit.** `docs/` (this map, the ADRs, `docs/agents/`) is out of scope: it
+describes the system rather than being part of it. Every file under `lib/src/` appears under some territory's `## Code`.
 A missing note therefore means a new area. **A territory is owed** when a
 change adds a public type that no existing territory's `## Code` names. **An
 invariant is owed** when the promotion test above says yes.
@@ -103,6 +109,7 @@ Territories: [placement](territory/placement.md) ·
 [theme resolution](territory/theme-resolution.md) · [search](territory/search.md) ·
 [text items](territory/text-items.md) · [tooltip](territory/tooltip.md) ·
 [scroll chrome](territory/scroll-chrome.md) · [multi-select](territory/multi-select.md) ·
+[single-select](territory/single-select.md) ·
 [release surfaces](territory/release-surfaces.md) · [example gallery](territory/example-gallery.md)
 
 Invariants: [chrome height has one source](invariant/chrome-height-one-source.md) ·
@@ -110,4 +117,5 @@ Invariants: [chrome height has one source](invariant/chrome-height-one-source.md
 [the overlay does not rebuild with its owner](invariant/overlay-does-not-rebuild-with-owner.md) ·
 [the entry outlives the open menu](invariant/entry-outlives-the-open-menu.md) ·
 [a resolved style is complete or null](invariant/resolved-style-complete-or-null.md) ·
-[the Flutter floor is measured, not read](invariant/flutter-floor-is-measured.md)
+[the Flutter floor is measured, not read](invariant/flutter-floor-is-measured.md) ·
+[the text presentations render a config alike](invariant/text-presentations-render-config-alike.md)

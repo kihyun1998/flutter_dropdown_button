@@ -19,13 +19,12 @@ site is locally correct against its own idea of the sum.
 
 ## Territories it holds in
 
-- [Placement](../territory/placement.md) — `DropdownPlacement.resolve` adds
-  `DropdownPlacementInput.chromeHeight` on top of the capped item height (and on
-  top of `minVisibleItems` rows when shrinking to fit).
-- [Overlay lifetime](../territory/overlay-lifetime.md) —
-  `DropdownOverlayController.measurePlacement` fills that input with
-  `spec().totalChromeHeight`. Placement never sees the getter itself, so this is
-  where the grow side is bound to it.
+- [Placement](../territory/placement.md) — the grow side.
+  `DropdownOverlayController.measurePlacement` (placement's reading half) fills
+  `DropdownPlacementInput.chromeHeight` with `spec().totalChromeHeight`, and the
+  pure `DropdownPlacement.resolve` adds it on top of the capped item height (and
+  on top of `minVisibleItems` rows when shrinking to fit). `resolve` never sees
+  the getter, so `measurePlacement` is where the grow side is bound to it.
 - [Menu shell](../territory/menu-shell.md) — `_buildOverlayContent` computes
   `availableContentHeight` from `_buildSpec().totalChromeHeight`.
 - [Theme resolution](../territory/theme-resolution.md) —
