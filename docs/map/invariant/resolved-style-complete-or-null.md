@@ -36,6 +36,10 @@ passes through "just the field the caller set".
   passed by no caller in `lib/`. The rule holds here by avoiding the slot.
 - [Semantics](../territory/semantics.md) — rule 3: a node with a role and no
   enabled state reads as unbreakable.
+- [Search](../territory/search.md) — `SearchFieldTheme.resolve`'s default
+  decoration fills `disabledBorder`, because that slot replaces Flutter's outline
+  rather than inheriting `enabledBorder`; the slot became reachable when a
+  disabled dropdown started disabling its field (#89).
 
 ## What a violation looks like
 

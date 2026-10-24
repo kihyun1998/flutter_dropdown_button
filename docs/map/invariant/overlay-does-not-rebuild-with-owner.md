@@ -29,6 +29,10 @@ one looks like "works until you close and reopen".
   across the owner's `setState`, and only `rebuild()` repaints the boxes.
 - [Dismissal](../territory/dismissal.md) — becoming disabled while open must
   rebuild *before* it closes, or the fading rows keep enabled callbacks.
+- [Single-select](../territory/single-select.md) — a new `value`, or
+  `enabled: false` when the list shrinks to one item, reaches an open menu only
+  through the shell's post-frame `rebuild()` (`test/disabled_open_menu_test.dart`,
+  the `disableWhenSingleItem` group).
 
 ## What a violation looks like
 

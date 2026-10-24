@@ -35,6 +35,9 @@ flag for different purposes and do not know about one another.
   true through the reverse. That is deliberate: [ADR 0001](../../adr/0001-accessibility-semantics-are-attached-by-hand.md#what-these-contradict)
   clears it "as long as both keep reading `isOpen`", meaning the node and the
   chevron a caller draws from the same flag.
+- [Single-select](../territory/single-select.md) — `closeOnTap: true` starts a
+  close on every row tap, so a second tap lands in the reverse and must not
+  select (`test/disabled_open_menu_test.dart`, `SingleHost`).
 
 ## What a violation looks like
 

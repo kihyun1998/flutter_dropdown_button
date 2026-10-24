@@ -29,6 +29,9 @@ territory for the same reason, but each one discovered it separately.
   is rebuilt per build (`_FlutterDropdownButtonState._presentation` is a getter;
   `FlutterMultiSelectDropdown.build` constructs `MultiSelectPresentation` inline),
   and caching it was rejected (#50).
+- [Single-select](../territory/single-select.md) — `_isSingleItemDisabled`,
+  `isEnabled`, `_showTrailing` and `_presentation` are getters on
+  `_FlutterDropdownButtonState`, recomputed from `widget.*` on every read.
 
 ## What a violation looks like
 
