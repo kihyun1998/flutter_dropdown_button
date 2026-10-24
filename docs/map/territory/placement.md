@@ -66,6 +66,10 @@ it as a settled divergence. No placement rule here has been checked against
   both places at once.
 - [Overlay lifetime](overlay-lifetime.md) — `measurePlacement` is the only
   caller, and a `null` result draws nothing (`SizedBox.shrink`).
+- [Dismissal](dismissal.md) — the menu is placed once per overlay build and
+  never follows a moving anchor; closing on an ancestor scroll
+  (`_handleScroll`) is what keeps it from being left stranded. Making placement
+  follow the anchor reopens whether scrolling still closes.
 - [Theme resolution](theme-resolution.md) — `SearchFieldTheme` and
   `DropdownOverlayTheme` supply chrome heights (search `totalHeight`, overlay
   `padding`, `borderThickness`).

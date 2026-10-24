@@ -73,6 +73,9 @@ Scroll dismissal has **not** been compared against any reference.
   with `ExcludeSemantics` prunes the whole menu.
 - [Trigger button](trigger-button.md) — both anchor paths must publish
   `triggerEnabled` for the veto to be honest.
+- [Placement](placement.md) — scroll dismissal exists because placement does not
+  track the anchor (`measurePlacement` runs per overlay build). Dropping the
+  close leaves a scrolled menu at coordinates that no longer point at the anchor.
 - [Release surfaces](release-surfaces.md) — both widgets' class dartdoc advertise
   the consumed tap, the sibling-swap exception and scroll dismissal.
 
