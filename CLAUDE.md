@@ -79,7 +79,8 @@ it, not as a fresh decision. The reading rules are in `docs/agents/domain.md`.
 **Map.** `docs/map/README.md` is the territory map: one note per area of what
 the package does, one per cross-cutting invariant. Open the territory note
 before the design is fixed; update its `## Code` and `## Blast radius` after the
-change.
+change. At the first fix, ask *does this hold at every site that shares the same
+assumption?* — if yes, the fix lands with an invariant note.
 
 **Comments.** A comment says what the code is. Why it is this way, what it
 deliberately leaves out, the trap and the measured value go to the territory

@@ -1,6 +1,7 @@
 # Map — flutter_dropdown_button
 
-<!-- grill-map build stamp: 1831304 -->
+<!-- grill-map build stamp: 8e5a943 -->
+<!-- grill-map synced at: c0e5b95 (2026-10-24) -->
 
 A dependency graph over what this package *does*. It answers two questions that
 no ADR, issue or CHANGELOG entry is indexed by:
