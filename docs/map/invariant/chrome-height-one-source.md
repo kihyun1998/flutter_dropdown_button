@@ -12,22 +12,30 @@ for this reason.
 ## Why it is cross-cutting
 
 Three places touch the number, and none of them calls another to agree on it.
-The resolved search-field style *produces* one term, placement *adds* the total,
-and the shell *subtracts* it. They share an assumption about what counts as
+The resolved search-field style *produces* one term, placement *adds* the total
+it is handed, and the shell *subtracts* it. They share an assumption about what counts as
 chrome, not a call path. So no territory-to-territory edge could carry it: each
 site is locally correct against its own idea of the sum.
 
 ## Territories it holds in
 
 - [Placement](../territory/placement.md) — `DropdownPlacement.resolve` adds
-  `chromeHeight` on top of the capped item height.
+  `DropdownPlacementInput.chromeHeight` on top of the capped item height (and on
+  top of `minVisibleItems` rows when shrinking to fit).
+- [Overlay lifetime](../territory/overlay-lifetime.md) —
+  `DropdownOverlayController.measurePlacement` fills that input with
+  `spec().totalChromeHeight`. Placement never sees the getter itself, so this is
+  where the grow side is bound to it.
 - [Menu shell](../territory/menu-shell.md) — `_buildOverlayContent` computes
   `availableContentHeight` from `_buildSpec().totalChromeHeight`.
 - [Theme resolution](../territory/theme-resolution.md) —
-  `ResolvedSearchFieldStyle.totalHeight` and `ResolvedOverlayStyle.borderThickness`
-  are the terms.
+  `ResolvedSearchFieldStyle.totalHeight` (field height + vertical margin +
+  `dividerHeight`, in `SearchFieldTheme.resolve`) and
+  `ResolvedOverlayStyle.borderThickness` are the terms; `DropdownOverlayTheme.padding`
+  is the third.
 - [Search](../territory/search.md) — the field and its divider are the tallest
-  term, and the divider is drawn at the height reserved for it.
+  term, and `_DropdownMenuShellState._buildSearchField` draws the divider inside
+  a `SizedBox(height: dividerHeight)`, the height reserved for it.
 
 ## What a violation looks like
 
@@ -43,9 +51,10 @@ is why it passed twice.
    of adding it to the overlay, so a 3-item menu scrolled.
 2. **2.5.0**: a hardcoded `1.0` divider reservation against Flutter's 16px
    `Divider()` overflowed by 15px.
-3. **3.0.0** refactor: the content area moved onto `totalChromeHeight`, because
-   "the grow and the shrink … disagreed in 2.3.2 and again in 2.5.0"
-   (CHANGELOG), and a lens found the widget re-adding it by hand
+3. **3.0.0** refactor: the content area moved onto `totalChromeHeight`, "so the
+   grow and the shrink can no longer disagree — which is what they did in 2.3.2
+   and again in 2.5.0" (CHANGELOG, 3.0.0), and a lens found the widget re-adding
+   it by hand
    ([lessons, Step 5](../../agents/lessons.md#step-5--적대적-검증-서로-다른-렌즈)).
 4. **#96**: an empty menu opened chrome-only (200×2), because the item term was
    zero. That fix went down into placement (`emptyStateHeight`).

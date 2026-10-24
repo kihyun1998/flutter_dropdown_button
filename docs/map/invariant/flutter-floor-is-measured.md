@@ -18,16 +18,23 @@ the SDK they are compiled against.
 
 ## Territories it holds in
 
-- [Tooltip](../territory/tooltip.md) — `Tooltip.constraints` is what set the floor.
-- [Overlay lifetime](../territory/overlay-lifetime.md) — the ticker fallback
-  exists because `TickerMode.valuesOf` is missing at the floor and `TickerMode.of`
-  is deprecated above it.
+- [Tooltip](../territory/tooltip.md) — `SmartTooltipText` passes
+  `Tooltip.constraints`, which `ci.yml`'s `minimum` entry records as absent
+  before the floor: that API is what set it.
+- [Overlay lifetime](../territory/overlay-lifetime.md) — `close()`'s
+  `_closeFallback` timer exists because `TickerMode.valuesOf` is missing at the
+  floor and `TickerMode.of` is deprecated above it (the comment in
+  `DropdownOverlayController.close`, #106).
 - [Semantics](../territory/semantics.md) — at the floor, the empty-state text
-  merges into the search field's node.
+  merged into the search field's node (#90); `_buildOverlayContent` now wraps
+  the empty state in `Semantics(container: true)`.
 - [Multi-select](../territory/multi-select.md) — `flutter_checkbox`'s declared
   floor is read per pinned version.
 - [Scroll chrome](../territory/scroll-chrome.md) — `flutter_smooth_wheel_scroll`'s
-  declared floor, and the `SpringDescription.withDurationAndBounce` it calls.
+  declared floor (0.1.3's environment is unchanged from 0.1.2: commit 88e089c,
+  2026-09-23), and the `SpringDescription.withDurationAndBounce` it calls
+  upstream (commit eb67b58, 2026-09-23 — upstream source, not checkable in this
+  repo).
 - [Release surfaces](../territory/release-surfaces.md) — the `minimum` CI job
   enforces all of the above.
 

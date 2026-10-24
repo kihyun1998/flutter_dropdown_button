@@ -22,13 +22,16 @@ passes through "just the field the caller set".
 
 - [Theme resolution](../territory/theme-resolution.md) — every `resolve()` is
   where the rule is satisfied or broken.
-- [Tooltip](../territory/tooltip.md) — `_resolveDecoration` returns null, or a
-  box with the default background and radius filled in.
-- [Scroll chrome](../territory/scroll-chrome.md) — `ScrollbarTheme` is inserted
-  only when one of its slots is set. Thickness is named as the value Flutter
-  would have used.
-- [Text items](../territory/text-items.md) — `semanticsLabel` replaces the
-  read-out, so it describes the whole control.
+- [Tooltip](../territory/tooltip.md) — `DropdownTooltipTheme._resolveDecoration`
+  returns null unless a box slot is set, then a `BoxDecoration` with the default
+  background and radius filled in.
+- [Scroll chrome](../territory/scroll-chrome.md) — `_applyScrollbarTheme`
+  inserts a `ScrollbarTheme` only when `ResolvedScrollStyle.overridesScrollbarTheme`.
+  Thickness falls back to `_restingScrollbarThickness`, the value Flutter would
+  have used (ambient `ScrollbarTheme` first, else 4 on Android, 8 elsewhere).
+- [Text items](../territory/text-items.md) — `config.semanticsLabel` replaces
+  the read-out, so `TextItemPresentation` applies it only in `buildSelected`,
+  never per row in `buildItem`.
 - [Semantics](../territory/semantics.md) — rule 3: a node with a role and no
   enabled state reads as unbreakable.
 
