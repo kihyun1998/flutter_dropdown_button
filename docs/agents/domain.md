@@ -13,12 +13,17 @@ If any of these files don't exist, **proceed silently**. Don't flag their absenc
 
 `GLOSSARY.md` does not exist yet in this repo. That is expected.
 
-`docs/adr/` does, as of #88, and holds one record:
+`docs/adr/` does, and holds two records:
 
 - **[0001 — Accessibility semantics are attached by hand, and the word for a
   state is the presentation's](../adr/0001-accessibility-semantics-are-attached-by-hand.md)**
-  — read it before touching anything that emits `Semantics`, and file work in
-  that area as a conformance item under it rather than as a fresh decision.
+  (#88) — read it before touching anything that emits `Semantics`.
+- **[0002 — The dismiss barrier stays; what is conditional is its arena
+  participation](../adr/0002-the-dismiss-barrier-stays-its-arena-participation-is-conditional.md)**
+  (#105) — read it before touching the barrier or pointer ownership.
+
+File work in either area as a conformance item under the matching record rather
+than as a fresh decision.
 
 ## File structure
 
@@ -27,8 +32,8 @@ If any of these files don't exist, **proceed silently**. Don't flag their absenc
 ├── GLOSSARY.md
 ├── docs/
 │   ├── adr/
-│   │   ├── 0001-overlay-based-rendering.md
-│   │   └── 0002-shared-dropdown-mixin.md
+│   │   ├── 0001-accessibility-semantics-are-attached-by-hand.md
+│   │   └── 0002-the-dismiss-barrier-stays-its-arena-participation-is-conditional.md
 │   └── agents/
 └── lib/
 ```

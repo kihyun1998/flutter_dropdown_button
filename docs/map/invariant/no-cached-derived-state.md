@@ -21,9 +21,17 @@ territory for the same reason, but each one discovered it separately.
 - [Search](../territory/search.md) —
   `DropdownSearchController.visibleItems` derives on each call.
 - [Menu shell](../territory/menu-shell.md) — `_visibleItems()` asks the
-  controller on each build. There is no `_filteredItems`.
+  search controller on each overlay build (the same site as search's, not a
+  second one), and the resolved styles are getters (`_buttonStyle`,
+  `_overlayStyle`, `_searchStyle`) that resolve on every read. There is no
+  `_filteredItems` and no stored `Resolved*` field.
 - [Item presentation](../territory/item-presentation.md) — the presentation
-  is rebuilt per build, and caching it was rejected (#50).
+  is rebuilt per build (`_FlutterDropdownButtonState._presentation` is a getter;
+  `FlutterMultiSelectDropdown.build` constructs `MultiSelectPresentation` inline),
+  and caching it was rejected (#50).
+- [Single-select](../territory/single-select.md) — `_isSingleItemDisabled`,
+  `isEnabled`, `_showTrailing` and `_presentation` are getters on
+  `_FlutterDropdownButtonState`, recomputed from `widget.*` on every read.
 
 ## What a violation looks like
 
@@ -41,7 +49,8 @@ build.
    invalidation sites and was wrong at three
    ([lessons, Step 1](../../agents/lessons.md#step-1--이슈-먼저-근거기각-대안부정-결과), #50).
 3. **#2**: an issue claimed mutating the list in place goes stale. A
-   characterization test showed it did not, because `openDropdown` re-derives.
+   characterization test showed it did not, because the open menu re-derives its items on build (then `openDropdown`;
+   today `_buildOverlayContent` calls `_visibleItems()`).
    The rule held somewhere nobody had checked.
 4. **#50**: caching `_presentation` per build was proposed and rejected on this
    ground. The rejection is recorded so that it is not proposed a second time.

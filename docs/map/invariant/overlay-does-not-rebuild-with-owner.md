@@ -29,6 +29,10 @@ one looks like "works until you close and reopen".
   across the owner's `setState`, and only `rebuild()` repaints the boxes.
 - [Dismissal](../territory/dismissal.md) — becoming disabled while open must
   rebuild *before* it closes, or the fading rows keep enabled callbacks.
+- [Single-select](../territory/single-select.md) — a new `value`, or
+  `enabled: false` when the list shrinks to one item, reaches an open menu only
+  through the shell's post-frame `rebuild()` (`test/disabled_open_menu_test.dart`,
+  the `disableWhenSingleItem` group).
 
 ## What a violation looks like
 
@@ -65,3 +69,11 @@ again each time. #157: scroll-to-item was scheduled from the build and took the
 user's scroll back on every `setState` above the dropdown. A one-shot effect is
 armed by the event it belongs to (`onOpenStateChanged`) and spent in the build.
 Only idempotent work, such as reassigning `motion`, belongs in the build itself.
+
+The same holds for inherited widgets. The entry reads the tree through the
+owner's context (`measurePlacement` calls `MediaQuery.of` and `Overlay.of` on
+`_context`; `_watchScrollables` walks the owner's ancestors), but a change to
+an inherited widget marks the owner, not the entry, and the owner's
+`didChangeDependencies` refreshes only the scroll subscriptions
+(`refreshScrollables`). A rotation or a keyboard inset therefore re-places an
+open menu only when something else rebuilds it ([placement](../territory/placement.md)).

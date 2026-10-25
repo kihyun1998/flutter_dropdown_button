@@ -5,8 +5,7 @@
 Substantive changes (bug fix / feature / behavior change) follow the **`thegraph`**
 skill — run `/thegraph` at the start. This repo's references (which outside sources
 it is read against, and whether each binds) live in **`docs/agents/thegraph.md`**;
-the per-incident evidence (#2, #9, #32, #37, #38, #40, #45, #47, #50, #51, #59 …)
-in **`docs/agents/lessons.md`**. Read both before starting; add new war-stories to
+the per-incident evidence in **`docs/agents/lessons.md`**. Read both before starting; add new war-stories to
 lessons.
 
 This is a **published package with consumers**, so downstream verification and
@@ -14,9 +13,8 @@ post-release migration both apply (derive the consumer list on the spot — do n
 store it here).
 
 **Branch → PR (`Closes #issue`) → CI green → merge. Never commit to `main`.**
-`ci.yml` defines the gates, not this policy, so it is stated here or nowhere —
-`37113b8` went to `main` without a PR and broke the `format & publish check` job
-(#120). The release rides in the change's own commit, not a separate `chore:`
+`ci.yml` defines the gates, not this policy, so it is stated here or nowhere.
+The release rides in the change's own commit, not a separate `chore:`
 one, and `flutter pub publish` is irreversible: **the agent never runs it, the
 user does.**
 
@@ -42,55 +40,47 @@ of `DropdownMenuShell`:
 - **The recurring pattern:** every module separates *reading from the element
   tree* (needs a `BuildContext`) from *deciding with what was read* (pure). The
   second half is where the bugs are, and the half worth testing. Keep the split.
-- **A resolved style is complete, or it is null.** Several Flutter slots
-  *replace* the ambient theme rather than merge (`Tooltip.decoration`,
-  `ScrollbarTheme`, `Text.semanticsLabel`, `Scrollbar.thickness`) — fill every
-  slot the ambient default would, or hand Flutter nothing. Never a half-built value.
-- **Dead-field detector:** a documented, settable field that `resolve()` never
-  mentions is read by nothing. Making the themes resolve themselves turned the
-  architecture into the detector — check that first when auditing the API.
+- **A resolved style is complete, or it is null.** Where a Flutter slot
+  *replaces* the ambient theme rather than merging, fill every slot the ambient
+  default would, or hand Flutter nothing. Never a half-built value. The slots
+  that replace are listed in `docs/map/invariant/resolved-style-complete-or-null.md`.
+- **Auditing the API:** start with the dead-field detector in
+  `docs/map/territory/theme-resolution.md`.
 - **Mechanism is core; policy crosses the seam.** Core: geometry (`placement`),
   theme resolution, overlay lifetime + single-open, search-query derivation,
   presentation — each takes plain values and no `BuildContext`. The consumer owns
   selection semantics (`isChosen`/`onItemTap`/`closeOnTap`), `itemBuilder`, theme
   values.
 - **Contract ≠ defect.** A consumer report may be against behavior the core
-  deliberately holds. #59: a consumer set `trackColor`, no track appeared — neither
-  Flutter nor `lib/` was wrong; the broken invariant was **our dartdoc**, teaching
-  exactly that combination. Nothing in `lib/` changed but a comment.
+  deliberately holds. Fix the surface that is actually wrong, even when that is
+  only a dartdoc.
 - **A leaked `OverlayEntry` is the consumer's whole app, not this widget.** It
   stays as a dead layer swallowing taps, and once the widget is gone there is
   nothing left to recover it with — which is why overlay lifetime and the
   single-open registry get the completeness pass regardless of how cheap the
   change looks.
-- **`flutter_checkbox`'s public types are part of this package's API.**
-  `CheckboxShape` / `CheckboxStyle` are re-exported from this barrel, so at `0.x`
-  an upstream breaking change is a **breaking change here** — and its
-  `environment` floor and emitted semantics are read at the exact version pinned,
-  never carried across versions (#80, #81).
+- **Every package the barrel re-exports is part of this package's API**
+  (`grep '^export .package:' lib/flutter_dropdown_button.dart`). At `0.x` an
+  upstream breaking change is a **breaking change here** — and its `environment`
+  floor and emitted semantics are read at the exact version pinned, never carried
+  across versions.
 
 ## Agent skills
 
-**Issue tracker.** GitHub issues in `kihyun1998/flutter_dropdown_button`, via the
-`gh` CLI. Pull requests are not a triage surface. See `docs/agents/issue-tracker.md`.
+**Issue tracker.** Before reading or filing an issue, read
+`docs/agents/issue-tracker.md`.
 
-**Triage labels.** `needs-triage`, `needs-info`, `ready-for-agent`,
-`ready-for-human`, `wontfix`. Create a label with `gh label create` the first
-time it is used. See `docs/agents/triage-labels.md`.
+**Triage labels.** Before applying a label, read `docs/agents/triage-labels.md`.
 
-**Domain docs.** Single-context. `GLOSSARY.md` does not exist yet and its absence
-is expected — it is created lazily, when a term actually needs resolving.
-`docs/adr/` **does** exist and holds two records: **0001** (accessibility
-semantics are attached by hand) and **0002** (the dismiss barrier stays; its
-arena participation is conditional). Both were created the same lazy way, by a
-promotion. Anything touching semantics emission, or the barrier and pointer
-ownership, files as a conformance item under the matching record rather than as
-a fresh decision. See `docs/agents/domain.md`.
+**Domain docs.** Before touching semantics emission or the dismiss barrier, read
+the matching record in `docs/adr/` and file the work as a conformance item under
+it, not as a fresh decision. The reading rules are in `docs/agents/domain.md`.
 
 **Map.** `docs/map/README.md` is the territory map: one note per area of what
 the package does, one per cross-cutting invariant. Open the territory note
 before the design is fixed; update its `## Code` and `## Blast radius` after the
-change.
+change. At the first fix, ask *does this hold at every site that shares the same
+assumption?* — if yes, the fix lands with an invariant note.
 
 **Comments.** A comment says what the code is. Why it is this way, what it
 deliberately leaves out, the trap and the measured value go to the territory

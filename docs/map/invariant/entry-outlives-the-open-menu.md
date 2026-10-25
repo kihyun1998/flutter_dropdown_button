@@ -2,7 +2,7 @@
 
 ## The fact
 
-`DropdownOverlayController.isOpen` is `_entry != null`. The entry survives the
+`DropdownOverlayController.isOpen` is `_entry != null` (the `isOpen` getter). The entry survives the
 whole close animation, so `isOpen` is true while the menu is on its way out.
 "Is the menu open?" and "is the menu closing?" are two questions: `_closing`
 (or `animation.status == reverse`) answers the second. And the close animation
@@ -18,17 +18,34 @@ flag for different purposes and do not know about one another.
 
 ## Territories it holds in
 
-- [Overlay lifetime](../territory/overlay-lifetime.md) — `open()` must not treat
-  "open while closing" as open, and teardown must not depend on the ticker.
-- [Menu shell](../territory/menu-shell.md) — a row tap is refused both when
-  `!isOpen` (gone) and when the status is `reverse` (going).
+- [Overlay lifetime](../territory/overlay-lifetime.md) — `open()` reverses a
+  close in flight (`if (!_closing) return;`, then `_cancelClose` and `forward`)
+  rather than treating it as open, and `close()` races the reverse with
+  `_closeFallback`, a `Timer` that is not ticker-gated.
+- [Menu shell](../territory/menu-shell.md) — `_buildItemWrapper`'s `onTap`
+  refuses a row tap both when `!isOpen` (gone) and when
+  `animation.status == AnimationStatus.reverse` (going).
 - [Dismissal](../territory/dismissal.md) — `_handleScroll` guards on `_closing`,
   so that per-frame scroll notifications close only once.
-- [Trigger button](../territory/trigger-button.md) — the chevron rotation
-  follows the animation.
+- [Trigger button](../territory/trigger-button.md) — two readers on one
+  trigger: `anchorBuilder(context, isOpen)` hands the bare path's caller the
+  flag, while the chromed path's own chevron (`_iconRotation`) follows
+  `animation`, not `isOpen`, and so turns back during the reverse.
 - [Semantics](../territory/semantics.md) — `expanded` reads `isOpen` and stays
-  true through the reverse. That is deliberate, and it holds as long as the
-  chevron reads the same flag.
+  true through the reverse. That is deliberate: [ADR 0001](../../adr/0001-accessibility-semantics-are-attached-by-hand.md#what-these-contradict)
+  clears it "as long as both keep reading `isOpen`", meaning the node and the
+  chevron a caller draws from the same flag.
+- [Single-select](../territory/single-select.md) — `closeOnTap: true` starts a
+  close on every row tap, so a second tap lands in the reverse and must not
+  select (`test/disabled_open_menu_test.dart`, `SingleHost`).
+- [Single-open](../territory/single-open.md) — `_openPerOverlay` keeps a
+  closing menu until `_teardown`, and `open()`'s reopen branch returns before it
+  re-claims the registry.
+- Toggling, in two places that do not call each other:
+  `DropdownOverlayController.toggle` and `_DropdownMenuShellState._toggleDropdown`
+  both choose close-or-open by `isOpen`, so a toggle mid-close closes again
+  ([overlay lifetime](../territory/overlay-lifetime.md),
+  [trigger button](../territory/trigger-button.md)).
 
 ## What a violation looks like
 

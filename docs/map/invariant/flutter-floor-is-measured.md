@@ -18,16 +18,24 @@ the SDK they are compiled against.
 
 ## Territories it holds in
 
-- [Tooltip](../territory/tooltip.md) — `Tooltip.constraints` is what set the floor.
-- [Overlay lifetime](../territory/overlay-lifetime.md) — the ticker fallback
-  exists because `TickerMode.valuesOf` is missing at the floor and `TickerMode.of`
-  is deprecated above it.
+- [Tooltip](../territory/tooltip.md) — `SmartTooltipText` passes
+  `Tooltip.constraints`, which `ci.yml`'s `minimum` entry records as absent
+  before the floor: that API is what set it.
+- [Overlay lifetime](../territory/overlay-lifetime.md) — `close()`'s
+  `_closeFallback` timer exists because `TickerMode.valuesOf` is missing at the
+  floor and `TickerMode.of` is deprecated above it (the comment in
+  `DropdownOverlayController.close`, #106).
 - [Semantics](../territory/semantics.md) — at the floor, the empty-state text
-  merges into the search field's node.
+  merged into the search field's node (found in #90's floor-only red,
+  fixed in #96); `_buildOverlayContent` now wraps the empty state in
+  `Semantics(container: true)`.
 - [Multi-select](../territory/multi-select.md) — `flutter_checkbox`'s declared
   floor is read per pinned version.
 - [Scroll chrome](../territory/scroll-chrome.md) — `flutter_smooth_wheel_scroll`'s
-  declared floor, and the `SpringDescription.withDurationAndBounce` it calls.
+  declared floor (0.1.3's environment is unchanged from 0.1.2: commit 88e089c,
+  2026-09-23), and the `SpringDescription.withDurationAndBounce` it calls
+  upstream (commit eb67b58, 2026-09-23 — upstream source, not checkable in this
+  repo).
 - [Release surfaces](../territory/release-surfaces.md) — the `minimum` CI job
   enforces all of the above.
 
@@ -47,7 +55,7 @@ from a number a dependency declared in a different version.
    needed.
 3. **#90**: a test was red only at the floor. The failure message was widened
    rather than the assertion loosened, which exposed the empty state merging
-   into the field's node at the floor.
+   into the field's node at the floor. The fix landed in #96.
 4. **#106**: the design was fixed by asking `flutter analyze` while the probe
    still used `TickerMode.of`.
 

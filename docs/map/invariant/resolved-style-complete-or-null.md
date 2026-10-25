@@ -22,15 +22,27 @@ passes through "just the field the caller set".
 
 - [Theme resolution](../territory/theme-resolution.md) — every `resolve()` is
   where the rule is satisfied or broken.
-- [Tooltip](../territory/tooltip.md) — `_resolveDecoration` returns null, or a
-  box with the default background and radius filled in.
-- [Scroll chrome](../territory/scroll-chrome.md) — `ScrollbarTheme` is inserted
-  only when one of its slots is set. Thickness is named as the value Flutter
-  would have used.
-- [Text items](../territory/text-items.md) — `semanticsLabel` replaces the
-  read-out, so it describes the whole control.
+- [Tooltip](../territory/tooltip.md) — `DropdownTooltipTheme._resolveDecoration`
+  returns null unless a box slot is set, then a `BoxDecoration` with the default
+  background and radius filled in.
+- [Scroll chrome](../territory/scroll-chrome.md) — `_applyScrollbarTheme`
+  inserts a `ScrollbarTheme` only when `ResolvedScrollStyle.overridesScrollbarTheme`
+  (the null half). The inserted data is built from the caller's slots alone and
+  does not fold in the ambient theme, so the complete half is open: see
+  scroll-chrome's `## Known holes / open`.
+  Thickness falls back to `_restingScrollbarThickness`, the value Flutter would
+  have used (ambient `ScrollbarTheme` first, else 4 on Android, 8 elsewhere).
+- [Text items](../territory/text-items.md) — `Text.semanticsLabel` replaces
+  what is read, so the package never fills it: both text presentations'
+  `buildSelected` attach `config.semanticsLabel` with a merging
+  `Semantics(label:)`, never per row, and `SmartTooltipText.semanticsLabel` is
+  passed by no caller in `lib/`. The rule holds here by avoiding the slot.
 - [Semantics](../territory/semantics.md) — rule 3: a node with a role and no
   enabled state reads as unbreakable.
+- [Search](../territory/search.md) — `SearchFieldTheme.resolve`'s default
+  decoration fills `disabledBorder`, because that slot replaces Flutter's outline
+  rather than inheriting `enabledBorder`; the slot became reachable when a
+  disabled dropdown started disabling its field (#89).
 
 ## What a violation looks like
 
