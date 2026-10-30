@@ -20,9 +20,9 @@ consumer.
 
 ## Governing decisions
 
-**None.** No record. The policy (branch → PR → CI green → merge; the user runs
-`flutter pub publish`) is stated in
-[CLAUDE.md](../../../CLAUDE.md#working-discipline--thegraph), and the gate
+**None.** No record. The policy (branch → PR → CI green → merge) is stated in
+[CLAUDE.md](../../../CLAUDE.md#working-discipline--thegraph), the release bar
+in `pub-ready`, and the gate
 reasons are stated in `ci.yml`'s own comments.
 
 ## Design model
@@ -30,10 +30,7 @@ reasons are stated in `ci.yml`'s own comments.
 From CLAUDE.md, `ci.yml`'s comments and the incidents cited; nothing is in a
 record.
 
-- **The next version comes from the registry, not the repo.** `pubspec.yaml` is
-  what will ship next, and pub.dev is what actually shipped. That also decides
-  whether a CHANGELOG section is still editable (#106,
-  [lessons, Step 7](../../agents/lessons.md#step-7--게이트--릴리스)).
+- Before a release, run `pub-ready`.
 - **CHANGELOG is a bug inventory.** A dartdoc-only change touches `lib/` and
   adds no entry — unless it is released on its own because pub.dev renders the
   dartdoc of the published version, as 4.2.1 was (#95/#102, dfe81d4).

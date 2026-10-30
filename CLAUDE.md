@@ -15,8 +15,7 @@ store it here).
 **Branch → PR (`Closes #issue`) → CI green → merge. Never commit to `main`.**
 `ci.yml` defines the gates, not this policy, so it is stated here or nowhere.
 The release rides in the change's own commit, not a separate `chore:`
-one, and `flutter pub publish` is irreversible: **the agent never runs it, the
-user does.**
+one. Before a release, run `pub-ready`.
 
 ## Identity & invariants (the boundary)
 
@@ -84,4 +83,8 @@ assumption?* — if yes, the fix lands with an invariant note.
 
 **Comments.** A comment says what the code is. Why it is this way, what it
 deliberately leaves out, the trap and the measured value go to the territory
-note under `docs/map/`; history goes to the commit message.
+note under `docs/map/`. Where none seems to hold it, search the folder and the
+code symbol first; only then start a new note, named for what the system does
+there, not for the file. History goes to the commit message. Comments written
+before this rule still carry the rest: never delete one whose content the map
+does not yet hold — move it there first.
