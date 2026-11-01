@@ -45,10 +45,10 @@ packages:
     dependency: "direct main"
     description:
       name: cupertino_icons
-      sha256: ba631d1c7f7bef6b729a622b7b752645a2d076dba9976925b8f25725a30e1ee6
+      sha256: b7cc2390aac296c083bea762859413eb1cf5b630c70e0c7e4d831018f762a8b2
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.8"
+    version: "2.0.0"
   fake_async:
     dependency: transitive
     description:
@@ -81,18 +81,18 @@ packages:
     dependency: "direct main"
     description:
       name: flutter_example_template
-      sha256: "7d3e06c4cf2afe5aa6e1cc4be0a9f840990b63932f9986340d20cb2566fbfd78"
+      sha256: d2d919fd6960f7d8b9f84caf6ae4c343e87dc3452f9d63de40f49f7ecef9e73f
       url: "https://pub.dev"
     source: hosted
-    version: "0.3.0"
+    version: "0.4.0"
   flutter_lints:
     dependency: "direct dev"
     description:
       name: flutter_lints
-      sha256: "5398f14efa795ffb7a33e9b6a08798b26a180edac4ad7db3f231e40f82ce11e1"
+      sha256: "3105dc8492f6183fb076ccf1f351ac3d60564bff92e20bfc4af9cc1651f4e7e1"
       url: "https://pub.dev"
     source: hosted
-    version: "5.0.0"
+    version: "6.0.0"
   flutter_smooth_wheel_scroll:
     dependency: transitive
     description:
@@ -105,10 +105,10 @@ packages:
     dependency: transitive
     description:
       name: flutter_syntax_highlight
-      sha256: b66d08374d09f076911374ec59c9444bf0555ebd96e4f51993c7bcc936086d38
+      sha256: "0d623fed7a34b5b644ce6b220e75c0f2ea66254ed521e13b6f6d39d390af1084"
       url: "https://pub.dev"
     source: hosted
-    version: "0.1.0"
+    version: "0.4.0"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -142,10 +142,10 @@ packages:
     dependency: transitive
     description:
       name: lints
-      sha256: c35bb79562d980e9a453fc715854e1ed39e24e7d0297a880ef54e17f9874a9d7
+      sha256: "12f842a479589fea194fe5c5a3095abc7be0c1f2ddfa9a0e76aed1dbd26a87df"
       url: "https://pub.dev"
     source: hosted
-    version: "5.1.1"
+    version: "6.1.0"
   matcher:
     dependency: transitive
     description:
