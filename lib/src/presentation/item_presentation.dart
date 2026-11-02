@@ -428,7 +428,7 @@ class MultiSelectPresentation<T> implements DropdownItemPresentation<T> {
                   : config.textStyle,
             ),
           ),
-          if (trailing != null) trailing,
+          ?trailing,
         ],
       ),
     );
