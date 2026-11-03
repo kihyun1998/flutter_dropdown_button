@@ -85,7 +85,7 @@ ls docs/map/territory/ docs/map/invariant/
   notes, so the graph view shows no edge to #95, even though it shaped three
   territories.
 - **Consumers are not in the map.** A change's reach into downstream apps is
-  derived per change, per [CLAUDE.md](../../CLAUDE.md#working-discipline--thegraph).
+  not tracked here or anywhere else in the repo.
 - **Blast edges are judgement, not a call graph.** The first real change is the
   test: before starting, write down from the map alone which territories you
   expect to touch, and compare afterwards. A miss is a missing edge.

@@ -8,10 +8,6 @@ it is read against, and whether each binds) live in **`docs/agents/thegraph.md`*
 the per-incident evidence in **`docs/agents/lessons.md`**. Read both before starting; add new war-stories to
 lessons.
 
-This is a **published package with consumers**, so downstream verification and
-post-release migration both apply (derive the consumer list on the spot — do not
-store it here).
-
 **Branch → PR (`Closes #issue`) → CI green → merge. Never commit to `main`.**
 `ci.yml` defines the gates, not this policy, so it is stated here or nowhere.
 The release rides in the change's own commit, not a separate `chore:`
